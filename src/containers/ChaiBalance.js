@@ -44,20 +44,22 @@ class ChaiBalanceContainer extends React.Component {
         const chaiBalance = store.get('chaiBalance')
         const chaiBalanceRaw = store.get('chaiBalanceRaw')
         const daiEquiv = chaiBalanceRaw ? toDai.bind(this)(chaiBalanceRaw).toFormat(5) : undefined
-      return <Card ><CardContent>
-        <h2>You have {chaiBalance ? daiEquiv : '0'} Dai brewing</h2>
-                 <CardMedia
-         component="img"
-                  style={{resizeMode: 'contain',     width: 100, float: 'right', paddingRight: 52
-}}
-        src={chaiBalance > 0 ? logogif : logostill}
-         />
-
-        <p>Chai balance: {chaiBalance ? `${chaiBalance}` : '-'}</p>
-        <p>1 CHAI = {chi ? `${chi}` : '?'} DAI</p>
-        <p>Dai Savings Rate: {dsrPercent ? `${dsrPercent}% per year` : '-'}</p>
-        <a target="_blank" href="/about.html" rel="noopener noreferrer">Learn more</a>
-        </CardContent></Card>
+        return (
+            <Card>
+                <CardContent>
+                    <h2>You have {chaiBalance ? daiEquiv : '0'} Dai brewing </h2>
+                    <CardMedia
+                        component="img"
+                        style={{resizeMode: 'contain', width: 100, float: 'right', paddingRight: 52 }}
+                        src={chaiBalance > 0 ? logogif : logostill}
+                    />
+                    <p> Chai balance: {chaiBalance ? `${chaiBalance}` : '-'} </p>
+                    <p> 1 CHAI = {chi ? `${chi}` : '?'} DAI </p>
+                    <p> Dai Savings Rate: {dsrPercent ? `${dsrPercent}% per year` : '-'} </p>
+                    <a target="_blank" href="/about.html" rel="noopener noreferrer"> Learn more </a>
+                </CardContent>
+            </Card> 
+        )
     }
 }
 

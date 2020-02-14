@@ -68,47 +68,49 @@ class NavContainer extends React.Component {
       const walletAddress = store.get('walletAddress')
       const web3Failure = store.get('web3Failure')
       const network = store.get('network')
-      return <Grid item sm={12}>
-              <Dialog
-                 open={
-                   network !== config.network}
-              >
-              <DialogTitle id="alert-dialog-title">{"Wrong network"}</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                   <p>Switch to mainnet to interact with this app</p>
-                </DialogContentText>
-              </DialogContent>
-            </Dialog>
-              <Dialog
-                  open={web3Failure}
-                  onClose={(event) => {store.set('web3Failure', false)}}
-              >
-              <DialogTitle id="alert-dialog-title">{"Failed to connect to web3"}</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                   <p>Unable to connect to wallet.</p>
-                   <a target="_blank" href="https://metamask.io/" rel="noopener noreferrer">Install metamask</a>
-                </DialogContentText>
-              </DialogContent>
-            </Dialog>
-        <Grid container className={classes.navContainer} alignItems='center'>
-          <Grid item sm={12} md={8}>
-            <img src={logostill} className={classes.logo} />
-            <div className={classes.title}>
-              <span className={classes.title}>chai.money</span>
-              <span className={classes.subtitle}>
-                 Accrue interest on your Dai by turning it into Chai.
-              </span>
-            </div>
-          </Grid>
-          <Grid item sm={12} md={4} className={classes.accountItem}>
-            <Button color='primary' onClick={() => { this.connect()}} variant={walletAddress ? 'text' : "contained"} className={classes.accountButton}>
-                      {walletAddress ? (walletAddress.slice(0,7) + '...' + walletAddress.slice(walletAddress.length - 5)) : 'Connect wallet'}
-            </Button>
+      return (
+        <Grid item sm={12}>
+          <Dialog
+              open={
+                network !== config.network}
+          >
+            <DialogTitle id="alert-dialog-title">{"Wrong network"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                  <p>Switch to Kovan to interact with this app</p>
+              </DialogContentText>
+            </DialogContent>
+          </Dialog>
+            <Dialog
+                open={web3Failure}
+                onClose={(event) => {store.set('web3Failure', false)}}
+            >
+            <DialogTitle id="alert-dialog-title">{"Failed to connect to web3"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                  <p>Unable to connect to wallet.</p>
+                  <a target="_blank" href="https://metamask.io/" rel="noopener noreferrer">Install metamask</a>
+              </DialogContentText>
+            </DialogContent>
+          </Dialog>
+          <Grid container className={classes.navContainer} alignItems='center'>
+            <Grid item sm={12} md={8}>
+              <img src={logostill} className={classes.logo} />
+              <div className={classes.title}>
+                <span className={classes.title}>chai.money</span>
+                <span className={classes.subtitle}>
+                  Accrue interest on your Dai by turning it into Chai.
+                </span>
+              </div>
+            </Grid>
+            <Grid item sm={12} md={4} className={classes.accountItem}>
+              <Button color='primary' onClick={() => { this.connect()}} variant={walletAddress ? 'text' : "contained"} className={classes.accountButton}>
+                        {walletAddress ? (walletAddress.slice(0,7) + '...' + walletAddress.slice(walletAddress.length - 5)) : 'Connect wallet'}
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
-    </Grid>
+      )
     }
 }
 

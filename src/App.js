@@ -49,7 +49,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider(config.defaultWeb3Provider
 const initialState = {
     web3: web3,
     web3Failure: false,
-    network: 1,
+    network: 55,
     potObject: new web3.eth.Contract(potABI, config.MCD_POT),
     daiObject: new web3.eth.Contract(daiABI, config.MCD_DAI),
     chaiObject: new web3.eth.Contract(chaiABI, config.CHAI),
@@ -77,12 +77,10 @@ const initialState = {
 class App extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-        }
+        this.state = { }
     }
 
-    async componentDidMount() {
-    }
+    async componentDidMount() { }
 
     render() {
         const classes = this.props.classes
@@ -92,13 +90,11 @@ class App extends React.Component {
                     <Grid container spacing={3}>
                         <Grid item xs={12}><br/></Grid>
                         <NavContainer />
-
                         <Grid item xs={12} md={6}>
                             <JoinExitContainer />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <ChaiBalanceContainer />
-
                         </Grid>
                         <Grid item xs={12}>
                           <TransferChaiContainer />

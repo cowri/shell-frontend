@@ -37,6 +37,22 @@ export const transfer = async function() {
     return chai.methods.transfer(transferAddress, transferAmount.toFixed()).send({from: walletAddress})
 }
 
+export const selectiveDeposit = async function () {
+    const { store } = this.props
+    const web3 = store.get('web3')
+    const loihi = store.get('loihiObject')
+    const amounts = store.get('selectAmounts')
+}
+
+export const proportionalWithdraw = async function () {
+    const { store } = this.props 
+    const web3 = store.get('web3')
+    const loihi = store.get('loihiObject')
+    const amount = store.get('depositAmount')
+    const walletAddress = store.get('walletAddress')
+    // return loihi.methods.proportionalDeposit
+}
+
 export default {
     join,
     exit,

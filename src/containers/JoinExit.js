@@ -73,17 +73,11 @@ class JoinExitContainer extends React.Component {
       try {
         value = new WadDecimal(event.target.value)
       } catch {
-        if (event.target.value.length === 0) {
-          value = new WadDecimal(0)
-        } else {
-          return
-        }
+        if (event.target.value.length === 0) value = new WadDecimal(0)
+        else return
       }
-      if (action === 0) {
-        store.set('joinAmount', value)
-      } else {
-        store.set('exitAmount', value)
-      }
+      if (action === 0) { store.set('joinAmount', value) } 
+      else { store.set('exitAmount', value) }
     }
     handleChange (event, newValue) {
       const {store} = this.props
