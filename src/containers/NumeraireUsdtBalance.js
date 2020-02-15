@@ -36,19 +36,16 @@ class NumeraireUsdtBalance extends React.Component {
 
     render() {
         const {store} = this.props
-        const cdaiBalanceRaw = store.get('cdaiBalanceRaw')
+        const usdtBalance = store.get('usdtBalance')
         return (
             <CardContent>
-                <h2>You have {'0'} Dai brewing </h2>
+                <h2> Usdt Liquidity { usdtBalance } </h2>
                 <CardMedia
                     component="img"
                     style={{resizeMode: 'contain', width: 100, float: 'right', paddingRight: 52 }}
                     src={logo}
                 />
-                <p> USDT balance: { 5 }` : '-'} </p>
-                <p> 1 CHAI = { 5 }` : '?'} DAI </p>
-                <p> USDT Savings Rate: { 5 } </p>
-                <a target="_blank" href="/about.html" rel="noopener noreferrer"> Learn more </a>
+                <p> USDT Liquidity { usdtBalance } </p>
             </CardContent>
         )
     }

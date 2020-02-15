@@ -40,14 +40,13 @@ class NumeraireDaiBalance extends React.Component {
         const daiBalance = store.get('daiBalance')
         return (
             <CardContent>
-                <h2> Dai Liquidity </h2>
+                <h2> Dai Liquidity { daiBalance } </h2>
                 <CardMedia
                     component="img"
                     style={{resizeMode: 'contain', width: 100, float: 'right', paddingRight: 52 }}
                     src={logo}
                 />
                 <p> Dai liquidity: { daiBalance } </p>
-                <p> 1 CHAI = { 5 }` : '?'} DAI </p>
             </CardContent>
         )
     }

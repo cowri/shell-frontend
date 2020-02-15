@@ -49,18 +49,10 @@ const styles = () => ({
 })
 
 class Menu extends React.Component {
-  async componentDidMount() {
-    initBrowserWallet.call(this)
-  }
-
-  connect () {
-    initBrowserWallet.call(this, true)
-  }
 
   setViewState (int) {
     setViewState.bind(this)(int)
   }
-
 
   render() {
       const {

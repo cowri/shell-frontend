@@ -1,15 +1,23 @@
 import Web3 from "web3"
 import config from '../config.json'
 import daiABI from '../abi/Dai.abi.json'
+import erc20ABI from '../abi/ERC20.abi.json'
+import ctokenABI from '../abi/CToken.abi.json'
 import potABI from '../abi/Pot.abi.json'
 import chaiABI from '../abi/Chai.abi.json'
 let Decimal = require('decimal.js-light')
 Decimal = require('toformat')(Decimal)
 
 
-const daiAddress = config.MCD_DAI
-const potAddress = config.MCD_POT
+const daiAddress = config.DAI
+const potAddress = config.POT
 const chaiAddress = config.CHAI
+const loihiAddress = config.LOIHI
+const cdaiAddress = config.CDAI
+const cusdcAddress = config.CUSDC
+const usdtAddress = config.USDT
+const usdcAddress = config.USDC
+
 
 export const WadDecimal = Decimal.clone({
   rounding: 1, // round down
@@ -22,6 +30,31 @@ WadDecimal.format = {
   groupSeparator: ",",
   groupSize: 3,
 }
+
+export const SixDecimal = Decimal.clone({
+  rounding: 1,
+  precision: 78,
+  toExpNeg: -6,
+  toExpPos: 78
+})
+
+SixDecimal.format = {
+  groupSeparator: ",",
+  groupSize: 3,
+}
+
+export const EightDecimal = Decimal.clone({
+  rounding: 1,
+  preciison: 78,
+  toExpNeg: -8,
+  toExpPos: 78
+})
+
+EightDecimal.format = {
+  groupSeparator: ",",
+  groupSize: 3,
+}
+
 
 function toFixed(num, precision) {
     return (+(Math.round(+(num + 'e' + precision)) + 'e' + -precision)).toFixed(precision);
@@ -63,13 +96,42 @@ export const getDaiBalance = async function() {
   const { store } = this.props
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
-  const dai = store.get('daiObject')
-  if (!dai || !walletAddress) return
-  const daiBalanceRaw = await dai.methods.balanceOf(walletAddress).call()
+  const cdai = store.get('cdaiObject')
+  if (!walletAddress || !cdai) return
+  const daiBalanceRaw = await cdai.methods.balanceOfUnderlying(loihiAddress).call()
   const daiBalanceDecimal = new WadDecimal(daiBalanceRaw).div('1e18')
+  console.log("dai balance raw", daiBalanceRaw)
+  console.log("daiBalanceDecimal", daiBalanceDecimal)
   store.set('daiBalanceDecimal', daiBalanceDecimal)
+  console.log("dai from wei", web3.utils.fromWei(daiBalanceRaw, 'mwei'));
   const daiBalance = toFixed(parseFloat(web3.utils.fromWei(daiBalanceRaw)),5)
   store.set('daiBalance', daiBalance)
+}
+
+export const getUsdcBalance = async function () {
+  const { store } = this.props
+  const web3 = store.get('web3')
+  const walletAddress = store.get('walletAddress')
+  const cusdc = store.get('cusdcObject')
+  if (!walletAddress || !cusdc) return
+  const usdcBalanceRaw = await cusdc.methods.balanceOfUnderlying(loihiAddress).call()
+  const usdcBalanceDecimal = new SixDecimal(usdcBalanceRaw).div('1e6')
+  store.set('usdcBalanceDecimal', usdcBalanceDecimal)
+  const usdcBalance = toFixed(parseFloat(web3.utils.fromWei(usdcBalanceRaw, 'mwei')),5)
+  store.set('usdcBalance', usdcBalance)
+}
+
+export const getUsdtBalance = async function () {
+  const { store } = this.props
+  const web3 = store.get('web3')
+  const walletAddress = store.get('walletAddress')
+  const usdt = store.get('usdtObject')
+  if (!walletAddress || !usdt) return
+  const usdtBalanceRaw = await usdt.methods.balanceOf(loihiAddress).call()
+  const usdtBalanceDecimal = new SixDecimal(usdtBalanceRaw).div('1e6')
+  store.set('usdtBalanceDecimal', usdtBalanceDecimal)
+  const usdtBalance = toFixed(parseFloat(web3.utils.fromWei(usdtBalanceRaw, 'mwei')),5)
+  store.set('usdtBalance', usdtBalance)
 }
 
 export const getChaiBalance = async function() {
@@ -82,7 +144,7 @@ export const getChaiBalance = async function() {
   store.set('chaiBalanceRaw', chaiBalanceRaw)
   const chaiBalanceDecimal = new WadDecimal(chaiBalanceRaw).div('1e18')
   store.set('chaiBalanceDecimal', chaiBalanceDecimal)
-  const chaiBalance = toFixed(parseFloat(web3.utils.fromWei(chaiBalanceRaw)),5)
+  const chaiBalance = toFixed(parseFloat(web3.utils.fromWei(chaiBalanceRaw, 'mwei')),5)
   store.set('chaiBalance', chaiBalance)
 }
 
@@ -118,8 +180,15 @@ export const setupContracts = function () {
     const { store } = this.props
     const web3 = store.get('web3')
     store.set('potObject', new web3.eth.Contract(potABI, potAddress))
-    store.set('daiObject', new web3.eth.Contract(daiABI, daiAddress))
+
+    store.set('daiObject', new web3.eth.Contract(erc20ABI, daiAddress))
     store.set('chaiObject', new web3.eth.Contract(chaiABI, chaiAddress))
+    store.set('cdaiObject', new web3.eth.Contract(ctokenABI, cdaiAddress))
+
+    store.set('usdcObject', new web3.eth.Contract(erc20ABI, usdcAddress))
+    store.set('cusdcObject', new web3.eth.Contract(ctokenABI, cusdcAddress))
+
+    store.set('usdtObject', new web3.eth.Contract(erc20ABI, usdtAddress))
 }
 
 export const getData = async function() {
@@ -127,6 +196,8 @@ export const getData = async function() {
     getPotChi.bind(this)()
     getDaiAllowance.bind(this)()
     getDaiBalance.bind(this)()
+    getUsdcBalance.bind(this)()
+    getUsdtBalance.bind(this)()
     getChaiBalance.bind(this)()
     getChaiTotalSupply.bind(this)()
 }
