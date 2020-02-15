@@ -11,8 +11,7 @@ import CardContent from '@material-ui/core/CardContent';
 
 import { toDai } from '../utils/web3Utils';
 
-import logogif from '../assets/logo.gif'
-import logostill from '../assets/logostill.png'
+import logo from '../assets/logo.jpg'
 
 const styles = () => ({
     container: {
@@ -51,7 +50,7 @@ class ChaiBalanceContainer extends React.Component {
                     <CardMedia
                         component="img"
                         style={{resizeMode: 'contain', width: 100, float: 'right', paddingRight: 52 }}
-                        src={chaiBalance > 0 ? logogif : logostill}
+                        src={chaiBalance > 0 ? logo : logo}
                     />
                     <p> Chai balance: {chaiBalance ? `${chaiBalance}` : '-'} </p>
                     <p> 1 CHAI = {chi ? `${chi}` : '?'} DAI </p>

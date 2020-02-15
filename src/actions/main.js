@@ -44,6 +44,14 @@ export const selectiveDeposit = async function () {
     const amounts = store.get('selectAmounts')
 }
 
+export const setViewState = async function (index) {
+    const { store } = this.props
+    console.log("index", index)
+    store.set('viewState', index)
+    const setValue = store.get('viewState')
+    console.log("set value", setValue)
+}
+
 export const proportionalWithdraw = async function () {
     const { store } = this.props 
     const web3 = store.get('web3')
