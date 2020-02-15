@@ -2,7 +2,7 @@ import React from 'react'
 import { createStore } from '@spyna/react-store'
 import Web3 from 'web3'
 
-import { WadDecimal, getData, toChai, toDai } from './utils/web3Utils'
+import { WadDecimal, SixDecimal, EightDecimal } from './utils/web3Utils'
 
 import config from './config.json'
 import daiABI from './abi/Dai.abi.json'
@@ -52,6 +52,12 @@ const initialState = {
     exitAmount: new WadDecimal(0),
     joinexitAction: 0,
     transferAmount: new WadDecimal(0),
+    daiDepositAmount: new WadDecimal(0),
+    chaiDepositAmount: new WadDecimal(0),
+    usdtDepositAmount: new SixDecimal(0),
+    usdcDepositAmount: new SixDecimal(0),
+    cdaiDepositAmount: new EightDecimal(0),
+    cusdcDepositAmount: new EightDecimal(0),
     viewState: 0
 }
 

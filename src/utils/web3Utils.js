@@ -5,6 +5,7 @@ import erc20ABI from '../abi/ERC20.abi.json'
 import ctokenABI from '../abi/CToken.abi.json'
 import potABI from '../abi/Pot.abi.json'
 import chaiABI from '../abi/Chai.abi.json'
+import loihiABI from '../abi/Loihi.abi.json'
 let Decimal = require('decimal.js-light')
 Decimal = require('toformat')(Decimal)
 
@@ -100,10 +101,7 @@ export const getDaiBalance = async function() {
   if (!walletAddress || !cdai) return
   const daiBalanceRaw = await cdai.methods.balanceOfUnderlying(loihiAddress).call()
   const daiBalanceDecimal = new WadDecimal(daiBalanceRaw).div('1e18')
-  console.log("dai balance raw", daiBalanceRaw)
-  console.log("daiBalanceDecimal", daiBalanceDecimal)
   store.set('daiBalanceDecimal', daiBalanceDecimal)
-  console.log("dai from wei", web3.utils.fromWei(daiBalanceRaw, 'mwei'));
   const daiBalance = toFixed(parseFloat(web3.utils.fromWei(daiBalanceRaw)),5)
   store.set('daiBalance', daiBalance)
 }
@@ -189,6 +187,8 @@ export const setupContracts = function () {
     store.set('cusdcObject', new web3.eth.Contract(ctokenABI, cusdcAddress))
 
     store.set('usdtObject', new web3.eth.Contract(erc20ABI, usdtAddress))
+
+    store.set('loihiObject', new web3.eth.Contract(loihiABI, loihiAddress))
 }
 
 export const getData = async function() {

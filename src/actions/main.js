@@ -1,4 +1,7 @@
-import { } from '../utils/web3Utils';
+import { } from '../utils/web3Utils'
+import config from '../config.json'
+
+const loihiAddress = config.LOIHI
 
 export const exit = async function() {
     const { store } = this.props
@@ -41,15 +44,47 @@ export const selectiveDeposit = async function () {
     const { store } = this.props
     const web3 = store.get('web3')
     const loihi = store.get('loihiObject')
-    const amounts = store.get('selectAmounts')
+    const walletAddress = store.get('walletAddress')
+
+    const contracts = []
+    const addresses = []
+    const amounts = []
+
+    if (store.get('daiDepositAmount') > 0){
+        const daiObject = store.get('daiObject');
+        contracts.push(daiObject)
+        addresses.push(daiObject._address)
+        amounts.push(store.get('daiDepositAmount').mul(10**18).toFixed())
+    } 
+
+    if (store.get('usdcDepositAmount') > 0) {
+        const usdcObject = store.get('usdcObject')
+        contracts.push(usdcObject)
+        addresses.push(usdcObject._address)
+        amounts.push(store.get('usdcDepositAmount').mul(10**6).toFixed())
+    }
+
+    if (store.get('usdtDepositAmount') > 0) {
+        const usdtObject = store.get('usdtObject')
+        contracts.push(usdtObject)
+        addresses.push(usdtObject._address)
+        amounts.push(store.get('usdtDepositAmount').mul(10**6).toFixed())
+    }
+
+    return Promise.all(contracts.map( (contract, ix) => {
+        return contract.methods.approve(loihiAddress, amounts[ix]).send({from: walletAddress})
+    })).then(results => {
+        return loihi.methods.selectiveDeposit(addresses, amounts, 3, Date.now() + 2000).send({from: walletAddress})
+    }).then(function () {
+
+    })
+
+
+
 }
 
 export const setViewState = async function (index) {
-    const { store } = this.props
-    console.log("index", index)
-    store.set('viewState', index)
-    const setValue = store.get('viewState')
-    console.log("set value", setValue)
+    this.props.store.set('viewState', index)
 }
 
 export const proportionalWithdraw = async function () {

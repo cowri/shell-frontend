@@ -56,16 +56,14 @@ class AppContainer extends React.Component {
     render() {
         const { store, classes } = this.props
         const viewState = store.get('viewState')
-        console.log("viewState", viewState)
 
         function injectView (index) {
-
             if (viewState == 0) return <StatsContainer/>
             else if (viewState == 1) return <TradeContainer/>
             else if (viewState == 2) return <DepositContainer/>
             else if (viewState == 3) return <WithdrawContainer/>
-
         }
+
         return (
             <Container maxWidth="md">
                 <Grid container spacing={3}>
