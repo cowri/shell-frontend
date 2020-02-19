@@ -115,8 +115,8 @@ class DepositContainer extends React.Component {
                                 onClick={this.setMax.bind(this)} >
                                     {chaiBalance ? `Balance: ${chaiBalance} CHAI` : '-'}
                             </Button> */}
-                            <Grid container alignItems="start" spacing={3}>
-                                <Grid item xs={12} md={6} spacing={3}>
+                            <Grid container  spacing={3}>
+                                <Grid item xs={12} md={6} >
                                     <TextField label="Dai Value"
                                         placeholder='0'
                                         className={classes.input}
@@ -129,8 +129,8 @@ class DepositContainer extends React.Component {
                                     />
                                 </Grid>
                             </Grid>
-                            <Grid container alignItems="start" spacing={3}>
-                                <Grid item xs={12} md={6} spacing={3}>
+                            <Grid container  spacing={3}>
+                                <Grid item xs={12} md={6} >
                                     <TextField label="Usdc Value"
                                         placeholder='0'
                                         className={classes.input}
@@ -143,8 +143,8 @@ class DepositContainer extends React.Component {
                                     />
                                 </Grid>
                             </Grid>
-                            <Grid container alignItems="start" spacing={3}>
-                                <Grid item xs={12} md={6} spacing={3}>
+                            <Grid container  spacing={3}>
+                                <Grid item xs={12} md={6} >
                                     <TextField label="Usdt Value"
                                         placeholder='0'
                                         className={classes.input}
@@ -157,8 +157,8 @@ class DepositContainer extends React.Component {
                                     />
                                 </Grid>
                             </Grid>
-                            <Grid container alignItems="start" spacing={3}>
-                                <Grid item xs={12} md={6} spacing={3}>
+                            <Grid container  spacing={3}>
+                                <Grid item xs={12} md={6} >
                                     <TextField label="sUsd Value"
                                         placeholder='0'
                                         className={classes.input}

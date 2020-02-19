@@ -95,24 +95,14 @@ export const proportionalWithdraw = async function () {
     const loihiBalance = store.get('loihiBalance')
     const loihi = store.get('loihiObject')
     const loihiBalancePrepped = loihi.getDecimal(loihiBalance).mul(10**18).sub(500000000000).toFixed()
-    console.log("loihiBalancePrepped", loihiBalancePrepped)
 
     const tx = loihi.methods.proportionalWithdraw(loihiBalancePrepped);
 
     return tx.estimateGas({from: walletAddress}).then(function () {
-        return tx.send({from: walletAddress, gas: arguments[0] * 2 })
+        return tx.send({from: walletAddress, gas: Math.floor(arguments[0] * 1.2) })
     }).then(function () {
         console.log("done withdraw", arguments)
     })
-    web3.eth.estimateGas(tx).then(function () {
-        console.log("estmiate thenned", arguments)
-    }).catch(function () { 
-        console.log("estimate caught", arguments)
-    })
-
-
-    // return loihi.methods.proportionalWithdraw(loihiBalancePrepped).call({from: walletAddress})
-    //     .then(function () { console.log("done") })
 
 }
 

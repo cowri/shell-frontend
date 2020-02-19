@@ -65,8 +65,7 @@ class Menu extends React.Component {
 
       return (
         <Grid container className={classes.menu} alignItems='center'>
-          {/* <Grid container className={classes.menu} alignItems='center'> */}
-            <Grid item sm={3} md={3} alignItems='center'>
+            <Grid item sm={3} md={3} >
                 <Button color='primary'
                         size='large'
                         onClick={() => { this.setViewState(0) }} 

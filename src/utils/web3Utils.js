@@ -69,10 +69,12 @@ export const getLoihiBalance = async function() {
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
   const loihi = store.get('loihiObject')
+  console.log("walletAddress", walletAddress)
   if (!walletAddress || !loihi) return
   const loihiBalanceRaw = await loihi.methods.balances(walletAddress).call()
   const loihiBalanceDecimal = new WadDecimal(loihiBalanceRaw).div('1e18')
   const loihiBalance = toFixed(parseFloat(web3.utils.fromWei(loihiBalanceRaw)),5)
+  console.log("loihibalance",loihiBalance)
   store.set('loihiBalance', loihiBalance)
 }
 
@@ -124,9 +126,9 @@ export const getUsdtReserve = async function () {
   const { store } = this.props
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
-  const usdt = store.get('usdtObject')
-  if (!walletAddress || !usdt) return
-  const usdtBalanceRaw = await usdt.methods.balanceOf(loihiAddress).call()
+  const ausdt = store.get('ausdtObject')
+  if (!walletAddress || !ausdt) return
+  const usdtBalanceRaw = await ausdt.methods.balanceOf(loihiAddress).call()
   const usdtBalanceDecimal = new SixDecimal(usdtBalanceRaw).div('1e6')
   store.set('usdtReserveDecimal', usdtBalanceDecimal)
   const usdtBalance = toFixed(parseFloat(web3.utils.fromWei(usdtBalanceRaw, 'mwei')),5)

@@ -16,22 +16,10 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
 const styles = () => ({
-   input: {
-        width: '100%',
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(3)
-    },
-    actionButton: {
-        marginTop: theme.spacing(2),
-        margin: '0px auto'
-    },
-    actionButtonContainer: {
-        width: '100%',
-        textAlign: 'center'
-    },
-    accountBalance: {
-        float: 'right',
-    },
+    input: { width: '100%', marginTop: theme.spacing(1), marginBottom: theme.spacing(3) },
+    actionButton: { marginTop: theme.spacing(2), margin: '0px auto' },
+    actionButtonContainer: { width: '100%', textAlign: 'center' },
+    accountBalance: { float: 'right', },
 })
 
 class WithdrawContainer extends React.Component {
@@ -46,16 +34,17 @@ class WithdrawContainer extends React.Component {
       proportionalWithdraw.bind(this)()
     }
 
-
     render() {
         const {classes, store} = this.props
 
         const shellSupply = store.get('loihiTotalSupply')
         const shellBalance = store.get('loihiBalance')
+        console.log("shellBalance", shellBalance)
 
         const loihiDaiBalance = store.get('loihiDaiBalance')
         const loihiUsdcBalance = store.get('loihiUsdcBalance')
         const loihiUsdtBalance = store.get('loihiUsdtBalance')
+        const loihiSusdBalance = store.get('loihiSusdBalance')
 
 
         const walletAddress = store.get('walletAddress')
@@ -70,8 +59,8 @@ class WithdrawContainer extends React.Component {
                 <CardContent>
                   <Typography variant='h4'>Withdraw Shells</Typography>
                   <Typography variant='subtitle2'>Send Chai to any address</Typography>
-                  <Grid container alignItems="start" spacing={3}>
-                    <Grid item xs={12} md={6} spacing={3}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6} >
                       <List>
                         <ListItem>
                           <ListItemText primary={ "Dai:" + loihiDaiBalance }  />
@@ -81,6 +70,9 @@ class WithdrawContainer extends React.Component {
                         </ListItem>
                         <ListItem>
                           <ListItemText primary={ "Usdt: " + loihiUsdtBalance } />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary={ "Usdt: " + loihiSusdBalance } />
                         </ListItem>
                       </List>
                     </Grid>
