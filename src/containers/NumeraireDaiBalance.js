@@ -28,16 +28,15 @@ class NumeraireDaiBalance extends React.Component {
     }
 
     async watchBalance() {
-        // await getData.bind(this)();
-        // setInterval(() => {
-        //     getData.bind(this)();
-        // }, 10 * 1000);
+        await getData.bind(this)();
+        setInterval(() => {
+            getData.bind(this)();
+        }, 10 * 1000);
     }
 
     render() {
         const {store} = this.props
-        const cdaiBalanceRaw = store.get('cdaiBalanceRaw')
-        const daiBalance = store.get('daiBalance')
+        const daiBalance = store.get('daiReserve')
         return (
             <CardContent>
                 <h2> Dai Liquidity { daiBalance } </h2>

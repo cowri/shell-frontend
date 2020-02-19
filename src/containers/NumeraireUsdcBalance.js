@@ -28,15 +28,15 @@ class NumeraireUsdcBalance extends React.Component {
     }
 
     async watchBalance() {
-        // await getData.bind(this)();
-        // setInterval(() => {
-        //     getData.bind(this)();
-        // }, 10 * 1000);
+        await getData.bind(this)();
+        setInterval(() => {
+            getData.bind(this)();
+        }, 10 * 1000);
     }
 
     render() {
         const {store} = this.props
-        const usdcBalance = store.get('usdcBalance')
+        const usdcBalance = store.get('usdcReserve')
         return (
             <CardContent>
                 <h2> USDC Liquidity { usdcBalance } </h2>

@@ -3,7 +3,7 @@ import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
 import { WadDecimal, getData, toDai } from '../utils/web3Utils'
-import { transfer } from '../actions/main'
+import { swap } from '../actions/main'
 
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
@@ -14,11 +14,24 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputBase from '@material-ui/core/InputBase';
+
+
 const styles = () => ({
    input: {
-        width: '100%',
+        width: '75%',
         marginTop: theme.spacing(1),
         marginBottom: theme.spacing(3)
+    },
+    control: {
+        width: '100%'
+    },
+    select: {
+        width: '25%'  
     },
     actionButton: {
         marginTop: theme.spacing(2),
@@ -34,11 +47,27 @@ const styles = () => ({
 })
 
 class TradeContainer extends React.Component {
+
+    constructor () {
+        super()
+        this.coins = [
+            "USDt",
+            "USDc",
+            "Dai",
+            "CDai",
+            "Chai",
+            "cUSDc"
+        ]
+    }
+
+
     async componentDidMount() {
         // update data periodically
         this.watchData()
 
     }
+
+
 
     async watchData() {
         await getData.bind(this)();
@@ -47,27 +76,27 @@ class TradeContainer extends React.Component {
         }, 10 * 1000);
     }
 
-    transfer() {
-        transfer.bind(this)()
+    swap() {
+        swap.bind(this)()
     }
 
-    handleInput(event) {
+    handleInputAmount(type, event) {
       const {store} = this.props
-      try {
-        store.set('transferAmount', new WadDecimal(event.target.value))
-      } catch {
-        if (event.target.value.length === 0) {
-          store.set('transferAmount', new WadDecimal(0))
-        } else {
-          return
-        }
-      }
+      store.set(type, event.target.value)
+    }
+
+    setSlot (type, event) {
+        const { store } = this.props
+        store.set(type, event.target.value)
+    }
+
+    slotTarget () {
+
     }
 
     setMax() {
       const {store} = this.props
       const chaiBalanceDecimal = store.get('chaiBalanceDecimal')
-      store.set('transferAmount', chaiBalanceDecimal)
     }
 
 
@@ -76,56 +105,97 @@ class TradeContainer extends React.Component {
 
         const walletAddress = store.get('walletAddress')
         const chaiBalance = store.get('chaiBalance')
-        const transferAmount = store.get('transferAmount')
-        const transferAddress = store.get('transferAddress')
         const chaiBalanceDecimal = store.get('chaiBalanceDecimal')
         const web3 = store.get('web3');
         const isSignedIn = walletAddress && walletAddress.length
+        const coins = store.get('contractObjects').map(contract => contract.name)
 
-        const canTransfer = transferAmount && transferAddress && (transferAmount <= chaiBalanceDecimal)
 
-        return <Grid container spacing={3}>
-               <Grid item xs={12}><Card><CardContent>
-        <Typography variant='h4'>Trade Stablecoins and Stablecoin Derivatives</Typography>
-        <Typography variant='subtitle2'>Swap</Typography>
-        <Button variant='subtitle2' className={classes.accountBalance}
-            style={{textTransform: 'none'}}
-      onClick={this.setMax.bind(this)}
-        >{chaiBalance ? `Balance: ${chaiBalance} CHAI` : '-'}</Button>
-                <Grid container alignItems="start" spacing={3}>
-                  <Grid item xs={12} md={6}>
-        <TextField label='Receiving address' placeholder='0x' className={classes.input} margin="normal" variant="outlined" onChange={(event) => {
-                            store.set('transferAddress', event.target.value)
-                        }} />
-        </Grid>
-                          <Grid item xs={12} md={6} spacing={3}>
-        <TextField label="CHAI Value"
-            placeholder='0'
-            className={classes.input}
-            margin="normal"
-            value={transferAmount.toString() !== "0" ? transferAmount : ''}
-            variant="outlined"
-            type="number"
-            onChange={this.handleInput.bind(this)}
-            InputProps={{inputProps: { min: 0 },
-                        endAdornment: <InputAdornment className={classes.endAdornment} position="end">CHAI</InputAdornment>
-                                       }}
-            helperText={(isSignedIn && transferAmount) ? "Worth: ~" + toDai.bind(this)(transferAmount.mul(10**18)) + " Dai": " "}
-        />
-                  </Grid>
+        const originSlot = store.get('originSlot')
+        const targetSlot = store.get('targetSlot')
+        const originAmount = store.get('originAmount')
+        console.log("originAmount", originAmount)
+        const targetAmount = store.get('targetAmount')
 
-               </Grid>
-               <Box className={classes.actionButtonContainer}>
-                  <Button color='primary'
-                    size='large'
-                    onClick={() => {
-                        this.transfer()
-                    }} variant="contained" disabled={!isSignedIn || !canTransfer} className={classes.actionButton}>
-                    Transfer
-                </Button>
-              </Box>
-            </CardContent></Card></Grid>
-        </Grid>
+        return (
+
+            <Grid container spacing={3}>
+               <Grid item xs={12}>
+                   <Card>
+                       <CardContent>
+                            <Typography variant='h4'>Trade Stablecoins and Stablecoin Derivatives</Typography>
+                            <Grid container alignItems="start" spacing={3}>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl className={classes.control}>
+                                        <TextField label="Origin Value"
+                                            placeholder='0'
+                                            className={classes.input}
+                                            margin="normal"
+                                            value={ originAmount }
+                                            variant="outlined"
+                                            type="number"
+                                            onChange={this.handleInputAmount.bind(this, "originAmount")}
+                                            // InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">CHAI</InputAdornment> }}
+                                            helperText={(isSignedIn) ? "Worth: ~" + 5 + " Dai": " "}
+                                        />
+                                        {/* <InputLabel id="demo-customized-select-label">Origin Value</InputLabel> */}
+                                        <Select
+                                            labelId="demo-customized-select-label"
+                                            id="demo-customized-select"
+                                            value={this.originSlot}
+                                            input={<InputBase />}
+                                            className={classes.select}
+                                            onChange={this.setSlot.bind(this, "originSlot")}
+                                        > 
+                                        { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
+                                        </Select>
+                                    </FormControl>
+                                    <FormControl className={classes.control}>
+                                        <TextField label="Target Value"
+                                            placeholder='0'
+                                            className={classes.input}
+                                            margin="normal"
+                                            value={ targetAmount }
+                                            variant="outlined"
+                                            type="number"
+                                            onChange={this.handleInputAmount.bind(this, "targetAmount")}
+                                            // InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">CHAI</InputAdornment> }}
+                                            helperText={(isSignedIn) ? "Worth: ~" + 5 + " Dai": " "}
+                                        />
+                                        {/* <InputLabel id="demo-customized-select-label">Origin Value</InputLabel> */}
+                                        <Select
+                                            labelId="demo-customized-select-label"
+                                            id="demo-customized-select"
+                                            value={this.originSlot}
+                                            input={<InputBase />}
+                                            className={classes.select}
+                                            onChange={this.setSlot.bind(this, "targetSlot")}
+                                        > 
+                                            { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                </Grid>
+                                <Grid item xs={12} md={6} spacing={3}>
+                                </Grid>
+                            </Grid>
+                            <Box className={classes.actionButtonContainer}>
+                                <Button color='primary'
+                                    size='large'
+                                    onClick={() => { this.swap() }} 
+                                    variant="contained" 
+                                    disabled={!isSignedIn} 
+                                    className={classes.actionButton}
+                                >
+                                    Transfer
+                                </Button>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+        )
     }
 }
 

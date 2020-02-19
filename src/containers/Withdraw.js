@@ -3,16 +3,17 @@ import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
 import { WadDecimal, getData, toDai } from '../utils/web3Utils'
-import { transfer } from '../actions/main'
+import { proportionalWithdraw } from '../actions/main'
 
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
 const styles = () => ({
    input: {
@@ -34,35 +35,6 @@ const styles = () => ({
 })
 
 class WithdrawContainer extends React.Component {
-    async componentDidMount() {
-        // update data periodically
-        this.watchData()
-
-    }
-
-    async watchData() {
-        await getData.bind(this)();
-        setInterval(() => {
-            getData.bind(this)();
-        }, 10 * 1000);
-    }
-
-    transfer() {
-        transfer.bind(this)()
-    }
-
-    handleInput(event) {
-      const {store} = this.props
-      try {
-        store.set('transferAmount', new WadDecimal(event.target.value))
-      } catch {
-        if (event.target.value.length === 0) {
-          store.set('transferAmount', new WadDecimal(0))
-        } else {
-          return
-        }
-      }
-    }
 
     setMax() {
       const {store} = this.props
@@ -70,62 +42,63 @@ class WithdrawContainer extends React.Component {
       store.set('transferAmount', chaiBalanceDecimal)
     }
 
+    withdraw () {
+      proportionalWithdraw.bind(this)()
+    }
+
 
     render() {
         const {classes, store} = this.props
 
+        const shellSupply = store.get('loihiTotalSupply')
+        const shellBalance = store.get('loihiBalance')
+
+        const loihiDaiBalance = store.get('loihiDaiBalance')
+        const loihiUsdcBalance = store.get('loihiUsdcBalance')
+        const loihiUsdtBalance = store.get('loihiUsdtBalance')
+
+
         const walletAddress = store.get('walletAddress')
-        const chaiBalance = store.get('chaiBalance')
-        const transferAmount = store.get('transferAmount')
-        const transferAddress = store.get('transferAddress')
-        const chaiBalanceDecimal = store.get('chaiBalanceDecimal')
+
         const web3 = store.get('web3');
         const isSignedIn = walletAddress && walletAddress.length
 
-        const canTransfer = transferAmount && transferAddress && (transferAmount <= chaiBalanceDecimal)
-
-        return <Grid container spacing={3}>
-               <Grid item xs={12}><Card><CardContent>
-        <Typography variant='h4'>Withdraw Shells</Typography>
-        <Typography variant='subtitle2'>Send Chai to any address</Typography>
-        <Button variant='subtitle2' className={classes.accountBalance}
-            style={{textTransform: 'none'}}
-      onClick={this.setMax.bind(this)}
-        >{chaiBalance ? `Balance: ${chaiBalance} CHAI` : '-'}</Button>
-                <Grid container alignItems="start" spacing={3}>
-                  <Grid item xs={12} md={6}>
-        <TextField label='Receiving address' placeholder='0x' className={classes.input} margin="normal" variant="outlined" onChange={(event) => {
-                            store.set('transferAddress', event.target.value)
-                        }} />
-        </Grid>
-                          <Grid item xs={12} md={6} spacing={3}>
-        <TextField label="CHAI Value"
-            placeholder='0'
-            className={classes.input}
-            margin="normal"
-            value={transferAmount.toString() !== "0" ? transferAmount : ''}
-            variant="outlined"
-            type="number"
-            onChange={this.handleInput.bind(this)}
-            InputProps={{inputProps: { min: 0 },
-                        endAdornment: <InputAdornment className={classes.endAdornment} position="end">CHAI</InputAdornment>
-                                       }}
-            helperText={(isSignedIn && transferAmount) ? "Worth: ~" + toDai.bind(this)(transferAmount.mul(10**18)) + " Dai": " "}
-        />
+        return (
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant='h4'>Withdraw Shells</Typography>
+                  <Typography variant='subtitle2'>Send Chai to any address</Typography>
+                  <Grid container alignItems="start" spacing={3}>
+                    <Grid item xs={12} md={6} spacing={3}>
+                      <List>
+                        <ListItem>
+                          <ListItemText primary={ "Dai:" + loihiDaiBalance }  />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary={ "Usdc: " + loihiUsdcBalance } />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText primary={ "Usdt: " + loihiUsdtBalance } />
+                        </ListItem>
+                      </List>
+                    </Grid>
                   </Grid>
-
-               </Grid>
-               <Box className={classes.actionButtonContainer}>
-                  <Button color='primary'
-                    size='large'
-                    onClick={() => {
-                        this.transfer()
-                    }} variant="contained" disabled={!isSignedIn || !canTransfer} className={classes.actionButton}>
-                    Transfer
-                </Button>
-              </Box>
-            </CardContent></Card></Grid>
-        </Grid>
+                  <Box className={classes.actionButtonContainer}>
+                    <Button color='primary'
+                      size='large'
+                      onClick={() => this.withdraw()} 
+                      variant="contained" disabled={!isSignedIn} className={classes.actionButton}
+                    >
+                      Withdraw Everything
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        )
     }
 }
 

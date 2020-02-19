@@ -1,4 +1,3 @@
-import { } from '../utils/web3Utils'
 import config from '../config.json'
 
 const loihiAddress = config.LOIHI
@@ -79,21 +78,77 @@ export const selectiveDeposit = async function () {
 
     })
 
+}
 
+export const proportionalWithdraw = async function () {
+    const { store } = this.props
+
+    const web3 = store.get('web3')
+    const walletAddress = store.get('walletAddress')
+    const loihiBalance = store.get('loihiBalance')
+    const loihi = store.get('loihiObject')
+    const loihiBalancePrepped = loihi.getDecimal(loihiBalance).mul(10**18).sub(500000000000).toFixed()
+    console.log("loihiBalancePrepped", loihiBalancePrepped)
+
+    const tx = loihi.methods.proportionalWithdraw(loihiBalancePrepped);
+
+    return tx.estimateGas({from: walletAddress}).then(function () {
+        return tx.send({from: walletAddress, gas: arguments[0] * 2 })
+    }).then(function () {
+        console.log("done withdraw", arguments)
+    })
+    web3.eth.estimateGas(tx).then(function () {
+        console.log("estmiate thenned", arguments)
+    }).catch(function () { 
+        console.log("estimate caught", arguments)
+    })
+
+
+    // return loihi.methods.proportionalWithdraw(loihiBalancePrepped).call({from: walletAddress})
+    //     .then(function () { console.log("done") })
+
+}
+
+export const swap = async function () {
+    const { store } = this.props
+
+    const walletAddress = store.get('walletAddress')
+    const originAmount = store.get('originAmount')
+    const targetAmount = store.get('targetAmount')
+    console.log("originAmount", originAmount)
+    console.log("targetAmount", targetAmount)
+    const originSlot = store.get('originSlot')
+    const targetSlot = store.get('targetSlot')
+    console.log(originSlot)
+    console.log(targetSlot)
+
+    const contracts = store.get('contractObjects')
+
+    const decimalOrigin = contracts[originSlot].getDecimal(originAmount)
+        .mul(10**contracts[originSlot].decimals)
+        .toFixed()
+
+    console.log("decimalOrigin", decimalOrigin)
+
+    const loihi = store.get('loihiObject')
+
+    return contracts[originSlot].methods.approve(loihi.options.address, decimalOrigin).send({from:walletAddress}) 
+        .then(function () {
+            return loihi.methods.swapByOrigin(
+                contracts[originSlot].options.address,
+                contracts[targetSlot].options.address,
+                decimalOrigin,
+                50000,
+                Date.now() + 50000
+            ) .send({from: walletAddress})
+        }).then(function () {
+            console.log("done", arguments)
+        })
 
 }
 
 export const setViewState = async function (index) {
     this.props.store.set('viewState', index)
-}
-
-export const proportionalWithdraw = async function () {
-    const { store } = this.props 
-    const web3 = store.get('web3')
-    const loihi = store.get('loihiObject')
-    const amount = store.get('depositAmount')
-    const walletAddress = store.get('walletAddress')
-    // return loihi.methods.proportionalDeposit
 }
 
 export default {

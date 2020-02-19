@@ -6,6 +6,7 @@ import ctokenABI from '../abi/CToken.abi.json'
 import potABI from '../abi/Pot.abi.json'
 import chaiABI from '../abi/Chai.abi.json'
 import loihiABI from '../abi/Loihi.abi.json'
+import { StylesProvider } from "@material-ui/core"
 let Decimal = require('decimal.js-light')
 Decimal = require('toformat')(Decimal)
 
@@ -93,7 +94,36 @@ export const getDaiAllowance = async function() {
   store.set('daiAllowance', new WadDecimal(daiAllowance).div('1e18'))
 }
 
-export const getDaiBalance = async function() {
+export const getLoihiBalance = async function() {
+  const { store } = this.props
+  const web3 = store.get('web3')
+  const walletAddress = store.get('walletAddress')
+  const loihi = store.get('loihiObject')
+  if (!walletAddress || !loihi) return
+  const loihiBalanceRaw = await loihi.methods.balances(walletAddress).call()
+  const loihiBalanceDecimal = new WadDecimal(loihiBalanceRaw).div('1e18')
+  const loihiBalance = toFixed(parseFloat(web3.utils.fromWei(loihiBalanceRaw)),5)
+  store.set('loihiBalance', loihiBalance)
+}
+
+export const getLoihiUnderlyingBalances = async function () {
+  const { store } = this.props
+  const web3 = store.get('web3')
+  const walletAddress = store.get('walletAddress')
+  const loihi = store.get('loihiObject')
+  if (!walletAddress || !loihi) return
+  const totalShells = await loihi.methods.totalSupply().call()
+  const shellBalance = await loihi.methods.balances(walletAddress).call()
+  const daiBal = shellBalance / totalShells * store.get('daiReserve')
+  const usdcBal = shellBalance / totalShells * store.get('usdcReserve')
+  const usdtBal = shellBalance / totalShells * store.get('usdtReserve')
+  store.set('loihiDaiBalance', new WadDecimal(daiBal > 0 ? daiBal : 0))
+  store.set('loihiUsdcBalance', new SixDecimal(usdcBal > 0 ? usdcBal : 0))
+  store.set('loihiUsdtBalance', new SixDecimal(usdtBal > 0 ? usdtBal : 0))
+
+}
+
+export const getDaiReserve = async function() {
   const { store } = this.props
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
@@ -101,12 +131,12 @@ export const getDaiBalance = async function() {
   if (!walletAddress || !cdai) return
   const daiBalanceRaw = await cdai.methods.balanceOfUnderlying(loihiAddress).call()
   const daiBalanceDecimal = new WadDecimal(daiBalanceRaw).div('1e18')
-  store.set('daiBalanceDecimal', daiBalanceDecimal)
+  store.set('daiReserveDecimal', daiBalanceDecimal)
   const daiBalance = toFixed(parseFloat(web3.utils.fromWei(daiBalanceRaw)),5)
-  store.set('daiBalance', daiBalance)
+  store.set('daiReserve', daiBalance)
 }
 
-export const getUsdcBalance = async function () {
+export const getUsdcReserve = async function () {
   const { store } = this.props
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
@@ -114,12 +144,12 @@ export const getUsdcBalance = async function () {
   if (!walletAddress || !cusdc) return
   const usdcBalanceRaw = await cusdc.methods.balanceOfUnderlying(loihiAddress).call()
   const usdcBalanceDecimal = new SixDecimal(usdcBalanceRaw).div('1e6')
-  store.set('usdcBalanceDecimal', usdcBalanceDecimal)
+  store.set('usdcReserveDecimal', usdcBalanceDecimal)
   const usdcBalance = toFixed(parseFloat(web3.utils.fromWei(usdcBalanceRaw, 'mwei')),5)
-  store.set('usdcBalance', usdcBalance)
+  store.set('usdcReserve', usdcBalance)
 }
 
-export const getUsdtBalance = async function () {
+export const getUsdtReserve = async function () {
   const { store } = this.props
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
@@ -127,9 +157,9 @@ export const getUsdtBalance = async function () {
   if (!walletAddress || !usdt) return
   const usdtBalanceRaw = await usdt.methods.balanceOf(loihiAddress).call()
   const usdtBalanceDecimal = new SixDecimal(usdtBalanceRaw).div('1e6')
-  store.set('usdtBalanceDecimal', usdtBalanceDecimal)
+  store.set('usdtReserveDecimal', usdtBalanceDecimal)
   const usdtBalance = toFixed(parseFloat(web3.utils.fromWei(usdtBalanceRaw, 'mwei')),5)
-  store.set('usdtBalance', usdtBalance)
+  store.set('usdtReserve', usdtBalance)
 }
 
 export const getChaiBalance = async function() {
@@ -174,30 +204,70 @@ export const toDai = function(chaiAmount) {
 }
 
 
-export const setupContracts = function () {
+export const setupContracts = async function () {
     const { store } = this.props
     const web3 = store.get('web3')
     store.set('potObject', new web3.eth.Contract(potABI, potAddress))
 
-    store.set('daiObject', new web3.eth.Contract(erc20ABI, daiAddress))
-    store.set('chaiObject', new web3.eth.Contract(chaiABI, chaiAddress))
-    store.set('cdaiObject', new web3.eth.Contract(ctokenABI, cdaiAddress))
+    const contractObjects = [
+      new web3.eth.Contract(erc20ABI, daiAddress),
+      new web3.eth.Contract(chaiABI, chaiAddress),
+      new web3.eth.Contract(ctokenABI, cdaiAddress),
+      new web3.eth.Contract(erc20ABI, usdcAddress),
+      new web3.eth.Contract(ctokenABI, cusdcAddress),
+      new web3.eth.Contract(erc20ABI, usdtAddress)
+    ]
 
-    store.set('usdcObject', new web3.eth.Contract(erc20ABI, usdcAddress))
-    store.set('cusdcObject', new web3.eth.Contract(ctokenABI, cusdcAddress))
+    contractObjects[0].name = 'Dai'
+    contractObjects[1].name = 'Chai'
+    contractObjects[2].name = 'cDai'
+    contractObjects[3].name = 'Usdc'
+    contractObjects[4].name = 'cUsdc'
+    contractObjects[5].name = 'Usdt'
 
-    store.set('usdtObject', new web3.eth.Contract(erc20ABI, usdtAddress))
+    contractObjects[0].decimals = await contractObjects[0].methods.decimals().call()
+    contractObjects[1].decimals = await contractObjects[1].methods.decimals().call()
+    contractObjects[2].decimals = await contractObjects[2].methods.decimals().call()
+    contractObjects[3].decimals = await contractObjects[3].methods.decimals().call()
+    contractObjects[4].decimals = await contractObjects[4].methods.decimals().call()
+    contractObjects[5].decimals = await contractObjects[5].methods.decimals().call()
 
-    store.set('loihiObject', new web3.eth.Contract(loihiABI, loihiAddress))
+    contractObjects[0].getDecimal = function (amount) { return new WadDecimal(amount) }
+    contractObjects[1].getDecimal = function (amount) { return new WadDecimal(amount) }
+    contractObjects[2].getDecimal = function (amount) { return new EightDecimal(amount) }
+    contractObjects[3].getDecimal = function (amount) { return new SixDecimal(amount) }
+    contractObjects[4].getDecimal = function (amount) { return new EightDecimal(amount) }
+    contractObjects[5].getDecimal = function (amount) { return new SixDecimal(amount) }
+
+    store.set('contractObjects', contractObjects)
+
+    store.set('daiObject', contractObjects[0])
+    store.set('chaiObject', contractObjects[1])
+    store.set('cdaiObject', contractObjects[2])
+    store.set('usdcObject', contractObjects[3])
+    store.set('cusdcObject', contractObjects[4])
+    store.set('usdtObject', contractObjects[5])
+
+    const loihi = new web3.eth.Contract(loihiABI, loihiAddress)
+    loihi.getDecimal = function (amount) { return new WadDecimal(amount) }
+    store.set('loihiObject', loihi)
+
 }
+
+// function getContractObject (name, abi, address, decimals) {
+//   const contract = new web3.eth.Contract(abi, address)
+//   contract.name = name
+// }
 
 export const getData = async function() {
     getPotDsr.bind(this)()
     getPotChi.bind(this)()
     getDaiAllowance.bind(this)()
-    getDaiBalance.bind(this)()
-    getUsdcBalance.bind(this)()
-    getUsdtBalance.bind(this)()
+    getDaiReserve.bind(this)()
+    getLoihiBalance.bind(this)()
+    getLoihiUnderlyingBalances.bind(this)()
+    getUsdcReserve.bind(this)()
+    getUsdtReserve.bind(this)()
     getChaiBalance.bind(this)()
     getChaiTotalSupply.bind(this)()
 }
@@ -206,6 +276,7 @@ const secondsInYear = WadDecimal(60 * 60 * 24 * 365)
 
 export const initBrowserWallet = async function(prompt) {
     const store = this.props.store
+    window.store = store
 
     store.set('walletLoading', true)
     if (!localStorage.getItem('walletKnown') && !prompt) return
