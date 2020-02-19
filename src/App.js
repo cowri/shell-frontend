@@ -5,12 +5,6 @@ import Web3 from 'web3'
 import { WadDecimal, SixDecimal, EightDecimal } from './utils/web3Utils'
 
 import config from './config.json'
-import daiABI from './abi/Dai.abi.json'
-import potABI from './abi/Pot.abi.json'
-import chaiABI from './abi/Chai.abi.json'
-import ctokenABI from './abi/CToken.abi.json'
-import erc20ABI from './abi/ERC20.abi.json'
-import loihiABI from './abi/Loihi.abi.json'
 
 import AppContainer from './containers/AppContainer'
 
@@ -54,10 +48,11 @@ const initialState = {
     transferAmount: new WadDecimal(0),
     daiDepositAmount: new WadDecimal(0),
     chaiDepositAmount: new WadDecimal(0),
-    usdtDepositAmount: new SixDecimal(0),
-    usdcDepositAmount: new SixDecimal(0),
     cdaiDepositAmount: new EightDecimal(0),
+    usdcDepositAmount: new SixDecimal(0),
     cusdcDepositAmount: new EightDecimal(0),
+    usdtDepositAmount: new SixDecimal(0),
+    susdDepositAmount: new SixDecimal(0),
     viewState: 0
 }
 

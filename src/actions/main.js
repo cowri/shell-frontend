@@ -52,28 +52,35 @@ export const selectiveDeposit = async function () {
     if (store.get('daiDepositAmount') > 0){
         const daiObject = store.get('daiObject');
         contracts.push(daiObject)
-        addresses.push(daiObject._address)
+        addresses.push(daiObject.options.address)
         amounts.push(store.get('daiDepositAmount').mul(10**18).toFixed())
     } 
 
     if (store.get('usdcDepositAmount') > 0) {
         const usdcObject = store.get('usdcObject')
         contracts.push(usdcObject)
-        addresses.push(usdcObject._address)
+        addresses.push(usdcObject.options.address)
         amounts.push(store.get('usdcDepositAmount').mul(10**6).toFixed())
     }
 
     if (store.get('usdtDepositAmount') > 0) {
         const usdtObject = store.get('usdtObject')
         contracts.push(usdtObject)
-        addresses.push(usdtObject._address)
+        addresses.push(usdtObject.options.address)
         amounts.push(store.get('usdtDepositAmount').mul(10**6).toFixed())
+    }
+
+    if (store.get('susdDepositAmount') > 0) {
+        const susdObject = store.get('susdObject')
+        contracts.push(susdObject)
+        addresses.push(susdObject.options.address)
+        amounts.push(store.get('susdDepositAmount').mul(10**6).toFixed())
     }
 
     return Promise.all(contracts.map( (contract, ix) => {
         return contract.methods.approve(loihiAddress, amounts[ix]).send({from: walletAddress})
     })).then(results => {
-        return loihi.methods.selectiveDeposit(addresses, amounts, 3, Date.now() + 2000).send({from: walletAddress})
+        return loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000).send({from: walletAddress})
     }).then(function () {
 
     })

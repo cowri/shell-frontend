@@ -4,10 +4,6 @@ import {withStore} from '@spyna/react-store'
 import config from '../config.json'
 
 import NavContainer from './Nav'
-import JoinExitContainer from './JoinExit'
-import ChaiBalanceContainer from './ChaiBalance'
-import TotalSupplyContainer from './TotalSupply'
-import TransferChaiContainer from './TransferChai'
 import StatsContainer from './Stats'
 import TradeContainer from './Trade'
 import DepositContainer from './Deposit'
@@ -16,31 +12,15 @@ import MenuContainer from "./Menu"
 
 import theme from '../theme/theme'
 
-import Typography from '@material-ui/core/Typography'
-import { withStyles, ThemeProvider } from '@material-ui/styles'
+import { withStyles } from '@material-ui/styles'
 import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
 
 const styles = () => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-  },
-  footer: {
-    textAlign: 'center',
-  },
-  navContainer: {
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(3),
-    minHeight: 52
-  },
-  contentContainer: {
-      // boxShadow: '0px 0px 30px 0px rgba(0, 0, 0, 0.05)',
-      borderRadius: theme.shape.borderRadius,
-      padding: 0,
-      marginBottom: theme.spacing(3)
-  }
+  root: { flexGrow: 1, },
+  footer: { textAlign: 'center', },
+  navContainer: { paddingTop: theme.spacing(1), paddingBottom: theme.spacing(3), minHeight: 52 },
+  contentContainer: { borderRadius: theme.shape.borderRadius, padding: 0, marginBottom: theme.spacing(3) }
 })
 
 class AppContainer extends React.Component {
@@ -49,7 +29,6 @@ class AppContainer extends React.Component {
         this.state = { }
         this.views =[ StatsContainer, TradeContainer, DepositContainer, WithdrawContainer ];
     }
-
 
     async componentDidMount() { }
 

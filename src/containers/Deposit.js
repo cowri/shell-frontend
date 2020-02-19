@@ -76,6 +76,14 @@ class DepositContainer extends React.Component {
       }
     }
 
+    handleSusdInput (event) {
+        const { store } = this.props
+        try { store.set('susdDepositAmount', new SixDecimal(event.target.value)) }
+        catch {
+            if (event.target.value.length == 0) store.set('susdDepositAmount', new SixDecimal(0))
+        }
+    }
+
     setMax() {
       const {store} = this.props
       const chaiBalanceDecimal = store.get('chaiBalanceDecimal')
@@ -92,6 +100,7 @@ class DepositContainer extends React.Component {
         const daiDepositAmount = store.get('daiDepositAmount')
         const usdcDepositAmount = store.get('usdcDepositAmount')
         const usdtDepositAmount = store.get('usdtDepositAmount')
+        const susdDepositAmount = store.get('susdDepositAmount')
 
 
         return (
@@ -145,6 +154,20 @@ class DepositContainer extends React.Component {
                                         type="number"
                                         onChange={this.handleUsdtInput.bind(this)}
                                         InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">USDT</InputAdornment> }}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid container alignItems="start" spacing={3}>
+                                <Grid item xs={12} md={6} spacing={3}>
+                                    <TextField label="sUsd Value"
+                                        placeholder='0'
+                                        className={classes.input}
+                                        margin="normal"
+                                        value={susdDepositAmount.toString() !== "0" ? susdDepositAmount : ''}
+                                        variant="outlined"
+                                        type="number"
+                                        onChange={this.handleSusdInput.bind(this)}
+                                        InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">SUSD</InputAdornment> }}
                                     />
                                 </Grid>
                             </Grid>
