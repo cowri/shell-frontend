@@ -1,13 +1,10 @@
 import React from 'react'
 import {withStore} from '@spyna/react-store'
+import { getData } from '../utils/web3Utils'
 
 import config from '../config.json'
 
 import NavContainer from './Nav'
-import JoinExitContainer from './JoinExit'
-import ChaiBalanceContainer from './ChaiBalance'
-import TotalSupplyContainer from './TotalSupply'
-import TransferChaiContainer from './TransferChai'
 import StatsContainer from './Stats'
 import TradeContainer from './Trade'
 import DepositContainer from './Deposit'
@@ -22,24 +19,11 @@ import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
 
 const styles = () => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-  },
-  footer: {
-    textAlign: 'center',
-    color: '#fff',
-  },
-  a: {
-    color: '#fff',
-    opacity: 0.9
-  },
-  navContainer: {
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(3),
-    minHeight: 52
-  },
+  root: { flexGrow: 1, },
+  paper: { },
+  footer: { textAlign: 'center', color: '#fff', },
+  a: { color: '#fff', opacity: 0.9 },
+  navContainer: { paddingTop: theme.spacing(1), paddingBottom: theme.spacing(3), minHeight: 52 },
   contentContainer: {
       // boxShadow: '0px 0px 30px 0px rgba(0, 0, 0, 0.05)',
       borderRadius: theme.shape.borderRadius,
@@ -55,6 +39,14 @@ class AppContainer extends React.Component {
         this.views =[ StatsContainer, TradeContainer, DepositContainer, WithdrawContainer ];
     }
 
+    async componentDidMount() {
+        this.watchData() // update data periodically
+    }
+
+    async watchData() {
+        await getData.bind(this)();
+        setInterval(() => { getData.bind(this)(); }, 10 * 1000);
+    }
 
     async componentDidMount() { }
 

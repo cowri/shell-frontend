@@ -100,12 +100,6 @@ class DepositContainer extends React.Component {
                    <Card>
                        <CardContent>
                             <Typography variant='h4'>Deposit stablecoins, receive Shells</Typography>
-                            {/* <Button variant='subtitle2' 
-                                className={classes.accountBalance} 
-                                style={{textTransform: 'none'}} 
-                                onClick={this.setMax.bind(this)} >
-                                    {chaiBalance ? `Balance: ${chaiBalance} CHAI` : '-'}
-                            </Button> */}
                             <Grid container alignItems="start" spacing={3}>
                                 <Grid item xs={12} md={6} spacing={3}>
                                     <TextField label="Dai Value"

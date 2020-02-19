@@ -1,25 +1,26 @@
 import Web3 from "web3"
 import config from '../config.json'
-import daiABI from '../abi/Dai.abi.json'
 import erc20ABI from '../abi/ERC20.abi.json'
 import ctokenABI from '../abi/CToken.abi.json'
-import potABI from '../abi/Pot.abi.json'
 import chaiABI from '../abi/Chai.abi.json'
 import loihiABI from '../abi/Loihi.abi.json'
-import { StylesProvider } from "@material-ui/core"
 let Decimal = require('decimal.js-light')
 Decimal = require('toformat')(Decimal)
 
-
 const daiAddress = config.DAI
-const potAddress = config.POT
 const chaiAddress = config.CHAI
-const loihiAddress = config.LOIHI
 const cdaiAddress = config.CDAI
-const cusdcAddress = config.CUSDC
-const usdtAddress = config.USDT
-const usdcAddress = config.USDC
 
+const usdcAddress = config.USDC
+const cusdcAddress = config.CUSDC
+
+const usdtAddress = config.USDT
+const ausdtAddress = config.AUSDT
+
+const susdAddress = config.SUSD
+const asusdAddress = config.ASUSD
+
+const loihiAddress = config.LOIHI
 
 export const WadDecimal = Decimal.clone({
   rounding: 1, // round down
@@ -117,10 +118,11 @@ export const getLoihiUnderlyingBalances = async function () {
   const daiBal = shellBalance / totalShells * store.get('daiReserve')
   const usdcBal = shellBalance / totalShells * store.get('usdcReserve')
   const usdtBal = shellBalance / totalShells * store.get('usdtReserve')
+  const susdBal = shellBalance / totalShells * store.get('susdReserve')
   store.set('loihiDaiBalance', new WadDecimal(daiBal > 0 ? daiBal : 0))
   store.set('loihiUsdcBalance', new SixDecimal(usdcBal > 0 ? usdcBal : 0))
   store.set('loihiUsdtBalance', new SixDecimal(usdtBal > 0 ? usdtBal : 0))
-
+  store.set('loihiSusdBalance', new SixDecimal(susdBal > 0 ? susdBal : 0))
 }
 
 export const getDaiReserve = async function() {
@@ -134,6 +136,19 @@ export const getDaiReserve = async function() {
   store.set('daiReserveDecimal', daiBalanceDecimal)
   const daiBalance = toFixed(parseFloat(web3.utils.fromWei(daiBalanceRaw)),5)
   store.set('daiReserve', daiBalance)
+}
+
+export const getSusdReserve = async function () {
+  const { store } = this.props
+  const web3 = store.get('web3')
+  const walletAddress = store.get('walletAddress')
+  const asusd = store.get('asusdObject')
+  if (!walletAddress || !asusd) return
+  const susdBalanceRaw = await asusd.methods.balanceOf(loihiAddress).call()
+  const susdBalanceDecimal = new SixDecimal(susdBalanceRaw).div('1e6')
+  store.set('susdReserveDecimal', susdBalanceDecimal)
+  const susdBalance = toFixed(parseFloat(web3.utils.fromWei(susdBalanceRaw, 'mwi')),5)
+  store.set('susdReserve', susdBalance)
 }
 
 export const getUsdcReserve = async function () {
@@ -176,38 +191,9 @@ export const getChaiBalance = async function() {
   store.set('chaiBalance', chaiBalance)
 }
 
-export const getChaiTotalSupply = async function() {
-  const { store } = this.props
-  const web3 = store.get('web3')
-  const chai = store.get('chaiObject')
-  if (!chai) return
-  const chaiTotalSupplyRaw = await chai.methods.totalSupply().call()
-  const chaiTotalSupplyDecimal = new WadDecimal(chaiTotalSupplyRaw)
-  store.set('chaiTotalSupply', toDai.bind(this)(chaiTotalSupplyDecimal))
-}
-
-export const toChai = function(daiAmount) {
-  const daiDecimal = daiAmount ? new WadDecimal(daiAmount).div('1e18') : new WadDecimal(0)
-  const { store } = this.props
-  if (!store.get('chi')) return
-  const chiDecimal = new WadDecimal(store.get('chi'))
-  return toFixed(daiDecimal.div(chiDecimal),5)
-}
-
-
-export const toDai = function(chaiAmount) {
-  const chaiDecimal = chaiAmount ? new WadDecimal(chaiAmount).div('1e18') : new WadDecimal(0)
-  const { store } = this.props
-  if (!store.get('chi')) return
-  const chiDecimal = new WadDecimal(store.get('chi'))
-  return chiDecimal.mul(chaiDecimal)
-}
-
-
 export const setupContracts = async function () {
     const { store } = this.props
     const web3 = store.get('web3')
-    store.set('potObject', new web3.eth.Contract(potABI, potAddress))
 
     const contractObjects = [
       new web3.eth.Contract(erc20ABI, daiAddress),
@@ -215,7 +201,10 @@ export const setupContracts = async function () {
       new web3.eth.Contract(ctokenABI, cdaiAddress),
       new web3.eth.Contract(erc20ABI, usdcAddress),
       new web3.eth.Contract(ctokenABI, cusdcAddress),
-      new web3.eth.Contract(erc20ABI, usdtAddress)
+      new web3.eth.Contract(erc20ABI, usdtAddress),
+      new web3.eth.Contract(erc20ABI, ausdtAddress),
+      new web3.eth.Contract(erc20ABI, susdAddress),
+      new web3.eth.Contract(erc20ABI, asusdAddress)
     ]
 
     contractObjects[0].name = 'Dai'
@@ -224,6 +213,9 @@ export const setupContracts = async function () {
     contractObjects[3].name = 'Usdc'
     contractObjects[4].name = 'cUsdc'
     contractObjects[5].name = 'Usdt'
+    contractObjects[6].name = 'Ausdt'
+    contractObjects[7].name = 'sUsd'
+    contractObjects[8].name = 'asUsd'
 
     contractObjects[0].decimals = await contractObjects[0].methods.decimals().call()
     contractObjects[1].decimals = await contractObjects[1].methods.decimals().call()
@@ -231,6 +223,9 @@ export const setupContracts = async function () {
     contractObjects[3].decimals = await contractObjects[3].methods.decimals().call()
     contractObjects[4].decimals = await contractObjects[4].methods.decimals().call()
     contractObjects[5].decimals = await contractObjects[5].methods.decimals().call()
+    contractObjects[5].decimals = await contractObjects[6].methods.decimals().call()
+    contractObjects[5].decimals = await contractObjects[7].methods.decimals().call()
+    contractObjects[5].decimals = await contractObjects[8].methods.decimals().call()
 
     contractObjects[0].getDecimal = function (amount) { return new WadDecimal(amount) }
     contractObjects[1].getDecimal = function (amount) { return new WadDecimal(amount) }
@@ -238,6 +233,9 @@ export const setupContracts = async function () {
     contractObjects[3].getDecimal = function (amount) { return new SixDecimal(amount) }
     contractObjects[4].getDecimal = function (amount) { return new EightDecimal(amount) }
     contractObjects[5].getDecimal = function (amount) { return new SixDecimal(amount) }
+    contractObjects[6].getDecimal = function (amount) { return new SixDecimal(amount) }
+    contractObjects[7].getDecimal = function (amount) { return new SixDecimal(amount) }
+    contractObjects[8].getDecimal = function (amount) { return new SixDecimal(amount) }
 
     store.set('contractObjects', contractObjects)
 
@@ -247,29 +245,24 @@ export const setupContracts = async function () {
     store.set('usdcObject', contractObjects[3])
     store.set('cusdcObject', contractObjects[4])
     store.set('usdtObject', contractObjects[5])
+    store.set('ausdtObject', contractObjects[6])
+    store.set('susdObject', contractObjects[7])
+    store.set('asusdObject', contractObjects[8])
 
     const loihi = new web3.eth.Contract(loihiABI, loihiAddress)
     loihi.getDecimal = function (amount) { return new WadDecimal(amount) }
+
     store.set('loihiObject', loihi)
 
 }
 
-// function getContractObject (name, abi, address, decimals) {
-//   const contract = new web3.eth.Contract(abi, address)
-//   contract.name = name
-// }
-
 export const getData = async function() {
-    getPotDsr.bind(this)()
-    getPotChi.bind(this)()
-    getDaiAllowance.bind(this)()
     getDaiReserve.bind(this)()
-    getLoihiBalance.bind(this)()
-    getLoihiUnderlyingBalances.bind(this)()
     getUsdcReserve.bind(this)()
     getUsdtReserve.bind(this)()
-    getChaiBalance.bind(this)()
-    getChaiTotalSupply.bind(this)()
+    getSusdReserve.bind(this)()
+    getLoihiBalance.bind(this)()
+    getLoihiUnderlyingBalances.bind(this)()
 }
 
 const secondsInYear = WadDecimal(60 * 60 * 24 * 365)
@@ -324,8 +317,4 @@ export const initBrowserWallet = async function(prompt) {
     getData.bind(this)()
 }
 
-export default {
-    initBrowserWallet,
-    toChai,
-    toDai
-}
+export default { initBrowserWallet }
