@@ -17,10 +17,30 @@ import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
 
 const styles = () => ({
-  root: { flexGrow: 1, },
-  footer: { textAlign: 'center', },
-  navContainer: { paddingTop: theme.spacing(1), paddingBottom: theme.spacing(3), minHeight: 52 },
-  contentContainer: { borderRadius: theme.shape.borderRadius, padding: 0, marginBottom: theme.spacing(3) }
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+  },
+  footer: {
+    textAlign: 'center',
+    color: '#fff',
+  },
+  a: {
+    color: '#fff',
+    opacity: 0.9
+  },
+  navContainer: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(3),
+    minHeight: 52
+  },
+  contentContainer: {
+      // boxShadow: '0px 0px 30px 0px rgba(0, 0, 0, 0.05)',
+      borderRadius: theme.shape.borderRadius,
+      padding: 0,
+      marginBottom: theme.spacing(3)
+  }
 })
 
 class AppContainer extends React.Component {
@@ -53,13 +73,13 @@ class AppContainer extends React.Component {
                         { injectView(viewState) }
                     </Grid>
                     <Grid item xs={12} className={classes.footer}>
-                        Interacting with the Lo'ihi contract at: <a target="_blank" href={"https://etherscan.io/token/" + config.LOIHI} rel="noopener noreferrer">{config.LOIHI}</a><br />
+                      Made by Cowri Labs
                     </Grid>
                     <Grid item xs={12} className={classes.footer}>
-                        Lo'ihi by Cowri &nbsp;
-                            <a target="_blank" href="https://twitter.com/white_kenny_" rel="noopener noreferrer">Kenny White</a>,&nbsp;
-                            <a target="_blank" href="https://twitter.com/nonnewtonianliq" rel="noopener noreferrer">James Foley</a>,&nbsp;
-                        &nbsp; UI at <a href="https://github.com/cowri/loihi-frontend">github.com/cowri/loihi-frontend</a>
+                            <a target="_blank" href="https://github.com/shellprotocol" rel="noopener noreferrer">Twitter</a> ·
+                            <a target="_blank" href="https://github.com/cowri" rel="noopener noreferrer">GitHub</a> ·
+                            <a target="_blank" href="https://discordapp.com/invite/PtEHX" rel="noopener noreferrer">Discord</a> ·
+                            <a target="_blank" href={"https://etherscan.io/token/" + config.LOIHI} rel="noopener noreferrer">Contract</a><br />
                     </Grid>
                 </Grid>
             </Container>
