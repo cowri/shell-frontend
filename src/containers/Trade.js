@@ -2,8 +2,8 @@ import React from 'react';
 import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
-import { WadDecimal, getData, toDai } from '../utils/web3Utils'
-import { swap } from '../actions/main'
+import { getData } from '../utils/web3Utils'
+import { swap, primeOriginTrade } from '../actions/main'
 
 import Box from '@material-ui/core/Box';
 import Card from '@material-ui/core/Card';
@@ -14,7 +14,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -64,10 +63,7 @@ class TradeContainer extends React.Component {
     async componentDidMount() {
         // update data periodically
         this.watchData()
-
     }
-
-
 
     async watchData() {
         await getData.bind(this)();
@@ -80,9 +76,14 @@ class TradeContainer extends React.Component {
         swap.bind(this)()
     }
 
-    handleInputAmount(type, event) {
-      const {store} = this.props
-      store.set(type, event.target.value)
+    handleOriginInput(event) {
+        const { store } = this.props
+        const originSlot = store.get('originSlot')
+        const origin = store.get('contractObjects')[originSlot]
+        const value = origin.getDecimal(event.target.value).mul(10**origin.decimals).toFixed()
+        console.log("value", value)
+        primeOriginTrade.bind(this)(value)
+
     }
 
     setSlot (type, event) {
@@ -110,15 +111,12 @@ class TradeContainer extends React.Component {
         const isSignedIn = walletAddress && walletAddress.length
         const coins = store.get('contractObjects').map(contract => contract.name)
 
-
         const originSlot = store.get('originSlot')
         const targetSlot = store.get('targetSlot')
         const originAmount = store.get('originAmount')
-        console.log("originAmount", originAmount)
         const targetAmount = store.get('targetAmount')
 
         return (
-
             <Grid container spacing={3}>
                <Grid item xs={12}>
                    <Card>
@@ -127,6 +125,16 @@ class TradeContainer extends React.Component {
                             <Grid container alignItems="start" spacing={3}>
                                 <Grid item xs={12} md={6}>
                                     <FormControl className={classes.control}>
+                                        <Select
+                                            labelId="demo-customized-select-label"
+                                            id="demo-customized-select"
+                                            value={this.originSlot}
+                                            input={<InputBase value={0} />}
+                                            className={classes.select}
+                                            onChange={this.setSlot.bind(this, "originSlot")}
+                                        > 
+                                            { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
+                                        </Select>
                                         <TextField label="Origin Value"
                                             placeholder='0'
                                             className={classes.input}
@@ -134,50 +142,23 @@ class TradeContainer extends React.Component {
                                             value={ originAmount }
                                             variant="outlined"
                                             type="number"
-                                            onChange={this.handleInputAmount.bind(this, "originAmount")}
-                                            // InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">CHAI</InputAdornment> }}
+                                            onChange={this.handleOriginInput.bind(this)}
+                                            InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">{ }</InputAdornment> }}
                                             helperText={(isSignedIn) ? "Worth: ~" + 5 + " Dai": " "}
                                         />
-                                        {/* <InputLabel id="demo-customized-select-label">Origin Value</InputLabel> */}
+                                    </FormControl>
+                                    <FormControl className={classes.control}>
                                         <Select
                                             labelId="demo-customized-select-label"
                                             id="demo-customized-select"
                                             value={this.originSlot}
-                                            input={<InputBase />}
+                                            input={<InputBase value={0} />}
                                             className={classes.select}
-                                            onChange={this.setSlot.bind(this, "originSlot")}
+                                            onChange={this.setSlot.bind(this, "Slot")}
                                         > 
                                         { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
                                         </Select>
                                     </FormControl>
-                                    <FormControl className={classes.control}>
-                                        <TextField label="Target Value"
-                                            placeholder='0'
-                                            className={classes.input}
-                                            margin="normal"
-                                            value={ targetAmount }
-                                            variant="outlined"
-                                            type="number"
-                                            onChange={this.handleInputAmount.bind(this, "targetAmount")}
-                                            // InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">CHAI</InputAdornment> }}
-                                            helperText={(isSignedIn) ? "Worth: ~" + 5 + " Dai": " "}
-                                        />
-                                        {/* <InputLabel id="demo-customized-select-label">Origin Value</InputLabel> */}
-                                        <Select
-                                            labelId="demo-customized-select-label"
-                                            id="demo-customized-select"
-                                            value={this.originSlot}
-                                            input={<InputBase />}
-                                            className={classes.select}
-                                            onChange={this.setSlot.bind(this, "targetSlot")}
-                                        > 
-                                            { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                </Grid>
-                                <Grid item xs={12} md={6} spacing={3}>
                                 </Grid>
                             </Grid>
                             <Box className={classes.actionButtonContainer}>

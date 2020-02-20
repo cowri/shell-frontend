@@ -8,8 +8,6 @@ import { getData } from '../utils/web3Utils'
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 
-import { toDai } from '../utils/web3Utils';
-
 import logo from '../assets/logo.jpg'
 
 const styles = () => ({

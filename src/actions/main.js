@@ -92,17 +92,34 @@ export const proportionalWithdraw = async function () {
 
     const web3 = store.get('web3')
     const walletAddress = store.get('walletAddress')
-    const loihiBalance = store.get('loihiBalance')
+    const loihiBalanceRaw = store.get('loihiBalanceDecimal').mul(10**18).toFixed()
     const loihi = store.get('loihiObject')
-    const loihiBalancePrepped = loihi.getDecimal(loihiBalance).mul(10**18).sub(500000000000).toFixed()
 
-    const tx = loihi.methods.proportionalWithdraw(loihiBalancePrepped);
+    const tx = loihi.methods.proportionalWithdraw(loihiBalanceRaw)
 
     return tx.estimateGas({from: walletAddress}).then(function () {
         return tx.send({from: walletAddress, gas: Math.floor(arguments[0] * 1.2) })
     }).then(function () {
         console.log("done withdraw", arguments)
     })
+
+}
+
+export const primeOriginTrade = async function (value) {
+    const { store } = this.props
+    const originAmount = store.get('originAmount')
+    const loihi = store.get('loihiObject')
+    const originSlot = store.get('originSlot')
+    const targetSlot = store.get('targetSlot')
+    const contracts = store.get('contractObjects')
+    const origin = contracts[originSlot]
+    const target = contracts[targetSlot]
+
+    console.log("calling", value)
+    loihi.methods.viewOriginTrade(origin.options.address, target.options.address, value).call()
+        .then(function () { 
+            console.log("arguments", arguments)
+        })
 
 }
 

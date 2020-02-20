@@ -37,10 +37,10 @@ class AppContainer extends React.Component {
         const viewState = store.get('viewState')
 
         function injectView (index) {
-            if (viewState == 0) return <StatsContainer/>
-            else if (viewState == 1) return <TradeContainer/>
-            else if (viewState == 2) return <DepositContainer/>
-            else if (viewState == 3) return <WithdrawContainer/>
+            if (viewState === 0) return <StatsContainer/>
+            else if (viewState === 1) return <TradeContainer/>
+            else if (viewState === 2) return <DepositContainer/>
+            else if (viewState === 3) return <WithdrawContainer/>
         }
 
         return (
@@ -53,7 +53,7 @@ class AppContainer extends React.Component {
                         { injectView(viewState) }
                     </Grid>
                     <Grid item xs={12} className={classes.footer}>
-                        Interacting with the Lo'ihi contract at: <a target="_blank" href={"https://etherscan.io/token/" + config.LOIHI} rel="noopener noreferrer">{config.CHAI}</a><br />
+                        Interacting with the Lo'ihi contract at: <a target="_blank" href={"https://etherscan.io/token/" + config.LOIHI} rel="noopener noreferrer">{config.LOIHI}</a><br />
                     </Grid>
                     <Grid item xs={12} className={classes.footer}>
                         Lo'ihi by Cowri &nbsp;

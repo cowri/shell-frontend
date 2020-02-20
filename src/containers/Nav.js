@@ -7,7 +7,6 @@ import config from '../config.json'
 
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
-import Typography from '@material-ui/core/Typography'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'

@@ -69,12 +69,13 @@ export const getLoihiBalance = async function() {
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
   const loihi = store.get('loihiObject')
-  console.log("walletAddress", walletAddress)
   if (!walletAddress || !loihi) return
   const loihiBalanceRaw = await loihi.methods.balances(walletAddress).call()
+  console.log("loihi balance raw", loihiBalanceRaw)
   const loihiBalanceDecimal = new WadDecimal(loihiBalanceRaw).div('1e18')
+  store.set('loihiBalanceDecimal', loihiBalanceDecimal)
+  console.log("loihi balance from dec", loihiBalanceDecimal.toFixed())
   const loihiBalance = toFixed(parseFloat(web3.utils.fromWei(loihiBalanceRaw)),5)
-  console.log("loihibalance",loihiBalance)
   store.set('loihiBalance', loihiBalance)
 }
 

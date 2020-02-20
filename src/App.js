@@ -20,13 +20,6 @@ const initialState = {
     web3: web3,
     web3Failure: false,
     network: 42,
-    // cdaiObject: new web3.eth.Contract(ctokenABI, config.CDAI),
-    // chaiObject: new web3.eth.Contract(chaiABI, config.CHAI),
-    // daiObject: new web3.eth.Contract(erc20ABI, config.DAI),
-    // cusdcObject: new web3.eth.Contract(ctokenABI, config.CUSDC),
-    // usdcObject: new web3.eth.Contract(erc20ABI, config.USDC),
-    // usdtObject: new web3.eth.Contract(erc20ABI, config.USDT),
-    // loihiObject: new web3.eth.Contract(loihiABI, config.LOIHI),
     walletAddress: '',
     walletConnecting: false,
     walletType: '',
@@ -53,7 +46,9 @@ const initialState = {
     cusdcDepositAmount: new EightDecimal(0),
     usdtDepositAmount: new SixDecimal(0),
     susdDepositAmount: new SixDecimal(0),
-    viewState: 0
+    viewState: 0,
+    originSlot:0,
+    targetSlot: 1
 }
 
 class App extends React.Component {

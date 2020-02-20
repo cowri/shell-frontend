@@ -90,7 +90,6 @@ class DepositContainer extends React.Component {
       store.set('transferAmount', chaiBalanceDecimal)
     }
 
-
     render() {
         const {classes, store} = this.props
         const walletAddress = store.get('walletAddress')
