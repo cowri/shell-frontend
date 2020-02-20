@@ -1,14 +1,14 @@
 import React from 'react'
 import {withStore} from '@spyna/react-store'
 
-import config from '../config.json'
-
 import NavContainer from './Nav'
 import StatsContainer from './Stats'
 import TradeContainer from './Trade'
 import DepositContainer from './Deposit'
 import WithdrawContainer from './Withdraw'
 import MenuContainer from "./Menu"
+import LoginStateContainer from "./LoginState"
+import FooterContainer from "./Footer"
 
 import theme from '../theme/theme'
 
@@ -17,19 +17,9 @@ import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
 
 const styles = () => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-  },
-  footer: {
-    textAlign: 'center',
-    color: '#fff',
-  },
-  a: {
-    color: '#fff',
-    opacity: 0.9
-  },
+  root: { flexGrow: 1, },
+  footer: { textAlign: 'center', color: '#fff', },
+  a: { color: '#fff', opacity: 0.9 },
   navContainer: {
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(3),
@@ -40,7 +30,8 @@ const styles = () => ({
       borderRadius: theme.shape.borderRadius,
       padding: 0,
       marginBottom: theme.spacing(3)
-  }
+  },
+  grid: { color: 'white' }
 })
 
 class AppContainer extends React.Component {
@@ -64,24 +55,16 @@ class AppContainer extends React.Component {
         }
 
         return (
-            <Container maxWidth="md">
-                <Grid container spacing={3}>
-                    <Grid item xs={12}><br/></Grid>
+            <Container maxWidth="xs">
+                <LoginStateContainer /> 
+                <Grid container >
                     <NavContainer />
                     <MenuContainer />
-                    <Grid item xs={12}>
+                    <Grid item xs={12} className={classes.grid}>
                         { injectView(viewState) }
                     </Grid>
-                    <Grid item xs={12} className={classes.footer}>
-                      Made by Cowri Labs
-                    </Grid>
-                    <Grid item xs={12} className={classes.footer}>
-                            <a target="_blank" href="https://github.com/shellprotocol" rel="noopener noreferrer">Twitter</a> ·
-                            <a target="_blank" href="https://github.com/cowri" rel="noopener noreferrer">GitHub</a> ·
-                            <a target="_blank" href="https://discordapp.com/invite/PtEHX" rel="noopener noreferrer">Discord</a> ·
-                            <a target="_blank" href={"https://etherscan.io/token/" + config.LOIHI} rel="noopener noreferrer">Contract</a><br />
-                    </Grid>
                 </Grid>
+                <FooterContainer />
             </Container>
         )
     }

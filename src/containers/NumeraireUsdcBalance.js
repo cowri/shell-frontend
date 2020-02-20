@@ -4,19 +4,23 @@ import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
 import { getData } from '../utils/web3Utils'
+import cusdcSvg from '../assets/cusdc.svg'
 
-import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-
-import logo from '../assets/logo.jpg'
+import Grid from '@material-ui/core/Grid';
 
 const styles = () => ({
+    // container: {
+    //     paddingTop: theme.spacing(1),
+    //     paddingBottom: theme.spacing(3),
+    //     minHeight: 52
+    // },
     container: {
         paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(3),
-        minHeight: 52
+        paddingBottom: theme.spacing(1),
+        minHeight: 52,
+        color: 'white' 
     },
+    icon: { width: '50px', height: '50px' }
 })
 
 class NumeraireUsdcBalance extends React.Component {
@@ -33,18 +37,20 @@ class NumeraireUsdcBalance extends React.Component {
     }
 
     render() {
-        const {store} = this.props
+        const { classes, store } = this.props
         const usdcBalance = store.get('usdcReserve')
         return (
-            <CardContent>
-                <h2> USDC Liquidity { usdcBalance } </h2>
-                <CardMedia
-                    component="img"
-                    style={{resizeMode: 'contain', width: 100, float: 'right', paddingRight: 52 }}
-                    src={logo}
-                />
-                <p> USDC liquidity { usdcBalance } </p>
-            </CardContent>
+            <Grid container direction='row' className={classes.container}>
+                <Grid item xs='3' sm='3'>
+                    <img className={classes.icon} src={cusdcSvg} />
+                </Grid>
+                <Grid item xs='7' sm='7'>
+                    <span> Compound USDC </span>
+                </Grid>
+                <Grid item xs='2' sm='2'>
+                    <span> { usdcBalance } </span>
+                </Grid>
+            </Grid>
         )
     }
 }

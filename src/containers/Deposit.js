@@ -103,87 +103,81 @@ class DepositContainer extends React.Component {
 
 
         return (
-            <Grid container spacing={3}>
-               <Grid item xs={12}>
-                   <Card>
-                       <CardContent>
-                            <Typography variant='h4'>Deposit stablecoins, receive Shells</Typography>
-                            {/* <Button variant='subtitle2' 
-                                className={classes.accountBalance} 
-                                style={{textTransform: 'none'}} 
-                                onClick={this.setMax.bind(this)} >
-                                    {chaiBalance ? `Balance: ${chaiBalance} CHAI` : '-'}
-                            </Button> */}
-                            <Grid container  spacing={3}>
-                                <Grid item xs={12} md={6} >
-                                    <TextField label="Dai Value"
-                                        placeholder='0'
-                                        className={classes.input}
-                                        margin="normal"
-                                        value={daiDepositAmount.toString() !== "0" ? daiDepositAmount : ''}
-                                        variant="outlined"
-                                        type="number"
-                                        onChange={this.handleDaiInput.bind(this)}
-                                        InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">DAI</InputAdornment> }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container  spacing={3}>
-                                <Grid item xs={12} md={6} >
-                                    <TextField label="Usdc Value"
-                                        placeholder='0'
-                                        className={classes.input}
-                                        margin="normal"
-                                        value={usdcDepositAmount.toString() !== "0" ? usdcDepositAmount : ''}
-                                        variant="outlined"
-                                        type="number"
-                                        onChange={this.handleUsdcInput.bind(this)}
-                                        InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">USDC</InputAdornment> }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container  spacing={3}>
-                                <Grid item xs={12} md={6} >
-                                    <TextField label="Usdt Value"
-                                        placeholder='0'
-                                        className={classes.input}
-                                        margin="normal"
-                                        value={usdtDepositAmount.toString() !== "0" ? usdtDepositAmount : ''}
-                                        variant="outlined"
-                                        type="number"
-                                        onChange={this.handleUsdtInput.bind(this)}
-                                        InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">USDT</InputAdornment> }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container  spacing={3}>
-                                <Grid item xs={12} md={6} >
-                                    <TextField label="sUsd Value"
-                                        placeholder='0'
-                                        className={classes.input}
-                                        margin="normal"
-                                        value={susdDepositAmount.toString() !== "0" ? susdDepositAmount : ''}
-                                        variant="outlined"
-                                        type="number"
-                                        onChange={this.handleSusdInput.bind(this)}
-                                        InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">SUSD</InputAdornment> }}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Box className={classes.actionButtonContainer}>
-                                <Button color='primary'
-                                    size='large'
-                                    onClick={() => { this.deposit() }} 
-                                    variant="contained" 
-                                    disabled={!isSignedIn } 
-                                    className={classes.actionButton}
-                                >
-                                    Deposit
-                                </Button>
-                            </Box>
-                        </CardContent>
-                    </Card>
+            <Grid>
+                <Typography variant='h4'>Deposit stablecoins, receive Shells</Typography>
+                {/* <Button variant='subtitle2' 
+                    className={classes.accountBalance} 
+                    style={{textTransform: 'none'}} 
+                    onClick={this.setMax.bind(this)} >
+                        {chaiBalance ? `Balance: ${chaiBalance} CHAI` : '-'}
+                </Button> */}
+                <Grid container  spacing={3}>
+                    <Grid item xs={12} md={6} >
+                        <TextField label="Dai Value"
+                            placeholder='0'
+                            className={classes.input}
+                            margin="normal"
+                            value={daiDepositAmount.toString() !== "0" ? daiDepositAmount : ''}
+                            variant="outlined"
+                            type="number"
+                            onChange={this.handleDaiInput.bind(this)}
+                            InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">DAI</InputAdornment> }}
+                        />
+                    </Grid>
                 </Grid>
+                <Grid container  spacing={3}>
+                    <Grid item xs={12} md={6} >
+                        <TextField label="Usdc Value"
+                            placeholder='0'
+                            className={classes.input}
+                            margin="normal"
+                            value={usdcDepositAmount.toString() !== "0" ? usdcDepositAmount : ''}
+                            variant="outlined"
+                            type="number"
+                            onChange={this.handleUsdcInput.bind(this)}
+                            InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">USDC</InputAdornment> }}
+                        />
+                    </Grid>
+                </Grid>
+                <Grid container  spacing={3}>
+                    <Grid item xs={12} md={6} >
+                        <TextField label="Usdt Value"
+                            placeholder='0'
+                            className={classes.input}
+                            margin="normal"
+                            value={usdtDepositAmount.toString() !== "0" ? usdtDepositAmount : ''}
+                            variant="outlined"
+                            type="number"
+                            onChange={this.handleUsdtInput.bind(this)}
+                            InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">USDT</InputAdornment> }}
+                        />
+                    </Grid>
+                </Grid>
+                <Grid container  spacing={3}>
+                    <Grid item xs={12} md={6} >
+                        <TextField label="sUsd Value"
+                            placeholder='0'
+                            className={classes.input}
+                            margin="normal"
+                            value={susdDepositAmount.toString() !== "0" ? susdDepositAmount : ''}
+                            variant="outlined"
+                            type="number"
+                            onChange={this.handleSusdInput.bind(this)}
+                            InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">SUSD</InputAdornment> }}
+                        />
+                    </Grid>
+                </Grid>
+                <Box className={classes.actionButtonContainer}>
+                    <Button color='primary'
+                        size='large'
+                        onClick={() => { this.deposit() }} 
+                        variant="contained" 
+                        disabled={!isSignedIn } 
+                        className={classes.actionButton}
+                    >
+                        Deposit
+                    </Button>
+                </Box>
             </Grid>
         )
     }

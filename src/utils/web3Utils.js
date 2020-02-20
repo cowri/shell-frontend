@@ -71,10 +71,8 @@ export const getLoihiBalance = async function() {
   const loihi = store.get('loihiObject')
   if (!walletAddress || !loihi) return
   const loihiBalanceRaw = await loihi.methods.balances(walletAddress).call()
-  console.log("loihi balance raw", loihiBalanceRaw)
   const loihiBalanceDecimal = new WadDecimal(loihiBalanceRaw).div('1e18')
   store.set('loihiBalanceDecimal', loihiBalanceDecimal)
-  console.log("loihi balance from dec", loihiBalanceDecimal.toFixed())
   const loihiBalance = toFixed(parseFloat(web3.utils.fromWei(loihiBalanceRaw)),5)
   store.set('loihiBalance', loihiBalance)
 }
@@ -149,6 +147,18 @@ export const getSusdReserve = async function () {
   store.set('susdReserve', susdBalance)
 }
 
+export const getReserves = async function () {
+  const { store } = this.props 
+  const loihi = store.get('loihiObject')
+  const walletAddress = store.get('walletAddress')
+  if (!loihi || !walletAddress) return
+
+  loihi.methods.totalReserves().call().then(function () {
+    console.log("reserves", arguments);
+    store.set('totalReserves', arguments[0][0])
+  })
+}
+
 export const setupContracts = async function () {
     const { store } = this.props
     const web3 = store.get('web3')
@@ -220,6 +230,7 @@ export const getData = async function() {
     getUsdcReserve.bind(this)()
     getUsdtReserve.bind(this)()
     getSusdReserve.bind(this)()
+    getReserves.bind(this)()
 }
 
 const secondsInYear = WadDecimal(60 * 60 * 24 * 365)

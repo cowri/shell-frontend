@@ -59,7 +59,6 @@ class TradeContainer extends React.Component {
         ]
     }
 
-
     async componentDidMount() {
         // update data periodically
         this.watchData()
@@ -80,8 +79,11 @@ class TradeContainer extends React.Component {
         const { store } = this.props
         const originSlot = store.get('originSlot')
         const origin = store.get('contractObjects')[originSlot]
-        const value = origin.getDecimal(event.target.value).mul(10**origin.decimals).toFixed()
-        console.log("value", value)
+
+        const value = origin.getDecimal(
+            event.target.value == 0 ? 0 : event.target.value
+        ).mul(10**origin.decimals).toFixed()
+
         primeOriginTrade.bind(this)(value)
 
     }
@@ -117,64 +119,58 @@ class TradeContainer extends React.Component {
         const targetAmount = store.get('targetAmount')
 
         return (
-            <Grid container spacing={3}>
-               <Grid item xs={12}>
-                   <Card>
-                       <CardContent>
-                            <Typography variant='h4'>Trade Stablecoins and Stablecoin Derivatives</Typography>
-                            <Grid container alignItems="start" spacing={3}>
-                                <Grid item xs={12} md={6}>
-                                    <FormControl className={classes.control}>
-                                        <Select
-                                            labelId="demo-customized-select-label"
-                                            id="demo-customized-select"
-                                            value={this.originSlot}
-                                            input={<InputBase value={0} />}
-                                            className={classes.select}
-                                            onChange={this.setSlot.bind(this, "originSlot")}
-                                        > 
-                                            { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
-                                        </Select>
-                                        <TextField label="Origin Value"
-                                            placeholder='0'
-                                            className={classes.input}
-                                            margin="normal"
-                                            value={ originAmount }
-                                            variant="outlined"
-                                            type="number"
-                                            onChange={this.handleOriginInput.bind(this)}
-                                            InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">{ }</InputAdornment> }}
-                                            helperText={(isSignedIn) ? "Worth: ~" + 5 + " Dai": " "}
-                                        />
-                                    </FormControl>
-                                    <FormControl className={classes.control}>
-                                        <Select
-                                            labelId="demo-customized-select-label"
-                                            id="demo-customized-select"
-                                            value={this.originSlot}
-                                            input={<InputBase value={0} />}
-                                            className={classes.select}
-                                            onChange={this.setSlot.bind(this, "Slot")}
-                                        > 
-                                        { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                            </Grid>
-                            <Box className={classes.actionButtonContainer}>
-                                <Button color='primary'
-                                    size='large'
-                                    onClick={() => { this.swap() }} 
-                                    variant="contained" 
-                                    disabled={!isSignedIn} 
-                                    className={classes.actionButton}
-                                >
-                                    Transfer
-                                </Button>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </Grid>
+            <Grid>
+                    <Typography variant='h4'>Trade Stablecoins and Stablecoin Derivatives</Typography>
+                    <Grid container alignItems="start" spacing={3}>
+                        <Grid item xs={12} md={6}>
+                            <FormControl className={classes.control}>
+                                <Select
+                                    labelId="demo-customized-select-label"
+                                    id="demo-customized-select"
+                                    value={this.originSlot}
+                                    input={<InputBase value={0} />}
+                                    className={classes.select}
+                                    onChange={this.setSlot.bind(this, "originSlot")}
+                                > 
+                                    { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
+                                </Select>
+                                <TextField label="Origin Value"
+                                    placeholder='0'
+                                    className={classes.input}
+                                    margin="normal"
+                                    value={ originAmount }
+                                    variant="outlined"
+                                    type="number"
+                                    onChange={this.handleOriginInput.bind(this)}
+                                    InputProps={{inputProps: { min: 0 }, endAdornment: <InputAdornment className={classes.endAdornment} position="end">{ }</InputAdornment> }}
+                                    helperText={(isSignedIn) ? "Worth: ~" + 5 + " Dai": " "}
+                                />
+                            </FormControl>
+                            <FormControl className={classes.control}>
+                                <Select
+                                    labelId="demo-customized-select-label"
+                                    id="demo-customized-select"
+                                    value={this.originSlot}
+                                    input={<InputBase value={0} />}
+                                    className={classes.select}
+                                    onChange={this.setSlot.bind(this, "targetSlot")}
+                                > 
+                                { coins.map((coin, ix) => { return (<MenuItem value={ix}> {coin} </MenuItem>) }) }
+                                </Select>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                    <Box className={classes.actionButtonContainer}>
+                        <Button color='primary'
+                            size='large'
+                            onClick={() => { this.swap() }} 
+                            variant="contained" 
+                            disabled={!isSignedIn} 
+                            className={classes.actionButton}
+                        >
+                            Transfer
+                        </Button>
+                    </Box>
             </Grid>
         )
     }

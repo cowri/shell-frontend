@@ -107,6 +107,8 @@ export const proportionalWithdraw = async function () {
 
 export const primeOriginTrade = async function (value) {
     const { store } = this.props
+
+    const walletAddress = store.get('walletAddress')
     const originAmount = store.get('originAmount')
     const loihi = store.get('loihiObject')
     const originSlot = store.get('originSlot')
@@ -115,48 +117,40 @@ export const primeOriginTrade = async function (value) {
     const origin = contracts[originSlot]
     const target = contracts[targetSlot]
 
-    console.log("calling", value)
+    store.set('rawOriginAmount', value)
+
+    console.log("origin", origin)
+    console.log("target", target)
+
     loihi.methods.viewOriginTrade(origin.options.address, target.options.address, value).call()
-        .then(function () { 
-            console.log("arguments", arguments)
+        .then(function () {
+            console.log("viewed", arguments)
         })
+
+    console.log("calling", value)
 
 }
 
 export const swap = async function () {
-    const { store } = this.props
 
+    const { store } = this.props
     const walletAddress = store.get('walletAddress')
-    const originAmount = store.get('originAmount')
-    const targetAmount = store.get('targetAmount')
-    console.log("originAmount", originAmount)
-    console.log("targetAmount", targetAmount)
+    const rawOriginAmount = store.get('rawOriginAmount')
+    const loihi = store.get('loihiObject')
     const originSlot = store.get('originSlot')
     const targetSlot = store.get('targetSlot')
-    console.log(originSlot)
-    console.log(targetSlot)
-
     const contracts = store.get('contractObjects')
+    const origin = contracts[originSlot]
+    const target = contracts[targetSlot]
 
-    const decimalOrigin = contracts[originSlot].getDecimal(originAmount)
-        .mul(10**contracts[originSlot].decimals)
-        .toFixed()
+    console.log("origin", origin)
+    console.log("target", target)
 
-    console.log("decimalOrigin", decimalOrigin)
-
-    const loihi = store.get('loihiObject')
-
-    return contracts[originSlot].methods.approve(loihi.options.address, decimalOrigin).send({from:walletAddress}) 
+    origin.methods.approve(loihi.options.address, rawOriginAmount).send({ from: walletAddress })
         .then(function () {
-            return loihi.methods.swapByOrigin(
-                contracts[originSlot].options.address,
-                contracts[targetSlot].options.address,
-                decimalOrigin,
-                50000,
-                Date.now() + 50000
-            ) .send({from: walletAddress})
+            return loihi.methods.swapByOrigin( origin.options.address, target.options.address, rawOriginAmount, 0, Date.now() + 500 ).send({ from : walletAddress })
         }).then(function () {
-            console.log("done", arguments)
+            console.log("traded", arguments)
         })
 
 }

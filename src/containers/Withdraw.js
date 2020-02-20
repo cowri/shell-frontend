@@ -54,42 +54,36 @@ class WithdrawContainer extends React.Component {
         const isSignedIn = walletAddress && walletAddress.length
 
         return (
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant='h4'>Withdraw Shells</Typography>
-                  <Typography variant='subtitle2'>Send Chai to any address</Typography>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6} >
-                      <List>
-                        <ListItem>
-                          <ListItemText primary={ "Dai:" + loihiDaiBalance }  />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText primary={ "Usdc: " + loihiUsdcBalance } />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText primary={ "Usdt: " + loihiUsdtBalance } />
-                        </ListItem>
-                        <ListItem>
-                          <ListItemText primary={ "Usdt: " + loihiSusdBalance } />
-                        </ListItem>
-                      </List>
-                    </Grid>
-                  </Grid>
-                  <Box className={classes.actionButtonContainer}>
-                    <Button color='primary'
-                      size='large'
-                      onClick={() => this.withdraw()} 
-                      variant="contained" disabled={!isSignedIn} className={classes.actionButton}
-                    >
-                      Withdraw Everything
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
+          <Grid>
+            <Typography variant='h4'>Withdraw Shells</Typography>
+            <Typography variant='subtitle2'>Send Chai to any address</Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6} >
+                <List>
+                  <ListItem>
+                    <ListItemText primary={ "Dai:" + loihiDaiBalance }  />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary={ "Usdc: " + loihiUsdcBalance } />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary={ "Usdt: " + loihiUsdtBalance } />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary={ "Usdt: " + loihiSusdBalance } />
+                  </ListItem>
+                </List>
+              </Grid>
             </Grid>
+            <Box className={classes.actionButtonContainer}>
+              <Button color='primary'
+                size='large'
+                onClick={() => this.withdraw()} 
+                variant="contained" disabled={!isSignedIn} className={classes.actionButton}
+              >
+                Withdraw Everything
+              </Button>
+            </Box>
           </Grid>
         )
     }

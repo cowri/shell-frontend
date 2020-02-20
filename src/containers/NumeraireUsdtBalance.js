@@ -4,18 +4,23 @@ import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
 import { getData } from '../utils/web3Utils'
+import ausdtPng from '../assets/aUSDT.png'
 
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-
-import logo from '../assets/logo.jpg'
+import Grid from '@material-ui/core/Grid';
 
 const styles = () => ({
+    // container: {
+    //     paddingTop: theme.spacing(1),
+    //     paddingBottom: theme.spacing(3),
+    //     minHeight: 52
+    // },
     container: {
         paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(3),
-        minHeight: 52
+        paddingBottom: theme.spacing(1),
+        minHeight: 52,
+        color: 'white' 
     },
+    icon: { width: '50px', height: '50px' }
 })
 
 class NumeraireUsdtBalance extends React.Component {
@@ -32,18 +37,20 @@ class NumeraireUsdtBalance extends React.Component {
     }
 
     render() {
-        const {store} = this.props
+        const { classes, store} = this.props
         const usdtBalance = store.get('usdtReserve')
         return (
-            <CardContent>
-                <h2> Usdt Liquidity { usdtBalance } </h2>
-                <CardMedia
-                    component="img"
-                    style={{resizeMode: 'contain', width: 100, float: 'right', paddingRight: 52 }}
-                    src={logo}
-                />
-                <p> USDT Liquidity { usdtBalance } </p>
-            </CardContent>
+            <Grid container direction='row' className={classes.container}>
+                <Grid item xs='3' sm='3'>
+                    <img className={classes.icon} src={ausdtPng} />
+                </Grid>
+                <Grid item xs='7' sm='7'>
+                    <span> Aave USD Tether </span>
+                </Grid>
+                <Grid item xs='2' sm='2'>
+                    <span> { usdtBalance } </span>
+                </Grid>
+            </Grid>
         )
     }
 }

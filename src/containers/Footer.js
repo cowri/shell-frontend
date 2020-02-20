@@ -18,7 +18,7 @@ import background from '../assets/ocean.jpg'
 const styles = () => ({
     navContainer: {
         paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
+        paddingBottom: theme.spacing(9),
         minHeight: 120
     },
     title: {
@@ -27,15 +27,30 @@ const styles = () => ({
       float:'center',
       fontSize: '20pt'
     },
+    subtitle: {
+      marginTop: '0px',
+      fontStyle: 'regular',
+      fontSize: '12pt'
+    },
     logo: {
         height: 40,
         display:'inline-block',
         float:'center',
         marginTop:'30px',
+        marginRight: theme.spacing(1)
     },
+    accountItem: {
+      float: 'right',
+    },
+    accountButton: {
+      float: 'right',
+      '& svg': {
+        marginRight: theme.spacing(1)
+      }
+    }
 })
 
-class NavContainer extends React.Component {
+class FooterContainer extends React.Component {
 
   render() {
       const { classes, store } = this.props
@@ -44,12 +59,19 @@ class NavContainer extends React.Component {
       const web3Failure = store.get('web3Failure')
       const network = store.get('network')
       return (
-          <Grid container direction='column' justify='center' alignContent='center' className={classes.navContainer} alignItems='center'>
-              <img src={logo} className={classes.logo} />
-              <span className={classes.title}>Shell</span>
+        <Grid container alignContent={'center'} >
+          <Grid item xs={12} className={classes.footer}>
+            Made by Cowri Labs
           </Grid>
+          <Grid item xs={12} className={classes.footer}>
+              <a target="_blank" href="https://github.com/shellprotocol" rel="noopener noreferrer">Twitter</a> ·
+              <a target="_blank" href="https://github.com/cowri" rel="noopener noreferrer">GitHub</a> ·
+              <a target="_blank" href="https://discordapp.com/invite/PtEHX" rel="noopener noreferrer">Discord</a> ·
+              <a target="_blank" href={"https://etherscan.io/token/" + config.LOIHI} rel="noopener noreferrer">Contract</a><br />
+          </Grid>
+        </Grid>
       )
     }
 }
 
-export default withStyles(styles)(withStore(NavContainer))
+export default withStyles(styles)(withStore(FooterContainer))

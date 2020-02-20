@@ -4,18 +4,23 @@ import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
 import { getData } from '../utils/web3Utils'
+import asusdPng from '../assets/aSUSD.png'
 
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-
-import logo from '../assets/logo.jpg'
+import Grid from '@material-ui/core/Grid';
 
 const styles = () => ({
+    // container: {
+    //     paddingTop: theme.spacing(1),
+    //     paddingBottom: theme.spacing(3),
+    //     minHeight: 52
+    // },
     container: {
         paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(3),
-        minHeight: 52
+        paddingBottom: theme.spacing(1),
+        minHeight: 52,
+        color: 'white' 
     },
+    icon: { width: '50px', height: '50px' }
 })
 
 class NumeraireSUsdBalance extends React.Component {
@@ -32,18 +37,20 @@ class NumeraireSUsdBalance extends React.Component {
     }
 
     render() {
-        const {store} = this.props
+        const { classes, store } = this.props
         const susdBalance = store.get('susdReserve')
         return (
-            <CardContent>
-                <h2> susd Liquidity { susdBalance } </h2>
-                <CardMedia
-                    component="img"
-                    style={{resizeMode: 'contain', width: 100, float: 'right', paddingRight: 52 }}
-                    src={logo}
-                />
-                <p> susd Liquidity { susdBalance } </p>
-            </CardContent>
+            <Grid container direction='row' className={classes.container} >
+                <Grid item xs='3' sm='3'>
+                    <img className={classes.icon} src={asusdPng} />
+                </Grid>
+                <Grid item xs='7' sm='7'>
+                    <span> Aave Synthetix USD </span>
+                </Grid>
+                <Grid item xs='2' sm='2'>
+                    <span> { susdBalance } </span>
+                </Grid>
+            </Grid>
         )
     }
 }

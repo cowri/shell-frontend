@@ -14,38 +14,19 @@ import Typography from '@material-ui/core/Typography'
 import logo from '../assets/logo.jpg'
 
 const styles = () => ({
-    navContainer: {
+    menu: {
         paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(9),
-        minHeight: 120
+        paddingBottom: theme.spacing(1),
+        minHeight: 100
     },
-    title: {
-      fontStyle: 'italic',
-      lineHeight: '0.8em',
-      display:'block',
-      fontSize: '40pt'
+    actionButton: {
+      color: 'white'
     },
-    subtitle: {
-      marginTop: '0px',
-      fontStyle: 'regular',
-      fontSize: '12pt'
+    activatedButton: {
+      color: 'white',
+      fontWeight: 'bold'
     },
-    logo: {
-        height: 150,
-        display:'inline-block',
-        float:'left',
-        marginTop:'-50px',
-        marginRight: theme.spacing(1)
-    },
-    accountItem: {
-      float: 'right',
-    },
-    accountButton: {
-      float: 'right',
-      '& svg': {
-        marginRight: theme.spacing(1)
-      }
-    }
+    zone: { textAlign: 'center' }
 })
 
 class Menu extends React.Component {
@@ -62,43 +43,40 @@ class Menu extends React.Component {
 
       const walletAddress = store.get('walletAddress')
       const isSignedIn = walletAddress && walletAddress.length
+      const viewState = store.get('viewState')
 
       return (
         <Grid container className={classes.menu} alignItems='center'>
-            <Grid item sm={3} md={3} >
-                <Button color='primary'
-                        size='large'
-                        onClick={() => { this.setViewState(0) }} 
-                        variant="contained" disabled={!isSignedIn} 
-                        className={classes.actionButton} >
-                            Stats
+            <Grid item sm={3} md={3} className={classes.zone}>
+                <Button size='small'
+                    onClick={() => { this.setViewState(0) }} 
+                    disabled={!isSignedIn} 
+                    className={viewState == 0 ? classes.activatedButton : classes.actionButton} >
+                        Overview
                 </Button>
             </Grid>
-            <Grid item sm={3} md={3}>
-                <Button color='primary'
-                        size='large'
-                        onClick={() => { this.setViewState(1) }} 
-                        variant="contained" disabled={!isSignedIn} 
-                        className={classes.actionButton} >
-                            Trade
+            <Grid item sm={3} md={3} className={classes.zone}>
+                <Button size='small'
+                    onClick={() => { this.setViewState(1) }} 
+                    disabled={!isSignedIn} 
+                    className={viewState == 1 ? classes.activatedButton : classes.actionButton} >
+                        Exchange
                 </Button>
             </Grid>
-            <Grid item sm={3} md={3}>
-                <Button color='primary'
-                        size='large'
-                        onClick={() => { this.setViewState(2) }} 
-                        variant="contained" disabled={!isSignedIn} 
-                        className={classes.actionButton} >
-                            Deposit
+            <Grid item sm={3} md={3} className={classes.zone}>
+                <Button size='small'
+                    onClick={() => { this.setViewState(2) }} 
+                    disabled={!isSignedIn} 
+                    className={viewState == 2 ? classes.activatedButton : classes.actionButton} >
+                        Deposit
                 </Button>
             </Grid>
-            <Grid item sm={3} md={3}>
-                <Button color='primary'
-                        size='large'
-                        onClick={() => { this.setViewState(3) }} 
-                        variant="contained" disabled={!isSignedIn} 
-                        className={classes.actionButton} >
-                            Withdraw
+            <Grid item sm={3} md={3} className={classes.zone}>
+                <Button size='small'
+                    onClick={() => { this.setViewState(3) }} 
+                    disabled={!isSignedIn} 
+                    className={viewState == 3 ? classes.activatedButton : classes.actionButton} >
+                        Withdraw
                 </Button>
             </Grid>
           {/* </Grid> */}
