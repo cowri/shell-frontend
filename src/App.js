@@ -19,7 +19,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider(config.defaultWeb3Provider
 const initialState = {
     web3: web3,
     web3Failure: false,
-    network: 42,
+    network: 1,
     walletAddress: '',
     walletConnecting: false,
     walletType: '',

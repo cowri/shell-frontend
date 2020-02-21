@@ -52,10 +52,12 @@ const styles = () => ({
 
 class LoginStateContainer extends React.Component {
   async componentDidMount() {
+    console.log("did mount")
     initBrowserWallet.call(this)
   }
 
   connect () {
+    console.log("connect")
     initBrowserWallet.call(this, true)
   }
 
