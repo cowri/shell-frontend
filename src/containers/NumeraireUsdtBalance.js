@@ -9,16 +9,12 @@ import ausdtPng from '../assets/aUSDT.png'
 import Grid from '@material-ui/core/Grid';
 
 const styles = () => ({
-    // container: {
-    //     paddingTop: theme.spacing(1),
-    //     paddingBottom: theme.spacing(3),
-    //     minHeight: 52
-    // },
     container: {
+        alignItems: 'center',
+        color: 'white',
+        minHeight: 52,
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1),
-        minHeight: 52,
-        color: 'white' 
     },
     icon: { width: '50px', height: '50px' }
 })

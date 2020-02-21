@@ -10,10 +10,11 @@ import Grid from '@material-ui/core/Grid';
 
 const styles = () => ({
   container: {
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
+    alignItems: 'center',
+    color: 'white',
     minHeight: 52,
-    color: 'white' 
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1)
   },
   icon: { width: '50px', height: '50px' }
 })
@@ -39,10 +40,10 @@ class NumeraireDaiBalance extends React.Component {
                 <Grid item sm='3' xs='3'>
                     <img className={classes.icon} src={cdaiSvg} /> 
                 </Grid>
-                <Grid item sm='7'>
+                <Grid item sm='7' xs='7'>
                     <span> Compound Dai </span> 
                 </Grid>
-                <Grid item sm='2'>
+                <Grid item sm='2' xs='2'>
                     <span> { daiBalance } </span>
                 </Grid>
             </Grid>

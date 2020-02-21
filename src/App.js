@@ -4,7 +4,7 @@ import Web3 from 'web3'
 
 import { WadDecimal, SixDecimal, EightDecimal } from './utils/web3Utils'
 
-import config from './config.json'
+import config from './mainnet.config.json'
 
 import AppContainer from './containers/AppContainer'
 

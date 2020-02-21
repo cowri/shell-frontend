@@ -5,7 +5,7 @@ import theme from '../theme/theme'
 import { initBrowserWallet } from '../utils/web3Utils'
 
 import { setViewState } from '../actions/main'
-import config from '../config.json'
+import config from '../mainnet.config.json'
 
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
@@ -26,7 +26,7 @@ const styles = () => ({
       color: 'white',
       fontWeight: 'bold'
     },
-    zone: { textAlign: 'center' }
+    zone: { textAlign: 'center', marginLeft: '10px', marginRight: '10px' }
 })
 
 class Menu extends React.Component {
@@ -46,7 +46,7 @@ class Menu extends React.Component {
       const viewState = store.get('viewState')
 
       return (
-        <Grid container className={classes.menu} alignItems='center'>
+        <Grid container className={classes.menu} alignContent='center' justify='center' alignItems='center'>
             <Grid item sm={3} md={3} className={classes.zone}>
                 <Button size='small'
                     onClick={() => { this.setViewState(0) }} 
@@ -79,7 +79,6 @@ class Menu extends React.Component {
                         Withdraw
                 </Button>
             </Grid>
-          {/* </Grid> */}
         </Grid>
       )
     }

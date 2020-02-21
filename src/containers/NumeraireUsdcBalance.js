@@ -15,10 +15,11 @@ const styles = () => ({
     //     minHeight: 52
     // },
     container: {
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
+        alignItems: 'center',
+        color: 'white',
         minHeight: 52,
-        color: 'white' 
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1)
     },
     icon: { width: '50px', height: '50px' }
 })

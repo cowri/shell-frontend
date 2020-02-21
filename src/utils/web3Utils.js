@@ -1,5 +1,5 @@
 import Web3 from "web3"
-import config from '../config.json'
+import config from '../mainnet.config.json'
 import erc20ABI from '../abi/ERC20.abi.json'
 import atokenABI from '../abi/AToken.abi.json'
 import ctokenABI from '../abi/CToken.abi.json'
@@ -154,7 +154,6 @@ export const getReserves = async function () {
   if (!loihi || !walletAddress) return
 
   loihi.methods.totalReserves().call().then(function () {
-    console.log("reserves", arguments);
     store.set('totalReserves', arguments[0][0])
   })
 }

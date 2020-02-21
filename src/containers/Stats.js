@@ -68,10 +68,12 @@ class StatsContainer extends React.Component {
         const totalReserves = store.get('totalReserves')
 
         return (
-            <Grid>
-                <div>
-                    total liquidity: {totalReserves}
-                </div>
+            <Grid container>
+                <Grid container alignItems='center' direction='column'>
+                    <Grid  item>
+                        total liquidity: {totalReserves}
+                    </Grid>
+                </Grid>
                 <NumeraireDaiBalance/>
                 <NumeraireUsdcBalance/>
                 <NumeraireUsdtBalance/>

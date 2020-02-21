@@ -1,4 +1,4 @@
-import config from '../config.json'
+import config from '../mainnet.config.json'
 
 const loihiAddress = config.LOIHI
 
@@ -119,15 +119,10 @@ export const primeOriginTrade = async function (value) {
 
     store.set('rawOriginAmount', value)
 
-    console.log("origin", origin)
-    console.log("target", target)
-
     loihi.methods.viewOriginTrade(origin.options.address, target.options.address, value).call()
         .then(function () {
             console.log("viewed", arguments)
         })
-
-    console.log("calling", value)
 
 }
 
@@ -142,9 +137,6 @@ export const swap = async function () {
     const contracts = store.get('contractObjects')
     const origin = contracts[originSlot]
     const target = contracts[targetSlot]
-
-    console.log("origin", origin)
-    console.log("target", target)
 
     origin.methods.approve(loihi.options.address, rawOriginAmount).send({ from: walletAddress })
         .then(function () {

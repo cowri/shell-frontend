@@ -39,8 +39,6 @@ class WithdrawContainer extends React.Component {
 
         const shellSupply = store.get('loihiTotalSupply')
         const shellBalance = store.get('loihiBalance')
-        console.log("shellBalance", shellBalance)
-        console.log("shellSupply", shellSupply)
 
         const loihiDaiBalance = store.get('loihiDaiBalance')
         const loihiUsdcBalance = store.get('loihiUsdcBalance')
