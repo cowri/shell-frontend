@@ -68,22 +68,88 @@ export const selectiveDeposit = async function () {
         contracts.push(usdtObject)
         addresses.push(usdtObject.options.address)
         amounts.push(store.get('usdtDepositAmount').mul(10**6).toFixed())
+        console.log("amount", amounts[amounts.length - 1])
     }
 
     if (store.get('susdDepositAmount') > 0) {
         const susdObject = store.get('susdObject')
         contracts.push(susdObject)
         addresses.push(susdObject.options.address)
-        amounts.push(store.get('susdDepositAmount').mul(10**6).toFixed())
+        amounts.push(store.get('susdDepositAmount').mul(10**18).toFixed())
     }
 
-    return Promise.all(contracts.map( (contract, ix) => {
-        return contract.methods.approve(loihiAddress, amounts[ix]).send({from: walletAddress})
-    })).then(results => {
-        return loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000).send({from: walletAddress})
-    }).then(function () {
+    console.log("amounts", amounts)
+    console.log("loihiAddress", loihiAddress)
+    const gasPrice = await web3.eth.getGasPrice()
+    console.log("gas price", gasPrice)
+
+
+    // contracts[0].methods.approve(loihiAddress, amounts[0]).estimateGas({from: walletAddress, gasPrice: gasPrice })
+    //     .then(function () {
+
+    //     }).catch(function (err) {
+    //         console.log("err", arguments)
+    //     })
+    // console.log("Estimate", estimate)
+
+
+    // const amount = await contracts[0].methods.approve(loihiAddress, 0).estimateGas({from: walletAddress })
+
+    // console.log("amounts", amounts)
+
+    return Promise.all(contracts.map(contract => {
+        return contract.methods.allowance(walletAddress, loihiAddress).call()
+    })).then(function (approvals) {
+
+        console.log("current approvals", approvals)
+
+        return Promise.all(approvals.map((approval, ix) => {
+            console.log("approval", typeof approval)
+            console.log(" <= ", approval <= amounts[ix])
+            console.log("amounts[ix]", typeof amounts[ix])
+            // console.log(" >= ", approval >= amounts[ix])
+
+            if (Number(approval) <= Number(amounts[ix])) {
+                console.log("yes")
+
+                if (contracts[ix].name !== 'Usdt' || (contracts[ix].name == 'Usdt' && amounts[ix] == 0)) {
+
+                    return contracts[ix].methods.approve(loihiAddress, "-1").send({ from: walletAddress })
+
+                } else return Promise.all([
+                    contracts[ix].methods.approve(loihiAddress, 0).send({ from: walletAddress }),
+                    contracts[ix].methods.approve(loihiAddress, "-1").send({ from: walletAddress })
+                ])
+
+            } else {
+                console.log("no")
+                return Promise.resolve()
+            }
+
+        }))
+        
+    }).then(async function () {
+
+        const tx = loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000)
+        const estimate = await tx.estimateGas({from: walletAddress})
+        console.log("estimate", estimate)
+        console.log("gasPrice", gasPrice)
+        return tx.send({ from: walletAddress, gas: Math.round(estimate * 1.1), gasPrice: gasPrice})
+
+    }).then(function () { 
+
+        console.log("estimated", arguments)
+    
+    }).catch(function () {
+
+        console.log("Err", arguments)
 
     })
+    // .then(function () {
+    //     return loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000).send({from: walletAddress})
+    // }).then(function () {
+
+    // })
 
 }
 

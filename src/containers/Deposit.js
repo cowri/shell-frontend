@@ -70,7 +70,10 @@ class DepositContainer extends React.Component {
 
     handleUsdtInput(event) {
       const {store} = this.props
-      try { store.set('usdtDepositAmount', new SixDecimal(event.target.value)) }
+      try { 
+          store.set('usdtDepositAmount', new SixDecimal(event.target.value)) 
+          console.log(store.get('usdtDepositAmount'))
+      }
       catch {
         if (event.target.value.length === 0) store.set('usdtDepositAmount', new SixDecimal(0))
       }

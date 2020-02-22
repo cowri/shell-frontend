@@ -9,11 +9,6 @@ import cusdcSvg from '../assets/cusdc.svg'
 import Grid from '@material-ui/core/Grid';
 
 const styles = () => ({
-    // container: {
-    //     paddingTop: theme.spacing(1),
-    //     paddingBottom: theme.spacing(3),
-    //     minHeight: 52
-    // },
     container: {
         alignItems: 'center',
         color: 'white',

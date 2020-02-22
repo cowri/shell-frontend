@@ -1,10 +1,13 @@
 import Web3 from "web3"
 import config from '../mainnet.config.json'
+
 import erc20ABI from '../abi/ERC20.abi.json'
+import usdtABI from '../abi/USDT.abi.json'
 import atokenABI from '../abi/AToken.abi.json'
 import ctokenABI from '../abi/CToken.abi.json'
 import chaiABI from '../abi/Chai.abi.json'
 import loihiABI from '../abi/Loihi.abi.json'
+
 let Decimal = require('decimal.js-light')
 Decimal = require('toformat')(Decimal)
 
@@ -115,6 +118,9 @@ export const getUsdcReserve = async function () {
   const cusdc = store.get('cusdcObject')
   if (!walletAddress || !cusdc) return
   const usdcBalanceRaw = await cusdc.methods.balanceOfUnderlying(loihiAddress).call()
+  const cusdcBalanceRaw = await cusdc.methods.balanceOf(loihiAddress).call()
+  console.log("cusdc", cusdcBalanceRaw)
+  console.log("usdc", usdcBalanceRaw)
   const usdcBalanceDecimal = new SixDecimal(usdcBalanceRaw).div('1e6')
   store.set('usdcReserveDecimal', usdcBalanceDecimal)
   const usdcBalance = toFixed(parseFloat(web3.utils.fromWei(usdcBalanceRaw, 'mwei')),5)
@@ -168,7 +174,7 @@ export const setupContracts = async function () {
       new web3.eth.Contract(ctokenABI, cdaiAddress),
       new web3.eth.Contract(erc20ABI, usdcAddress),
       new web3.eth.Contract(ctokenABI, cusdcAddress),
-      new web3.eth.Contract(erc20ABI, usdtAddress),
+      new web3.eth.Contract(usdtABI, usdtAddress),
       new web3.eth.Contract(atokenABI, ausdtAddress),
       new web3.eth.Contract(erc20ABI, susdAddress),
       new web3.eth.Contract(atokenABI, asusdAddress)
@@ -189,10 +195,10 @@ export const setupContracts = async function () {
     contractObjects[2].decimals = 8
     contractObjects[3].decimals = 6
     contractObjects[4].decimals = 8
-    contractObjects[5].decimals = 6
-    contractObjects[6].decimals = 6
-    contractObjects[7].decimals = 6
-    contractObjects[8].decimals = 6
+    contractObjects[5].decimals = 6 
+    contractObjects[6].decimals = 6 
+    contractObjects[7].decimals = 18 
+    contractObjects[8].decimals = 18
 
     contractObjects[0].getDecimal = function (amount) { return new WadDecimal(amount) }
     contractObjects[1].getDecimal = function (amount) { return new WadDecimal(amount) }
@@ -201,8 +207,8 @@ export const setupContracts = async function () {
     contractObjects[4].getDecimal = function (amount) { return new EightDecimal(amount) }
     contractObjects[5].getDecimal = function (amount) { return new SixDecimal(amount) }
     contractObjects[6].getDecimal = function (amount) { return new SixDecimal(amount) }
-    contractObjects[7].getDecimal = function (amount) { return new SixDecimal(amount) }
-    contractObjects[8].getDecimal = function (amount) { return new SixDecimal(amount) }
+    contractObjects[7].getDecimal = function (amount) { return new WadDecimal(amount) }
+    contractObjects[8].getDecimal = function (amount) { return new WadDecimal(amount) }
 
     store.set('contractObjects', contractObjects)
 
@@ -271,6 +277,7 @@ export const initBrowserWallet = async function(prompt) {
 
     const web3 = new Web3(web3Provider)
     const network = await web3.eth.net.getId()
+    console.log("network...", network)
     store.set('network', network)
     store.set('web3Failure', false)
     store.set('web3', web3)
