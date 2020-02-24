@@ -59,7 +59,7 @@ class WithdrawContainer extends React.Component {
               <Grid item xs={12} md={6} >
                 <List>
                   <ListItem>
-                    <ListItemText primary={ "Dai:" + loihiDaiBalance }  />
+                    <ListItemText primary={ "Dai: " + loihiDaiBalance }  />
                   </ListItem>
                   <ListItem>
                     <ListItemText primary={ "Usdc: " + loihiUsdcBalance } />
@@ -68,7 +68,7 @@ class WithdrawContainer extends React.Component {
                     <ListItemText primary={ "Usdt: " + loihiUsdtBalance } />
                   </ListItem>
                   <ListItem>
-                    <ListItemText primary={ "Usdt: " + loihiSusdBalance } />
+                    <ListItemText primary={ "Susd: " + loihiSusdBalance } />
                   </ListItem>
                 </List>
               </Grid>

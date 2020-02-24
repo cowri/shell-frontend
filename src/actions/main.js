@@ -174,21 +174,35 @@ export const proportionalWithdraw = async function () {
 export const primeOriginTrade = async function (value) {
     const { store } = this.props
 
+    console.log("prime origin trade", value)
+
+    store.set('originAmount', value)
+
     const walletAddress = store.get('walletAddress')
-    const originAmount = store.get('originAmount')
     const loihi = store.get('loihiObject')
     const originSlot = store.get('originSlot')
     const targetSlot = store.get('targetSlot')
     const contracts = store.get('contractObjects')
     const origin = contracts[originSlot]
     const target = contracts[targetSlot]
+    if (!walletAddress || !loihi) return
 
-    store.set('rawOriginAmount', value)
+    const rawOrigin = origin.getRaw(value)
+    console.log("raworig", rawOrigin)
 
-    loihi.methods.viewOriginTrade(origin.options.address, target.options.address, value).call()
-        .then(function () {
-            console.log("viewed", arguments)
-        })
+    const rawTarget = await loihi.methods.viewOriginTrade(origin.options.address, target.options.address, rawOrigin).call()
+    console.log("raw target", rawTarget);
+
+    // const contracts = store.get('contractObjects')
+    // const origin = contracts[originSlot]
+    // const target = contracts[targetSlot]
+
+    // store.set('rawOriginAmount', value)
+
+    // loihi.methods.viewOriginTrade(origin.options.address, target.options.address, value).call()
+    //     .then(function () {
+    //         console.log("viewed", arguments)
+    //     })
 
 }
 

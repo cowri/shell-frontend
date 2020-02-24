@@ -5,6 +5,11 @@ import theme from '../theme/theme'
 import { WadDecimal, getData, toDai } from '../utils/web3Utils'
 import { transfer } from '../actions/main'
 
+import cdaiSvg from '../assets/cdai.svg'
+import cusdcSvg from '../assets/cusdc.svg'
+import ausdtPng from '../assets/aUSDT.png'
+import asusdPng from '../assets/aSUSD.png' 
+
 import NumeraireDaiBalance from './NumeraireDaiBalance'
 import NumeraireUsdcBalance from './NumeraireUsdcBalance'
 import NumeraireUsdtBalance from './NumeraireUsdtBalance'
@@ -14,6 +19,7 @@ import Card from '@material-ui/core/Card';
 import Grid from '@material-ui/core/Grid';
 
 const styles = () => ({
+   icon: { width: '50px', height: '50px' },
    input: {
         width: '100%',
         marginTop: theme.spacing(1),

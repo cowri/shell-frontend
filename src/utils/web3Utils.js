@@ -8,6 +8,16 @@ import ctokenABI from '../abi/CToken.abi.json'
 import chaiABI from '../abi/Chai.abi.json'
 import loihiABI from '../abi/Loihi.abi.json'
 
+import asusdIcon from '../assets/aSUSD.svg'
+import ausdtIcon from '../assets/aUSDT.svg'
+import susdIcon from '../assets/susd.svg'
+import usdcIcon from '../assets/usdc.svg'
+import cdaiIcon from '../assets/cdai.svg'
+import cusdcIcon from '../assets/cusdc.svg'
+import daiIcon from '../assets/dai.svg'
+import usdtIcon from '../assets/usdt.svg'
+import chaiIcon from '../assets/chai.png'
+
 let Decimal = require('decimal.js-light')
 Decimal = require('toformat')(Decimal)
 
@@ -67,100 +77,96 @@ function toFixed(num, precision) {
     return (+(Math.round(+(num + 'e' + precision)) + 'e' + -precision)).toFixed(precision);
 }
 
-export const getLoihiBalance = async function() {
+export const getLoihiBalances = async function () {
   const { store } = this.props
   const web3 = store.get('web3')
   const walletAddress = store.get('walletAddress')
   const loihi = store.get('loihiObject')
   if (!walletAddress || !loihi) return
-  const loihiBalanceRaw = await loihi.methods.balances(walletAddress).call()
-  const loihiBalanceDecimal = new WadDecimal(loihiBalanceRaw).div('1e18')
-  store.set('loihiBalanceDecimal', loihiBalanceDecimal)
-  const loihiBalance = toFixed(parseFloat(web3.utils.fromWei(loihiBalanceRaw)),5)
-  store.set('loihiBalance', loihiBalance)
-}
 
-export const getLoihiUnderlyingBalances = async function () {
-  const { store } = this.props
-  const web3 = store.get('web3')
-  const walletAddress = store.get('walletAddress')
-  const loihi = store.get('loihiObject')
-  if (!walletAddress || !loihi) return
-  const totalShells = await loihi.methods.totalSupply().call()
-  const shellBalance = await loihi.methods.balances(walletAddress).call()
-  const daiBal = shellBalance / totalShells * store.get('daiReserve')
-  const usdcBal = shellBalance / totalShells * store.get('usdcReserve')
-  const usdtBal = shellBalance / totalShells * store.get('usdtReserve')
-  const susdBal = shellBalance / totalShells * store.get('susdReserve')
-  store.set('loihiDaiBalance', new WadDecimal(daiBal > 0 ? daiBal : 0))
-  store.set('loihiUsdcBalance', new SixDecimal(usdcBal > 0 ? usdcBal : 0))
-  store.set('loihiUsdtBalance', new SixDecimal(usdtBal > 0 ? usdtBal : 0))
-  store.set('loihiSusdBalance', new SixDecimal(susdBal > 0 ? susdBal : 0))
-}
+  const shellBalanceRaw = await loihi.methods.balances(walletAddress).call()
+  store.set('shellBalanceRaw', shellBalanceRaw)
+  const shellBalanceDecimal = new WadDecimal(shellBalanceRaw).div('1e18')
+  store.set('shellBalanceDecimal', shellBalanceDecimal)
+  const shellBalance = toFixed(parseFloat(web3.utils.fromWei(shellBalanceRaw)),5)
+  store.set('shellBalance', shellBalance)
 
-export const getDaiReserve = async function() {
-  const { store } = this.props
-  const web3 = store.get('web3')
-  const walletAddress = store.get('walletAddress')
-  const cdai = store.get('cdaiObject')
-  if (!walletAddress || !cdai) return
-  const daiBalanceRaw = await cdai.methods.balanceOfUnderlying(loihiAddress).call()
-  const daiBalanceDecimal = new WadDecimal(daiBalanceRaw).div('1e18')
-  store.set('daiReserveDecimal', daiBalanceDecimal)
-  const daiBalance = toFixed(parseFloat(web3.utils.fromWei(daiBalanceRaw)),5)
-  store.set('daiReserve', daiBalance)
-}
+  const totalShellsRaw = await loihi.methods.totalSupply().call()
+  const totalShells = toFixed(parseFloat(web3.utils.fromWei(totalShellsRaw)),5)
+  store.set('totalShells', totalShells)
 
-export const getUsdcReserve = async function () {
-  const { store } = this.props
-  const web3 = store.get('web3')
-  const walletAddress = store.get('walletAddress')
-  const cusdc = store.get('cusdcObject')
-  if (!walletAddress || !cusdc) return
-  const usdcBalanceRaw = await cusdc.methods.balanceOfUnderlying(loihiAddress).call()
-  const cusdcBalanceRaw = await cusdc.methods.balanceOf(loihiAddress).call()
-  console.log("cusdc", cusdcBalanceRaw)
-  console.log("usdc", usdcBalanceRaw)
-  const usdcBalanceDecimal = new SixDecimal(usdcBalanceRaw).div('1e6')
-  store.set('usdcReserveDecimal', usdcBalanceDecimal)
-  const usdcBalance = toFixed(parseFloat(web3.utils.fromWei(usdcBalanceRaw, 'mwei')),5)
-  store.set('usdcReserve', usdcBalance)
-}
+  const daiReserveRaw = store.get('daiReserveRaw')
+  const usdcReserveRaw = store.get('usdcReserveRaw')
+  const usdtReserveRaw = store.get('usdtReserveRaw')
+  const susdReserveRaw = store.get('susdReserveRaw')
 
-export const getUsdtReserve = async function () {
-  const { store } = this.props
-  const web3 = store.get('web3')
-  const walletAddress = store.get('walletAddress')
-  const ausdt = store.get('ausdtObject')
-  if (!walletAddress || !ausdt) return
-  const usdtBalanceRaw = await ausdt.methods.balanceOf(loihiAddress).call()
-  const usdtBalanceDecimal = new SixDecimal(usdtBalanceRaw).div('1e6')
-  store.set('usdtReserveDecimal', usdtBalanceDecimal)
-  const usdtBalance = toFixed(parseFloat(web3.utils.fromWei(usdtBalanceRaw, 'mwei')),5)
-  store.set('usdtReserve', usdtBalance)
-}
+  const daiBal = shellBalanceRaw / totalShellsRaw * daiReserveRaw
+  const usdcBal = shellBalanceRaw / totalShellsRaw * usdcReserveRaw
+  const usdtBal = shellBalanceRaw / totalShellsRaw * usdtReserveRaw
+  const susdBal = shellBalanceRaw / totalShellsRaw * susdReserveRaw
 
-export const getSusdReserve = async function () {
-  const { store } = this.props
-  const web3 = store.get('web3')
-  const walletAddress = store.get('walletAddress')
-  const asusd = store.get('asusdObject')
-  if (!walletAddress || !asusd) return
-  const susdBalanceRaw = await asusd.methods.balanceOf(loihiAddress).call()
-  const susdBalanceDecimal = new SixDecimal(susdBalanceRaw).div('1e6')
-  store.set('susdReserveDecimal', susdBalanceDecimal)
-  const susdBalance = toFixed(parseFloat(web3.utils.fromWei(susdBalanceRaw, 'mwei')),5)
-  store.set('susdReserve', susdBalance)
+  store.set('loihiDaiBalanceRaw', daiBal)
+  store.set('loihiUsdcBalanceRaw', usdcBal)
+  store.set('loihiDaiBalanceRaw', usdtBal)
+  store.set('loihiDaiBalanceRaw', susdBal)
+
+  store.set('loihiDaiBalance', toFixed(parseFloat(web3.utils.fromWei(daiBal.toString())),5))
+  store.set('loihiUsdcBalance', toFixed(parseFloat(web3.utils.fromWei(usdcBal.toString())),5))
+  store.set('loihiUsdtBalance', toFixed(parseFloat(web3.utils.fromWei(usdtBal.toString())),5))
+  store.set('loihiSusdBalance', toFixed(parseFloat(web3.utils.fromWei(susdBal.toString())),5))
+
+  store.set('loihiDaiBalanceDecimal', new WadDecimal(daiBal))
+  store.set('loihiUsdcBalanceDecimal', new WadDecimal(usdcBal))
+  store.set('loihiUsdtBalanceDecimal', new WadDecimal(usdtBal))
+  store.set('loihiSusdBalanceDecimal', new WadDecimal(susdBal))
+
 }
 
 export const getReserves = async function () {
   const { store } = this.props 
+
+  const web3 = store.get('web3')
   const loihi = store.get('loihiObject')
   const walletAddress = store.get('walletAddress')
+
   if (!loihi || !walletAddress) return
 
   loihi.methods.totalReserves().call().then(function () {
-    store.set('totalReserves', arguments[0][0])
+
+    store.set('totalReservesRaw', arguments[0][0])
+    const totalReservesDecimal = new WadDecimal(arguments[0][0]).div('1e18')
+    store.set('totalReservesDecimal', totalReservesDecimal)
+    const totalReserves = toFixed(parseFloat(web3.utils.fromWei(arguments[0][0])), 5)
+    store.set('totalReserves', totalReserves)
+
+    const daiReserveRaw = arguments[0][1][0]
+    store.set('daiReserveRaw', daiReserveRaw)
+    const daiReserveDecimal = new WadDecimal(arguments[0][1][0]).div('1e18')
+    store.set('daiReserveDecimal', daiReserveDecimal)
+    const daiReserve = toFixed(parseFloat(web3.utils.fromWei(arguments[0][1][0])), 5)
+    store.set('daiReserve', daiReserve)
+
+    const usdcReserveRaw = arguments[0][1][1]
+    store.set('usdcReserveRaw', usdcReserveRaw)
+    const usdcReserveDecimal = new SixDecimal(arguments[0][1][1]).div('1e18')
+    store.set('usdcReserveDecimal', usdcReserveDecimal)
+    const usdcReserve = toFixed(parseFloat(web3.utils.fromWei(arguments[0][1][2])), 5)
+    store.set('usdcReserve', usdcReserve)
+
+    const usdtReserveRaw = arguments[0][1][2]
+    store.set('usdtReserveRaw', usdtReserveRaw)
+    const usdtReserveDecimal = new SixDecimal(arguments[0][1][2]).div('1e18')
+    store.set('usdtReserveDecimal', usdtReserveDecimal)
+    const usdtReserve = toFixed(parseFloat(web3.utils.fromWei(arguments[0][1][2])), 5)
+    store.set('usdtReserve', usdtReserve)
+
+    const susdReserveRaw = arguments[0][1][3]
+    store.set('susdReserveRaw', susdReserveRaw)
+    const susdReserveDecimal = new WadDecimal(arguments[0][1][3]).div('1e18')
+    store.set('susdReserveDecimal', susdReserveDecimal)
+    const susdReserve = toFixed(parseFloat(web3.utils.fromWei(arguments[0][1][3])), 5)
+    store.set('susdReserve', susdReserve)
+
   })
 }
 
@@ -180,15 +186,35 @@ export const setupContracts = async function () {
       new web3.eth.Contract(atokenABI, asusdAddress)
     ]
 
-    contractObjects[0].name = 'Dai'
-    contractObjects[1].name = 'Chai'
-    contractObjects[2].name = 'cDai'
-    contractObjects[3].name = 'Usdc'
-    contractObjects[4].name = 'cUsdc'
-    contractObjects[5].name = 'Usdt'
-    contractObjects[6].name = 'aUsdt'
-    contractObjects[7].name = 'sUsd'
-    contractObjects[8].name = 'asUsd'
+    contractObjects[0].symbol = 'MultiCollateral Dai'
+    contractObjects[1].symbol = 'Chai'
+    contractObjects[2].symbol = 'Compound Dai'
+    contractObjects[3].symbol = 'USD Coin'
+    contractObjects[4].symbol = 'Compound USD Coin'
+    contractObjects[5].symbol = 'Tether Stablecoin'
+    contractObjects[6].symbol = 'Aave Tether'
+    contractObjects[7].symbol = 'Synthetix USD'
+    contractObjects[8].symbol = 'Aave Synthetix USD'
+
+    contractObjects[0].symbol = 'DAI'
+    contractObjects[1].symbol = 'CHAI'
+    contractObjects[2].symbol = 'cDAI'
+    contractObjects[3].symbol = 'USDC'
+    contractObjects[4].symbol = 'cUSDC'
+    contractObjects[5].symbol = 'USDT'
+    contractObjects[6].symbol = 'aUSDT'
+    contractObjects[7].symbol = 'SUSD'
+    contractObjects[8].symbol = 'aSUSD'
+
+    contractObjects[0].icon = daiIcon
+    contractObjects[1].icon = chaiIcon 
+    contractObjects[2].icon = cdaiIcon
+    contractObjects[3].icon = usdcIcon
+    contractObjects[4].icon = cusdcIcon
+    contractObjects[5].icon = usdtIcon
+    contractObjects[6].icon = ausdtIcon 
+    contractObjects[7].icon = susdIcon
+    contractObjects[8].icon = asusdIcon
 
     contractObjects[0].decimals = 18
     contractObjects[1].decimals = 18
@@ -210,6 +236,16 @@ export const setupContracts = async function () {
     contractObjects[7].getDecimal = function (amount) { return new WadDecimal(amount) }
     contractObjects[8].getDecimal = function (amount) { return new WadDecimal(amount) }
 
+    contractObjects[0].getRaw = function (amount) { return new WadDecimal(amount).mul('1e18').toFixed() }
+    contractObjects[1].getRaw = function (amount) { return new WadDecimal(amount).mul('1e18').toFixed() }
+    contractObjects[2].getRaw = function (amount) { return new EightDecimal(amount).mul('1e8').toFixed() }
+    contractObjects[3].getRaw = function (amount) { return new SixDecimal(amount).mul('1e6').toFixed() }
+    contractObjects[4].getRaw = function (amount) { return new EightDecimal(amount).mul('1e8').toFixed() }
+    contractObjects[5].getRaw = function (amount) { return new SixDecimal(amount).mul('1e6').toFixed() }
+    contractObjects[6].getRaw = function (amount) { return new SixDecimal(amount).mul('1e6').toFixed() }
+    contractObjects[7].getRaw = function (amount) { return new WadDecimal(amount).mul('1e18').toFixed() }
+    contractObjects[8].getRaw = function (amount) { return new WadDecimal(amount).mul('1e18').toFixed() }
+
     store.set('contractObjects', contractObjects)
 
     store.set('daiObject', contractObjects[0])
@@ -229,13 +265,9 @@ export const setupContracts = async function () {
 }
 
 export const getData = async function() {
-    getLoihiBalance.bind(this)()
-    getLoihiUnderlyingBalances.bind(this)()
-    getDaiReserve.bind(this)()
-    getUsdcReserve.bind(this)()
-    getUsdtReserve.bind(this)()
-    getSusdReserve.bind(this)()
+    getLoihiBalances.bind(this)()
     getReserves.bind(this)()
+
 }
 
 const secondsInYear = WadDecimal(60 * 60 * 24 * 365)

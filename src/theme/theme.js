@@ -4,10 +4,10 @@ import grey from '@material-ui/core/colors/grey';
 export default createMuiTheme({
     palette: {
         primary: {
-            light: '#000',
-            main: '#000',
-            dark: '#000',
-            contrastText: '#fff',
+            light: '#fff',
+            main: '#fff',
+            dark: '#fff',
+            contrastText: '#000',
         },
         secondary: grey,
     },
@@ -20,6 +20,9 @@ export default createMuiTheme({
         //     color: 'white',
         //   },
         // }
+        MuiTypography: {
+            body1: { color: '#EBEBEB !important' }
+        },
         PrivateNotchedOutline: {
             root: {
             }
@@ -27,20 +30,45 @@ export default createMuiTheme({
         // '.MuiOutlinedInput-root:hover':{
         //     borderColor: '#EBEBEB !important'
         // },
+        MuiInputAdornment: {
+            root: { color: '#EBEBEB !important' },
+            positionEnd: { color: '#EBEBEB !important' }
+        },
+        MuiFormHelperText: {
+            root: {
+                color: '#EBEBEB !important',
+            }
+        },
+        MuiFormLabel: {
+            root: {
+                color: '#EBEBEB !important',
+            }
+        },
+        MuiInput: {
+            root: {
+                fontSize: '100px'
+            }
+        },
         MuiOutlinedInput: {
-            // root:{
+            root:{
             //     '&:hover': {
             //         // notchedOutline: {
             //             borderColor: '#EBEBEB'
             //         // }
             //     }
-            // },
+                color: '#EBEBEB !important',
+                height: '70px',
+                fontSize: '27.5px',
+                fontWeight: 100
+            },
             notchedOutline: {
                 borderColor: '#EBEBEB !important',
                 borderWidth: '1px !important'
             }
         },
         MuiTextField: {
+            root: {
+            }
 
         },
         MuiToggleButtonGroup: {

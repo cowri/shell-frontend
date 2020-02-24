@@ -16,21 +16,14 @@ const styles = () => ({
         paddingTop: theme.spacing(1),
         paddingBottom: theme.spacing(1)
     },
-    icon: { width: '50px', height: '50px' }
+    icon: { 
+        textAlign: 'center',
+        width: '50px', 
+        height: '50px' 
+    }
 })
 
 class NumeraireUsdcBalance extends React.Component {
-
-    async componentDidMount() {
-        this.watchBalance()
-    }
-
-    async watchBalance() {
-        await getData.bind(this)();
-        setInterval(() => {
-            getData.bind(this)();
-        }, 10 * 1000);
-    }
 
     render() {
         const { classes, store } = this.props

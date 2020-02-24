@@ -21,17 +21,6 @@ const styles = () => ({
 
 class NumeraireDaiBalance extends React.Component {
 
-    async componentDidMount() {
-        this.watchBalance()
-    }
-
-    async watchBalance() {
-        await getData.bind(this)();
-        setInterval(() => {
-            getData.bind(this)();
-        }, 10 * 1000);
-    }
-
     render() {
         const { classes, store } = this.props
         const daiBalance = store.get('daiReserve')

@@ -39,7 +39,7 @@ class NumeraireSUsdBalance extends React.Component {
 
     render() {
         const { classes, store } = this.props
-        const susdBalance = store.get('susdReserve')
+        const susdReserve = store.get('susdReserve')
         return (
             <Grid container direction='row' className={classes.container} >
                 <Grid item xs='3' sm='3'>
@@ -49,7 +49,7 @@ class NumeraireSUsdBalance extends React.Component {
                     <span> Aave Synthetix USD </span>
                 </Grid>
                 <Grid item xs='2' sm='2'>
-                    <span> { susdBalance } </span>
+                    <span> { susdReserve } </span>
                 </Grid>
             </Grid>
         )
