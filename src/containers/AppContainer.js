@@ -41,7 +41,16 @@ class AppContainer extends React.Component {
         this.views =[ StatsContainer, TradeContainer, DepositContainer, WithdrawContainer ];
     }
 
-    async componentDidMount() { }
+    async componentDidMount() {
+        this.watchData()
+    }
+
+    async watchData() {
+        await getData.call(this)
+        setInterval(() => {
+            getData.call(this)
+        }, 10 * 1000);
+    }
 
     render() {
         const { store, classes } = this.props

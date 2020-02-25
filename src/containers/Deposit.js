@@ -62,15 +62,13 @@ const styles = () => ({
 
 class DepositContainer extends React.Component {
     async componentDidMount() {
-        // update data periodically
         this.watchData()
-
     }
 
     async watchData() {
-        await getData.bind(this)();
+        await getData.call(this)
         setInterval(() => {
-            getData.bind(this)();
+            getData.call(this)
         }, 10 * 1000);
     }
 

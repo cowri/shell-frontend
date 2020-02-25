@@ -76,20 +76,8 @@ class TradeContainer extends React.Component {
 
     }
 
-    async componentDidMount() {
-        // update data periodically
-        this.watchData()
-    }
-
-    async watchData() {
-        await getData.bind(this)();
-        setInterval(() => {
-            getData.bind(this)();
-        }, 10 * 1000);
-    }
-
     swap() {
-        swap.bind(this)()
+        swap.call(this)
     }
 
     handleOriginSelect (e) { 
