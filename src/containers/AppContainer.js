@@ -1,6 +1,8 @@
 import React from 'react'
 import {withStore} from '@spyna/react-store'
 
+import { getData } from '../utils/web3Utils'
+
 import NavContainer from './Nav'
 import StatsContainer from './Stats'
 import TradeContainer from './Trade'
@@ -42,14 +44,8 @@ class AppContainer extends React.Component {
     }
 
     async componentDidMount() {
-        this.watchData()
-    }
-
-    async watchData() {
         await getData.call(this)
-        setInterval(() => {
-            getData.call(this)
-        }, 10 * 1000);
+        setInterval(() => { getData.call(this) }, 10 * 1000);
     }
 
     render() {

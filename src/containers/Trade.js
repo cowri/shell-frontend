@@ -2,22 +2,15 @@ import React from 'react';
 import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
-import { getData } from '../utils/web3Utils'
 import { swap, primeOriginTrade } from '../actions/main'
 
 import Box from '@material-ui/core/Box';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputBase from '@material-ui/core/InputBase';
 import InputLabel from '@material-ui/core/InputLabel';
 
 import usdcIcon from '../assets/usdc.svg'

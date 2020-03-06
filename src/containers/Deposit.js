@@ -2,7 +2,7 @@ import React from 'react';
 import {withStore} from '@spyna/react-store'
 import {withStyles} from '@material-ui/styles';
 import theme from '../theme/theme'
-import { SixDecimal, EightDecimal, WadDecimal, getData, toDai } from '../utils/web3Utils'
+import { SixDecimal, WadDecimal } from '../utils/web3Utils'
 import { selectiveDeposit } from '../actions/main'
 
 import daiIcon from '../assets/dai.svg'
@@ -11,12 +11,9 @@ import usdtIcon from '../assets/usdt.svg'
 import susdIcon from '../assets/susd.svg'
 
 import Box from '@material-ui/core/Box'
-import Card from '@material-ui/core/Card'
-import CardContent from '@material-ui/core/CardContent'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import Typography from '@material-ui/core/Typography'
 import InputAdornment from '@material-ui/core/InputAdornment'
 
 
@@ -24,7 +21,7 @@ const styles = () => ({
    input: {
         width: '100%',
         color: 'white',
-        background: 'rgba(0,0,0,.05)',
+        // background: 'rgba(0,0,0,.05)',
         borderRadius: '5px',
     },
     actionButton: {
@@ -61,16 +58,6 @@ const styles = () => ({
 })
 
 class DepositContainer extends React.Component {
-    async componentDidMount() {
-        this.watchData()
-    }
-
-    async watchData() {
-        await getData.call(this)
-        setInterval(() => {
-            getData.call(this)
-        }, 10 * 1000);
-    }
 
     deposit () {
         selectiveDeposit.bind(this)()
@@ -190,7 +177,7 @@ class DepositContainer extends React.Component {
                         InputProps={{
                             inputProps: { min: 0 }, 
                             endAdornment: <InputAdornment className={classes.endAdornment} position="end">SUSD</InputAdornment>,
-                            startAdornment: <InputAdornment position="start"> <img className={classes.iconInBox} src={usdtIcon}/> </InputAdornment> 
+                            startAdornment: <InputAdornment position="start"> <img className={classes.iconInBox} src={susdIcon}/> </InputAdornment> 
                         }}
                     />
                 </Grid>

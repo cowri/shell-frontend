@@ -1,5 +1,5 @@
 import Web3 from "web3"
-import config from '../mainnet.config.json'
+import config from '../kovan.config.json'
 
 import erc20ABI from '../abi/ERC20.abi.json'
 import usdtABI from '../abi/USDT.abi.json'

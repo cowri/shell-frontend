@@ -2,18 +2,10 @@ import React from 'react'
 import { withStore } from '@spyna/react-store'
 import { withStyles } from '@material-ui/styles'
 import theme from '../theme/theme'
-import { initBrowserWallet } from '../utils/web3Utils'
-import config from '../mainnet.config.json'
 
 import Grid from '@material-ui/core/Grid'
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
 
 import logo from '../assets/cowri-logo.svg'
-import background from '../assets/ocean.jpg'
 
 const styles = () => ({
     navContainer: {

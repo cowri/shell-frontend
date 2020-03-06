@@ -5,7 +5,7 @@ import theme from '../theme/theme'
 import { initBrowserWallet } from '../utils/web3Utils'
 
 import { setViewState } from '../actions/main'
-import config from '../mainnet.config.json'
+import config from '../kovan.config.json'
 
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'

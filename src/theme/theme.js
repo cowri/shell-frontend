@@ -62,6 +62,7 @@ export default createMuiTheme({
                 fontWeight: 100
             },
             notchedOutline: {
+                display: 'none',
                 borderColor: '#EBEBEB !important',
                 borderWidth: '1px !important'
             }

@@ -1,4 +1,4 @@
-import config from '../mainnet.config.json'
+import config from '../kovan.config.json'
 
 const loihiAddress = config.LOIHI
 

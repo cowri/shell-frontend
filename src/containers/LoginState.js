@@ -3,7 +3,7 @@ import { withStore } from '@spyna/react-store'
 import { withStyles } from '@material-ui/styles'
 import theme from '../theme/theme'
 import { initBrowserWallet } from '../utils/web3Utils'
-import config from '../mainnet.config.json'
+import config from '../kovan.config.json'
 
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
@@ -83,7 +83,7 @@ class LoginStateContainer extends React.Component {
             <DialogTitle id="alert-dialog-title">{"Wrong network"}</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                  <p>Switch to Mainnet to interact with this app</p>
+                  <p>Switch to Kovan to interact with this app</p>
               </DialogContentText>
             </DialogContent>
           </Dialog>
