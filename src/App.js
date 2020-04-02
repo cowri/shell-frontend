@@ -9,9 +9,7 @@ import Dashboard from './views/Dashboard'
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <div className="App">
-        <Dashboard />
-      </div>
+      <Dashboard />
     </ThemeProvider>
   )
 }

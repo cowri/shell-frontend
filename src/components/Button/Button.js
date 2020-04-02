@@ -1,27 +1,26 @@
 import React from 'react'
 import styled from 'styled-components'
+import { withTheme } from '@material-ui/core/styles'
 
-import theme from '../../theme'
-
-const StyledButton = styled.button`
+const StyledButton = withTheme(styled.button`
   align-items: center;
-  background-color: ${props => props.outlined ? 'transparent' : theme.palette.primary.main};
-  border: 0;
-  border-radius: ${theme.shape.borderRadius}px;
+  background-color: ${props => props.outlined ? props.theme.palette.grey[50] : props.theme.palette.primary.main};
+  border: ${props => props.outlined ? `1px solid ${props.theme.palette.grey[200]}` : '0'};
+  border-radius: ${props => props.theme.shape.borderRadius}px;
   box-sizing: border-box;
-  color: #FFF;
+  color: ${props => props.outlined ? props.theme.palette.grey[600] : '#FFF'};
   cursor: pointer;
   display: flex;
   font-size: 16px;
   font-weight: 700;
   height: 48px;
-  padding: 0 24px;
+  padding: 0 32px;
   transition: background-color .2s, border-color .2s;
   &:hover {
-    background-color: ${props => props.outlined ? 'rgba(255,255,255,0.1)' : theme.palette.primary.dark};
-    color: ${props => props.outlined ? '#FFF' : '#FFF'};
+    background-color: ${props => props.outlined ? '#FFF' : props.theme.palette.primary.dark};
+    color: ${props => props.outlined ? props.theme.palette.primary.main : '#FFF' };
   }
-`
+`)
 
 const Button = ({ children, onClick, outlined }) => {
 

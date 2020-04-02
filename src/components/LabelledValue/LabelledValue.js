@@ -6,15 +6,15 @@ const StyledLabelledValue = styled.div`
   flex-direction: column;
 `
 const StyledLabel = styled.span`
-  font-size: 0.6em;
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 16px;
   margin-top: 0.25em;
   opacity: 0.3;
-  text-transform: uppercase;
+
 `
 const StyledValue = styled.h3`
-  font-size: 1.5em;
+  font-size: 1em;
   font-weight: 500;
   margin: 0;
   padding: 0;

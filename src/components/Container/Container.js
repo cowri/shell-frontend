@@ -7,6 +7,9 @@ const StyledContainer = styled.div`
   max-width: ${props => props.full ? '100%' : '700px'};
   padding: 0 24px;
   width: 100%;
+  @media (max-width: 512px) {
+    padding: 0 12px;
+  }
 `
 
 const Container = ({ children, full }) => (

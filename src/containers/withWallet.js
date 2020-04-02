@@ -4,6 +4,7 @@ import Web3 from 'web3'
 
 import {
   getContracts,
+  getLoihiBalances,
   getReserves,
 } from '../utils/web3Utils'
 
@@ -11,35 +12,31 @@ const withWallet = (WrappedComponent) => {
   return (props) => {
     const [web3, setWeb3] = useState()
     const [account, setAccount] = useState()
+    const [balances, setBalances] = useState({})
     const [contracts, setContracts] = useState({})
     const [reserves, setReserves] = useState({})
     const [networkId, setNetworkId] = useState(1)
 
-    /*
-    const handleEnable = async () => {
-      try {
-        const accounts = await window.ethereum.enable()
-        setAccount(accounts[0])
-      } catch (e) {
-        console.log(e)
-      }
+    const fetchBalances = async () => {
+      const balances = await getLoihiBalances(account, contracts.loihi, reserves)
+      setBalances(balances)
     }
-    */
-   const fetchReserves = async () => {
-    const reserves = await getReserves(contracts.loihi)
-    setReserves(reserves)
-   }
 
-   const handleEnable = () => {
-     return new Promise((resolve, reject) => {
-       window.ethereum.enable()
-        .then(accounts => {
-          setAccount(accounts[0])
-          resolve(accounts)
-        })
-        .catch(e => reject(e))
-     })
-   }
+    const fetchReserves = async () => {
+      const reserves = await getReserves(contracts.loihi)
+      setReserves(reserves)
+    }
+
+    const handleEnable = () => {
+      return new Promise((resolve, reject) => {
+        window.ethereum.enable()
+          .then(accounts => {
+            setAccount(accounts[0])
+            resolve(accounts)
+          })
+          .catch(e => reject(e))
+      })
+    }
 
     // init web3, account
     useEffect(() => {
@@ -72,11 +69,19 @@ const withWallet = (WrappedComponent) => {
       }
     }, [contracts])
 
+    // init balances
+    useEffect(() => {
+      if (account && reserves.totalReserves) {
+        fetchBalances()
+      }
+    }, [account, reserves])
+
     return (
       <>
         <WrappedComponent
           {...props}
           account={account}
+          balances={balances}
           hasMetamask={!!window.ethereum}
           isUnlocked={!!account}
           onEnable={handleEnable}
@@ -88,13 +93,5 @@ const withWallet = (WrappedComponent) => {
     )
   }
 }
-
-/*
-        {networkId !== 1 && (
-          <Modal>
-            <ErrorModal error="Wrong Network!" />
-          </Modal>
-        )}
-*/
 
 export default withWallet

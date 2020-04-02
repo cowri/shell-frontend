@@ -9,7 +9,7 @@ const StyledModalIcon = withTheme(styled.div`
   display: flex;
   height: 128px;
   justify-content: center;
-  margin: 48px auto 24px;
+  margin: 24px auto 0;
   width: 128px;
 `)
 

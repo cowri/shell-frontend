@@ -43,54 +43,31 @@ export const bnAmount = (value, decimals) => {
   return new BigNumber(value).multipliedBy(new BigNumber(10).pow(decimals))
 }
 
-export const getLoihiBalances = async function () {
-  /*
-  const { store } = this.props
-  const web3 = store.get('web3')
-  const walletAddress = store.get('walletAddress')
-  const loihi = store.get('loihiObject')
-  if (!walletAddress || !loihi) return
+export const getLoihiBalances = async function (walletAddress, loihi, reserves) {
 
-  const shellBalanceRaw = await loihi.methods.balanceOf(walletAddress).call()
-  store.set('shellBalanceRaw', shellBalanceRaw)
-  const shellBalanceDecimal = new WadDecimal(shellBalanceRaw).div('1e18')
-  store.set('shellBalanceDecimal', shellBalanceDecimal)
-  const shellBalance = toFixed(parseFloat(web3.utils.fromWei(shellBalanceRaw)),5)
-  store.set('shellBalance', shellBalance)
+  const shellBalance = new BigNumber(await loihi.methods.balanceOf(walletAddress).call())
+  const totalShells = new BigNumber(await loihi.methods.totalSupply().call())
 
-  const totalShellsRaw = await loihi.methods.totalSupply().call()
-  const totalShells = toFixed(parseFloat(web3.utils.fromWei(totalShellsRaw)),5)
-  store.set('totalShells', totalShells)
+  const {
+    daiReserve,
+    susdReserve,
+    usdcReserve,
+    usdtReserve,
+  } = reserves
 
-  const daiReserveRaw = store.get('daiReserveRaw')
-  const usdcReserveRaw = store.get('usdcReserveRaw')
-  const usdtReserveRaw = store.get('usdtReserveRaw')
-  const susdReserveRaw = store.get('susdReserveRaw')
+  const daiBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(daiReserve)
+  const susdBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(susdReserve)
+  const usdcBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(usdcReserve)
+  const usdtBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(usdtReserve)
 
-  const daiBal = totalShellsRaw == 0 ? 0 : shellBalanceRaw / totalShellsRaw * daiReserveRaw
-  const usdcBal = totalShellsRaw == 0 ? 0 : shellBalanceRaw / totalShellsRaw * usdcReserveRaw
-  const usdtBal = totalShellsRaw == 0 ? 0 : shellBalanceRaw / totalShellsRaw * usdtReserveRaw
-  const susdBal = totalShellsRaw == 0 ? 0 : shellBalanceRaw / totalShellsRaw * susdReserveRaw
-
-  console.log("--- shell balance raw --- ", shellBalanceRaw);
-  console.log("--- total shells raw ---  ", totalShellsRaw);
-
-  store.set('loihiDaiBalanceRaw', daiBal)
-  store.set('loihiUsdcBalanceRaw', usdcBal)
-  store.set('loihiDaiBalanceRaw', usdtBal)
-  store.set('loihiDaiBalanceRaw', susdBal)
-
-  store.set('loihiDaiBalance', toFixed(parseFloat(web3.utils.fromWei(Math.floor(daiBal).toString())),5))
-  store.set('loihiUsdcBalance', toFixed(parseFloat(web3.utils.fromWei(Math.floor(usdcBal).toString())),5))
-  store.set('loihiUsdtBalance', toFixed(parseFloat(web3.utils.fromWei(Math.floor(usdtBal).toString())),5))
-  store.set('loihiSusdBalance', toFixed(parseFloat(web3.utils.fromWei(Math.floor(susdBal).toString())),5))
-
-  store.set('loihiDaiBalanceDecimal', new WadDecimal(daiBal))
-  store.set('loihiUsdcBalanceDecimal', new WadDecimal(usdcBal))
-  store.set('loihiUsdtBalanceDecimal', new WadDecimal(usdtBal))
-  store.set('loihiSusdBalanceDecimal', new WadDecimal(susdBal))
-  */
-
+  return {
+    dai: daiBal,
+    susd: susdBal,
+    usdc: usdcBal,
+    usdt: usdtBal,
+    shell: shellBalance,
+    totalShells,
+  }
 }
 
 export const getReserves = async (loihi) => {

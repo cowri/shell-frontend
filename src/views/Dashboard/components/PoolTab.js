@@ -1,7 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
+import { withTheme } from '@material-ui/core/styles'
 
+import Button from '../../../components/Button'
 import LabelledValue from '../../../components/LabelledValue'
+
 import Overview from '../../../components/Overview'
 import OverviewSection from '../../../components/OverviewSection'
 import Row from '../../../components/Row'
@@ -16,34 +19,59 @@ import { displayAmount } from '../../../utils/web3Utils'
 
 import DashboardContext from '../context'
 
+import DepositModal from './DepositModal'
+import WithdrawModal from './WithdrawModal'
+
 const StyledPoolTab = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding-bottom: 96px;
 `
 
 const StyledTokenName = styled.span`
-  align-items: baseline;
+  align-items: center;
   display: flex;
-  flex: 1;
-  margin-left: 24px;
+  flex: 3;
+  margin-left: 12px;
   opacity: 0.75;
 `
 
 const StyledBalance = styled.div`
-  opacity: 0.8;
-  font-weight: 700;
+  display: flex;
+  flex: 2;
+  font-size: 22px;
+  justify-content: flex-end;
+  text-align: left;
 `
 
 const StyledCurrency = styled.span`
-  flex: 4;
-  margin-left: 24px;
+  font-size: 12px;
+  margin-left: 12px;
   opacity: 0.5;
 `
 
+const StyledActions = withTheme(styled.div`
+  align-items: center;
+  background-color: ${props => props.theme.palette.grey[50]};
+  display: flex;
+  height: 80px;
+  padding: 0 48px;
+  @media (max-width: 512px) {
+    padding: 0 12px;
+  }
+`)
+
+const StyledRows = styled.div`
+  padding: 24px 48px;
+  @media (max-width: 512px) {
+    padding: 0 12px;
+  }
+`
+
 const PoolTab = () => {
-  const { reserves } = useContext(DashboardContext)
+  const { balances, reserves } = useContext(DashboardContext)
+  const [depositModal, setDepositModal] = useState(false)
+  const [withdrawModal, setWithdrawModal] = useState(false)
 
   const {
     totalReserves,
@@ -52,60 +80,108 @@ const PoolTab = () => {
     usdcReserve,
     usdtReserve,
   } = reserves
-  if (totalReserves) {
-    console.log(daiReserve.toNumber())
-  }
+
+  const {
+    dai: daiBalance,
+    susd: susdBalance,
+    usdc: usdcBalance,
+    usdt: usdtBalance,
+    shell: shellBalance,
+  } = balances
+
+
+  const totalBalance = shellBalance ? `${displayAmount(shellBalance, 18, 0)}` : '--'
+  const totalPoolLiquidity = totalReserves ? `$${displayAmount(totalReserves, 18, 0)}` : '--'
+
+  const daiReserveDisplay = daiReserve ? `$${displayAmount(daiReserve, 18, 0)}` : '--'
+  const susdReserveDisplay = susdReserve ? `$${displayAmount(susdReserve, 18, 0)}` : '--'
+  const usdcReserveDisplay = usdcReserve ? `$${displayAmount(usdcReserve, 18, 0)}` : '--'
+  const usdtReserveDisplay = usdtReserve ? `$${displayAmount(usdtReserve, 18, 0)}` : '--'
+
+  const daiBalanceDisplay = daiBalance ? `$${displayAmount(daiBalance, 18, 0)}` : '--'
+  const susdBalanceDisplay = susdBalance ? `$${displayAmount(susdBalance, 18, 0)}` : '--'
+  const usdcBalanceDisplay = usdcBalance ? `$${displayAmount(usdcBalance, 18, 0)}` : '--'
+  const usdtBalanceDisplay = usdtBalance ? `$${displayAmount(usdtBalance, 18, 0)}` : '--'
 
   return (
-    <StyledPoolTab>
-      {!!totalReserves && (
-        <>
-          <Overview>
-            <OverviewSection>
-              <LabelledValue label="Pool Liquidity" value={`$${displayAmount(totalReserves, 18, 0)}`} />
-            </OverviewSection>
-          </Overview>
-          <div>
-            <Row>
-              <TokenIcon>
-                <img src={daiIcon} />
-              </TokenIcon>
-              <StyledTokenName>Dai<StyledCurrency>DAI</StyledCurrency></StyledTokenName>
-              <StyledBalance>
-                {`$${displayAmount(daiReserve, 18, 0)}`}
-              </StyledBalance>
-            </Row>
-            <Row>
-              <TokenIcon>
-                <img src={usdcIcon} />
-              </TokenIcon>
-              <StyledTokenName>USD Coin<StyledCurrency>USDC</StyledCurrency></StyledTokenName>
-              <StyledBalance>
-                {`$${displayAmount(usdcReserve, 18, 0)}`}
-              </StyledBalance>
-            </Row>
-            <Row>
-              <TokenIcon>
-                <img src={usdtIcon} />
-              </TokenIcon>
-              <StyledTokenName>Tether<StyledCurrency>USDT</StyledCurrency></StyledTokenName>
-              <StyledBalance>
-                {`$${displayAmount(usdtReserve, 18, 0)}`}
-              </StyledBalance>
-            </Row>
-            <Row>
-              <TokenIcon>
-                <img src={susdIcon} />
-              </TokenIcon>
-              <StyledTokenName>Synthetix USD<StyledCurrency>SUSD</StyledCurrency></StyledTokenName>
-              <StyledBalance>
-                {`$${displayAmount(susdReserve, 18, 0)}`}
-              </StyledBalance>
-            </Row>
-          </div>
-        </>
-      )}
-    </StyledPoolTab>
+    <>
+      <StyledPoolTab>
+        <Overview>
+          <OverviewSection>
+            <LabelledValue label="Your Balance" value={totalBalance} />
+          </OverviewSection>
+          <OverviewSection>
+            <LabelledValue label="Total Liquidity" value={totalPoolLiquidity} />
+          </OverviewSection>
+        </Overview>
+        <StyledRows>
+          <Row>
+            <TokenIcon>
+              <img src={daiIcon} />
+            </TokenIcon>
+            <StyledTokenName>
+              <LabelledValue label="DAI" value="Dai" />
+            </StyledTokenName>
+            <StyledBalance>
+              <LabelledValue label="Balance" value={daiBalanceDisplay} />
+            </StyledBalance>
+            <StyledBalance>
+              <LabelledValue label="Liquidity" value={daiReserveDisplay} />
+            </StyledBalance>
+          </Row>
+          <Row>
+            <TokenIcon>
+              <img src={usdcIcon} />
+            </TokenIcon>
+            <StyledTokenName>
+              <LabelledValue label="USDC" value="USD Coin" />
+            </StyledTokenName>
+            <StyledBalance>
+              <LabelledValue label="Balance" value={usdcBalanceDisplay} />
+            </StyledBalance>
+            <StyledBalance>
+              <LabelledValue label="Liquidity" value={usdcReserveDisplay} />
+            </StyledBalance>
+          </Row>
+          <Row>
+            <TokenIcon>
+              <img src={usdtIcon} />
+            </TokenIcon>
+            <StyledTokenName>
+              <LabelledValue label="USDT" value="Tether" />
+            </StyledTokenName>
+            <StyledBalance>
+              <LabelledValue label="Balance" value={usdtBalanceDisplay} />
+            </StyledBalance>
+            <StyledBalance>
+              <LabelledValue label="Liquidity" value={usdtReserveDisplay} />
+            </StyledBalance>
+          </Row>
+          <Row>
+            <TokenIcon>
+              <img src={susdIcon} />
+            </TokenIcon>
+            <StyledTokenName>
+              <LabelledValue label="SUSD" value="Sythentix USD" />
+            </StyledTokenName>
+            <StyledBalance>
+              <LabelledValue label="Balance" value={susdBalanceDisplay} />
+            </StyledBalance>
+            <StyledBalance>
+              <LabelledValue label="Liquidity" value={susdReserveDisplay} />
+            </StyledBalance>
+          </Row>
+        </StyledRows>
+        <StyledActions>
+          <Button onClick={() => setDepositModal(true)}>Deposit</Button>
+          <div style={{ width: 12 }} />
+          <Button outlined onClick={() => setWithdrawModal(true)}>Withdraw</Button>
+        </StyledActions>
+      </StyledPoolTab>
+
+      {depositModal && <DepositModal onDismiss={() => setDepositModal(false)} />}
+      {withdrawModal && <WithdrawModal onDismiss={() => setWithdrawModal(false)} />}
+    </>
   )
 }
 

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 const StyledTab = styled.div`
   align-items: center;
-  background: ${props => props.active ? 'transparent' : 'rgba(0,0,0,0.1)'};
+  background: ${props => props.active ? '#FFF' : 'transparent'};
   color: ${props => props.active ? '#0043ff' : '#000'};
   cursor: pointer;
   display: flex;
@@ -12,13 +12,14 @@ const StyledTab = styled.div`
   height: 72px;
   justify-content: center;
   opacity: ${props => props.active ? 1 : 0.5};
+  pointer-events: ${props => props.disabled ? 'none' : 'all'};
   &:hover {
     opacity: 1;
   }
 `
 
-const Tab = ({ active, children, onClick }) => (
-  <StyledTab active={active} onClick={onClick}>
+const Tab = ({ active, children, disabled, onClick }) => (
+  <StyledTab active={active} disabled={disabled} onClick={onClick}>
     {children}
   </StyledTab>
 )

@@ -5,8 +5,8 @@ import Surface from '../../../components/Surface'
 import Tab from '../../../components/Tab'
 import Tabs from '../../../components/Tabs'
 
-import DepositTab from './DepositTab'
 import PoolTab from './PoolTab'
+import SwapTab from './SwapTab'
 
 const DashboardContent = () => {
   const [activeTab, setActiveTab] = useState('pool')
@@ -16,31 +16,19 @@ const DashboardContent = () => {
       <Surface>
         <Tabs>
           <Tab active={activeTab === 'pool'} onClick={() => setActiveTab('pool')}>
-            Overview
+            Pool
           </Tab>
-          <Tab />
-          <Tab />
-          <Tab />
+          <Tab active={activeTab === 'swap'} onClick={() => setActiveTab('swap')}>
+            Swap
+          </Tab>
         </Tabs>
 
         {activeTab === 'pool' && <PoolTab />}
-        {activeTab === 'deposit' && <DepositTab />}
+        {activeTab === 'swap' && <SwapTab />}
 
       </Surface>
     </Container> 
   )
 }
-
-/*
-          <Tab active={activeTab === 'deposit'} onClick={() => setActiveTab('deposit')}>
-            Deposit
-          </Tab>
-          <Tab active={activeTab === 'withdraw'} onClick={() => setActiveTab('withdraw')}>
-            Withdraw
-          </Tab>
-          <Tab active={activeTab === 'swap'} onClick={() => setActiveTab('swap')}>
-            Swap
-          </Tab>
-*/
 
 export default DashboardContent

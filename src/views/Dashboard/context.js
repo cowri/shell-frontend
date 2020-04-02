@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 
 export default React.createContext({
   account: undefined,
+  balances: {},
   reserves: {},
   totalShells: new BigNumber(0),
   onEnable: () => {},
