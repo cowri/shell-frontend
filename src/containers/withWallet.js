@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react'
 
 import Web3 from 'web3'
 
+import {
+  getContracts,
+  getReserves,
+} from '../utils/web3Utils'
+
 const withWallet = (WrappedComponent) => {
   return (props) => {
     const [web3, setWeb3] = useState()
     const [account, setAccount] = useState()
+    const [contracts, setContracts] = useState({})
+    const [reserves, setReserves] = useState({})
     const [networkId, setNetworkId] = useState(1)
 
     /*
@@ -18,6 +25,11 @@ const withWallet = (WrappedComponent) => {
       }
     }
     */
+   const fetchReserves = async () => {
+    const reserves = await getReserves(contracts.loihi)
+    setReserves(reserves)
+   }
+
    const handleEnable = () => {
      return new Promise((resolve, reject) => {
        window.ethereum.enable()
@@ -45,6 +57,21 @@ const withWallet = (WrappedComponent) => {
       init()
     }, [])
 
+    // init contracts
+    useEffect(() => {
+      if (web3) {
+        const contracts = getContracts(web3)
+        setContracts(contracts)
+      }
+    }, [web3])
+
+    // init reserves
+    useEffect(() => {
+      if (contracts.loihi) {
+        fetchReserves()
+      }
+    }, [contracts])
+
     return (
       <>
         <WrappedComponent
@@ -54,6 +81,7 @@ const withWallet = (WrappedComponent) => {
           isUnlocked={!!account}
           onEnable={handleEnable}
           networkId={networkId}
+          reserves={reserves}
           web3={web3}
         />
       </>

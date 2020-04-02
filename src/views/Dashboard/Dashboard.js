@@ -6,10 +6,11 @@ import Header from '../../components/Header'
 
 import withWallet from '../../containers/withWallet'
 
-import DashboardContext from './context'
-import DashboardContent from './DashboardContent'
+import DashboardContent from './components/DashboardContent'
 import NetworkModal from './components/NetworkModal'
 import UnlockModal from './components/UnlockModal'
+
+import DashboardContext from './context'
 
 const StyledDashboard = styled.div`
   align-items: center;
@@ -28,6 +29,7 @@ const Dashboard = ({
   hasMetamask,
   isUnlocked,
   networkId,
+  reserves,
   onEnable,
   web3,
 }) => {
@@ -50,6 +52,7 @@ const Dashboard = ({
     <DashboardContext.Provider value={{
       account,
       onEnable,
+      reserves,
       web3,
     }}>
       <StyledDashboard>
