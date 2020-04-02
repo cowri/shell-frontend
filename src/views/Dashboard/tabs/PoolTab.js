@@ -1,14 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import LabelledValue from '../../components/LabelledValue'
-import Overview from '../../components/Overview'
-import OverviewSection from '../../components/OverviewSection'
-import Row from '../../components/Row'
-import TokenIcon from '../../components/TokenIcon'
+import LabelledValue from '../../../components/LabelledValue'
+import Overview from '../../../components/Overview'
+import OverviewSection from '../../../components/OverviewSection'
+import Row from '../../../components/Row'
+import TokenIcon from '../../../components/TokenIcon'
 
-import DaiIcon from '../../components/icons/Dai'
-import UsdcIcon from '../../components/icons/Usdc'
+import DaiIcon from '../../../components/icons/Dai'
+import UsdcIcon from '../../../components/icons/Usdc'
 
 const StyledPoolTab = styled.div`
   display: flex;

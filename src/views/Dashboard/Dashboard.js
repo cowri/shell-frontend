@@ -1,17 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import Container from '../../components/Container'
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
-import Surface from '../../components/Surface'
-import Tab from '../../components/Tab'
-import Tabs from '../../components/Tabs'
 
-import DepositTab from './DepositTab'
-import PoolTab from './PoolTab'
+import withWallet from '../../containers/withWallet'
+
+import DashboardContext from './context'
+import DashboardContent from './DashboardContent'
+import NetworkModal from './components/NetworkModal'
+import UnlockModal from './components/UnlockModal'
 
 const StyledDashboard = styled.div`
+  align-items: center;
   background: radial-gradient(circle at top, #00fff3 -0%, #0043ff, #000079);
   background-size: cover;
   background-position: center center;
@@ -19,38 +20,45 @@ const StyledDashboard = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 `
 
-const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('pool')
+const Dashboard = ({
+  account,
+  hasMetamask,
+  isUnlocked,
+  networkId,
+  onEnable,
+  web3,
+}) => {
+
+  const renderContent = () => {
+    if (!hasMetamask) {
+      return <span style={{ color: '#FFF' }}>Metamask not found.</span>
+    }
+    if (networkId !== 1) {
+      return <NetworkModal />
+    }
+    if (!isUnlocked) {
+      return <UnlockModal />
+    }
+
+    return <DashboardContent />
+  }
+
   return (
-    <StyledDashboard>
-      <Header />
-      <Container>
-        <Surface>
-          <Tabs>
-            <Tab active={activeTab === 'pool'} onClick={() => setActiveTab('pool')}>
-              Overview
-            </Tab>
-            <Tab active={activeTab === 'deposit'} onClick={() => setActiveTab('deposit')}>
-              Deposit
-            </Tab>
-            <Tab active={activeTab === 'withdraw'} onClick={() => setActiveTab('withdraw')}>
-              Withdraw
-            </Tab>
-            <Tab active={activeTab === 'swap'} onClick={() => setActiveTab('swap')}>
-              Swap
-            </Tab>
-          </Tabs>
-
-          {activeTab === 'pool' && <PoolTab />}
-          {activeTab === 'deposit' && <DepositTab />}
-
-        </Surface>
-      </Container>
-      <Footer />
-    </StyledDashboard>
+    <DashboardContext.Provider value={{
+      account,
+      onEnable,
+      web3,
+    }}>
+      <StyledDashboard>
+        <Header />
+        {renderContent()}
+        <Footer />
+      </StyledDashboard>
+    </DashboardContext.Provider>
   )
 }
 
-export default Dashboard
+export default withWallet(Dashboard)

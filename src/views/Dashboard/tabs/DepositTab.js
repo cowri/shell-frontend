@@ -3,12 +3,12 @@ import styled from 'styled-components'
 
 import TextField from '@material-ui/core/TextField'
 
-import Button from '../../components/Button'
-import Row from '../../components/Row'
-import TokenIcon from '../../components/TokenIcon'
+import Button from '../../../components/Button'
+import Row from '../../../components/Row'
+import TokenIcon from '../../../components/TokenIcon'
 
-import DaiIcon from '../../components/icons/Dai'
-import UsdcIcon from '../../components/icons/Usdc'
+import DaiIcon from '../../../components/icons/Dai'
+import UsdcIcon from '../../../components/icons/Usdc'
 
 const StyledDepositTab = styled.div`
   display: flex;

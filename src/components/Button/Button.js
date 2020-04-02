@@ -23,10 +23,13 @@ const StyledButton = styled.button`
   }
 `
 
-const Button = ({ children, outlined = false }) => {
+const Button = ({ children, onClick, outlined }) => {
 
   return (
-    <StyledButton outlined={outlined}>
+    <StyledButton
+      onClick={onClick}
+      outlined={outlined}
+    >
       {children}
     </StyledButton>
   )
