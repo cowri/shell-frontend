@@ -116,12 +116,15 @@ const DepositModal = ({ onDismiss }) => {
         setStep('depositing')
       })
       .on('error', error => {
-        console.log('error')
+        console.log(error)
         setStep('error')
       })
       .then(receipt => {
         setStep('success')
-      }).catch(error => setStep('error'))
+      }).catch(error => {
+        setStep('error')
+        console.log(error)
+      })
 
   }
 
@@ -151,7 +154,10 @@ const DepositModal = ({ onDismiss }) => {
       .then(receipt => {
         setUnlocking({ ...unlocking, [tokenKey]: false })
         onUpdateAllowances()
-      }).catch(error => setStep('start'))
+      }).catch(error => {
+        console.log(error)
+        setStep('start')
+      })
   }
 
   return (
