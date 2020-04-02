@@ -12,6 +12,8 @@ export default React.createContext({
   onUpdateAllowances: () => {},
   onUpdateBalances: () => {},
   onUpdateWalletBalances: () => {},
+  presentDeposit: () => {},
+  presentWithdraw: () => {},
   walletBalances: {},
   web3: undefined,
 })

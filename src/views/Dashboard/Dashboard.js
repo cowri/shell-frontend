@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
 
 import withWallet from '../../containers/withWallet'
+
+import Deposit from '../Deposit'
 
 import DashboardContent from './components/DashboardContent'
 import NetworkModal from './components/NetworkModal'
@@ -40,6 +42,9 @@ const Dashboard = ({
   web3,
 }) => {
 
+  const [depositModal, setDepositModal] = useState(false)
+  const [withdrawModal, setWithdrawModal] = useState(false)
+
   const renderContent = () => {
     if (!hasMetamask) {
       return <span style={{ color: '#FFF' }}>Metamask not found.</span>
@@ -55,25 +60,31 @@ const Dashboard = ({
   }
 
   return (
-    <DashboardContext.Provider value={{
-      account,
-      allowances,
-      balances,
-      contracts,
-      onEnable,
-      onUpdateAllowances,
-      onUpdateBalances,
-      onUpdateWalletBalances,
-      reserves,
-      walletBalances,
-      web3,
-    }}>
-      <StyledDashboard>
-        <Header />
-        {renderContent()}
-        <Footer />
-      </StyledDashboard>
-    </DashboardContext.Provider>
+    <>
+      <DashboardContext.Provider value={{
+        account,
+        allowances,
+        balances,
+        contracts,
+        onEnable,
+        onUpdateAllowances,
+        onUpdateBalances,
+        onUpdateWalletBalances,
+        presentDeposit: () => setDepositModal(true),
+        presentWithdraw: () => setWithdrawModal(true),
+        reserves,
+        walletBalances,
+        web3,
+      }}>
+        <StyledDashboard>
+          <Header />
+          {renderContent()}
+          <Footer />
+        </StyledDashboard>
+      </DashboardContext.Provider>
+
+      {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
+    </>
   )
 }
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
 
@@ -18,9 +18,6 @@ import usdtIcon from '../../../assets/usdt.svg'
 import { displayAmount } from '../../../utils/web3Utils'
 
 import DashboardContext from '../context'
-
-import DepositModal from './DepositModal'
-import WithdrawModal from './WithdrawModal'
 
 const StyledPoolTab = styled.div`
   display: flex;
@@ -61,9 +58,12 @@ const StyledRows = withTheme(styled.div`
 `)
 
 const PoolTab = () => {
-  const { balances, reserves } = useContext(DashboardContext)
-  const [depositModal, setDepositModal] = useState(false)
-  const [withdrawModal, setWithdrawModal] = useState(false)
+  const {
+    balances,
+    presentDeposit,
+    presentWithdraw,
+    reserves,
+  } = useContext(DashboardContext)
 
   const {
     totalReserves,
@@ -95,93 +95,88 @@ const PoolTab = () => {
   const usdtBalanceDisplay = usdtBalance ? `$${displayAmount(usdtBalance, 18, 0)}` : '--'
 
   return (
-    <>
-      <StyledPoolTab>
-        <Overview>
-          <OverviewSection>
-            <LabelledValue label="Pool Balance" value={totalPoolLiquidity} />
-          </OverviewSection>
-          <OverviewSection>
-            <LabelledValue label="Your Balance" value={totalBalance} />
-          </OverviewSection>
-        </Overview>
-        <StyledRows>
-          <Row head>
-            <span style={{ flex: 1 }}>Token</span>
-            <span style={{ flex: 1, textAlign: 'right' }}>Pool Balance</span>
-            <span style={{ flex: 1, textAlign: 'right' }}>My Balance</span>
-          </Row>
-          <Row>
-            <StyledTokenName>
-              <TokenIcon>
-                <img src={daiIcon} />
-              </TokenIcon>
-              <div style={{ width: 12 }} />
-              <LabelledValue label="DAI" value="Dai" />
-            </StyledTokenName>
-            <StyledBalance>
-              {daiReserveDisplay}
-            </StyledBalance>
-            <StyledBalance>
-              {daiBalanceDisplay}
-            </StyledBalance>
-          </Row>
-          <Row>
-            <StyledTokenName>
-              <TokenIcon>
-                <img src={usdcIcon} />
-              </TokenIcon>
-              <div style={{ width: 12 }} />
-              <LabelledValue label="USDC" value="USD Coin" />
-            </StyledTokenName>
-            <StyledBalance>
-              {usdcReserveDisplay}
-            </StyledBalance>
-            <StyledBalance>
-              {usdcBalanceDisplay}
-            </StyledBalance>
-          </Row>
-          <Row>
-            <StyledTokenName>
-              <TokenIcon>
-                <img src={usdtIcon} />
-              </TokenIcon>
-              <div style={{ width: 12 }} />
-              <LabelledValue label="USDT" value="Tether" />
-            </StyledTokenName>
-            <StyledBalance>
-              {usdtReserveDisplay}
-            </StyledBalance>
-            <StyledBalance>
-              {usdtBalanceDisplay}
-            </StyledBalance>
-          </Row>
-          <Row>
-            <StyledTokenName>
-              <TokenIcon>
-                <img src={susdIcon} />
-              </TokenIcon>
-              <div style={{ width: 12 }} />
-              <LabelledValue label="SUSD" value="Sythentix USD" />
-            </StyledTokenName>
-            <StyledBalance hasBalance>
-             {susdReserveDisplay}
-            </StyledBalance>
-            <StyledBalance>
-              {susdBalanceDisplay}
-            </StyledBalance>
-          </Row>
-        </StyledRows>
-        <StyledActions>
-          <Button onClick={() => setDepositModal(true)}>Deposit</Button>
-          <div style={{ width: 12 }} />
-          <Button outlined onClick={() => setWithdrawModal(true)}>Withdraw</Button>
-        </StyledActions>
-      </StyledPoolTab>
-
-      {depositModal && <DepositModal onDismiss={() => setDepositModal(false)} />}
-      {withdrawModal && <WithdrawModal onDismiss={() => setWithdrawModal(false)} />}
-    </>
+    <StyledPoolTab>
+      <Overview>
+        <OverviewSection>
+          <LabelledValue label="Pool Balance" value={totalPoolLiquidity} />
+        </OverviewSection>
+        <OverviewSection>
+          <LabelledValue label="Your Balance" value={totalBalance} />
+        </OverviewSection>
+      </Overview>
+      <StyledRows>
+        <Row head>
+          <span style={{ flex: 1 }}>Token</span>
+          <span style={{ flex: 1, textAlign: 'right' }}>Pool Balance</span>
+          <span style={{ flex: 1, textAlign: 'right' }}>My Balance</span>
+        </Row>
+        <Row>
+          <StyledTokenName>
+            <TokenIcon>
+              <img src={daiIcon} />
+            </TokenIcon>
+            <div style={{ width: 12 }} />
+            <LabelledValue label="DAI" value="Dai" />
+          </StyledTokenName>
+          <StyledBalance>
+            {daiReserveDisplay}
+          </StyledBalance>
+          <StyledBalance>
+            {daiBalanceDisplay}
+          </StyledBalance>
+        </Row>
+        <Row>
+          <StyledTokenName>
+            <TokenIcon>
+              <img src={usdcIcon} />
+            </TokenIcon>
+            <div style={{ width: 12 }} />
+            <LabelledValue label="USDC" value="USD Coin" />
+          </StyledTokenName>
+          <StyledBalance>
+            {usdcReserveDisplay}
+          </StyledBalance>
+          <StyledBalance>
+            {usdcBalanceDisplay}
+          </StyledBalance>
+        </Row>
+        <Row>
+          <StyledTokenName>
+            <TokenIcon>
+              <img src={usdtIcon} />
+            </TokenIcon>
+            <div style={{ width: 12 }} />
+            <LabelledValue label="USDT" value="Tether" />
+          </StyledTokenName>
+          <StyledBalance>
+            {usdtReserveDisplay}
+          </StyledBalance>
+          <StyledBalance>
+            {usdtBalanceDisplay}
+          </StyledBalance>
+        </Row>
+        <Row>
+          <StyledTokenName>
+            <TokenIcon>
+              <img src={susdIcon} />
+            </TokenIcon>
+            <div style={{ width: 12 }} />
+            <LabelledValue label="SUSD" value="Sythentix USD" />
+          </StyledTokenName>
+          <StyledBalance hasBalance>
+            {susdReserveDisplay}
+          </StyledBalance>
+          <StyledBalance>
+            {susdBalanceDisplay}
+          </StyledBalance>
+        </Row>
+      </StyledRows>
+      <StyledActions>
+        <Button onClick={presentDeposit}>Deposit</Button>
+        <div style={{ width: 12 }} />
+        <Button outlined onClick={presentWithdraw}>Withdraw</Button>
+      </StyledActions>
+    </StyledPoolTab>
   )
 }
 

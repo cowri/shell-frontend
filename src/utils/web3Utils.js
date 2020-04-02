@@ -1,4 +1,3 @@
-import Web3 from "web3"
 import BigNumber from 'bignumber.js'
 
 import config from '../mainnet.config.json'
