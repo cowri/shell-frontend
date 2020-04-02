@@ -120,7 +120,8 @@ const DepositModal = ({ onDismiss }) => {
         setStep('error')
       })
       .then(receipt => {
-      }).catch(error => setStep('success'))
+        setStep('success')
+      }).catch(error => setStep('error'))
 
   }
 
