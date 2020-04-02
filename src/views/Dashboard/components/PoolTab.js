@@ -51,7 +51,7 @@ const StyledActions = withTheme(styled.div`
   background-color: ${props => props.theme.palette.grey[50]};
   display: flex;
   height: 80px;
-  padding: 0 48px;
+  padding: 0 24px;
   @media (max-width: 512px) {
     padding: 0 12px;
   }
