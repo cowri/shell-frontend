@@ -10,7 +10,7 @@ import ModalContent from '../../../components/ModalContent'
 import ModalIcon from '../../../components/ModalIcon'
 import ModalTitle from '../../../components/ModalTitle'
 
-import metamaskLogo from '../../../img/metamask.svg'
+import metamaskLogo from '../../../assets/metamask.svg'
 
 import DashboardContext from '../context'
 

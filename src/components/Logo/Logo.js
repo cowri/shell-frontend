@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import logo from '../../img/logo.png'
+import logo from '../../assets/logo.png'
 
 const StyledLogo = styled.div`
   align-items: center;
