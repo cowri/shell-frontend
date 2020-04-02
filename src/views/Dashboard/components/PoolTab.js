@@ -31,23 +31,19 @@ const StyledPoolTab = styled.div`
 const StyledTokenName = styled.span`
   align-items: center;
   display: flex;
-  flex: 3;
-  margin-left: 12px;
+  flex: 1;
   opacity: 0.75;
 `
 
 const StyledBalance = styled.div`
   display: flex;
-  flex: 2;
+  flex: 1;
   font-size: 22px;
   justify-content: flex-end;
-  text-align: left;
-`
-
-const StyledCurrency = styled.span`
-  font-size: 12px;
-  margin-left: 12px;
-  opacity: 0.5;
+  text-align: right;
+  @media (max-width: 512px) {
+    font-size: 18px;
+  }
 `
 
 const StyledActions = withTheme(styled.div`
@@ -61,12 +57,8 @@ const StyledActions = withTheme(styled.div`
   }
 `)
 
-const StyledRows = styled.div`
-  padding: 24px 48px;
-  @media (max-width: 512px) {
-    padding: 0 12px;
-  }
-`
+const StyledRows = withTheme(styled.div`
+`)
 
 const PoolTab = () => {
   const { balances, reserves } = useContext(DashboardContext)
@@ -89,8 +81,7 @@ const PoolTab = () => {
     shell: shellBalance,
   } = balances
 
-
-  const totalBalance = shellBalance ? `${displayAmount(shellBalance, 18, 0)}` : '--'
+  const totalBalance = shellBalance ? `$${displayAmount(shellBalance, 18, 0)}` : '--'
   const totalPoolLiquidity = totalReserves ? `$${displayAmount(totalReserves, 18, 0)}` : '--'
 
   const daiReserveDisplay = daiReserve ? `$${displayAmount(daiReserve, 18, 0)}` : '--'
@@ -108,67 +99,76 @@ const PoolTab = () => {
       <StyledPoolTab>
         <Overview>
           <OverviewSection>
-            <LabelledValue label="Your Balance" value={totalBalance} />
+            <LabelledValue label="Pool Balance" value={totalPoolLiquidity} />
           </OverviewSection>
           <OverviewSection>
-            <LabelledValue label="Total Liquidity" value={totalPoolLiquidity} />
+            <LabelledValue label="Your Balance" value={totalBalance} />
           </OverviewSection>
         </Overview>
         <StyledRows>
+          <Row head>
+            <span style={{ flex: 1 }}>Token</span>
+            <span style={{ flex: 1, textAlign: 'right' }}>Pool Balance</span>
+            <span style={{ flex: 1, textAlign: 'right' }}>My Balance</span>
+          </Row>
           <Row>
-            <TokenIcon>
-              <img src={daiIcon} />
-            </TokenIcon>
             <StyledTokenName>
+              <TokenIcon>
+                <img src={daiIcon} />
+              </TokenIcon>
+              <div style={{ width: 12 }} />
               <LabelledValue label="DAI" value="Dai" />
             </StyledTokenName>
             <StyledBalance>
-              <LabelledValue label="Balance" value={daiBalanceDisplay} />
+              {daiReserveDisplay}
             </StyledBalance>
             <StyledBalance>
-              <LabelledValue label="Liquidity" value={daiReserveDisplay} />
+              {daiBalanceDisplay}
             </StyledBalance>
           </Row>
           <Row>
-            <TokenIcon>
-              <img src={usdcIcon} />
-            </TokenIcon>
             <StyledTokenName>
+              <TokenIcon>
+                <img src={usdcIcon} />
+              </TokenIcon>
+              <div style={{ width: 12 }} />
               <LabelledValue label="USDC" value="USD Coin" />
             </StyledTokenName>
             <StyledBalance>
-              <LabelledValue label="Balance" value={usdcBalanceDisplay} />
+              {usdcReserveDisplay}
             </StyledBalance>
             <StyledBalance>
-              <LabelledValue label="Liquidity" value={usdcReserveDisplay} />
+              {usdcBalanceDisplay}
             </StyledBalance>
           </Row>
           <Row>
-            <TokenIcon>
-              <img src={usdtIcon} />
-            </TokenIcon>
             <StyledTokenName>
+              <TokenIcon>
+                <img src={usdtIcon} />
+              </TokenIcon>
+              <div style={{ width: 12 }} />
               <LabelledValue label="USDT" value="Tether" />
             </StyledTokenName>
             <StyledBalance>
-              <LabelledValue label="Balance" value={usdtBalanceDisplay} />
+              {usdtReserveDisplay}
             </StyledBalance>
             <StyledBalance>
-              <LabelledValue label="Liquidity" value={usdtReserveDisplay} />
+              {usdtBalanceDisplay}
             </StyledBalance>
           </Row>
           <Row>
-            <TokenIcon>
-              <img src={susdIcon} />
-            </TokenIcon>
             <StyledTokenName>
+              <TokenIcon>
+                <img src={susdIcon} />
+              </TokenIcon>
+              <div style={{ width: 12 }} />
               <LabelledValue label="SUSD" value="Sythentix USD" />
             </StyledTokenName>
-            <StyledBalance>
-              <LabelledValue label="Balance" value={susdBalanceDisplay} />
+            <StyledBalance hasBalance>
+             {susdReserveDisplay}
             </StyledBalance>
             <StyledBalance>
-              <LabelledValue label="Liquidity" value={susdReserveDisplay} />
+              {susdBalanceDisplay}
             </StyledBalance>
           </Row>
         </StyledRows>

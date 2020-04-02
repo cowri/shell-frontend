@@ -17,7 +17,6 @@ const StyledDashboard = styled.div`
   background: radial-gradient(circle at top, #00fff3 -0%, #0043ff, #000079);
   background-size: cover;
   background-position: center center;
-  color: #000;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

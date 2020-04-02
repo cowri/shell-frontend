@@ -1,22 +1,23 @@
 import React from 'react'
 import styled from 'styled-components'
+import { withTheme } from'@material-ui/core/styles'
 
-const StyledRow = styled.div`
+const StyledRow = withTheme(styled.div`
   align-items: center;
-  border-bottom: ${props => props.hideBorder ? 0 : '1px solid rgba(0,0,0,0.075)'};
-  border-top: ${props => props.hideBorder ? 0 : '1px solid rgba(255,255,255,0.08)'};
+  border-top: ${props => props.hideBorder ? 0 : `1px solid ${props.theme.palette.grey[50]}`};
+  color: ${props => props.head ? props.theme.palette.grey[500] : 'inherit'};
   display: flex;
-  height: 96px;
-  &:first-of-type {
-    border-top: 0;
+  font-weight: ${props => props.head ? 500 : 400};
+  height: ${props => props.head ? 48 : 96}px;
+  margin: 0;
+  padding: 0 24px;
+  @media (max-width: 512px) {
+    padding: 0 12px;
   }
-  &:last-of-type {
-    border-bottom: 0;
-  }
-`
+`)
 
-const Row = ({ children, hideBorder }) => (
-  <StyledRow hideBorder={hideBorder}>
+const Row = ({ children, head, hideBorder }) => (
+  <StyledRow head={head} hideBorder={hideBorder}>
     {children}
   </StyledRow>
 )

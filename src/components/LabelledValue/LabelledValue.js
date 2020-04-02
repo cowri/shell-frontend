@@ -1,24 +1,24 @@
 import React from 'react'
 import styled from 'styled-components'
+import { withTheme } from '@material-ui/core/styles'
 
 const StyledLabelledValue = styled.div`
   display: flex;
   flex-direction: column;
 `
-const StyledLabel = styled.span`
+const StyledLabel = withTheme(styled.span`
+  color: ${props => props.theme.palette.grey[500]};
   font-size: 16px;
   font-weight: 400;
-  line-height: 16px;
+  line-height: 1rem;
   margin-top: 0.25em;
-  opacity: 0.3;
-
-`
-const StyledValue = styled.h3`
+`)
+const StyledValue = withTheme(styled.h3`
   font-size: 1em;
   font-weight: 500;
   margin: 0;
   padding: 0;
-`
+`)
 
 const LabelledValue = ({ label, value }) => (
   <StyledLabelledValue>

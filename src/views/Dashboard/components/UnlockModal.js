@@ -27,7 +27,7 @@ const Unlock = () => {
     return (
       <Modal onDismiss={() => setIsRequesting(false)}>
         <ModalIcon>
-          <img src={metamaskLogo} />
+          <img src={metamaskLogo} style={{ height: 96 }} />
         </ModalIcon>
         <ModalTitle>Confirming with MetaMask</ModalTitle>
         <ModalActions>
