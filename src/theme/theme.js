@@ -17,7 +17,6 @@ theme.overrides = {
     root: {
       background: grey[50],
       borderRadius: theme.shape.borderRadius,
-      paddingTop: 6,
     },
   },
   MuiInput: {
@@ -27,12 +26,6 @@ theme.overrides = {
       },
     }
   },
-  MuiInputLabel: {
-    formControl: {
-      top: 6,
-      left: 6
-    }
-  }
 }
 
 export default theme

@@ -99,6 +99,19 @@ export const getWalletBalances = async (walletAddress, contracts) => {
   }
 }
 
+export const getAllowances = async (walletAddress, contracts) => {
+  const [dai, susd, usdc, usdt] = await Promise.all([
+    contracts.dai,
+    contracts.susd,
+    contracts.usdc,
+    contracts.usdt
+  ].map(contract => {
+    return contract.methods.allowance(walletAddress, loihiAddress).call()
+  }))
+
+  return { dai, susd, usdc, usdt }
+}
+
 export const getContracts = function (web3) {
 
     const contractObjects = [
@@ -175,5 +188,52 @@ export const getContracts = function (web3) {
       asusd: contractObjects[8],
       loihi: new web3.eth.Contract(loihiABI, loihiAddress)
     }
+}
 
+export const selectiveDeposit = async (walletAddress, contracts, tokens) => {
+  /*
+  const gasPrice = await web3.eth.getGasPrice()
+  return senseApprovals()
+      .then(assureApprovals)
+      .then(doDeposit)
+      .then(complete)
+      .catch(triage)
+
+  function senseApprovals () {
+      return Promise.all(contracts.map(contract => {
+          return contract.methods.allowance(walletAddress, loihiAddress).call()
+      }))
+  }
+
+
+  function assureApprovals (approvals) {
+      console.log("approvals", approvals)
+      return Promise.all(approvals.map((approval, ix) => {
+          if (Number(approval) <= Number(amounts[ix])) {
+              if (contracts[ix].name !== 'Usdt' || (contracts[ix].name == 'Usdt' && amounts[ix] == 0)) {
+                  return contracts[ix].methods.approve(loihiAddress, "-1").send({ from: walletAddress })
+              } else return Promise.all([
+                  contracts[ix].methods.approve(loihiAddress, 0).send({ from: walletAddress }),
+                  contracts[ix].methods.approve(loihiAddress, "-1").send({ from: walletAddress })
+              ])
+          } else {
+              return Promise.resolve()
+          }
+      }))
+  }
+
+  async function doDeposit () {
+      console.log("do deposit")
+      const tx = loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000)
+      const estimate = await tx.estimateGas({from: walletAddress})
+      console.log("estimate", estimate)
+      console.log("estimate * 1.5", estimate * 1.5)
+      return tx.send({ from: walletAddress, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
+      
+  }
+
+  function complete () { console.log("complete")    }
+
+  function triage (err) { console.log("err", err) }
+  */
 }

@@ -40,6 +40,7 @@ const StyledForm = styled.form`
 
 const StyledRows = styled.div`
   margin-bottom: 24px;
+  margin-top: -24px;
 `
 
 const StyledLabelBar = withTheme(styled.div`
@@ -52,7 +53,7 @@ const StyledLabelBar = withTheme(styled.div`
 `)
 
 const DepositModal = ({ onDeposit, onDismiss }) => {
-  const { contracts, walletBalances } = useContext(DashboardContext)
+  const { allowances, contracts, walletBalances } = useContext(DashboardContext)
 
   const [daiValue, setDaiValue] = useState('')
   const [susdValue, setSusdValue] = useState('')
@@ -76,86 +77,50 @@ const DepositModal = ({ onDeposit, onDismiss }) => {
     console.log(daiValue, susdValue, usdcValue, usdtValue)
   }
 
+  const handleUnlock = () => {
+
+  }
+
   return (
     <Modal onDismiss={onDismiss}>
       <ModalTitle>Deposit Funds</ModalTitle>
       <ModalContent>
         <StyledForm onSubmit={handleSubmit}>
           <StyledRows>
-            <StyledLabelBar>
-              <span>Available: {availableDai} DAI</span>
-            </StyledLabelBar>
-            <TextField
-              fullWidth
-              InputProps={{
-                endAdornment: <StyledEndAdornment>DAI</StyledEndAdornment>,
-                startAdornment: (
-                  <StyledStartAdornment>
-                    <TokenIcon size={24}>
-                      <img src={daiIcon} />
-                    </TokenIcon>
-                  </StyledStartAdornment>
-                )
-              }}
+            <TokenInput
+              available={availableDai}
+              icon={daiIcon}
+              locked={allowances.dai === '0'}
               onChange={e => handleChange(e, setDaiValue)}
-              placeholder="0"
+              onUnlock={handleUnlock}
+              symbol="DAI"
               value={daiValue}
             />
-            <StyledLabelBar>
-              <span>Available: {availableUsdc} USDC</span>
-            </StyledLabelBar>
-            <TextField
-              fullWidth
-              InputProps={{
-                endAdornment: <StyledEndAdornment>USDC</StyledEndAdornment>,
-                startAdornment: (
-                  <StyledStartAdornment>
-                    <TokenIcon size={24}>
-                      <img src={usdcIcon} />
-                    </TokenIcon>
-                  </StyledStartAdornment>
-                )
-              }}
+            <TokenInput
+              available={availableUsdc}
+              icon={usdcIcon}
+              locked={allowances.usdc === '0'}
               onChange={e => handleChange(e, setUsdcValue)}
-              placeholder="0"
+              onUnlock={handleUnlock}
+              symbol="USDC"
               value={usdcValue}
             />
-            <StyledLabelBar>
-              <span>Available: {availableUsdt} USDT</span>
-            </StyledLabelBar>
-            <TextField
-              fullWidth
-              InputProps={{
-                endAdornment: <StyledEndAdornment>USDT</StyledEndAdornment>,
-                startAdornment: (
-                  <StyledStartAdornment>
-                    <TokenIcon size={24}>
-                      <img src={usdtIcon} />
-                    </TokenIcon>
-                  </StyledStartAdornment>
-                )
-              }}
+            <TokenInput
+              available={availableUsdt}
+              icon={usdtIcon}
+              locked={allowances.usdt === '0'}
               onChange={e => handleChange(e, setUsdtValue)}
-              placeholder="0"
+              onUnlock={handleUnlock}
+              symbol="USDT"
               value={usdtValue}
             />
-            <StyledLabelBar>
-              <span>Available: {availableSusd} SUSD</span>
-            </StyledLabelBar>
-            <TextField
-              fullWidth
-              InputProps={{
-                endAdornment: <StyledEndAdornment>SUSD</StyledEndAdornment>,
-                startAdornment: (
-                  <StyledStartAdornment>
-                    <TokenIcon size={24}>
-                      <img src={susdIcon} />
-                    </TokenIcon>
-                  </StyledStartAdornment>
-                )
-              }}
+            <TokenInput
+              available={availableSusd}
+              icon={susdIcon}
+              locked={allowances.susd === '0'}
               onChange={e => handleChange(e, setSusdValue)}
-              placeholder="0"
+              onUnlock={handleUnlock}
+              symbol="SUSD"
               value={susdValue}
             />
           </StyledRows>
@@ -168,5 +133,50 @@ const DepositModal = ({ onDeposit, onDismiss }) => {
     </Modal>
   )
 }
+
+const TokenInput = ({
+  available,
+  icon,
+  locked,
+  onChange,
+  onUnlock,
+  symbol,
+  value
+}) => (
+  <>
+    <StyledLabelBar>
+      <span>Available: {available} {symbol}</span>
+    </StyledLabelBar>
+    <TextField
+      disabled={locked}
+      fullWidth
+      InputProps={{
+        endAdornment: locked ? (
+          <div style={{ marginRight: 6 }}>
+            <Button
+              outlined
+              small
+              onClick={onUnlock}
+            >
+              Unlock
+            </Button>
+          </div>
+        ) : (
+          <StyledEndAdornment>{symbol}</StyledEndAdornment>
+        ),
+        startAdornment: (
+          <StyledStartAdornment>
+            <TokenIcon size={24}>
+              <img src={icon} />
+            </TokenIcon>
+          </StyledStartAdornment>
+        )
+      }}
+      onChange={onChange}
+      placeholder="0"
+      value={value}
+    />
+  </>
+)
 
 export default DepositModal

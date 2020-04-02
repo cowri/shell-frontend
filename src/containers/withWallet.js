@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Web3 from 'web3'
 
 import {
+  getAllowances,
   getContracts,
   getLoihiBalances,
   getReserves,
@@ -13,11 +14,17 @@ const withWallet = (WrappedComponent) => {
   return (props) => {
     const [web3, setWeb3] = useState()
     const [account, setAccount] = useState()
+    const [allowances, setAllowances] = useState({})
     const [balances, setBalances] = useState({})
     const [contracts, setContracts] = useState({})
     const [reserves, setReserves] = useState({})
     const [networkId, setNetworkId] = useState(1)
     const [walletBalances, setWalletBalances] = useState({})
+
+    const fetchAllowances = async () => {
+      const allowances = await getAllowances(account, contracts)
+      setAllowances(allowances)
+    }
 
     const fetchBalances = async () => {
       const balances = await getLoihiBalances(account, contracts.loihi, reserves)
@@ -79,6 +86,7 @@ const withWallet = (WrappedComponent) => {
     // init balances
     useEffect(() => {
       if (account && reserves.totalReserves) {
+        fetchAllowances()
         fetchBalances()
         fetchWalletBalances()
       }
@@ -89,6 +97,7 @@ const withWallet = (WrappedComponent) => {
         <WrappedComponent
           {...props}
           account={account}
+          allowances={allowances}
           balances={balances}
           contracts={contracts}
           hasMetamask={!!window.ethereum}

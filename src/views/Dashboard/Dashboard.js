@@ -25,6 +25,7 @@ const StyledDashboard = styled.div`
 
 const Dashboard = ({
   account,
+  allowances,
   balances,
   contracts,
   hasMetamask,
@@ -53,6 +54,7 @@ const Dashboard = ({
   return (
     <DashboardContext.Provider value={{
       account,
+      allowances,
       balances,
       contracts,
       onEnable,

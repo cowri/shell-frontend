@@ -11,10 +11,10 @@ const StyledButton = withTheme(styled.button`
   color: ${props => props.outlined ? props.theme.palette.grey[600] : '#FFF'};
   cursor: pointer;
   display: flex;
-  font-size: 16px;
+  font-size: ${props => props.small ? '0.8rem' : '1rem'};
   font-weight: 700;
-  height: 48px;
-  padding: 0 32px;
+  height: ${props => props.small ? 32 : 48}px;
+  padding: 0 ${props => props.small ? 12 : 32}px;
   transition: background-color .2s, border-color .2s;
   &:hover {
     background-color: ${props => props.outlined ? '#FFF' : props.theme.palette.primary.dark};
@@ -22,12 +22,13 @@ const StyledButton = withTheme(styled.button`
   }
 `)
 
-const Button = ({ children, onClick, outlined }) => {
+const Button = ({ children, onClick, outlined, small }) => {
 
   return (
     <StyledButton
       onClick={onClick}
       outlined={outlined}
+      small={small}
     >
       {children}
     </StyledButton>
