@@ -9,6 +9,9 @@ export default React.createContext({
   reserves: {},
   totalShells: new BigNumber(0),
   onEnable: () => {},
+  onUpdateAllowances: () => {},
+  onUpdateBalances: () => {},
+  onUpdateWalletBalances: () => {},
   walletBalances: {},
   web3: undefined,
 })

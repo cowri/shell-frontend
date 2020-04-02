@@ -11,6 +11,9 @@ const StyledModalIcon = withTheme(styled.div`
   justify-content: center;
   margin: 24px auto 0;
   width: 128px;
+  & > * {
+    font-size: 48px !important;
+  }
 `)
 
 const ModalIcon = ({ children }) => (

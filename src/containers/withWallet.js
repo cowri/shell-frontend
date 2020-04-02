@@ -103,6 +103,9 @@ const withWallet = (WrappedComponent) => {
           hasMetamask={!!window.ethereum}
           isUnlocked={!!account}
           onEnable={handleEnable}
+          onUpdateAllowances={() => fetchAllowances()}
+          onUpdateBalances={() => fetchBalances()}
+          onUpdateWalletBalances={() => fetchWalletBalances()}
           networkId={networkId}
           reserves={reserves}
           walletBalances={walletBalances}
