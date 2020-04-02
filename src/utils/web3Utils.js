@@ -36,7 +36,11 @@ const susdAddress = config.SUSD
 const asusdAddress = config.ASUSD
 
 export const displayAmount = (value, decimals, precision) => {
-  return value.dividedBy(new BigNumber(10).pow(decimals)).toFixed(precision)
+  const amount = value.dividedBy(new BigNumber(10).pow(decimals))
+  if (precision === -1) {
+    return amount.toFixed()
+  }
+  return amount.toFormat(precision)
 }
 
 export const bnAmount = (value, decimals) => {
@@ -78,6 +82,20 @@ export const getReserves = async (loihi) => {
     usdcReserve: new BigNumber(results[1][1]),
     usdtReserve: new BigNumber(results[1][2]),
     susdReserve: new BigNumber(results[1][3])
+  }
+}
+
+export const getWalletBalances = async (walletAddress, contracts) => {
+  const daiBalance = new BigNumber(await contracts.dai.methods.balanceOf(walletAddress).call())
+  const usdcBalance = new BigNumber(await contracts.usdc.methods.balanceOf(walletAddress).call())
+  const usdtBalance = new BigNumber(await contracts.usdt.methods.balanceOf(walletAddress).call())
+  const susdBalance = new BigNumber(await contracts.susd.methods.balanceOf(walletAddress).call())
+
+  return {
+    dai: daiBalance,
+    usdc: usdcBalance,
+    usdt: usdtBalance,
+    susd: susdBalance,
   }
 }
 

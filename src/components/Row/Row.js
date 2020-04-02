@@ -12,6 +12,7 @@ const StyledRow = withTheme(styled.div`
   margin: 0;
   padding: 0 24px;
   @media (max-width: 512px) {
+    height: ${props => props.head ? 32 : 80}px;
     padding: 0 12px;
   }
 `)

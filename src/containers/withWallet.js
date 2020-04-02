@@ -6,6 +6,7 @@ import {
   getContracts,
   getLoihiBalances,
   getReserves,
+  getWalletBalances,
 } from '../utils/web3Utils'
 
 const withWallet = (WrappedComponent) => {
@@ -16,6 +17,7 @@ const withWallet = (WrappedComponent) => {
     const [contracts, setContracts] = useState({})
     const [reserves, setReserves] = useState({})
     const [networkId, setNetworkId] = useState(1)
+    const [walletBalances, setWalletBalances] = useState({})
 
     const fetchBalances = async () => {
       const balances = await getLoihiBalances(account, contracts.loihi, reserves)
@@ -25,6 +27,11 @@ const withWallet = (WrappedComponent) => {
     const fetchReserves = async () => {
       const reserves = await getReserves(contracts.loihi)
       setReserves(reserves)
+    }
+
+    const fetchWalletBalances = async () => {
+      const walletBalances = await getWalletBalances(account, contracts)
+      setWalletBalances(walletBalances)
     }
 
     const handleEnable = () => {
@@ -73,6 +80,7 @@ const withWallet = (WrappedComponent) => {
     useEffect(() => {
       if (account && reserves.totalReserves) {
         fetchBalances()
+        fetchWalletBalances()
       }
     }, [account, reserves])
 
@@ -82,11 +90,13 @@ const withWallet = (WrappedComponent) => {
           {...props}
           account={account}
           balances={balances}
+          contracts={contracts}
           hasMetamask={!!window.ethereum}
           isUnlocked={!!account}
           onEnable={handleEnable}
           networkId={networkId}
           reserves={reserves}
+          walletBalances={walletBalances}
           web3={web3}
         />
       </>

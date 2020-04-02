@@ -36,14 +36,18 @@ const StyledModal = styled.div`
 const StyledModalBg = styled.div`
   background-color: rgba(0,0,0,0.5);
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
+  top: 0; right: 0; left: 0; bottom: 0;
 `
 
 const StyledModalContent = styled.div`
   animation: ${contentKeyframes} .2s ease-out;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - 12px);
   max-width: 420px;
-  position: relative;
-  width: calc(100% - 24px);
+  position: sticky;
+  width: calc(100% - 12px);
+  margin: 6px;
 `
 
 const Modal = ({ children, onDismiss }) => (
