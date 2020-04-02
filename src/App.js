@@ -1,12 +1,18 @@
 import React from 'react'
 
-import Dashboard from './components/Dashboard'
+import { ThemeProvider } from '@material-ui/core/styles'
+
+import theme from './theme'
+
+import Dashboard from './views/Dashboard'
 
 function App() {
   return (
-    <div className="App">
-      <Dashboard />
-    </div>
+    <ThemeProvider theme={theme}>
+      <div className="App">
+        <Dashboard />
+      </div>
+    </ThemeProvider>
   )
 }
 

@@ -10,6 +10,7 @@ export const grey = {
 }
 
 export const primary = {
-  dark: '#00669c',
-  main: '#008fdc',
+  dark: '#000079',
+  light: '#00fff3 ',
+  main: '#0043ff',
 }

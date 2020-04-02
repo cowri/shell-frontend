@@ -1,26 +1,26 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import logo from '../../logo.png'
+import logo from '../../img/logo.png'
 
 const StyledLogo = styled.div`
   align-items: center;
   display: flex;
   color: ${props => props.color};
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
 `
 
 const StyledImg = styled.img`
   height: 48px;
   position: relative;
-  top: -4px;
+  top: -2px;
 `
 
 const Logo = ({ color = "#FFF" }) => (
   <StyledLogo color={color}>
     <StyledImg src={logo} />
-    <div style={{ width: 16 }} />
+    <div style={{ width: 4 }} />
     <span>Shell</span>
   </StyledLogo>
 )
