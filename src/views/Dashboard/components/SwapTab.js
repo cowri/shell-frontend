@@ -72,26 +72,34 @@ const SwapTab = ({
   const [step, setStep] = useState('start')
   const [originSlot, setOriginSlot] = useState(0)
   const [targetSlot, setTargetSlot] = useState(3)
-  const [originAmount, setOriginAmount] = useState(0)
-  const [targetAmount, setTargetAmount] = useState(0)
+  const [originValue, setOriginValue] = useState(0)
+  const [targetValue, setTargetValue] = useState(0)
   const [swapType, setSwapType] = useState('origin')
 
   const origin = contracts[originSlot]
   const target = contracts[targetSlot]
 
-  const primeSwap = async (value, type) => {
-    console.log("prime swap", value, type)
-    setSwapType(type)
-    const theseChickens = Number(value)
+  const primeSwap = async (swapPayload, slotPayload) => {
 
-    console.log("origin slot", originSlot)
-    console.log("target slot", targetSlot)
+    let origin
+    let target
 
-    const origin = contracts[originSlot]
-    const target = contracts[targetSlot]
+    if (slotPayload.type == 'origin'){
+      origin = contracts[slotPayload.value]
+      target = contracts[targetSlot]
+      setOriginSlot(slotPayload.value)
+    } else if (slotPayload.type == 'target'){
+      origin = contracts[originSlot]
+      target = contracts[slotPayload.value]
+      setTargetSlot(slotPayload.value)
+    } else {
+      origin = contracts[originSlot]
+      target = contracts[targetSlot]
+    }
 
     let thoseChickens
-    if (type === 'origin') {
+    const theseChickens = Number(swapPayload.value)
+    if (swapPayload.type === 'origin') {
       thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
         origin.options.address,
         target.options.address,
@@ -104,16 +112,49 @@ const SwapTab = ({
         bnAmount(theseChickens ? theseChickens : 0, target.decimals).toString()
       ).call())
     }
-    console.log("Those chickens", thoseChickens)
-    window.thoseChickens = thoseChickens
-    if (type == 'origin'){
-      setOriginAmount(theseChickens)
-      setTargetAmount(target.getDisplay(thoseChickens))
+
+    if (swapPayload.type == 'origin'){
+      setOriginValue(theseChickens)
+      setTargetValue(target.getDisplay(thoseChickens))
     } else {
-      setOriginAmount(origin.getDisplay(thoseChickens))
-      setTargetAmount(theseChickens)
+      setOriginValue(origin.getDisplay(thoseChickens))
+      setTargetValue(theseChickens)
+    }
+
+    setSwapType(swapPayload.type)
+
+  }
+
+  const handleOriginSelect = e => {
+    e.preventDefault()
+    if (e.target.value != targetSlot) {
+      const swapPayload = { type: swapType, value: swapType == 'origin' ? originValue : targetValue }
+      const slotPayload = { type: 'origin', value: e.target.value }
+      primeSwap(swapPayload, slotPayload)
     }
   }
+
+  const handleTargetSelect = e => {
+    e.preventDefault()
+    if (e.target.value != originSlot) {
+      const swapPayload = { type: swapType, value: swapType == 'origin' ? originValue : targetValue }
+      const slotPayload = { type: 'target', value: e.target.value }
+      primeSwap(swapPayload, slotPayload)
+    }
+  }
+
+  const handleOriginInput = e => {
+    e.preventDefault()
+    const swapPayload = { value: e.target.value, type: 'origin' }
+    primeSwap(swapPayload, {})
+  }
+
+  const handleTargetInput = e => {
+    e.preventDefault()
+    const swapPayload = { value: e.target.value, type: 'target' }
+    primeSwap(swapPayload, {})
+  }
+
 
   const selections = [
       <MenuItem ref={useRef()} key={0} value={0} > { contracts[0].symbol } </MenuItem>,
@@ -130,27 +171,9 @@ const SwapTab = ({
   const getDropdown = (handler, value) => {
     return ( <TextField select
       children={ selections }
-      onChange={e => { e.preventDefault(); handler(e.target.value) }}
+      onChange={e => handler(e)}
       value={value}
     /> )
-  }
-
-  const handleOriginSelect = (value) => {
-    if (value != targetSlot) {
-      setOriginSlot(value)
-      console.log("swap type from origin select", swapType)
-      if (swapType == 'origin') primeSwap(originAmount, 'origin')
-      else primeSwap(targetAmount, 'target')
-    }
-  }
-
-  const handleTargetSelect = (value) => {
-    if (value != originSlot) {
-      setTargetSlot(value)
-      console.log("swap type from target select", swapType)
-      if (swapType == 'origin') primeSwap(originAmount, 'origin')
-      else primeSwap(targetAmount, 'target')
-    }
   }
 
   return (
@@ -158,16 +181,16 @@ const SwapTab = ({
       <StyledRows>
         <AmountInput 
           icon={origin.icon}
-          onChange={e => { e.preventDefault(); primeSwap(e.target.value, 'origin') } }
+          onChange={e => handleOriginInput(e)}
           symbol={origin.symbol}
-          value={originAmount}
+          value={originValue}
           selections={getDropdown(handleOriginSelect, originSlot)}
         />
         <AmountInput 
           icon={target.icon}
-          onChange={e => { e.preventDefault(); primeSwap(e.target.value, 'target') } }
+          onChange={e => handleTargetInput(e)}
           symbol={target.symbol}
-          value={targetAmount}
+          value={targetValue}
           selections={getDropdown(handleTargetSelect, targetSlot)}
         /> 
       </StyledRows>
