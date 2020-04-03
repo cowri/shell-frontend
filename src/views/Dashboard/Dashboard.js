@@ -56,6 +56,8 @@ const Dashboard = ({
       return <UnlockModal />
     }
 
+    console.log("allowances", allowances)
+
     return <DashboardContent 
       account={account}
       allowances={allowances}

@@ -3,7 +3,12 @@ import styled from 'styled-components'
 
 import BigNumber from 'bignumber.js'
 
-import { bnAmount } from '../../../utils/web3Utils'
+import { bnAmount, getAllowances } from '../../../utils/web3Utils'
+
+import ModalConfirmMetamask from '../../../components/ModalConfirmMetamask'
+import SwappingModal from '../../Deposit/components/DepositingModal'
+import ErrorModal from '../../Deposit/components/ErrorModal'
+import SuccessModal from '../../Deposit/components/SuccessModal'
 
 import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
@@ -65,9 +70,14 @@ const StyledRows = styled.div`
   margin-top: -24px;
 `
 const SwapTab = ({
+  account,
   contracts,
-  loihi
+  loihi,
+  allowances,
+  web3
 }) => {
+
+  console.log("Account", account)
 
   const [step, setStep] = useState('start')
   const [originSlot, setOriginSlot] = useState(0)
@@ -78,6 +88,11 @@ const SwapTab = ({
 
   const origin = contracts[originSlot]
   const target = contracts[targetSlot]
+
+  const originLocked = allowances[origin.symbol.toLowerCase()] == 0
+  const targetLocked = allowances[target.symbol.toLowerCase()] == 0
+  const [originUnlocking, setOriginUnlocking] = useState(false)
+  const [targetUnlocking, setTargetUnlocking] = useState(false)
 
   const primeSwap = async (swapPayload, slotPayload) => {
 
@@ -100,23 +115,28 @@ const SwapTab = ({
     let thoseChickens
     const theseChickens = Number(swapPayload.value)
     if (swapPayload.type === 'origin') {
+
       thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
         origin.options.address,
         target.options.address,
         bnAmount(theseChickens ? theseChickens : 0, origin.decimals).toString()
       ).call())
+
     } else {
+
       thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
         origin.options.address,
         target.options.address,
         bnAmount(theseChickens ? theseChickens : 0, target.decimals).toString()
       ).call())
+
     }
 
     if (swapPayload.type == 'origin'){
       setOriginValue(theseChickens)
       setTargetValue(target.getDisplay(thoseChickens))
     } else {
+      console.log("origin.getDisplay(thoseChickens)", origin.getDisplay(thoseChickens))
       setOriginValue(origin.getDisplay(thoseChickens))
       setTargetValue(theseChickens)
     }
@@ -124,6 +144,86 @@ const SwapTab = ({
     setSwapType(swapPayload.type)
 
   }
+
+  const handleSwap = async (e) => {
+    e.preventDefault()
+    setStep('confirmingMetamask')
+
+    let originInput, targetInput
+    if (swapType == 'origin') {
+      originInput = originValue
+      targetInput = targetValue * .99
+      console.log("ORIGIN")
+    } else {
+      console.log("TARGET")
+      console.log("ORIGIN VALUE", originValue)
+      originInput = originValue * 1.01
+      targetInput = targetValue
+    }
+
+    console.log("targetValue", bnAmount(targetValue, target.decimals))
+    console.log("originValue", originValue)
+    console.log("target input     ", targetInput)
+    console.log("bn target input  ", bnAmount(targetInput, target.decimals))
+    console.log("origin input     ", originInput)
+    console.log("bn origin input  ", bnAmount(originInput, origin.decimals))
+
+    const tx = loihi.methods[swapType == 'origin' ? 'swapByOrigin' : 'swapByTarget'](
+      origin.options.address,
+      target.options.address,
+      bnAmount(originInput, origin.decimals),
+      bnAmount(targetInput, target.decimals),
+      Math.floor((Date.now()/1000) + 900)
+    )
+
+    const gas = await tx.estimateGas({from: account })
+    const gasPrice = await web3.eth.getGasPrice()
+
+    tx.send({ from: account, gas: Math.floor(gas * 1.1), gasPrice})
+      .once('transactionHash', hash => {
+        setStep('swapping')
+        console.log('transactionHash', hash)
+      }).on('error', error => {
+        setStep('error')
+        console.log('error', error)
+      }).on('receipt', receipt => {
+        setStep('success')
+        console.log('receipt', receipt)
+      })
+
+  }
+
+  const handleUnlock = async (contract, setUnlocking) => {
+    setStep('confirmingMetamask')
+    // Should be abstracted to web3Utils / withWallet
+    const tx = contract.methods.approve(loihi.options.address, "-1")
+    const estimate = await tx.estimateGas({from: account})
+    const gasPrice = await web3.eth.getGasPrice()
+    tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
+      .once('transactionHash', hash => {
+        setStep('unlocking')
+        setUnlocking(true)
+      })
+      .on('error', error => {
+        setStep('error')
+        setUnlocking(false)
+      })
+      .on('receipt', receipt => {
+        setStep('success')
+        setUnlocking(false)
+      })
+  }
+
+  const handleOriginUnlock = async (e) => {
+    e.preventDefault()
+    handleUnlock(origin, setOriginUnlocking)
+  }
+
+  const handleTargetUnlock = e => {
+    e.preventDefault()
+    handleUnlock(target, setTargetUnlocking)
+  }
+
 
   const handleOriginSelect = e => {
     e.preventDefault()
@@ -155,7 +255,6 @@ const SwapTab = ({
     primeSwap(swapPayload, {})
   }
 
-
   const selections = [
       <MenuItem ref={useRef()} key={0} value={0} > { contracts[0].symbol } </MenuItem>,
       <MenuItem ref={useRef()} key={1} value={1} > { contracts[1].symbol } </MenuItem>,
@@ -177,27 +276,41 @@ const SwapTab = ({
   }
 
   return (
+    <>
+    { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
+    { (step == 'swapping' || step == 'unlocking') && <SwappingModal/> }
+    { step == 'success' && <SuccessModal onDismiss={() => setStep('none')}/> }
+    { step == 'error' && <ErrorModal onDismiss={() => setStep('none')} />}
+
     <StyledSwapTab>
       <StyledRows>
         <AmountInput 
           icon={origin.icon}
+          locked={originLocked}
           onChange={e => handleOriginInput(e)}
-          symbol={origin.symbol}
-          value={originValue}
+          onUnlock={e => handleOriginUnlock(e)}
           selections={getDropdown(handleOriginSelect, originSlot)}
+          symbol={origin.symbol}
+          unlocking={originUnlocking}
+          value={originValue}
         />
         <AmountInput 
           icon={target.icon}
+          locked={targetLocked}
           onChange={e => handleTargetInput(e)}
-          symbol={target.symbol}
-          value={targetValue}
+          onUnlock={e => handleTargetUnlock(e) }
           selections={getDropdown(handleTargetSelect, targetSlot)}
+          symbol={target.symbol}
+          unlocking={targetUnlocking}
+          value={targetValue}
         /> 
+        <Button onClick={handleSwap}>Swap</Button>
       </StyledRows>
       <div style={{ height: 634 }}>
         coming soon™
       </div>
     </StyledSwapTab>
+    </>
   )
 }
 
@@ -216,18 +329,17 @@ const AmountInput = ({
     <StyledLabelBar>
       <span>Available: {available} {symbol}</span>
     </StyledLabelBar>
-    <TextField
-      disabled={locked}
-      fullWidth
+    <TextField fullWidth
+      onChange={onChange}
+      placeholder="0"
+      value={value}
       InputProps={{
         endAdornment: (
           <div style={{ marginRight: 6 }}>
             { selections }
             { locked ? (
-              <Button
+              <Button outlined small
                 disabled={unlocking}
-                outlined
-                small
                 onClick={onUnlock}
               >
                 {unlocking ? (
@@ -248,9 +360,6 @@ const AmountInput = ({
           </StyledStartAdornment>
         )
       }}
-      onChange={onChange}
-      placeholder="0"
-      value={value}
     />
   </>
 )

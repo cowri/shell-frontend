@@ -109,16 +109,23 @@ export const getWalletBalances = async (walletAddress, contracts) => {
 }
 
 export const getAllowances = async (walletAddress, contracts) => {
-  const [dai, susd, usdc, usdt] = await Promise.all([
+  
+  const [dai, cdai, chai, usdc, cusdc, usdt, ausdt, susd, asusd] = await Promise.all([
     contracts.dai,
-    contracts.susd,
+    contracts.cdai,
+    contracts.chai,
     contracts.usdc,
-    contracts.usdt
+    contracts.cusdc,
+    contracts.usdt,
+    contracts.ausdt,
+    contracts.susd,
+    contracts.asusd
   ].map(contract => {
     return contract.methods.allowance(walletAddress, loihiAddress).call()
   }))
 
-  return { dai, susd, usdc, usdt }
+  return { dai, cdai, chai, usdc, cusdc, usdt, ausdt, susd, asusd }
+
 }
 
 export const getContracts = function (web3) {

@@ -57,7 +57,7 @@ const Deposit = ({
         console.log(error)
         setStep('error')
       })
-      .on('receipt', () => {
+      .on('receipt', receipt => {
         setStep('success')
       })
   }
