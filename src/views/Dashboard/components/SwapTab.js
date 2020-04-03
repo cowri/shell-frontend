@@ -77,7 +77,7 @@ const SwapTab = ({
   web3
 }) => {
 
-  console.log("Account", account)
+  const erc20s = contracts.erc20s
 
   const [step, setStep] = useState('start')
   const [originSlot, setOriginSlot] = useState(0)
@@ -86,8 +86,8 @@ const SwapTab = ({
   const [targetValue, setTargetValue] = useState(0)
   const [swapType, setSwapType] = useState('origin')
 
-  const origin = contracts[originSlot]
-  const target = contracts[targetSlot]
+  const origin = erc20s[originSlot]
+  const target = erc20s[targetSlot]
 
   const originLocked = allowances[origin.symbol.toLowerCase()] == 0
   const targetLocked = allowances[target.symbol.toLowerCase()] == 0
@@ -100,16 +100,16 @@ const SwapTab = ({
     let target
 
     if (slotPayload.type == 'origin'){
-      origin = contracts[slotPayload.value]
-      target = contracts[targetSlot]
+      origin = erc20s[slotPayload.value]
+      target = erc20s[targetSlot]
       setOriginSlot(slotPayload.value)
     } else if (slotPayload.type == 'target'){
-      origin = contracts[originSlot]
-      target = contracts[slotPayload.value]
+      origin = erc20s[originSlot]
+      target = erc20s[slotPayload.value]
       setTargetSlot(slotPayload.value)
     } else {
-      origin = contracts[originSlot]
-      target = contracts[targetSlot]
+      origin = erc20s[originSlot]
+      target = erc20s[targetSlot]
     }
 
     let thoseChickens
@@ -211,6 +211,7 @@ const SwapTab = ({
       .on('receipt', receipt => {
         setStep('success')
         setUnlocking(false)
+        getAllowances(account, contracts)
       })
   }
 
@@ -256,15 +257,15 @@ const SwapTab = ({
   }
 
   const selections = [
-      <MenuItem ref={useRef()} key={0} value={0} > { contracts[0].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={1} value={1} > { contracts[1].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={2} value={2} > { contracts[2].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={3} value={3} > { contracts[3].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={4} value={4} > { contracts[4].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={5} value={5} > { contracts[5].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={6} value={6} > { contracts[6].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={7} value={7} > { contracts[7].symbol } </MenuItem>,
-      <MenuItem ref={useRef()} key={8} value={8} > { contracts[8].symbol } </MenuItem>
+      <MenuItem ref={useRef()} key={0} value={0} > { erc20s[0].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={1} value={1} > { erc20s[1].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={2} value={2} > { erc20s[2].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={3} value={3} > { erc20s[3].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={4} value={4} > { erc20s[4].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={5} value={5} > { erc20s[5].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={6} value={6} > { erc20s[6].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={7} value={7} > { erc20s[7].symbol } </MenuItem>,
+      <MenuItem ref={useRef()} key={8} value={8} > { erc20s[8].symbol } </MenuItem>
   ]
 
   const getDropdown = (handler, value) => {

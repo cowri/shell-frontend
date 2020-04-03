@@ -50,8 +50,18 @@ const Deposit = ({
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
     tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
-      .once('transactionHash', hash => {
+      .on('transactionHash', hash => {
+        console.log(hash)
         setStep('depositing')
+      })
+      .on('confirmation', (confirmationNumber, receipt) => {
+        console.log(confirmationNumber)
+        console.log(receipt)
+        setStep('success')
+      })
+      .on('receipt', receipt => {
+        console.log(receipt)
+        setStep('success')
       })
       .on('error', error => {
         console.log(error)
@@ -62,27 +72,26 @@ const Deposit = ({
       })
   }
 
-  const handleUnlock = async (e, contract, tokenKey) => {
-    e.preventDefault()
+  const handleUnlock = async (tokenKey) => {
     setStep('confirmingMetamask')
 
     // Should be abstracted to web3Utils / withWallet
-    const tx = contract.methods.approve(contracts.loihi.options.address, '-1')
+    const tx = contracts[tokenKey].methods.approve(contracts.loihi.options.address, '-1')
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
     tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
-      .once('transactionHash', hash => {
+      .on('transactionHash', hash => {
         setStep('start')
         setUnlocking({ ...unlocking, [tokenKey]: true })
+      })
+      .on('confirmation', (confirmationNumber, receipt) =>{
+        setUnlocking({ ...unlocking, [tokenKey]: false })
+        onUpdateAllowances()
       })
       .on('error', error => {
         console.log(error)
         setStep('error')
         setUnlocking({ ...unlocking, [tokenKey]: false })
-      })
-      .on('receipt', receipt => {
-        setUnlocking({ ...unlocking, [tokenKey]: false })
-        onUpdateAllowances()
       })
   }
 

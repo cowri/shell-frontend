@@ -32,7 +32,7 @@ const DashboardContent = ({
         {activeTab === 'swap' && (<SwapTab 
           account={account}
           allowances={allowances}
-          contracts={contracts.erc20s}
+          contracts={contracts}
           loihi={contracts.loihi}
           web3={web3}
         />)}
