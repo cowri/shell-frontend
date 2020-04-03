@@ -41,7 +41,6 @@ const StyledRows = styled.div`
   margin-bottom: 24px;
   margin-top: -24px;
 `
-
 const StyledLabelBar = withTheme(styled.div`
   align-items: center;
   color: ${props => props.theme.palette.grey[500]};
@@ -69,6 +68,8 @@ const StartModal = ({
   const availableUsdc = walletBalances.usdc ? displayAmount(walletBalances.usdc, contracts.usdc.decimals, -1) : '--'
   const availableUsdt = walletBalances.usdt ? displayAmount(walletBalances.usdt, contracts.usdt.decimals, -1) : '--'
   const availableSusd = walletBalances.susd ? displayAmount(walletBalances.susd, contracts.susd.decimals, -1) : '--'
+  console.log("WALLET BALANCES", walletBalances)
+  window.wb = walletBalances
 
   const handleChange = (e, changeHandler) => {
     const { value } = e.target

@@ -56,7 +56,22 @@ const Dashboard = ({
       return <UnlockModal />
     }
 
-    return <DashboardContent />
+    return <DashboardContent 
+      account={account}
+      allowances={allowances}
+      balances={balances}
+      contracts={contracts}
+      hasMetaMask={hasMetamask}
+      isUnlocked={isUnlocked}
+      networkId={networkId}
+      reserves={reserves}
+      onEnable={onEnable}
+      onUpdateAllowances={onUpdateAllowances}
+      onUpdateBalances={onUpdateBalances}
+      onUpdateWalletBalances={onUpdateWalletBalances}
+      walletBalances={walletBalances}
+      web3={web3}
+    />
   }
 
   return (

@@ -8,7 +8,7 @@ import Tabs from '../../../components/Tabs'
 import PoolTab from './PoolTab'
 import SwapTab from './SwapTab'
 
-const DashboardContent = () => {
+const DashboardContent = (value) => {
   const [activeTab, setActiveTab] = useState('pool')
 
   return (
@@ -23,8 +23,11 @@ const DashboardContent = () => {
           </Tab>
         </Tabs>
 
-        {activeTab === 'pool' && <PoolTab />}
-        {activeTab === 'swap' && <SwapTab />}
+        {activeTab === 'pool' && <PoolTab /> }
+        {activeTab === 'swap' && (<SwapTab 
+          contracts={value.contracts.erc20s}
+          loihi={value.contracts.loihi}
+        />)}
 
       </Surface>
     </Container> 

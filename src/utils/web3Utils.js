@@ -86,15 +86,25 @@ export const getReserves = async (loihi) => {
 
 export const getWalletBalances = async (walletAddress, contracts) => {
   const daiBalance = new BigNumber(await contracts.dai.methods.balanceOf(walletAddress).call())
+  const cdaiBalance = new BigNumber(await contracts.cdai.methods.balanceOf(walletAddress).call())
+  const chaiBalance = new BigNumber(await contracts.chai.methods.balanceOf(walletAddress).call())
   const usdcBalance = new BigNumber(await contracts.usdc.methods.balanceOf(walletAddress).call())
+  const cusdcBalance = new BigNumber(await contracts.cusdc.methods.balanceOf(walletAddress).call())
   const usdtBalance = new BigNumber(await contracts.usdt.methods.balanceOf(walletAddress).call())
+  const ausdtBalance = new BigNumber(await contracts.ausdt.methods.balanceOf(walletAddress).call())
   const susdBalance = new BigNumber(await contracts.susd.methods.balanceOf(walletAddress).call())
+  const asusdBalance = new BigNumber(await contracts.asusd.methods.balanceOf(walletAddress).call())
 
   return {
     dai: daiBalance,
+    cdai: cdaiBalance,
+    chai: chaiBalance,
     usdc: usdcBalance,
+    cusdc: cusdcBalance,
     usdt: usdtBalance,
+    ausdt: ausdtBalance,
     susd: susdBalance,
+    asusd: asusdBalance,
   }
 }
 
@@ -176,6 +186,7 @@ export const getContracts = function (web3) {
     contractObjects[8].getDisplay = function (amount) { return displayAmount(amount, 18) }
 
     return {
+      erc20s: contractObjects,
       dai: contractObjects[0],
       chai: contractObjects[1],
       cdai: contractObjects[2],
