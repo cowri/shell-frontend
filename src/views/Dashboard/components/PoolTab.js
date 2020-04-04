@@ -90,9 +90,9 @@ const PoolTab = () => {
   const usdtReserveDisplay = usdtReserve ? `$${displayAmount(usdtReserve, 18, 0)}` : '--'
 
   const daiBalanceDisplay = daiBalance ? `$${displayAmount(daiBalance, 18, 0)}` : '--'
+  const usdcBalanceDisplay = usdcBalance ? `$${displayAmount(usdcBalance, 6, 0)}` : '--'
+  const usdtBalanceDisplay = usdtBalance ? `$${displayAmount(usdtBalance, 6, 0)}` : '--'
   const susdBalanceDisplay = susdBalance ? `$${displayAmount(susdBalance, 18, 0)}` : '--'
-  const usdcBalanceDisplay = usdcBalance ? `$${displayAmount(usdcBalance, 18, 0)}` : '--'
-  const usdtBalanceDisplay = usdtBalance ? `$${displayAmount(usdtBalance, 18, 0)}` : '--'
 
   return (
     <StyledPoolTab>

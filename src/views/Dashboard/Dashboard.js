@@ -7,6 +7,7 @@ import Header from '../../components/Header'
 import withWallet from '../../containers/withWallet'
 
 import Deposit from '../Deposit'
+import Withdraw from '../Withdraw'
 
 import DashboardContent from './components/DashboardContent'
 import NetworkModal from './components/NetworkModal'
@@ -84,6 +85,7 @@ const Dashboard = ({
           <Footer />
         </StyledDashboard>
         {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
+        {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
       </DashboardContext.Provider>
 
     </>

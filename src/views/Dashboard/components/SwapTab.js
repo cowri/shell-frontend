@@ -8,7 +8,7 @@ import { bnAmount } from '../../../utils/web3Utils'
 import DashboardContext from '../context'
 
 import ModalConfirmMetamask from '../../../components/ModalConfirmMetamask'
-import SwappingModal from '../../Deposit/components/DepositingModal'
+import SwappingModal from '../../../components/ModalAwaitingTx'
 import ErrorModal from '../../Deposit/components/ErrorModal'
 import SuccessModal from '../../Deposit/components/SuccessModal'
 

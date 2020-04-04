@@ -58,10 +58,21 @@ export const getLoihiBalances = async function (walletAddress, loihi, reserves) 
     usdtReserve,
   } = reserves
 
+  const tenToTheTwelth = new BigNumber(1e12)
+
   const daiBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(daiReserve)
+  const usdcBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(usdcReserve).dividedBy(tenToTheTwelth)
+  const usdtBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(usdtReserve).dividedBy(tenToTheTwelth)
   const susdBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(susdReserve)
-  const usdcBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(usdcReserve)
-  const usdtBal = totalShells === 0 ? 0 : shellBalance.dividedBy(totalShells).multipliedBy(usdtReserve)
+
+  console.log(shellBalance.dividedBy(totalShells).toString())
+  console.log(usdcReserve.toString())
+  console.log(usdcReserve.toFixed())
+
+  console.log("daiBal", daiBal.toString())
+  console.log("usdcBal", usdcBal.toString())
+  console.log("usdtBal", usdtBal.toString())
+  console.log("susdBal", susdBal.toString())
 
   return {
     dai: daiBal,

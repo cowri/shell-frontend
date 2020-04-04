@@ -3,12 +3,12 @@ import React, { useContext, useState } from 'react'
 import { bnAmount } from '../../utils/web3Utils'
 
 import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
+import DepositingModal from '../../components/ModalAwaitingTx'
 
 import withWallet from '../../containers/withWallet'
 
 import DashboardContext from '../Dashboard/context'
 
-import DepositingModal from './components/DepositingModal'
 import ErrorModal from './components/ErrorModal'
 import StartModal from './components/StartModal'
 import SuccessModal from './components/SuccessModal'
@@ -56,27 +56,20 @@ const Deposit = ({
     const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000)
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
-    tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
-      .on('transactionHash', hash => {
-        console.log(hash)
-        setStep('depositing')
-      })
-      .on('confirmation', (confirmationNumber, receipt) => {
-        console.log(confirmationNumber)
-        console.log(receipt)
-        setStep('success')
-      })
-      .on('receipt', receipt => {
-        console.log(receipt)
-        setStep('success')
-      })
-      .on('error', error => {
-        console.log(error)
-        setStep('error')
-      })
-      .on('receipt', receipt => {
-        setStep('success')
-      })
+    const promivent = tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
+
+    promivent.on('transactionHash', hash => {
+      console.log("hash", hash)
+      setStep('depositing')
+    }).on('confirmation', (confirmation, receipt) => {
+      console.log("confirmation", confirmation)
+      console.log("receipt from confirmation", receipt)
+    }).on('receipt', receipt => {
+      console.log('receipt', receipt)
+    }).on('error', err => {
+      console.log('error', err)
+    })
+
   }
 
   const handleUnlock = async (tokenKey) => {
