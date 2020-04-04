@@ -75,10 +75,11 @@ const SwapTab = () => {
 
   const {
     account,
-    contracts,
     allowances,
-    web3,
+    contracts,
     onUpdateAllowances,
+    walletBalances,
+    web3
   } = useContext(DashboardContext)
 
   const erc20s = contracts.erc20s
@@ -274,6 +275,7 @@ const SwapTab = () => {
     <StyledSwapTab>
       <StyledRows>
         <AmountInput 
+          available={walletBalances[origin.symbol.toLowerCase()].toFixed()}
           icon={origin.icon}
           locked={originLocked}
           onChange={e => handleOriginInput(e)}
@@ -284,6 +286,7 @@ const SwapTab = () => {
           value={originValue}
         />
         <AmountInput 
+          available={walletBalances[target.symbol.toLowerCase()].toFixed()}
           icon={target.icon}
           locked={targetLocked}
           onChange={e => handleTargetInput(e)}
