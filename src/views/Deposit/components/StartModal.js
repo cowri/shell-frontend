@@ -41,7 +41,6 @@ const StyledRows = styled.div`
   margin-bottom: 24px;
   margin-top: -24px;
 `
-
 const StyledLabelBar = withTheme(styled.div`
   align-items: center;
   color: ${props => props.theme.palette.grey[500]};
@@ -153,9 +152,11 @@ const TokenInput = ({
     <StyledLabelBar>
       <span>Available: {available} {symbol}</span>
     </StyledLabelBar>
-    <TextField
+    <TextField fullWidth
       disabled={locked}
-      fullWidth
+      onChange={onChange}
+      placeholder="0"
+      value={value}
       InputProps={{
         endAdornment: locked ? (
           <div style={{ marginRight: 6 }}>
@@ -184,9 +185,6 @@ const TokenInput = ({
           </StyledStartAdornment>
         )
       }}
-      onChange={onChange}
-      placeholder="0"
-      value={value}
     />
   </>
 )

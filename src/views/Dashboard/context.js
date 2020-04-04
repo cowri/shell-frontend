@@ -9,7 +9,7 @@ export default React.createContext({
   reserves: {},
   totalShells: new BigNumber(0),
   onEnable: () => {},
-  onUpdateAllowances: () => {},
+  onUpdateAllowances: () => { console.log("update allowances") },
   onUpdateBalances: () => {},
   onUpdateWalletBalances: () => {},
   presentDeposit: () => {},

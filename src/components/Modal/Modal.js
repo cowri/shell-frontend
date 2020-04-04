@@ -24,7 +24,7 @@ const contentKeyframes = keyframes`
 
 const StyledModal = styled.div`
   align-items: center;
-  backdrop-filter: blur(100px);
+  // backdrop-filter: blur(100px);
   display: flex;
   justify-content: center;
   text-align: center;

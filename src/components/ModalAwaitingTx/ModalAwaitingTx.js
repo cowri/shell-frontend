@@ -2,14 +2,13 @@ import React from 'react'
 
 import HourglassFullIcon from '@material-ui/icons/HourglassFull'
 
-import Loader from '../../../components/Loader'
-import Modal from '../../../components/Modal'
-import ModalActions from '../../../components/ModalActions'
-import ModalIcon from '../../../components/ModalIcon'
-import ModalTitle from '../../../components/ModalTitle'
+import Loader from '../Loader'
+import Modal from '../Modal'
+import ModalActions from '../ModalActions'
+import ModalIcon from '../ModalIcon'
+import ModalTitle from '../ModalTitle'
 
-const DepositingModal = ({
-}) => {
+const AwaitingTxModal = () => {
   return (
     <Modal>
       <ModalIcon>
@@ -25,4 +24,4 @@ const DepositingModal = ({
   )
 }
 
-export default DepositingModal
+export default AwaitingTxModal

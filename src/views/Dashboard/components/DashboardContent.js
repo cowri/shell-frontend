@@ -23,8 +23,8 @@ const DashboardContent = () => {
           </Tab>
         </Tabs>
 
-        {activeTab === 'pool' && <PoolTab />}
-        {activeTab === 'swap' && <SwapTab />}
+        {activeTab === 'pool' && <PoolTab /> }
+        {activeTab === 'swap' && <SwapTab /> }
 
       </Surface>
     </Container> 

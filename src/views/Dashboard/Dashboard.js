@@ -7,12 +7,15 @@ import Header from '../../components/Header'
 import withWallet from '../../containers/withWallet'
 
 import Deposit from '../Deposit'
+import Withdraw from '../Withdraw'
 
 import DashboardContent from './components/DashboardContent'
 import NetworkModal from './components/NetworkModal'
 import UnlockModal from './components/UnlockModal'
 
 import DashboardContext from './context'
+
+import { getAllowances } from '../../utils/web3Utils'
 
 const StyledDashboard = styled.div`
   align-items: center;
@@ -22,7 +25,7 @@ const StyledDashboard = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  position: relative;
 `
 
 const Dashboard = ({
@@ -81,9 +84,10 @@ const Dashboard = ({
           {renderContent()}
           <Footer />
         </StyledDashboard>
+        {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
+        {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
       </DashboardContext.Provider>
 
-      {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
     </>
   )
 }
