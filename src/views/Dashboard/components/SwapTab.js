@@ -158,13 +158,15 @@ const SwapTab = () => {
     if (swapPayload.type == 'origin') setOriginValue(theseChickens)
     else setTargetValue(theseChickens)
 
+    console.log("THESE CHICKENS", theseChickens)
+
     let thoseChickens
     if (swapPayload.type === 'origin') {
 
       thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
         origin.options.address,
         target.options.address,
-        bnAmount(theseChickens ? theseChickens : 0, origin.decimals).toString()
+        bnAmount(theseChickens ? theseChickens : 0, origin.decimals).toFixed()
       ).call())
 
     } else {
@@ -172,7 +174,7 @@ const SwapTab = () => {
       thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
         origin.options.address,
         target.options.address,
-        bnAmount(theseChickens ? theseChickens : 0, target.decimals).toString()
+        bnAmount(theseChickens ? theseChickens : 0, target.decimals).toFixed()
       ).call())
 
     }
