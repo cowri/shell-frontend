@@ -78,10 +78,6 @@ const StartModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log("daiInputValue", daiInputValue)
-    console.log("usdcInputValue", usdcInputValue)
-    console.log("usdtInputValue", usdtInputValue)
-    console.log("susdInputValue", susdInputValue)
     onDeposit(daiInputValue, usdcInputValue, usdtInputValue, susdInputValue)
   }
 
@@ -156,9 +152,11 @@ const TokenInput = ({
     <StyledLabelBar>
       <span>Available: {available} {symbol}</span>
     </StyledLabelBar>
-    <TextField
+    <TextField fullWidth
       disabled={locked}
-      fullWidth
+      onChange={onChange}
+      placeholder="0"
+      value={value}
       InputProps={{
         endAdornment: locked ? (
           <div style={{ marginRight: 6 }}>
@@ -187,9 +185,6 @@ const TokenInput = ({
           </StyledStartAdornment>
         )
       }}
-      onChange={onChange}
-      placeholder="0"
-      value={value}
     />
   </>
 )

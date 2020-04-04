@@ -8,12 +8,7 @@ import Tabs from '../../../components/Tabs'
 import PoolTab from './PoolTab'
 import SwapTab from './SwapTab'
 
-const DashboardContent = ({
-  account,
-  allowances,
-  contracts,
-  web3
-}) => {
+const DashboardContent = () => {
   const [activeTab, setActiveTab] = useState('pool')
 
   return (

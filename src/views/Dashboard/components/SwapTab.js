@@ -15,7 +15,7 @@ import SuccessModal from '../../Deposit/components/SuccessModal'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem';
-import { withTheme } from '@material-ui/core/styles'
+import { makeStyles, withTheme } from '@material-ui/core/styles'
 
 import Button from '../../../components/Button'
 import LabelledValue from '../../../components/LabelledValue'
@@ -42,8 +42,9 @@ const StyledStartAdornment = styled.div`
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
+  padding-left: 22px;
+  padding-right: 12px;
 `
-
 const StyledEndAdornment = styled.div`
   padding-left: 6px;
   padding-right: 12px;
@@ -52,25 +53,50 @@ const StyledSwapTab = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 24px;
 `
+
 const StyledLabelBar = withTheme(styled.div`
-  align-items: center;
-  color: ${props => props.theme.palette.grey[500]};
+  align-items: flex-end;
   display: flex;
   height: 32px;
-  justify-content: space-between;
+  // justify-content: flex-end;
+  align-content: baseline;
   margin-top: 24px;
 `)
 
-const StyledForm = styled.form`
-  display: flex;
-  flex-direction: column;
+const StyledTitle = styled.div`
+  margin-left: 24px;
+  font-size: 36px;
+  align-items: center;
+  // height: 32px;
+  // margin-top:24px;
 `
+const StyledAvailability = withTheme(styled.div`
+  color: ${props => props.theme.palette.grey[500]};
+  margin-left: 8px;
+  font-size: 16px;
+  margin-bottom: 5px;
+`)
+
+const StyledInput = styled.div`
+  margin-bottom: 24px;
+`
+
 const StyledRows = styled.div`
   margin-bottom: 24px;
-  margin-top: -24px;
+  margin-top: 24px;
 `
+const StyledActions = withTheme(styled.div`
+  align-items: center;
+  background-color: ${props => props.theme.palette.grey[50]};
+  display: flex;
+  height: 80px;
+  padding: 0 24px;
+  @media (max-width: 512px) {
+    padding: 0 12px;
+  }
+`)
+
 const SwapTab = () => {
 
   const {
@@ -94,6 +120,10 @@ const SwapTab = () => {
 
   const origin = erc20s[originSlot]
   const target = erc20s[targetSlot]
+  const originBalance = walletBalances[origin.symbol.toLowerCase()]
+    ? walletBalances[origin.symbol.toLowerCase()].toFixed() : 0
+  const targetBalance = walletBalances[target.symbol.toLowerCase()]
+    ? walletBalances[target.symbol.toLowerCase()].toFixed() : 0
 
   const originLocked = allowances[origin.symbol.toLowerCase()] == 0
   const targetLocked = allowances[target.symbol.toLowerCase()] == 0
@@ -266,43 +296,41 @@ const SwapTab = () => {
   }
 
   return (
-    <>
-    { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
-    { (step == 'swapping' || step == 'unlocking') && <SwappingModal/> }
-    { step == 'success' && <SuccessModal onDismiss={() => setStep('none')}/> }
-    { step == 'error' && <ErrorModal onDismiss={() => setStep('none')} />}
-
     <StyledSwapTab>
+      { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
+      { (step == 'swapping' || step == 'unlocking') && <SwappingModal/> }
+      { step == 'success' && <SuccessModal onDismiss={() => setStep('none')}/> }
+      { step == 'error' && <ErrorModal onDismiss={() => setStep('none')} />}
       <StyledRows>
         <AmountInput 
-          available={walletBalances[origin.symbol.toLowerCase()].toFixed()}
+          available={originBalance ? originBalance : 0}
           icon={origin.icon}
           locked={originLocked}
           onChange={e => handleOriginInput(e)}
           onUnlock={e => handleOriginUnlock(e)}
           selections={getDropdown(handleOriginSelect, originSlot)}
           symbol={origin.symbol}
+          title={'From'}
           unlocking={originUnlocking}
           value={originValue}
         />
         <AmountInput 
-          available={walletBalances[target.symbol.toLowerCase()].toFixed()}
+          available={targetBalance ? targetBalance : 0}
           icon={target.icon}
           locked={targetLocked}
           onChange={e => handleTargetInput(e)}
-          onUnlock={e => handleTargetUnlock(e) }
+          onUnlock={e => handleTargetUnlock(e)}
           selections={getDropdown(handleTargetSelect, targetSlot)}
           symbol={target.symbol}
+          title={'To'}
           unlocking={targetUnlocking}
           value={targetValue}
         /> 
-        <Button onClick={handleSwap}>Swap</Button>
       </StyledRows>
-      <div style={{ height: 634 }}>
-        coming soon™
-      </div>
+      <StyledActions>
+        <Button onClick={handleSwap}>Swap</Button>
+      </StyledActions>
     </StyledSwapTab>
-    </>
   )
 }
 
@@ -313,47 +341,52 @@ const AmountInput = ({
   onChange,
   onUnlock,
   symbol,
+  title,
   unlocking,
   value,
   selections
-}) => (
-  <>
-    <StyledLabelBar>
-      <span>Available: {available} {symbol}</span>
-    </StyledLabelBar>
-    <TextField fullWidth
-      onChange={onChange}
-      placeholder="0"
-      value={value}
-      InputProps={{
-        endAdornment: (
-          <div style={{ marginRight: 6 }}>
-            { selections }
-            { locked ? (
-              <Button outlined small
-                disabled={unlocking}
-                onClick={onUnlock}
-              >
-                {unlocking ? (
-                  <>
-                    <CircularProgress size={18} />
-                    <span style={{ marginLeft: 6 }}>Unlocking</span>
-                  </>
-                ) : 'Unlock'}
-              </Button>
-            ) : null }
-          </div>
-        ),
-        startAdornment: (
-          <StyledStartAdornment>
-            <TokenIcon size={24}>
-              <img src={icon} />
-            </TokenIcon>
-          </StyledStartAdornment>
-        )
-      }}
-    />
-  </>
-)
+}) => {
+
+  return (
+    <StyledInput>
+      <StyledLabelBar>
+        <StyledTitle> { title } </StyledTitle>
+        <StyledAvailability>Available: {available} {symbol}</StyledAvailability>
+      </StyledLabelBar>
+      <TextField fullWidth
+        onChange={onChange}
+        placeholder="0"
+        value={value}
+        InputProps={{
+          endAdornment: (
+            <div style={{ marginRight: 6 }}>
+              { selections }
+              { locked ? (
+                <Button outlined small
+                  disabled={unlocking}
+                  onClick={onUnlock}
+                >
+                  {unlocking ? (
+                    <>
+                      <CircularProgress size={18} />
+                      <span style={{ marginLeft: 6 }}>Unlocking</span>
+                    </>
+                  ) : 'Unlock'}
+                </Button>
+              ) : null }
+            </div>
+          ),
+          startAdornment: (
+            <StyledStartAdornment>
+              <TokenIcon >
+                <img src={icon} />
+              </TokenIcon>
+            </StyledStartAdornment>
+          )
+        }}
+      />
+    </StyledInput>
+  )
+}
 
 export default SwapTab
