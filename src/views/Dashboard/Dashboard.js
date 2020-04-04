@@ -14,6 +14,8 @@ import UnlockModal from './components/UnlockModal'
 
 import DashboardContext from './context'
 
+import { getAllowances } from '../../utils/web3Utils'
+
 const StyledDashboard = styled.div`
   align-items: center;
   background: radial-gradient(circle at top, #00fff3 -0%, #0043ff, #000079);
@@ -56,24 +58,7 @@ const Dashboard = ({
       return <UnlockModal />
     }
 
-    console.log("allowances", allowances)
-
-    return <DashboardContent 
-      account={account}
-      allowances={allowances}
-      balances={balances}
-      contracts={contracts}
-      hasMetaMask={hasMetamask}
-      isUnlocked={isUnlocked}
-      networkId={networkId}
-      reserves={reserves}
-      onEnable={onEnable}
-      onUpdateAllowances={onUpdateAllowances}
-      onUpdateBalances={onUpdateBalances}
-      onUpdateWalletBalances={onUpdateWalletBalances}
-      walletBalances={walletBalances}
-      web3={web3}
-    />
+    return <DashboardContent />
   }
 
   return (
@@ -98,9 +83,9 @@ const Dashboard = ({
           {renderContent()}
           <Footer />
         </StyledDashboard>
+        {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
       </DashboardContext.Provider>
 
-      {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
     </>
   )
 }

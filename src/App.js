@@ -9,7 +9,9 @@ import Dashboard from './views/Dashboard'
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Dashboard />
+      <Dashboard 
+      
+      />
     </ThemeProvider>
   )
 }

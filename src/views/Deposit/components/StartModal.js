@@ -80,6 +80,10 @@ const StartModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    console.log("daiInputValue", daiInputValue)
+    console.log("usdcInputValue", usdcInputValue)
+    console.log("usdtInputValue", usdtInputValue)
+    console.log("susdInputValue", susdInputValue)
     onDeposit(daiInputValue, usdcInputValue, usdtInputValue, susdInputValue)
   }
 

@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import BigNumber from 'bignumber.js'
 
-import { bnAmount, getAllowances } from '../../../utils/web3Utils'
+import { bnAmount } from '../../../utils/web3Utils'
+
+import DashboardContext from '../context'
 
 import ModalConfirmMetamask from '../../../components/ModalConfirmMetamask'
 import SwappingModal from '../../Deposit/components/DepositingModal'
@@ -69,15 +71,18 @@ const StyledRows = styled.div`
   margin-bottom: 24px;
   margin-top: -24px;
 `
-const SwapTab = ({
-  account,
-  contracts,
-  loihi,
-  allowances,
-  web3
-}) => {
+const SwapTab = () => {
+
+  const {
+    account,
+    contracts,
+    allowances,
+    web3,
+    onUpdateAllowances,
+  } = useContext(DashboardContext)
 
   const erc20s = contracts.erc20s
+  const loihi = contracts.loihi
 
   const [step, setStep] = useState('start')
   const [originSlot, setOriginSlot] = useState(0)
@@ -152,21 +157,11 @@ const SwapTab = ({
     let originInput, targetInput
     if (swapType == 'origin') {
       originInput = originValue
-      targetInput = targetValue * .99
-      console.log("ORIGIN")
+      targetInput = Math.floor(targetValue * .99)
     } else {
-      console.log("TARGET")
-      console.log("ORIGIN VALUE", originValue)
-      originInput = originValue * 1.01
+      originInput = Math.floor(originValue * 1.01)
       targetInput = targetValue
     }
-
-    console.log("targetValue", bnAmount(targetValue, target.decimals))
-    console.log("originValue", originValue)
-    console.log("target input     ", targetInput)
-    console.log("bn target input  ", bnAmount(targetInput, target.decimals))
-    console.log("origin input     ", originInput)
-    console.log("bn origin input  ", bnAmount(originInput, origin.decimals))
 
     const tx = loihi.methods[swapType == 'origin' ? 'swapByOrigin' : 'swapByTarget'](
       origin.options.address,
@@ -180,16 +175,9 @@ const SwapTab = ({
     const gasPrice = await web3.eth.getGasPrice()
 
     tx.send({ from: account, gas: Math.floor(gas * 1.1), gasPrice})
-      .once('transactionHash', hash => {
-        setStep('swapping')
-        console.log('transactionHash', hash)
-      }).on('error', error => {
-        setStep('error')
-        console.log('error', error)
-      }).on('receipt', receipt => {
-        setStep('success')
-        console.log('receipt', receipt)
-      })
+      .once('transactionHash', () => { setStep('swapping') })
+      .on('error', error => {          setStep('error') })
+      .on('receipt', receipt => {      setStep('success') })
 
   }
 
@@ -211,7 +199,7 @@ const SwapTab = ({
       .on('receipt', receipt => {
         setStep('success')
         setUnlocking(false)
-        getAllowances(account, contracts)
+        onUpdateAllowances()
       })
   }
 

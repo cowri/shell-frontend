@@ -29,13 +29,7 @@ const DashboardContent = ({
         </Tabs>
 
         {activeTab === 'pool' && <PoolTab /> }
-        {activeTab === 'swap' && (<SwapTab 
-          account={account}
-          allowances={allowances}
-          contracts={contracts}
-          loihi={contracts.loihi}
-          web3={web3}
-        />)}
+        {activeTab === 'swap' && <SwapTab /> }
 
       </Surface>
     </Container> 
