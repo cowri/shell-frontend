@@ -9,9 +9,9 @@ import withWallet from '../../containers/withWallet'
 
 import DashboardContext from '../Dashboard/context'
 
-import ErrorModal from './components/ErrorModal'
+import ModalError from '../../components/ModalError'
 import StartModal from './components/StartModal'
-import SuccessModal from './components/SuccessModal'
+import ModalSuccess from '../../components/ModalSuccess'
 
 const Deposit = ({
   onDismiss
@@ -21,6 +21,8 @@ const Deposit = ({
     allowances,
     contracts,
     onUpdateAllowances,
+    onUpdateBalances,
+    onUpdateWalletBalances,
     walletBalances,
     web3
   } = useContext(DashboardContext)
@@ -56,19 +58,17 @@ const Deposit = ({
     const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000)
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
-    const promivent = tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
+    tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
+      .on('transactionHash', () => setStep('depositing'))
+      .once('confirmation', handleConfirmation)
+      .on('error', () => setStep('error'))
 
-    promivent.on('transactionHash', hash => {
-      console.log("hash", hash)
-      setStep('depositing')
-    }).on('confirmation', (confirmation, receipt) => {
-      console.log("confirmation", confirmation)
-      console.log("receipt from confirmation", receipt)
-    }).on('receipt', receipt => {
-      console.log('receipt', receipt)
-    }).on('error', err => {
-      console.log('error', err)
-    })
+
+    function handleConfirmation () {
+      onUpdateBalances()
+      onUpdateWalletBalances()
+      setStep('succes')
+    }
 
   }
 
@@ -118,11 +118,11 @@ const Deposit = ({
       )}
 
       {step === 'success' && (
-        <SuccessModal onDismiss={onDismiss} />
+        <ModalSuccess buttonBlurb={'Finish'} onDismiss={onDismiss} title={'Deposit Successful.'} />
       )}
 
       {step === 'error' && (
-        <ErrorModal onDismiss={onDismiss} />
+        <ModalError buttonBlurb={'Finish'} onDismiss={onDismiss} title={'An error occurred'} />
       )}
     </>
   )

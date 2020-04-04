@@ -3,14 +3,14 @@ import styled from 'styled-components'
 
 import BigNumber from 'bignumber.js'
 
-import { bnAmount } from '../../../utils/web3Utils'
+import { bnAmount, displayAmount } from '../../../utils/web3Utils'
 
 import DashboardContext from '../context'
 
 import ModalConfirmMetamask from '../../../components/ModalConfirmMetamask'
+import ModalError from '../../../components/ModalError'
+import ModalSuccess from '../../../components/ModalSuccess'
 import SwappingModal from '../../../components/ModalAwaitingTx'
-import ErrorModal from '../../Deposit/components/ErrorModal'
-import SuccessModal from '../../Deposit/components/SuccessModal'
 
 import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
@@ -104,6 +104,8 @@ const SwapTab = () => {
     allowances,
     contracts,
     onUpdateAllowances,
+    onUpdateBalances,
+    onUpdateWalletBalances,
     walletBalances,
     web3
   } = useContext(DashboardContext)
@@ -124,6 +126,10 @@ const SwapTab = () => {
     ? walletBalances[origin.symbol.toLowerCase()].toFixed() : 0
   const targetBalance = walletBalances[target.symbol.toLowerCase()]
     ? walletBalances[target.symbol.toLowerCase()].toFixed() : 0
+  const originAvailable = walletBalances[origin.symbol.toLowerCase()]
+    ? displayAmount(walletBalances[origin.symbol.toLowerCase()], origin.decimals) : 0
+  const targetAvailable = walletBalances[target.symbol.toLowerCase()]
+    ? displayAmount(walletBalances[target.symbol.toLowerCase()], target.decimals) : 0
 
   const originLocked = allowances[origin.symbol.toLowerCase()] == 0
   const targetLocked = allowances[target.symbol.toLowerCase()] == 0
@@ -148,8 +154,11 @@ const SwapTab = () => {
       target = erc20s[targetSlot]
     }
 
-    let thoseChickens
     const theseChickens = Number(swapPayload.value)
+    if (swapPayload.type == 'origin') setOriginValue(theseChickens)
+    else setTargetValue(theseChickens)
+
+    let thoseChickens
     if (swapPayload.type === 'origin') {
 
       thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
@@ -168,14 +177,8 @@ const SwapTab = () => {
 
     }
 
-    if (swapPayload.type == 'origin'){
-      setOriginValue(theseChickens)
-      setTargetValue(target.getDisplay(thoseChickens))
-    } else {
-      console.log("origin.getDisplay(thoseChickens)", origin.getDisplay(thoseChickens))
-      setOriginValue(origin.getDisplay(thoseChickens))
-      setTargetValue(theseChickens)
-    }
+    if (swapPayload.type == 'origin') setTargetValue(target.getDisplay(thoseChickens))
+    else setOriginValue(origin.getDisplay(thoseChickens))
 
     setSwapType(swapPayload.type)
 
@@ -197,8 +200,8 @@ const SwapTab = () => {
     const tx = loihi.methods[swapType == 'origin' ? 'swapByOrigin' : 'swapByTarget'](
       origin.options.address,
       target.options.address,
-      bnAmount(originInput, origin.decimals),
-      bnAmount(targetInput, target.decimals),
+      bnAmount(originInput, origin.decimals).toFixed(),
+      bnAmount(targetInput, target.decimals).toFixed(),
       Math.floor((Date.now()/1000) + 900)
     )
 
@@ -206,9 +209,27 @@ const SwapTab = () => {
     const gasPrice = await web3.eth.getGasPrice()
 
     tx.send({ from: account, gas: Math.floor(gas * 1.1), gasPrice})
-      .once('transactionHash', () => { setStep('swapping') })
-      .on('error', error => {          setStep('error') })
-      .on('receipt', receipt => {      setStep('success') })
+      .once('transactionHash', () =>  setStep('swapping'))
+      .once('confirmation', handleConfirmation)
+      .on('error', handleError)
+
+    function handleConfirmation () {
+      setOriginValue('0')
+      setTargetValue('0')
+      setOriginSlot(0)
+      setTargetSlot(3)
+      setStep('success')
+    }
+
+    function handleError () {
+      onUpdateBalances()
+      onUpdateWalletBalances()
+      setOriginValue('0')
+      setTargetValue('0')
+      setOriginSlot(0)
+      setTargetSlot(3)
+      setStep('error')
+    }
 
   }
 
@@ -299,11 +320,11 @@ const SwapTab = () => {
     <StyledSwapTab>
       { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
       { (step == 'swapping' || step == 'unlocking') && <SwappingModal/> }
-      { step == 'success' && <SuccessModal onDismiss={() => setStep('none')}/> }
-      { step == 'error' && <ErrorModal onDismiss={() => setStep('none')} />}
+      { step == 'success' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
+      { step == 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
       <StyledRows>
         <AmountInput 
-          available={originBalance ? originBalance : 0}
+          available={originAvailable}
           icon={origin.icon}
           locked={originLocked}
           onChange={e => handleOriginInput(e)}
@@ -315,7 +336,7 @@ const SwapTab = () => {
           value={originValue}
         />
         <AmountInput 
-          available={targetBalance ? targetBalance : 0}
+          available={targetAvailable}
           icon={target.icon}
           locked={targetLocked}
           onChange={e => handleTargetInput(e)}

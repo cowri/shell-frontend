@@ -7,9 +7,9 @@ import WithdrawingModal from '../../components/ModalAwaitingTx'
 
 import DashboardContext from '../Dashboard/context'
 
-import ErrorModal from './components/ErrorModal'
+import ModalError from '../../components/ModalError'
 import StartModal from './components/StartModal'
-import SuccessModal from './components/SuccessModal'
+import ModalSuccess from '../../components/ModalSuccess'
 
 const Withdraw = ({
   onDismiss
@@ -20,6 +20,8 @@ const Withdraw = ({
     balances,
     contracts,
     onUpdateAllowances,
+    onUpdateBalances,
+    onUpdateWalletBalances,
     walletBalances,
     web3
   } = useContext(DashboardContext)
@@ -35,10 +37,16 @@ const Withdraw = ({
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
     tx.send({ from: account, gas: Math.floor(estimate * 1.1), gasPrice: gasPrice})
-      .on('transactionHash', hash => { console.log("hello"); setStep('withdrawing') })
-      .on('confirmation', (confirmation, receipt) => { console.log("confirmation", confirmation, receipt); setStep('success') })
-      .on('receipt', receipt => { console.log("hello2"); setStep('success') })
-      .on('error', error => { console.log("hello3"); setStep('error') })
+      .once('transactionHash', () => setStep('withdrawing'))
+      .once('confirmation', handleConfirmation)
+      .on('error', () => setStep('error'))
+
+    function handleConfirmation () {
+      onUpdateBalances()
+      onUpdateWalletBalances()
+      setStep('succes')
+    }
+
   }
 
   return (
@@ -62,11 +70,11 @@ const Withdraw = ({
       )}
 
       {step === 'success' && (
-        <SuccessModal onDismiss={onDismiss} />
+        <ModalSuccess buttonBlurb={'Finish'} onDismiss={onDismiss} title={'Withdrawal Successful.'} />
       )}
 
       {step === 'error' && (
-        <ErrorModal onDismiss={onDismiss} />
+        <ModalError buttonBlurb={'Finish'} onDismiss={onDismiss} title={'An error occurred.'} />
       )}
     </>
   )
