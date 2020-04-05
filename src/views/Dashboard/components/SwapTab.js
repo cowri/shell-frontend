@@ -136,8 +136,6 @@ const SwapTab = () => {
   const [originUnlocking, setOriginUnlocking] = useState(false)
   const [targetUnlocking, setTargetUnlocking] = useState(false)
 
-  console.log("TARGET VALUE", targetValue)
-
   const primeSwap = async (swapPayload, slotPayload) => {
 
     let origin
@@ -157,19 +155,23 @@ const SwapTab = () => {
     }
 
 
-    const val = swapPayload.value.replace(/[A-Za-z!@#$%^&*()]/g, '');
+    const val = swapPayload.value !== '' 
+      ? String(+swapPayload.value.replace(/[A-Za-z!@#$%^&*()?<∞>;:-=,._+\\|`~/]/g, ''))
+      : '0'
 
-    if (swapPayload.type == 'origin') setOriginValue(val)
-    else setTargetValue(val)
+    let theseChickens = swapPayload.type == 'origin'
+      ? bnAmount(val, origin.decimals)
+      : bnAmount(val, target.decimals)
+
+    if (swapPayload.type == 'origin') setOriginValue(displayAmount(theseChickens, origin.decimals))
+    else setTargetValue(displayAmount(theseChickens, target.decimals))
 
     let thoseChickens
-    let theseChickens 
     if (swapPayload.type === 'origin') {
 
-      theseChickens = bnAmount(
-        isNaN(val) ? 0 : val, 
-        origin.decimals
-      )
+      
+      console.log("VAL", val)
+      console.log("THESE FIXED CHICKENS", theseChickens.toFixed())
 
       thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
         origin.options.address,
@@ -179,10 +181,6 @@ const SwapTab = () => {
 
     } else {
 
-      theseChickens = bnAmount(
-        isNaN(val) ? 0 : val, 
-        target.decimals
-      )
 
       thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
         origin.options.address,
@@ -232,7 +230,7 @@ const SwapTab = () => {
         setTargetHelperText('')
         setTargetError(false)
       }
-      
+
     }
 
     setSwapType(swapPayload.type)
@@ -431,8 +429,6 @@ const AmountInput = ({
   selections
 }) => {
   const classes = AmountInputStyles()
-  console.log("CLASSES", classes)
-
 
   return (
     <StyledInput>
