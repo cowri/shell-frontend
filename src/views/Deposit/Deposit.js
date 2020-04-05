@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 
 import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
 import DepositingModal from '../../components/ModalAwaitingTx'
+import UnlockingModal from '../../components/ModalAwaitingTx'
 
 import withWallet from '../../containers/withWallet'
 
@@ -69,9 +70,9 @@ const Deposit = ({
 
 
     function handleConfirmation () {
+      setStep('success')
       onUpdateBalances()
       onUpdateWalletBalances()
-      setStep('succes')
     }
 
   }
@@ -85,7 +86,7 @@ const Deposit = ({
     const gasPrice = await web3.eth.getGasPrice()
     tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
       .on('transactionHash', hash => {
-        setStep('start')
+        setStep('unlocking')
         setUnlocking({ ...unlocking, [tokenKey]: true })
       })
       .on('confirmation', (confirmationNumber, receipt) =>{
@@ -121,6 +122,10 @@ const Deposit = ({
 
       {step === 'depositing' && (
         <DepositingModal />
+      )}
+
+      {step === 'unlocking' && (
+        <UnlockingModal />
       )}
 
       {step === 'success' && (
