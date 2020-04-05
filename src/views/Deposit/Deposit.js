@@ -2,6 +2,8 @@ import React, { useContext, useState } from 'react'
 
 import { bnAmount } from '../../utils/web3Utils'
 
+import BigNumber from 'bignumber.js'
+
 import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
 import DepositingModal from '../../components/ModalAwaitingTx'
 
@@ -19,10 +21,12 @@ const Deposit = ({
   const { 
     account,
     allowances,
+    balances,
     contracts,
     onUpdateAllowances,
     onUpdateBalances,
     onUpdateWalletBalances,
+    reserves,
     walletBalances,
     web3
   } = useContext(DashboardContext)
@@ -100,10 +104,12 @@ const Deposit = ({
       {step === 'start' && (
         <StartModal
           allowances={allowances}
+          balances={balances}
           contracts={contracts}
           onDismiss={onDismiss}
           onDeposit={handleDeposit}
           onUnlock={handleUnlock}
+          reserves={reserves}
           unlocking={unlocking}
           walletBalances={walletBalances}
         />

@@ -17,7 +17,9 @@ import ModalContent from '../../../components/ModalContent'
 import ModalTitle from '../../../components/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
 
-import { displayAmount } from '../../../utils/web3Utils'
+import { bnAmount, displayAmount } from '../../../utils/web3Utils'
+
+import BigNumber from 'bignumber.js'
 
 const StyledStartAdornment = styled.div`
   align-items: center;
@@ -52,10 +54,12 @@ const StyledLabelBar = withTheme(styled.div`
 
 const StartModal = ({
   allowances,
+  balances,
   contracts,
   onDeposit,
   onDismiss,
   onUnlock,
+  reserves,
   unlocking,
   walletBalances,
 }) => {
@@ -63,18 +67,65 @@ const StartModal = ({
   const [susdInputValue, setSusdInputValue] = useState('')
   const [usdcInputValue, setUsdcInputValue] = useState('')
   const [usdtInputValue, setUsdtInputValue] = useState('')
+  const [slippage, setSlippage] = useState(0)
 
   const availableDai = walletBalances.dai ? displayAmount(walletBalances.dai, contracts.dai.decimals, 4) : '--'
   const availableUsdc = walletBalances.usdc ? displayAmount(walletBalances.usdc, contracts.usdc.decimals, 4) : '--'
   const availableUsdt = walletBalances.usdt ? displayAmount(walletBalances.usdt, contracts.usdt.decimals, 4) : '--'
   const availableSusd = walletBalances.susd ? displayAmount(walletBalances.susd, contracts.susd.decimals, 4) : '--'
 
-  const handleChange = (e, changeHandler) => {
-    const { value } = e.target
-    if (!isNaN(value)) {
-      changeHandler(value)
+  const handleInput = (e, type, setter) => {
+    e.preventDefault()
+    if (!isNaN(e.target.value)) {
+      setter(e.target.value)
+      primeDeposit({ type: type, value: e.target.value })
     }
   }
+
+  const primeDeposit = async (
+    inputPayload
+  ) => {
+
+    const addresses = [
+      contracts.dai.options.address,
+      contracts.usdc.options.address,
+      contracts.usdt.options.address,
+      contracts.susd.options.address,
+    ]
+
+    const amounts = [
+      bnAmount(inputPayload.type === 'dai' ? inputPayload.value : daiInputValue ? daiInputValue : 0, contracts.dai.decimals).toFixed(),
+      bnAmount(inputPayload.type === 'usdc' ? inputPayload.value : usdcInputValue ? usdcInputValue : 0, contracts.usdc.decimals).toFixed(),
+      bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputValue ? usdtInputValue : 0, contracts.usdt.decimals).toFixed(),
+      bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputValue ? susdInputValue : 0, contracts.susd.decimals).toFixed(),
+    ]
+
+    const shellsToMint = new BigNumber(
+      await contracts.loihi.methods.viewSelectiveDeposit(addresses, amounts).call()
+    )
+
+    if (shellsToMint.comparedTo(new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')) === 0) {
+      console.log("reverted")
+    }
+
+
+    const numeraireAmounts = [
+      new BigNumber(await contracts.dai.adapter.methods.viewNumeraireAmount(amounts[0]).call()),
+      new BigNumber(await contracts.usdc.adapter.methods.viewNumeraireAmount(amounts[1]).call()),
+      new BigNumber(await contracts.usdt.adapter.methods.viewNumeraireAmount(amounts[2]).call()),
+      new BigNumber(await contracts.susd.adapter.methods.viewNumeraireAmount(amounts[3]).call())
+    ]
+
+    const sum = (accu, val) => accu.plus(val)
+    const totalDeposit = numeraireAmounts.reduce(sum, new BigNumber(0))
+
+    const reservesChange = totalDeposit.dividedBy(reserves.totalReserves)
+    const shellsChange = shellsToMint.dividedBy(balances.totalShells)
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(reservesChange)).multipliedBy(new BigNumber(100))
+    setSlippage(slippage.toFixed(4))
+    
+  }
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -87,11 +138,14 @@ const StartModal = ({
       <ModalContent>
         <StyledForm onSubmit={handleSubmit}>
           <StyledRows>
+            <>
+              { slippage == 0 ? '' : slippage > 0 ? 'slippage:' + slippage + '%' : 'anti-slippage:' + slippage + '%' }
+            </>
             <TokenInput
               available={availableDai}
               icon={daiIcon}
               locked={allowances.dai === '0'}
-              onChange={e => handleChange(e, setDaiInputValue)}
+              onChange={e => handleInput(e, 'dai', setDaiInputValue)}
               onUnlock={e => onUnlock('dai')}
               symbol="DAI"
               unlocking={unlocking.dai}
@@ -101,7 +155,7 @@ const StartModal = ({
               available={availableUsdc}
               icon={usdcIcon}
               locked={allowances.usdc === '0'}
-              onChange={e => handleChange(e, setUsdcInputValue)}
+              onChange={e =>  handleInput(e, 'usdc', setUsdcInputValue)}
               onUnlock={e => onUnlock('usdc')}
               unlocking={unlocking.usdc}
               symbol="USDC"
@@ -111,7 +165,7 @@ const StartModal = ({
               available={availableUsdt}
               icon={usdtIcon}
               locked={allowances.usdt === '0'}
-              onChange={e => handleChange(e, setUsdtInputValue)}
+              onChange={e => handleInput(e, 'usdt', setUsdtInputValue)}
               onUnlock={e => onUnlock('usdt')}
               unlocking={unlocking.usdt}
               symbol="USDT"
@@ -121,7 +175,7 @@ const StartModal = ({
               available={availableSusd}
               icon={susdIcon}
               locked={allowances.susd === '0'}
-              onChange={e => handleChange(e, setSusdInputValue)}
+              onChange={e => handleInput(e, 'susd', setSusdInputValue)}
               onUnlock={e => onUnlock('susd')}
               unlocking={unlocking.susd}
               symbol="SUSD"

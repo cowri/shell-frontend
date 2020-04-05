@@ -155,6 +155,8 @@ const SwapTab = () => {
       target = erc20s[targetSlot]
     }
 
+    swapPayload.value = swapPayload.value.split('.')[0]
+
     const val = swapPayload.value !== '' 
       ? String(+swapPayload.value.replace(/[A-Za-z!@#$%^&*()?<∞>;:-=,._+\\|`~/]/g, ''))
       : '0'
@@ -197,7 +199,6 @@ const SwapTab = () => {
 
     const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
     const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
-
 
     if (swapPayload.type == 'origin') {
 
