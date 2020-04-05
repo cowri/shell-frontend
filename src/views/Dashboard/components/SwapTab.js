@@ -123,13 +123,14 @@ const SwapTab = () => {
   const [originHelperText, setOriginHelperText] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
+  const [slippage, setSlippage] = useState(0)
 
   const origin = erc20s[originSlot]
   const target = erc20s[targetSlot]
   const originAvailable = walletBalances[origin.symbol.toLowerCase()]
-    ? displayAmount(walletBalances[origin.symbol.toLowerCase()], origin.decimals) : 0
+    ? displayAmount(walletBalances[origin.symbol.toLowerCase()], origin.decimals, 4) : 0
   const targetAvailable = walletBalances[target.symbol.toLowerCase()]
-    ? displayAmount(walletBalances[target.symbol.toLowerCase()], target.decimals) : 0
+    ? displayAmount(walletBalances[target.symbol.toLowerCase()], target.decimals, 4) : 0
 
   const originLocked = allowances[origin.symbol.toLowerCase()] == 0
   const targetLocked = allowances[target.symbol.toLowerCase()] == 0
@@ -159,6 +160,7 @@ const SwapTab = () => {
       : '0'
     
     if (val == '0') {
+      setSlippage(0)
       setOriginValue('0')
       setTargetValue('0')
       return
@@ -191,8 +193,11 @@ const SwapTab = () => {
 
     }
 
+    setSwapType(swapPayload.type)
+
     const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
     const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
+
 
     if (swapPayload.type == 'origin') {
 
@@ -200,10 +205,16 @@ const SwapTab = () => {
       setTargetError(false)
 
       if (thoseChickens.comparedTo(reverted) == 0) {
+        setSlippage('∞')
         setOriginError(true)
         setOriginHelperText('Amount triggers halt check')
         setTargetValue('∞')
-      } else if (theseChickens.isGreaterThan(availableOrigin)) {
+        return
+      } 
+
+      setSlippage(await getSlippage(theseChickens, thoseChickens))
+      
+      if (theseChickens.isGreaterThan(availableOrigin)) {
         setOriginError(true)
         setOriginHelperText("This amount is greater than your wallet's balance.")
         setTargetValue(target.getDisplay(thoseChickens))
@@ -219,10 +230,16 @@ const SwapTab = () => {
       setOriginError(false)
 
       if (thoseChickens.comparedTo(reverted) == 0) {
+        setSlippage('∞')
         setOriginValue('∞')
         setTargetError(true)
         setTargetHelperText('Amount triggers halt check')
-      } else if (thoseChickens.isGreaterThan(availableOrigin)) {
+        return 
+      }
+
+      setSlippage(await getSlippage(theseChickens, thoseChickens))
+      
+      if (thoseChickens.isGreaterThan(availableOrigin)) {
         setOriginValue(origin.getDisplay(thoseChickens))
         setTargetHelperText("Origin amount is greater than your wallet's balance.")
         setTargetError(true)
@@ -234,7 +251,24 @@ const SwapTab = () => {
 
     }
 
-    setSwapType(swapPayload.type)
+    async function getSlippage (theseChickens, thoseChickens) {
+
+      const theseRoosters = new BigNumber(swapPayload.type === 'origin'
+        ? await origin.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call()
+        : await origin.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call()
+      )
+
+      const thoseRoosters = new BigNumber(swapPayload.type === 'origin'
+        ? await target.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call()
+        : await target.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call()
+      )
+
+      const one = new BigNumber(1)
+      const proportion = theseRoosters.dividedBy(thoseRoosters)
+      return one.minus(proportion).multipliedBy(new BigNumber(100)).toFixed(4)
+
+    }
+
 
   }
 
@@ -331,8 +365,6 @@ const SwapTab = () => {
     e.preventDefault()
     if (e.target.value != targetSlot) {
       const swapPayload = { type: swapType, value: swapType == 'origin' ? originValue : targetValue }
-      console.log("ORIGIN VALUE", originValue)
-      console.log("TARGET VALUE", targetValue)
       const slotPayload = { type: 'origin', value: e.target.value }
       primeSwap(swapPayload, slotPayload)
     }
@@ -415,6 +447,9 @@ const SwapTab = () => {
           unlocking={targetUnlocking}
           value={targetValue}
         /> 
+        <>
+          { slippage == 0 ? '' : slippage < 0 ? 'slippage: ' + slippage : 'anti-slippage:' + slippage }
+        </>
       </StyledRows>
       <StyledActions>
         <Button onClick={handleSwap}>Swap</Button>

@@ -54,6 +54,22 @@ const StyledLabelBar = withTheme(styled.div`
   margin-top: 24px;
 `)
 
+const StyledShells = styled.div`
+  align-items: center;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+`
+const StyledShellIcon = styled.img`
+  height: 48px;
+  float: left;
+`
+const StyledShellBalance = styled.div`
+  font-size: 36px;
+  font-weight: 300;
+`
+
 const StartModal = ({
   allowances,
   balances,
@@ -72,30 +88,34 @@ const StartModal = ({
       <ModalContent>
         <StyledForm onSubmit={handleSubmit}>
           <StyledRows>
-            <TokenInput
+            <StyledShells>
+                <StyledShellIcon src={shellIcon}/>
+                <StyledShellBalance> { displayAmount(balances.shell, 18, 4) + ' Shells'} </StyledShellBalance>
+            </StyledShells>
+            {/* <TokenInput
               icon={shellIcon}
               symbol="Shells"
               value={displayAmount(balances.shell, 18, -1)}
-            />
+            /> */}
             <TokenInput
               icon={daiIcon}
               symbol="DAI"
-              value={displayAmount(balances.dai, 18, -1)}
+              value={displayAmount(balances.dai, 18, 4)}
             />
             <TokenInput
               icon={usdcIcon}
               symbol="USDC"
-              value={displayAmount(balances.usdc, 6, -1)}
+              value={displayAmount(balances.usdc, 6, 4)}
             />
             <TokenInput
               icon={usdtIcon}
               symbol="USDT"
-              value={displayAmount(balances.usdt, 6, -1)}
+              value={displayAmount(balances.usdt, 6, 4)}
             />
             <TokenInput
               icon={susdIcon}
               symbol="SUSD"
-              value={displayAmount(balances.susd, 18, -1)}
+              value={displayAmount(balances.susd, 18, 4)}
             />
           </StyledRows>
         </StyledForm>

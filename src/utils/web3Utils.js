@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import config from '../mainnet.config.json'
 
 import erc20ABI from '../abi/ERC20.abi.json'
+import adapterABI from '../abi/IAdapter.abi.json'
 import usdtABI from '../abi/USDT.abi.json'
 import atokenABI from '../abi/AToken.abi.json'
 import ctokenABI from '../abi/CToken.abi.json'
@@ -33,6 +34,19 @@ const ausdtAddress = config.AUSDT
 
 const susdAddress = config.SUSD
 const asusdAddress = config.ASUSD
+
+const daiAdapterAddress = config.DAI_ADAPTER
+const cdaiAdapterAddress = config.CDAI_ADAPTER
+const chaiAdapterAddress = config.CHAI_ADAPTER
+
+const usdcAdapterAddress = config.USDC_ADAPTER
+const cusdcAdapterAddress = config.CUSDC_ADAPTER
+
+const usdtAdapterAddress = config.USDT_ADAPTER
+const ausdtAdapterAddress = config.AUSDT_ADAPTER
+
+const susdAdapterAddress = config.SUSD_ADAPTER
+const asusdAdapterAddress = config.ASUSD_ADAPTER
 
 export const displayAmount = (value, decimals, precision) => {
   const amount = value.dividedBy(new BigNumber(10).pow(decimals))
@@ -203,6 +217,18 @@ export const getContracts = function (web3) {
     contractObjects[7].getDisplay = function (amount) { return displayAmount(amount, 18) }
     contractObjects[8].getDisplay = function (amount) { return displayAmount(amount, 18) }
 
+    contractObjects[0].adapter = new web3.eth.Contract(adapterABI, daiAdapterAddress)
+    contractObjects[1].adapter = new web3.eth.Contract(adapterABI, chaiAdapterAddress)
+    contractObjects[2].adapter = new web3.eth.Contract(adapterABI, cdaiAdapterAddress)
+    contractObjects[3].adapter = new web3.eth.Contract(adapterABI, usdcAdapterAddress)
+    contractObjects[4].adapter = new web3.eth.Contract(adapterABI, cusdcAdapterAddress)
+    contractObjects[5].adapter = new web3.eth.Contract(adapterABI, usdtAdapterAddress)
+    contractObjects[6].adapter = new web3.eth.Contract(adapterABI, ausdtAdapterAddress)
+    contractObjects[7].adapter = new web3.eth.Contract(adapterABI, susdAdapterAddress)
+    contractObjects[8].adapter = new web3.eth.Contract(adapterABI, asusdAdapterAddress)
+
+    console.log("daiAdapterAddress", daiAdapterAddress)
+
     return {
       erc20s: contractObjects,
       dai: contractObjects[0],
@@ -216,52 +242,4 @@ export const getContracts = function (web3) {
       asusd: contractObjects[8],
       loihi: new web3.eth.Contract(loihiABI, loihiAddress)
     }
-}
-
-export const selectiveDeposit = async (walletAddress, contracts, tokens) => {
-  /*
-  const gasPrice = await web3.eth.getGasPrice()
-  return senseApprovals()
-      .then(assureApprovals)
-      .then(doDeposit)
-      .then(complete)
-      .catch(triage)
-
-  function senseApprovals () {
-      return Promise.all(contracts.map(contract => {
-          return contract.methods.allowance(walletAddress, loihiAddress).call()
-      }))
-  }
-
-
-  function assureApprovals (approvals) {
-      console.log("approvals", approvals)
-      return Promise.all(approvals.map((approval, ix) => {
-          if (Number(approval) <= Number(amounts[ix])) {
-              if (contracts[ix].name !== 'Usdt' || (contracts[ix].name == 'Usdt' && amounts[ix] == 0)) {
-                  return contracts[ix].methods.approve(loihiAddress, "-1").send({ from: walletAddress })
-              } else return Promise.all([
-                  contracts[ix].methods.approve(loihiAddress, 0).send({ from: walletAddress }),
-                  contracts[ix].methods.approve(loihiAddress, "-1").send({ from: walletAddress })
-              ])
-          } else {
-              return Promise.resolve()
-          }
-      }))
-  }
-
-  async function doDeposit () {
-      console.log("do deposit")
-      const tx = loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000)
-      const estimate = await tx.estimateGas({from: walletAddress})
-      console.log("estimate", estimate)
-      console.log("estimate * 1.5", estimate * 1.5)
-      return tx.send({ from: walletAddress, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
-      
-  }
-
-  function complete () { console.log("complete")    }
-
-  function triage (err) { console.log("err", err) }
-  */
 }

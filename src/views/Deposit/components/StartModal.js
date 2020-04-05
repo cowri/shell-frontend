@@ -64,10 +64,10 @@ const StartModal = ({
   const [usdcInputValue, setUsdcInputValue] = useState('')
   const [usdtInputValue, setUsdtInputValue] = useState('')
 
-  const availableDai = walletBalances.dai ? displayAmount(walletBalances.dai, contracts.dai.decimals, -1) : '--'
-  const availableUsdc = walletBalances.usdc ? displayAmount(walletBalances.usdc, contracts.usdc.decimals, -1) : '--'
-  const availableUsdt = walletBalances.usdt ? displayAmount(walletBalances.usdt, contracts.usdt.decimals, -1) : '--'
-  const availableSusd = walletBalances.susd ? displayAmount(walletBalances.susd, contracts.susd.decimals, -1) : '--'
+  const availableDai = walletBalances.dai ? displayAmount(walletBalances.dai, contracts.dai.decimals, 4) : '--'
+  const availableUsdc = walletBalances.usdc ? displayAmount(walletBalances.usdc, contracts.usdc.decimals, 4) : '--'
+  const availableUsdt = walletBalances.usdt ? displayAmount(walletBalances.usdt, contracts.usdt.decimals, 4) : '--'
+  const availableSusd = walletBalances.susd ? displayAmount(walletBalances.susd, contracts.susd.decimals, 4) : '--'
 
   const handleChange = (e, changeHandler) => {
     const { value } = e.target

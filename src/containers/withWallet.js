@@ -73,6 +73,7 @@ const withWallet = (WrappedComponent) => {
     useEffect(() => {
       if (web3) {
         const contracts = getContracts(web3)
+        window.contracts = contracts
         setContracts(contracts)
       }
     }, [web3])
