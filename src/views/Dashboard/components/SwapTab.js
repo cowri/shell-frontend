@@ -118,7 +118,7 @@ const SwapTab = () => {
   const [targetSlot, setTargetSlot] = useState(3)
   const [originValue, setOriginValue] = useState(0)
   const [targetValue, setTargetValue] = useState(0)
-  const [originError, setOriginError] = useState(true)
+  const [originError, setOriginError] = useState(false)
   const [targetError, setTargetError] = useState(false)
   const [originHelperText, setOriginHelperText] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
@@ -154,10 +154,15 @@ const SwapTab = () => {
       target = erc20s[targetSlot]
     }
 
-
     const val = swapPayload.value !== '' 
       ? String(+swapPayload.value.replace(/[A-Za-z!@#$%^&*()?<∞>;:-=,._+\\|`~/]/g, ''))
       : '0'
+    
+    if (val == '0') {
+      setOriginValue('0')
+      setTargetValue('0')
+      return
+    }
 
     let theseChickens = swapPayload.type == 'origin'
       ? bnAmount(val, origin.decimals)
@@ -169,10 +174,6 @@ const SwapTab = () => {
     let thoseChickens
     if (swapPayload.type === 'origin') {
 
-      
-      console.log("VAL", val)
-      console.log("THESE FIXED CHICKENS", theseChickens.toFixed())
-
       thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
         origin.options.address,
         target.options.address,
@@ -180,7 +181,6 @@ const SwapTab = () => {
       ).call())
 
     } else {
-
 
       thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
         origin.options.address,
