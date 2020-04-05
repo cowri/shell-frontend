@@ -154,8 +154,6 @@ const SwapTab = () => {
       target = erc20s[targetSlot]
     }
 
-    console.log("SWAP PAYLOAD DOT VALUE", swapPayload.value)
-
     const val = swapPayload.value !== '' 
       ? String(+swapPayload.value.replace(/[A-Za-z!@#$%^&*()?<∞>;:-=,._+\\|`~/]/g, ''))
       : '0'
@@ -189,6 +187,7 @@ const SwapTab = () => {
         target.options.address,
         theseChickens.toFixed()
       ).call())
+
 
     }
 
@@ -291,23 +290,30 @@ const SwapTab = () => {
   const handleUnlock = async (contract, setUnlocking) => {
     setStep('confirmingMetamask')
     // Should be abstracted to web3Utils / withWallet
-    const tx = contract.methods.approve(loihi.options.address, "-1")
+    const tx = contract.methods.approve(loihi.options.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
     tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
-      .once('transactionHash', hash => {
-        setStep('unlocking')
-        setUnlocking(true)
-      })
-      .on('error', error => {
-        setStep('error')
-        setUnlocking(false)
-      })
-      .on('receipt', receipt => {
-        setStep('success')
-        setUnlocking(false)
-        onUpdateAllowances()
-      })
+      .once('transactionHash', onTxHash)
+      .once('confirmation', onConfirmation)
+      .on('error', onError)
+
+    function onTxHash () {
+      setStep('unlocking')
+      setUnlocking(true)
+    }
+
+    function onConfirmation () {
+      setStep('success')
+      setUnlocking(false)
+      onUpdateAllowances()
+    }
+
+    function onError () {
+      setStep('error')
+      setUnlocking(false)
+    }
+
   }
 
   const handleOriginUnlock = async (e) => {
