@@ -116,8 +116,8 @@ const SwapTab = () => {
   const [step, setStep] = useState('start')
   const [originSlot, setOriginSlot] = useState(0)
   const [targetSlot, setTargetSlot] = useState(3)
-  const [originValue, setOriginValue] = useState(0)
-  const [targetValue, setTargetValue] = useState(0)
+  const [originValue, setOriginValue] = useState('0')
+  const [targetValue, setTargetValue] = useState('0')
   const [originError, setOriginError] = useState(false)
   const [targetError, setTargetError] = useState(false)
   const [originHelperText, setOriginHelperText] = useState('')
@@ -153,6 +153,8 @@ const SwapTab = () => {
       origin = erc20s[originSlot]
       target = erc20s[targetSlot]
     }
+
+    console.log("SWAP PAYLOAD DOT VALUE", swapPayload.value)
 
     const val = swapPayload.value !== '' 
       ? String(+swapPayload.value.replace(/[A-Za-z!@#$%^&*()?<∞>;:-=,._+\\|`~/]/g, ''))
@@ -323,6 +325,8 @@ const SwapTab = () => {
     e.preventDefault()
     if (e.target.value != targetSlot) {
       const swapPayload = { type: swapType, value: swapType == 'origin' ? originValue : targetValue }
+      console.log("ORIGIN VALUE", originValue)
+      console.log("TARGET VALUE", targetValue)
       const slotPayload = { type: 'origin', value: e.target.value }
       primeSwap(swapPayload, slotPayload)
     }
