@@ -118,14 +118,14 @@ const SwapTab = () => {
   const [targetSlot, setTargetSlot] = useState(3)
   const [originValue, setOriginValue] = useState(0)
   const [targetValue, setTargetValue] = useState(0)
+  const [originError, setOriginError] = useState(true)
+  const [targetError, setTargetError] = useState(false)
+  const [originHelperText, setOriginHelperText] = useState('')
+  const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
 
   const origin = erc20s[originSlot]
   const target = erc20s[targetSlot]
-  const originBalance = walletBalances[origin.symbol.toLowerCase()]
-    ? walletBalances[origin.symbol.toLowerCase()].toFixed() : 0
-  const targetBalance = walletBalances[target.symbol.toLowerCase()]
-    ? walletBalances[target.symbol.toLowerCase()].toFixed() : 0
   const originAvailable = walletBalances[origin.symbol.toLowerCase()]
     ? displayAmount(walletBalances[origin.symbol.toLowerCase()], origin.decimals) : 0
   const targetAvailable = walletBalances[target.symbol.toLowerCase()]
@@ -135,6 +135,8 @@ const SwapTab = () => {
   const targetLocked = allowances[target.symbol.toLowerCase()] == 0
   const [originUnlocking, setOriginUnlocking] = useState(false)
   const [targetUnlocking, setTargetUnlocking] = useState(false)
+
+  console.log("TARGET VALUE", targetValue)
 
   const primeSwap = async (swapPayload, slotPayload) => {
 
@@ -154,33 +156,84 @@ const SwapTab = () => {
       target = erc20s[targetSlot]
     }
 
-    const theseChickens = Number(swapPayload.value)
-    if (swapPayload.type == 'origin') setOriginValue(theseChickens)
-    else setTargetValue(theseChickens)
 
-    console.log("THESE CHICKENS", theseChickens)
+    const val = swapPayload.value.replace(/[A-Za-z!@#$%^&*()]/g, '');
+
+    if (swapPayload.type == 'origin') setOriginValue(val)
+    else setTargetValue(val)
 
     let thoseChickens
+    let theseChickens 
     if (swapPayload.type === 'origin') {
+
+      theseChickens = bnAmount(
+        isNaN(val) ? 0 : val, 
+        origin.decimals
+      )
 
       thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
         origin.options.address,
         target.options.address,
-        bnAmount(theseChickens ? theseChickens : 0, origin.decimals).toFixed()
+        theseChickens.toFixed()
       ).call())
 
     } else {
 
+      theseChickens = bnAmount(
+        isNaN(val) ? 0 : val, 
+        target.decimals
+      )
+
       thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
         origin.options.address,
         target.options.address,
-        bnAmount(theseChickens ? theseChickens : 0, target.decimals).toFixed()
+        theseChickens.toFixed()
       ).call())
 
     }
 
-    if (swapPayload.type == 'origin') setTargetValue(target.getDisplay(thoseChickens))
-    else setOriginValue(origin.getDisplay(thoseChickens))
+    const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
+    const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
+
+    if (swapPayload.type == 'origin') {
+
+      setTargetHelperText('')
+      setTargetError(false)
+
+      if (thoseChickens.comparedTo(reverted) == 0) {
+        setOriginError(true)
+        setOriginHelperText('Amount triggers halt check')
+        setTargetValue('∞')
+      } else if (theseChickens.isGreaterThan(availableOrigin)) {
+        setOriginError(true)
+        setOriginHelperText("This amount is greater than your wallet's balance.")
+        setTargetValue(target.getDisplay(thoseChickens))
+      } else {
+        setOriginError(false)
+        setOriginHelperText('')
+        setTargetValue(target.getDisplay(thoseChickens))
+      }
+
+    } else if (swapPayload.type == 'target') {
+
+      setOriginHelperText('')
+      setOriginError(false)
+
+      if (thoseChickens.comparedTo(reverted) == 0) {
+        setOriginValue('∞')
+        setTargetError(true)
+        setTargetHelperText('Amount triggers halt check')
+      } else if (thoseChickens.isGreaterThan(availableOrigin)) {
+        setOriginValue(origin.getDisplay(thoseChickens))
+        setTargetHelperText("Origin amount is greater than your wallet's balance.")
+        setTargetError(true)
+      } else {
+        setOriginValue(origin.getDisplay(thoseChickens))
+        setTargetHelperText('')
+        setTargetError(false)
+      }
+      
+    }
 
     setSwapType(swapPayload.type)
 
@@ -327,7 +380,9 @@ const SwapTab = () => {
       <StyledRows>
         <AmountInput 
           available={originAvailable}
+          error={originError}
           icon={origin.icon}
+          helperText={originHelperText}
           locked={originLocked}
           onChange={e => handleOriginInput(e)}
           onUnlock={e => handleOriginUnlock(e)}
@@ -339,7 +394,9 @@ const SwapTab = () => {
         />
         <AmountInput 
           available={targetAvailable}
+          error={targetError}
           icon={target.icon}
+          helperText={targetHelperText}
           locked={targetLocked}
           onChange={e => handleTargetInput(e)}
           onUnlock={e => handleTargetUnlock(e)}
@@ -357,9 +414,13 @@ const SwapTab = () => {
   )
 }
 
+const AmountInputStyles = makeStyles({ root: { color: 'pink', fontSize: '30px' } })
+
 const AmountInput = ({
   available,
   icon,
+  error,
+  helperText,
   locked,
   onChange,
   onUnlock,
@@ -369,6 +430,9 @@ const AmountInput = ({
   value,
   selections
 }) => {
+  const classes = AmountInputStyles()
+  console.log("CLASSES", classes)
+
 
   return (
     <StyledInput>
@@ -377,6 +441,9 @@ const AmountInput = ({
         <StyledAvailability>Available: {available} {symbol}</StyledAvailability>
       </StyledLabelBar>
       <TextField fullWidth
+        error={error}
+        FormHelperTextProps={{className: classes.root}}
+        helperText={helperText}
         onChange={onChange}
         placeholder="0"
         value={value}
