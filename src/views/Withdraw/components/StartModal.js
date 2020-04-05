@@ -102,7 +102,7 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
-        <Button onClick={handleSubmit}>Withdraw</Button>
+        <Button onClick={handleSubmit}>Withdraw Everything</Button>
       </ModalActions>
     </Modal>
   )

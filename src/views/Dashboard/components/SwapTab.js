@@ -179,7 +179,7 @@ const SwapTab = () => {
         target.options.address,
         theseChickens.toFixed()
       ).call())
-
+      
     } else {
 
       thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
@@ -304,7 +304,7 @@ const SwapTab = () => {
     }
 
     function onConfirmation () {
-      setStep('success')
+      setStep('unlockSuccess')
       setUnlocking(false)
       onUpdateAllowances()
     }
@@ -384,6 +384,7 @@ const SwapTab = () => {
       { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
       { (step == 'swapping' || step == 'unlocking') && <SwappingModal/> }
       { step == 'success' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
+      { step == 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
       { step == 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
       <StyledRows>
         <AmountInput 
