@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import CircularProgress from '@material-ui/core/CircularProgress'
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from '@material-ui/lab/Alert';
 import TextField from '@material-ui/core/TextField'
 import { withTheme } from '@material-ui/core/styles'
 
@@ -63,11 +65,16 @@ const StartModal = ({
   unlocking,
   walletBalances,
 }) => {
+
   const [daiInputValue, setDaiInputValue] = useState('')
-  const [susdInputValue, setSusdInputValue] = useState('')
   const [usdcInputValue, setUsdcInputValue] = useState('')
   const [usdtInputValue, setUsdtInputValue] = useState('')
-  const [slippage, setSlippage] = useState(0)
+  const [susdInputValue, setSusdInputValue] = useState('')
+
+  const [error, setError] = useState(false)
+  const [errorText, setErrorText] = useState('')
+
+  const [feeMessage, setFeeMessage] = useState('')
 
   const availableDai = walletBalances.dai ? displayAmount(walletBalances.dai, contracts.dai.decimals, 4) : '--'
   const availableUsdc = walletBalances.usdc ? displayAmount(walletBalances.usdc, contracts.usdc.decimals, 4) : '--'
@@ -78,7 +85,7 @@ const StartModal = ({
     e.preventDefault()
     if (!isNaN(e.target.value)) {
       setter(e.target.value)
-      primeDeposit({ type: type, value: e.target.value })
+      primeDeposit({ type: type, value: e.target.value == '' ? '0' : e.target.value})
     }
   }
 
@@ -100,12 +107,18 @@ const StartModal = ({
       bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputValue ? susdInputValue : 0, contracts.susd.decimals).toFixed(),
     ]
 
-    const shellsToMint = new BigNumber(
-      await contracts.loihi.methods.viewSelectiveDeposit(addresses, amounts).call()
-    )
+    const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
+    if (sum.isZero()) return setFeeMessage('')
 
-    if (shellsToMint.comparedTo(new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')) === 0) {
-      console.log("reverted")
+    const shellsToMint = new BigNumber(await contracts.loihi.methods.viewSelectiveDeposit(addresses, amounts).call())
+    const isReverted = shellsToMint.comparedTo(new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')) === 0
+    if (isReverted) {
+      setError(true)
+      setErrorText('This amount triggers the halt check')
+      return setFeeMessage('')
+    } else {
+      setError(false)
+      setErrorText('')
     }
 
 
@@ -116,20 +129,72 @@ const StartModal = ({
       new BigNumber(await contracts.susd.adapter.methods.viewNumeraireAmount(amounts[3]).call())
     ]
 
-    const sum = (accu, val) => accu.plus(val)
-    const totalDeposit = numeraireAmounts.reduce(sum, new BigNumber(0))
+    const totalDeposit = numeraireAmounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
 
     const reservesChange = totalDeposit.dividedBy(reserves.totalReserves)
     const shellsChange = shellsToMint.dividedBy(balances.totalShells)
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(reservesChange)).multipliedBy(new BigNumber(100))
-    setSlippage(slippage.toFixed(4))
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(reservesChange)).multipliedBy(100)
+
+    setFeeMessage(getFeeMessage(slippage))
+
+    function getFeeMessage (slippage) {
+      if (slippage.isNegative()) return "This deposit will earn a " + slippage.toFixed(4) + "% rebalancing subsidy"
+      else return "This deposit will have a " + slippage.toFixed(4) + "% fee"
+    }
     
   }
 
 
+  const handleDeposit = async (
+    daiValue,
+    usdcValue,
+    usdtValue,
+    susdValue,
+  ) => {
+
+    // Should be abstracted to web3Utils / withWallet
+    const addresses = [
+      contracts.dai.options.address,
+      contracts.usdc.options.address,
+      contracts.usdt.options.address,
+      contracts.susd.options.address,
+    ]
+
+    const amounts = [
+      bnAmount(daiValue ? daiValue : 0, contracts.dai.decimals).toFixed(),
+      bnAmount(usdcValue ? usdcValue : 0, contracts.usdc.decimals).toFixed(),
+      bnAmount(usdtValue ? usdtValue : 0, contracts.usdt.decimals).toFixed(),
+      bnAmount(susdValue ? susdValue : 0, contracts.susd.decimals).toFixed(),
+    ]
+
+    const sum = amounts.reduce(function(accu, val) { return accu.plus(val) }, new BigNumber(0))
+
+    if (sum.isZero()) {
+      setError(true)
+      setErrorText("You can not deposit 0 value")
+      setFeeMessage('')
+      return
+    } else {
+      setError(false)
+      setErrorText("")
+    }
+
+    
+    onDeposit(addresses, amounts)
+
+  }
+
+
+  const handleErrorSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setError(false);
+    setErrorText("")
+  };
+
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    onDeposit(daiInputValue, usdcInputValue, usdtInputValue, susdInputValue)
+    handleDeposit(daiInputValue, usdcInputValue, usdtInputValue, susdInputValue)
   }
 
   return (
@@ -139,12 +204,12 @@ const StartModal = ({
         <StyledForm onSubmit={handleSubmit}>
           <StyledRows>
             <>
-              { slippage == 0 ? '' : slippage > 0 ? 'slippage:' + slippage + '%' : 'anti-slippage:' + slippage + '%' }
+              { feeMessage }
             </>
             <TokenInput
               available={availableDai}
               icon={daiIcon}
-              locked={allowances.dai === '0'}
+              locked={allowances.dai.isZero()}
               onChange={e => handleInput(e, 'dai', setDaiInputValue)}
               onUnlock={e => onUnlock('dai')}
               symbol="DAI"
@@ -154,7 +219,7 @@ const StartModal = ({
             <TokenInput
               available={availableUsdc}
               icon={usdcIcon}
-              locked={allowances.usdc === '0'}
+              locked={allowances.usdc.isZero()}
               onChange={e =>  handleInput(e, 'usdc', setUsdcInputValue)}
               onUnlock={e => onUnlock('usdc')}
               unlocking={unlocking.usdc}
@@ -164,7 +229,7 @@ const StartModal = ({
             <TokenInput
               available={availableUsdt}
               icon={usdtIcon}
-              locked={allowances.usdt === '0'}
+              locked={allowances.usdt.isZero()}
               onChange={e => handleInput(e, 'usdt', setUsdtInputValue)}
               onUnlock={e => onUnlock('usdt')}
               unlocking={unlocking.usdt}
@@ -174,7 +239,7 @@ const StartModal = ({
             <TokenInput
               available={availableSusd}
               icon={susdIcon}
-              locked={allowances.susd === '0'}
+              locked={allowances.susd.isZero()}
               onChange={e => handleInput(e, 'susd', setSusdInputValue)}
               onUnlock={e => onUnlock('susd')}
               unlocking={unlocking.susd}
@@ -188,6 +253,22 @@ const StartModal = ({
         <Button outlined onClick={onDismiss}>Cancel</Button>
         <Button onClick={handleSubmit}>Deposit</Button>
       </ModalActions>
+      <Snackbar 
+        anchorOrigin={{vertical: 'center', horizontal: 'center'}} 
+        autoHideDuration={6000} 
+        onClose={handleErrorSnackbarClose}
+        style={{'marginTop': '65px'}}
+        open={error} 
+      >
+        <MuiAlert 
+          elevation={6}
+          onClose={handleErrorSnackbarClose}   
+          severity={'error'} 
+          variant="filled"
+        >
+          { errorText }
+        </MuiAlert>
+      </Snackbar>
     </Modal>
   )
 }

@@ -66,7 +66,7 @@ const StyledLabelBar = withTheme(styled.div`
 
 const StyledTitle = styled.div`
   margin-left: 24px;
-  font-size: 36px;
+  font-size: 24px;
   align-items: center;
   // height: 32px;
   // margin-top:24px;
@@ -124,6 +124,7 @@ const SwapTab = () => {
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
   const [slippage, setSlippage] = useState(0)
+  const [priceIndicator, setPriceIndicator] = useState('')
 
   const origin = erc20s[originSlot]
   const target = erc20s[targetSlot]
@@ -162,7 +163,6 @@ const SwapTab = () => {
       : '0'
     
     if (val == '0') {
-      setSlippage(0)
       setOriginValue('0')
       setTargetValue('0')
       return
@@ -192,7 +192,6 @@ const SwapTab = () => {
         theseChickens.toFixed()
       ).call())
 
-
     }
 
     setSwapType(swapPayload.type)
@@ -202,27 +201,34 @@ const SwapTab = () => {
 
     if (swapPayload.type == 'origin') {
 
+      const thing = theseChickens.dividedBy(thoseChickens)
+      console.log("thing to string", thing.toFixed())
+
+      const oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
+      const tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
+
       setTargetHelperText('')
       setTargetError(false)
 
       if (thoseChickens.comparedTo(reverted) == 0) {
-        setSlippage('∞')
         setOriginError(true)
         setOriginHelperText('Amount triggers halt check')
         setTargetValue('∞')
         return
       } 
 
-      setSlippage(await getSlippage(theseChickens, thoseChickens))
+      setPriceIndicator(getPriceMessage(tNAmt.dividedBy(oNAmt).toFixed(4)))
+
+      await getSlippage(theseChickens, thoseChickens)
       
       if (theseChickens.isGreaterThan(availableOrigin)) {
         setOriginError(true)
         setOriginHelperText("This amount is greater than your wallet's balance.")
-        setTargetValue(target.getDisplay(thoseChickens))
+        setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
       } else {
         setOriginError(false)
         setOriginHelperText('')
-        setTargetValue(target.getDisplay(thoseChickens))
+        setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
       }
 
     } else if (swapPayload.type == 'target') {
@@ -231,21 +237,23 @@ const SwapTab = () => {
       setOriginError(false)
 
       if (thoseChickens.comparedTo(reverted) == 0) {
-        setSlippage('∞')
         setOriginValue('∞')
         setTargetError(true)
         setTargetHelperText('Amount triggers halt check')
         return 
       }
 
-      setSlippage(await getSlippage(theseChickens, thoseChickens))
+      const oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
+      const tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
+
+      setPriceIndicator(getPriceMessage(tNAmt.dividedBy(oNAmt).toFixed(4)))
       
       if (thoseChickens.isGreaterThan(availableOrigin)) {
-        setOriginValue(origin.getDisplay(thoseChickens))
+        setOriginValue(displayAmount(thoseChickens, origin.decimals, 4))
         setTargetHelperText("Origin amount is greater than your wallet's balance.")
         setTargetError(true)
       } else {
-        setOriginValue(origin.getDisplay(thoseChickens))
+        setOriginValue(displayAmount(thoseChickens, origin.decimals, 4))
         setTargetHelperText('')
         setTargetError(false)
       }
@@ -265,8 +273,29 @@ const SwapTab = () => {
       )
 
       const one = new BigNumber(1)
-      const proportion = theseRoosters.dividedBy(thoseRoosters)
-      return one.minus(proportion).multipliedBy(new BigNumber(100)).toFixed(4)
+      const proportion = thoseRoosters.dividedBy(theseRoosters)
+
+    }
+
+    function getPriceMessage (tPrice) {
+
+      const oSymbol = origin.symbol
+      const tSymbol = target.symbol
+
+      let message = 'Average price: '
+      if (oSymbol == 'cUSDC' || oSymbol == 'cDAI' || oSymbol == 'CHAI') {
+        message += '$1.00 of ' + oSymbol + ' is worth '
+      } else {
+        message += '1.0000 ' + oSymbol + ' is worth '
+      }
+
+      if (tSymbol == 'cUSDC' || tSymbol == 'cDAI' || tSymbol == 'CHAI') {
+        message += '$' + tPrice + ' of ' + tSymbol + ' for this trade'
+      } else {
+        message += tPrice + ' ' + tSymbol + ' for this trade'
+      }
+
+      return message
 
     }
 
@@ -412,6 +441,7 @@ const SwapTab = () => {
     /> )
   }
 
+
   return (
     <StyledSwapTab>
       { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
@@ -448,6 +478,10 @@ const SwapTab = () => {
           unlocking={targetUnlocking}
           value={targetValue}
         /> 
+        <div>
+          { priceIndicator }
+
+        </div>
         <>
           { slippage == 0 ? '' : slippage < 0 ? 'slippage: ' + slippage : 'anti-slippage:' + slippage }
         </>

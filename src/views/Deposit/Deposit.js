@@ -8,8 +8,6 @@ import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
 import DepositingModal from '../../components/ModalAwaitingTx'
 import UnlockingModal from '../../components/ModalAwaitingTx'
 
-import withWallet from '../../containers/withWallet'
-
 import DashboardContext from '../Dashboard/context'
 
 import ModalError from '../../components/ModalError'
@@ -37,40 +35,20 @@ const Deposit = ({
   // should change to useReducer
   const [unlocking, setUnlocking] = useState({})
 
-  const handleDeposit = async (
-    daiValue,
-    usdcValue,
-    usdtValue,
-    susdValue,
-  ) => {
+  const handleDeposit = async (addresses, amounts) => {
     setStep('confirmingMetamask')
 
-    // Should be abstracted to web3Utils / withWallet
-    const addresses = [
-      contracts.dai.options.address,
-      contracts.usdc.options.address,
-      contracts.usdt.options.address,
-      contracts.susd.options.address,
-    ]
-
-    const amounts = [
-      bnAmount(daiValue ? daiValue : 0, contracts.dai.decimals).toFixed(),
-      bnAmount(usdcValue ? usdcValue : 0, contracts.usdc.decimals).toFixed(),
-      bnAmount(usdtValue ? usdtValue : 0, contracts.usdt.decimals).toFixed(),
-      bnAmount(susdValue ? susdValue : 0, contracts.susd.decimals).toFixed(),
-    ]
-
-    const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 1, Date.now() + 2000)
+    const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
+    console.log("gas price", gasPrice)
     tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
       .on('transactionHash', () => setStep('depositing'))
       .once('confirmation', handleConfirmation)
       .on('error', () => setStep('error'))
 
-
     function handleConfirmation () {
-      setStep('success')
+      setStep('deposit-success')
       onUpdateBalances()
       onUpdateWalletBalances()
     }
@@ -81,24 +59,32 @@ const Deposit = ({
     setStep('confirmingMetamask')
 
     // Should be abstracted to web3Utils / withWallet
-    const tx = contracts[tokenKey].methods.approve(contracts.loihi.options.address, '-1')
+    const tx = contracts[tokenKey].methods.approve(contracts.loihi.options.address, '115792089237316195423570985008687907853269984665640564039457584007913129639935')
     const estimate = await tx.estimateGas({from: account})
     const gasPrice = await web3.eth.getGasPrice()
     tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
-      .on('transactionHash', hash => {
-        setStep('unlocking')
+      .once('transactionHash', txHash)
+      .once('confirmation', confirmation)
+      .on('error', error)
+
+      function txHash () {
         setUnlocking({ ...unlocking, [tokenKey]: true })
-      })
-      .on('confirmation', (confirmationNumber, receipt) =>{
-        setUnlocking({ ...unlocking, [tokenKey]: false })
+        setStep('unlocking')
+      }
+
+      function confirmation () {
+        setUnlocking({...unlocking, [tokenKey]: false })
         onUpdateAllowances()
-      })
-      .on('error', error => {
-        console.log(error)
-        setStep('error')
+        setStep('unlocking-success')
+      }
+
+      function error () {
         setUnlocking({ ...unlocking, [tokenKey]: false })
-      })
+        setStep('error')
+      }
   }
+
+  const onUnlockSuccessDismiss = () => setStep('start')
 
   return (
     <>
@@ -128,8 +114,12 @@ const Deposit = ({
         <UnlockingModal />
       )}
 
-      {step === 'success' && (
+      {step === 'deposit-success' && (
         <ModalSuccess buttonBlurb={'Finish'} onDismiss={onDismiss} title={'Deposit Successful.'} />
+      )}
+
+      {step === 'unlocking-success' && (
+        <ModalSuccess buttonBlurb={'Finish'} onDismiss={onUnlockSuccessDismiss} title={'Approval Successful.'} />
       )}
 
       {step === 'error' && (
