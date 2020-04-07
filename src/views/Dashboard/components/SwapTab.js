@@ -132,170 +132,207 @@ const SwapTab = () => {
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
   const [slippage, setSlippage] = useState(0)
-  const [priceIndicator, setPriceIndicator] = useState('')
+  const [priceMessage, setPriceMessage] = useState('')
 
   const origin = erc20s[originSlot]
   const target = erc20s[targetSlot]
+
+  console.log("origin start", origin)
+  console.log("target start", target)
+
   const originAvailable = walletBalances[origin.symbol.toLowerCase()]
     ? displayAmount(walletBalances[origin.symbol.toLowerCase()], origin.decimals, 4) : 0
   const targetAvailable = walletBalances[target.symbol.toLowerCase()]
     ? displayAmount(walletBalances[target.symbol.toLowerCase()], target.decimals, 4) : 0
 
   const originLocked = allowances[origin.symbol.toLowerCase()] == 0
-  const targetLocked = allowances[target.symbol.toLowerCase()] == 0
   const [originUnlocking, setOriginUnlocking] = useState(false)
   const [targetUnlocking, setTargetUnlocking] = useState(false)
 
   const primeSwap = async (swapPayload, slotPayload) => {
 
-    let origin
-    let target
+    let { origin, target } = setSlots(slotPayload)
 
-    if (slotPayload.type == 'origin'){
-      origin = erc20s[slotPayload.value]
-      target = erc20s[targetSlot]
-      setOriginSlot(slotPayload.value)
-    } else if (slotPayload.type == 'target'){
-      origin = erc20s[originSlot]
-      target = erc20s[slotPayload.value]
-      setTargetSlot(slotPayload.value)
-    } else if (slotPayload.switch) {
-      origin = erc20s[targetSlot]
-      target = erc20s[originSlot]
-    } else {
-      origin = erc20s[originSlot]
-      target = erc20s[targetSlot]
+    if (swapPayload.type == 'switch') {
+
+      setTargetValue(originValue)
+      setOriginValue(targetValue)
+      const { theseChickens, thoseChickens } = await getChickens(swapType, swapType === 'origin' ? targetValue : originValue)
+      return setPriceIndication(swapType, theseChickens, thoseChickens)
+
+    } 
+
+    const noNonNums = /[A-Za-z!@#$%^&*()?<∞>;:-=,._+\\|`~/]/g
+    const value = +swapPayload.value.split('.')[0].replace(noNonNums, '')
+
+    if (value == '' || value == '0') {
+      setOriginValue(value)
+      return setTargetValue(value)
     }
 
-    swapPayload.value = swapPayload.value.split('.')[0]
+    return await setSwap (swapPayload)
 
-    const val = swapPayload.value !== '' 
-      ? String(+swapPayload.value.replace(/[A-Za-z!@#$%^&*()?<∞>;:-=,._+\\|`~/]/g, ''))
-      : '0'
-    
-    if (val == '0') {
-      setOriginValue('0')
-      setTargetValue('0')
-      return
-    }
+    async function setSwap (swapPayload)  {
+      if (swapPayload.type == 'origin'){
 
-    let theseChickens = swapPayload.type == 'origin'
-      ? bnAmount(val, origin.decimals)
-      : bnAmount(val, target.decimals)
+        setSwapType(swapPayload.type)
+        const { theseChickens, thoseChickens } = await getChickens(swapPayload.type, value)
+        console.log("these chickens after get chickens", theseChickens)
+        console.log("those chickens after get chickens", thoseChickens)
+        setValues(swapPayload.type, theseChickens, thoseChickens)
+        setPriceIndication(swapPayload.type, theseChickens, thoseChickens)
 
-    if (swapPayload.type == 'origin') setOriginValue(displayAmount(theseChickens, origin.decimals))
-    else setTargetValue(displayAmount(theseChickens, target.decimals))
+      } else if (swapPayload.type == 'target'){
 
-    let thoseChickens
-    if (swapPayload.type === 'origin') {
+        setSwapType(swapPayload.type)
+        const { theseChickens, thoseChickens } = await getChickens(swapPayload.type, value)
+        setValues(swapPayload.type, theseChickens, thoseChickens)
+        setPriceIndication(swapPayload.type, theseChickens, thoseChickens)
 
-      thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
-        origin.options.address,
-        target.options.address,
-        theseChickens.toFixed()
-      ).call())
-      
-    } else {
-
-      thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
-        origin.options.address,
-        target.options.address,
-        theseChickens.toFixed()
-      ).call())
-
-    }
-
-    setSwapType(swapPayload.type)
-
-    const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
-    const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
-
-    if (swapPayload.type == 'origin') {
-
-      const thing = theseChickens.dividedBy(thoseChickens)
-      console.log("thing to string", thing.toFixed())
-
-      const oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
-      const tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
-
-      setTargetHelperText('')
-      setTargetError(false)
-
-      if (thoseChickens.comparedTo(reverted) == 0) {
-        setOriginError(true)
-        setOriginHelperText('Amount triggers halt check')
-        setTargetValue('∞')
-        return
       } 
-
-      setPriceIndicator(getPriceMessage(tNAmt.dividedBy(oNAmt).toFixed(4)))
-
-      await getSlippage(theseChickens, thoseChickens)
       
-      if (theseChickens.isGreaterThan(availableOrigin)) {
-        setOriginError(true)
-        setOriginHelperText("This amount is greater than your wallet's balance.")
-        setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
+    }
+
+    function setSlots (slotPayload) {
+      let origin, target
+
+      if (slotPayload.type == 'origin') {
+
+        setOriginSlot(slotPayload.value)
+        origin = erc20s[slotPayload.value]
+        target = erc20s[targetSlot]
+
+      } else if (slotPayload.type == 'target') {
+
+        setTargetSlot(slotPayload.value)
+        origin = erc20s[originSlot]
+        target = erc20s[slotPayload.value]
+
+      } else if (slotPayload.type == 'switch') {
+
+        setOriginSlot(targetSlot)
+        setTargetSlot(originSlot)
+
+        origin = erc20s[targetSlot]
+        target = erc20s[originSlot]
+        
       } else {
-        setOriginError(false)
-        setOriginHelperText('')
-        setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
+
+        origin = erc20s[originSlot]
+        target = erc20s[targetSlot]
+
       }
 
-    } else if (swapPayload.type == 'target') {
+      return { origin, target }
 
-      setOriginHelperText('')
-      setOriginError(false)
+    }
 
-      if (thoseChickens.comparedTo(reverted) == 0) {
-        setOriginValue('∞')
-        setTargetError(true)
-        setTargetHelperText('Amount triggers halt check')
-        return 
+    async function getChickens (type, value) {
+
+      console.log("getChickens", arguments)
+
+      let theseChickens, thoseChickens
+      if (type == 'origin') {
+        console.log("origin type of get chickens")
+
+        theseChickens = bnAmount(value, origin.decimals)
+        setOriginValue(displayAmount(theseChickens, origin.decimals))
+        thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
+          origin.options.address,
+          target.options.address,
+          theseChickens.toFixed()
+        ).call())
+
+        console.log("these chicks inside o type", theseChickens)
+        console.log("those chicks inside o type", thoseChickens)
+
+      } else if (type == 'target') {
+        console.log("origin type of get chickens")
+
+        theseChickens = bnAmount(value, target.decimals)
+        setTargetValue(displayAmount(theseChickens, target.decimals))
+        thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
+          origin.options.address,
+          target.options.address,
+          theseChickens.toFixed()
+        ).call())
+
+
       }
 
-      const oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
-      const tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
+      console.log("! these chickens at the end of get chickens", theseChickens)
+      console.log("! those chickens at the end of get chickens", thoseChickens)
 
-      setPriceIndicator(getPriceMessage(tNAmt.dividedBy(oNAmt).toFixed(4)))
-      
-      if (thoseChickens.isGreaterThan(availableOrigin)) {
-        setOriginValue(displayAmount(thoseChickens, origin.decimals, 4))
-        setTargetHelperText("Origin amount is greater than your wallet's balance.")
-        setTargetError(true)
-      } else {
-        setOriginValue(displayAmount(thoseChickens, origin.decimals, 4))
+      return { theseChickens, thoseChickens }
+    }
+
+
+    function setValues (type, theseChickens, thoseChickens) {
+      const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
+      const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
+
+      if (type == 'origin') {
+
         setTargetHelperText('')
         setTargetError(false)
+
+        if (thoseChickens.comparedTo(reverted) == 0) {
+          setOriginError(true)
+          setOriginHelperText('Amount triggers halt check')
+          setTargetValue('∞')
+          return
+        } 
+
+        if (theseChickens.isGreaterThan(availableOrigin)) {
+          setOriginError(true)
+          setOriginHelperText("This amount is greater than your wallet's balance.")
+          setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
+        } else {
+          setOriginError(false)
+          setOriginHelperText('')
+          setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
+        }
+
+      } else if (type == 'target') {
+
+        setOriginHelperText('')
+        setOriginError(false)
+
+        if (thoseChickens.comparedTo(reverted) == 0) {
+          setOriginValue('∞')
+          setTargetError(true)
+          setTargetHelperText('Amount triggers halt check')
+          return 
+        }
+
+        if (thoseChickens.isGreaterThan(availableOrigin)) {
+          setOriginValue(displayAmount(thoseChickens, origin.decimals, 4))
+          setTargetHelperText("Origin amount is greater than your wallet's balance.")
+          setTargetError(true)
+        } else {
+          setOriginValue(displayAmount(thoseChickens, origin.decimals, 4))
+          setTargetHelperText('')
+          setTargetError(false)
+        }
+
+      }
+    }
+
+    async function setPriceIndication (type, theseChickens, thoseChickens) {
+
+      let oNAmt, tNAmt
+      if (type === 'origin') {
+        oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
+        tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
+      } else {
+        oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
+        tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
       }
 
-    }
-
-    async function getSlippage (theseChickens, thoseChickens) {
-
-
-      const theseRoosters = new BigNumber(swapPayload.type === 'origin'
-        ? await origin.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call()
-        : await origin.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call()
-      )
-
-      const thoseRoosters = new BigNumber(swapPayload.type === 'origin'
-        ? await target.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call()
-        : await target.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call()
-      )
-
-      const one = new BigNumber(1)
-      const proportion = thoseRoosters.dividedBy(theseRoosters)
-
-    }
-
-    function getPriceMessage (tPrice) {
+      const tPrice = tNAmt.dividedBy(oNAmt).toFixed(5)
 
       const oSymbol = origin.symbol
       const tSymbol = target.symbol
-
-      console.log("oSymbol", oSymbol)
-      console.log("tSymbol", tSymbol)
 
       let message = 'Average price: '
       if (oSymbol == 'cUSDC' || oSymbol == 'cDAI' || oSymbol == 'CHAI') {
@@ -310,16 +347,20 @@ const SwapTab = () => {
         message += tPrice + ' ' + tSymbol + ' for this trade'
       }
 
-      return message
+      setPriceMessage(message)
 
     }
-
 
   }
 
   const handleSwap = async (e) => {
     e.preventDefault()
     setStep('confirmingMetamask')
+
+    if (allowances[erc20s[originSlot].symbol.toLowerCase()].isZero()) {
+      console.log("hello")
+      return
+    }
 
     let originInput, targetInput
     if (swapType == 'origin') {
@@ -426,13 +467,13 @@ const SwapTab = () => {
 
   const handleOriginInput = e => {
     e.preventDefault()
-    const swapPayload = { value: e.target.value, type: 'origin' }
+    const swapPayload = { type: 'origin', value: e.target.value }
     primeSwap(swapPayload, {})
   }
 
   const handleTargetInput = e => {
     e.preventDefault()
-    const swapPayload = { value: e.target.value, type: 'target' }
+    const swapPayload = { type: 'target', value: e.target.value }
     primeSwap(swapPayload, {})
   }
 
@@ -455,22 +496,6 @@ const SwapTab = () => {
       value={value}
     /> )
   }
-
-  const handleSwitch = (e) => {
-    e.preventDefault();
-    setOriginSlot(targetSlot)
-    setOriginValue(targetValue)
-    setTargetSlot(originSlot)
-    setTargetValue(originValue)
-    const swapPayload = { 
-      type: swapType, 
-      value: swapType == 'origin' ? originValue : targetValue
-    }
-    const slotPayload = { switch: true }
-    primeSwap(swapPayload, slotPayload)
-  }
-
-  // const AmountInputStyles = makeStyles({ buttons: { margin: } })
 
   return (
     <StyledSwapTab>
@@ -495,10 +520,10 @@ const SwapTab = () => {
           value={originValue}
         />
         <StyledSwapRow>
-          <IconButton onClick={handleSwitch}>
+          <IconButton onClick={e=> primeSwap({type:'switch'}, {type:'switch'})}>
             <SwapVertIcon fontSize={'large'}/>
           </IconButton>
-          <IconButton onClick={handleSwitch}>
+          <IconButton onClick={e => primeSwap({type:'switch'}, {type:'switch'})}>
             <SwapVertIcon fontSize={'large'} />
           </IconButton>
         </StyledSwapRow>
@@ -515,7 +540,7 @@ const SwapTab = () => {
           value={targetValue}
         /> 
         <div>
-          { priceIndicator }
+          { priceMessage }
         </div>
         <>
           { slippage == 0 ? '' : slippage < 0 ? 'slippage: ' + slippage : 'anti-slippage:' + slippage }
