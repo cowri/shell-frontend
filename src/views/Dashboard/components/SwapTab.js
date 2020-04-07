@@ -20,6 +20,9 @@ import { makeStyles, withTheme } from '@material-ui/core/styles'
 import Button from '../../../components/Button'
 import LabelledValue from '../../../components/LabelledValue'
 
+import IconButton from '@material-ui/core/IconButton';
+import SwapVertIcon from '@material-ui/icons/SwapVert';
+
 import Row from '../../../components/Row'
 import TokenIcon from '../../../components/TokenIcon'
 
@@ -80,6 +83,11 @@ const StyledAvailability = withTheme(styled.div`
 
 const StyledInput = styled.div`
   margin-bottom: 24px;
+`
+
+const StyledSwapRow = styled.div`
+  display: flex;
+  justify-content: center;
 `
 
 const StyledRows = styled.div`
@@ -151,6 +159,9 @@ const SwapTab = () => {
       origin = erc20s[originSlot]
       target = erc20s[slotPayload.value]
       setTargetSlot(slotPayload.value)
+    } else if (slotPayload.switch) {
+      origin = erc20s[targetSlot]
+      target = erc20s[originSlot]
     } else {
       origin = erc20s[originSlot]
       target = erc20s[targetSlot]
@@ -262,6 +273,7 @@ const SwapTab = () => {
 
     async function getSlippage (theseChickens, thoseChickens) {
 
+
       const theseRoosters = new BigNumber(swapPayload.type === 'origin'
         ? await origin.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call()
         : await origin.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call()
@@ -281,6 +293,9 @@ const SwapTab = () => {
 
       const oSymbol = origin.symbol
       const tSymbol = target.symbol
+
+      console.log("oSymbol", oSymbol)
+      console.log("tSymbol", tSymbol)
 
       let message = 'Average price: '
       if (oSymbol == 'cUSDC' || oSymbol == 'cDAI' || oSymbol == 'CHAI') {
@@ -441,6 +456,21 @@ const SwapTab = () => {
     /> )
   }
 
+  const handleSwitch = (e) => {
+    e.preventDefault();
+    setOriginSlot(targetSlot)
+    setOriginValue(targetValue)
+    setTargetSlot(originSlot)
+    setTargetValue(originValue)
+    const swapPayload = { 
+      type: swapType, 
+      value: swapType == 'origin' ? originValue : targetValue
+    }
+    const slotPayload = { switch: true }
+    primeSwap(swapPayload, slotPayload)
+  }
+
+  // const AmountInputStyles = makeStyles({ buttons: { margin: } })
 
   return (
     <StyledSwapTab>
@@ -464,14 +494,20 @@ const SwapTab = () => {
           unlocking={originUnlocking}
           value={originValue}
         />
+        <StyledSwapRow>
+          <IconButton onClick={handleSwitch}>
+            <SwapVertIcon fontSize={'large'}/>
+          </IconButton>
+          <IconButton onClick={handleSwitch}>
+            <SwapVertIcon fontSize={'large'} />
+          </IconButton>
+        </StyledSwapRow>
         <AmountInput 
           available={targetAvailable}
           error={targetError}
           icon={target.icon}
           helperText={targetHelperText}
-          locked={targetLocked}
           onChange={e => handleTargetInput(e)}
-          onUnlock={e => handleTargetUnlock(e)}
           selections={getDropdown(handleTargetSelect, targetSlot)}
           symbol={target.symbol}
           title={'To'}
@@ -480,7 +516,6 @@ const SwapTab = () => {
         /> 
         <div>
           { priceIndicator }
-
         </div>
         <>
           { slippage == 0 ? '' : slippage < 0 ? 'slippage: ' + slippage : 'anti-slippage:' + slippage }

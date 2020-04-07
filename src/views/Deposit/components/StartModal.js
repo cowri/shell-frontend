@@ -121,7 +121,6 @@ const StartModal = ({
       setErrorText('')
     }
 
-
     const numeraireAmounts = [
       new BigNumber(await contracts.dai.adapter.methods.viewNumeraireAmount(amounts[0]).call()),
       new BigNumber(await contracts.usdc.adapter.methods.viewNumeraireAmount(amounts[1]).call()),
