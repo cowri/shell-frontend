@@ -54,8 +54,9 @@ const StyledActions = withTheme(styled.div`
   }
 `)
 
-const StyledRows = withTheme(styled.div`
-`)
+const StyledRows = styled.div`
+  margin-bottom: 12px;
+`
 
 const PoolTab = () => {
   const {
@@ -81,18 +82,18 @@ const PoolTab = () => {
     shell: shellBalance,
   } = balances
 
-  const totalBalance = shellBalance ? `$${displayAmount(shellBalance, 18, 0)}` : '--'
-  const totalPoolLiquidity = totalReserves ? `$${displayAmount(totalReserves, 18, 0)}` : '--'
+  const totalBalance = shellBalance ? `$${displayAmount(shellBalance, 18, 2)}` : '--'
+  const totalPoolLiquidity = totalReserves ? `$${displayAmount(totalReserves, 18, 2)}` : '--'
 
-  const daiReserveDisplay = daiReserve ? `$${displayAmount(daiReserve, 18, 0)}` : '--'
-  const susdReserveDisplay = susdReserve ? `$${displayAmount(susdReserve, 18, 0)}` : '--'
-  const usdcReserveDisplay = usdcReserve ? `$${displayAmount(usdcReserve, 18, 0)}` : '--'
-  const usdtReserveDisplay = usdtReserve ? `$${displayAmount(usdtReserve, 18, 0)}` : '--'
+  const daiReserveDisplay = daiReserve ? `$${displayAmount(daiReserve, 18, 2)}` : '--'
+  const susdReserveDisplay = susdReserve ? `$${displayAmount(susdReserve, 18, 2)}` : '--'
+  const usdcReserveDisplay = usdcReserve ? `$${displayAmount(usdcReserve, 18, 2)}` : '--'
+  const usdtReserveDisplay = usdtReserve ? `$${displayAmount(usdtReserve, 18, 2)}` : '--'
 
-  const daiBalanceDisplay = daiBalance ? `$${displayAmount(daiBalance, 18, 0)}` : '--'
-  const usdcBalanceDisplay = usdcBalance ? `$${displayAmount(usdcBalance, 6, 0)}` : '--'
-  const usdtBalanceDisplay = usdtBalance ? `$${displayAmount(usdtBalance, 6, 0)}` : '--'
-  const susdBalanceDisplay = susdBalance ? `$${displayAmount(susdBalance, 18, 0)}` : '--'
+  const daiBalanceDisplay = daiBalance ? `$${displayAmount(daiBalance, 18, 2)}` : '--'
+  const usdcBalanceDisplay = usdcBalance ? `$${displayAmount(usdcBalance, 6, 2)}` : '--'
+  const usdtBalanceDisplay = usdtBalance ? `$${displayAmount(usdtBalance, 6, 2)}` : '--'
+  const susdBalanceDisplay = susdBalance ? `$${displayAmount(susdBalance, 18, 2)}` : '--'
 
   return (
     <StyledPoolTab>

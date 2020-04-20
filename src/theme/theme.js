@@ -19,6 +19,11 @@ theme.overrides = {
       borderRadius: theme.shape.borderRadius,
     },
   },
+  MuiButton: {
+    disabled: {
+      cursor: 'no-drop'
+    }
+  },
   MuiInput: {
     underline: {
       '&:before': {

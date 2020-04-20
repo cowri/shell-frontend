@@ -218,8 +218,6 @@ export const getContracts = function (web3) {
     contractObjects[7].adapter = new web3.eth.Contract(adapterABI, susdAdapterAddress)
     contractObjects[8].adapter = new web3.eth.Contract(adapterABI, asusdAdapterAddress)
 
-    console.log("daiAdapterAddress", daiAdapterAddress)
-
     return {
       erc20s: contractObjects,
       dai: contractObjects[0],

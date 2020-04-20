@@ -24,6 +24,7 @@ const Deposit = ({
     contracts,
     onUpdateAllowances,
     onUpdateBalances,
+    onUpdateReserves,
     onUpdateWalletBalances,
     reserves,
     walletBalances,
@@ -39,10 +40,7 @@ const Deposit = ({
     setStep('confirmingMetamask')
 
     const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
-    const estimate = await tx.estimateGas({from: account})
-    const gasPrice = await web3.eth.getGasPrice()
-    console.log("gas price", gasPrice)
-    tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
+    tx.send({ from: account })
       .on('transactionHash', () => setStep('depositing'))
       .once('confirmation', handleConfirmation)
       .on('error', () => setStep('error'))
@@ -50,6 +48,7 @@ const Deposit = ({
     function handleConfirmation () {
       setStep('deposit-success')
       onUpdateBalances()
+      onUpdateReserves()
       onUpdateWalletBalances()
     }
 
@@ -60,9 +59,7 @@ const Deposit = ({
 
     // Should be abstracted to web3Utils / withWallet
     const tx = contracts[tokenKey].methods.approve(contracts.loihi.options.address, '115792089237316195423570985008687907853269984665640564039457584007913129639935')
-    const estimate = await tx.estimateGas({from: account})
-    const gasPrice = await web3.eth.getGasPrice()
-    tx.send({ from: account, gas: Math.floor(estimate * 1.5), gasPrice: gasPrice})
+    tx.send({ from: account })
       .once('transactionHash', txHash)
       .once('confirmation', confirmation)
       .on('error', error)

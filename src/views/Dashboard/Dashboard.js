@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import Intercom from 'react-intercom'
+import cookie from 'js-cookie'
+import randomWords from 'random-words'
 
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
@@ -14,8 +17,6 @@ import NetworkModal from './components/NetworkModal'
 import UnlockModal from './components/UnlockModal'
 
 import DashboardContext from './context'
-
-import { getAllowances } from '../../utils/web3Utils'
 
 const StyledDashboard = styled.div`
   align-items: center;
@@ -40,10 +41,17 @@ const Dashboard = ({
   onEnable,
   onUpdateAllowances,
   onUpdateBalances,
+  onUpdateReserves,
   onUpdateWalletBalances,
   walletBalances,
   web3,
 }) => {
+
+  let userId = cookie.get('userId')
+  if (!userId) {
+    userId = randomWords(3).join('-')
+    cookie.set('userId', userId)
+  } 
 
   const [depositModal, setDepositModal] = useState(false)
   const [withdrawModal, setWithdrawModal] = useState(false)
@@ -72,6 +80,7 @@ const Dashboard = ({
         onEnable,
         onUpdateAllowances,
         onUpdateBalances,
+        onUpdateReserves,
         onUpdateWalletBalances,
         presentDeposit: () => setDepositModal(true),
         presentWithdraw: () => setWithdrawModal(true),
@@ -79,13 +88,14 @@ const Dashboard = ({
         walletBalances,
         web3,
       }}>
-        <StyledDashboard>
-          <Header />
-          {renderContent()}
-          <Footer />
-        </StyledDashboard>
-        {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
-        {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
+          <Intercom appID='zr42wlxq' user_id={userId} />
+          <StyledDashboard>
+            <Header />
+            {renderContent()}
+            <Footer />
+          </StyledDashboard>
+          {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
+          {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
       </DashboardContext.Provider>
 
     </>

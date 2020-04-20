@@ -107,6 +107,7 @@ const withWallet = (WrappedComponent) => {
           onEnable={handleEnable}
           onUpdateAllowances={() => fetchAllowances()}
           onUpdateBalances={() => fetchBalances()}
+          onUpdateReserves={() => fetchReserves()}
           onUpdateWalletBalances={() => fetchWalletBalances()}
           networkId={networkId}
           reserves={reserves}

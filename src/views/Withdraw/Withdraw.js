@@ -16,33 +16,36 @@ const Withdraw = ({
 }) => {
   const { 
     account,
-    allowances,
     balances,
     contracts,
-    onUpdateAllowances,
     onUpdateBalances,
+    onUpdateReserves,
     onUpdateWalletBalances,
-    walletBalances,
-    web3
+    reserves,
   } = useContext(DashboardContext)
 
-  console.log("balances", balances)
-
   const [step, setStep] = useState('start')
+  const [withdrawEverything, setWithdrawEverything] = useState(false)
 
-  const handleWithdraw = async () => {
+  const handleWithdraw = async (addresses, amounts) => {
+
     setStep('confirmingMetamask')
-    const shells = balances.shell.toFixed()
-    const tx = contracts.loihi.methods.proportionalWithdraw(shells)
-    const estimate = await tx.estimateGas({from: account})
-    const gasPrice = await web3.eth.getGasPrice()
-    tx.send({ from: account, gas: Math.floor(estimate * 1.1), gasPrice: gasPrice})
-      .once('transactionHash', () => setStep('withdrawing'))
+
+    let tx
+    if (withdrawEverything) {
+      tx = contracts.loihi.methods.proportionalWithdraw(balances.shell.toFixed())
+    } else {
+      tx = contracts.loihi.methods.selectiveWithdraw(addresses, amounts, balances.shell.toFixed(), Date.now())
+    }
+
+    tx.send({ from: account })
+     .once('transactionHash', () => setStep('withdrawing'))
       .once('confirmation', handleConfirmation)
       .on('error', () => setStep('error'))
 
     function handleConfirmation () {
       onUpdateBalances()
+      onUpdateReserves()
       onUpdateWalletBalances()
       setStep('succes')
     }
@@ -53,11 +56,13 @@ const Withdraw = ({
     <>
       {step === 'start' && (
         <StartModal
-          allowances={allowances}
           balances={balances}
           contracts={contracts}
           onDismiss={onDismiss}
           onWithdraw={handleWithdraw}
+          reserves={reserves}
+          setWithdrawEverything={setWithdrawEverything}
+          withdrawEverything={withdrawEverything}
         />
       )}
 
