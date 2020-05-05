@@ -1,12 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
+import config from '../../mainnet.config.json'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faDiscord,
-  faTelegramPlane,
-  faTwitter,
-} from '@fortawesome/free-brands-svg-icons'
+import { faDiscord, faTwitter, } from '@fortawesome/free-brands-svg-icons'
+
+import etherscan from "../../assets/etherscan-logo-light-circle.svg"
 
 import Container from '../Container'
 
@@ -24,9 +23,10 @@ const StyledSocialIcon = styled.a`
   display: flex;
   height: 44px;
   justify-content: center;
-  width: 44px;
   opacity: 0.5;
+  margin: 10px;
   transition: opacity .2s;
+  width: 44px;
   &:hover {
     opacity: 1;
   }
@@ -35,14 +35,15 @@ const StyledSocialIcon = styled.a`
 const Footer = () => (
   <Container>
     <StyledFooter>
-      <StyledSocialIcon href="#">
-        <FontAwesomeIcon icon={faTwitter} />
+      <StyledSocialIcon target="_blank" href="https://twitter.com/shellprotocol">
+        <FontAwesomeIcon icon={faTwitter} size="lg" />
       </StyledSocialIcon>
-      <StyledSocialIcon href="#">
-        <FontAwesomeIcon icon={faTelegramPlane} />
+      <StyledSocialIcon target="_blank" href={"https://etherscan.io/address/" + config.LOIHI} >
+        <img src={etherscan} style={{width:'1.33em'}}/>
+        {/* <FontAwesomeIcon icon={etherscan} /> */}
       </StyledSocialIcon>
-      <StyledSocialIcon href="#">
-        <FontAwesomeIcon icon={faDiscord} />
+      <StyledSocialIcon target="_blank" href="https://discord.gg/ZqMJPr4">
+        <FontAwesomeIcon icon={faDiscord} size="lg" />
       </StyledSocialIcon>
     </StyledFooter>
   </Container>

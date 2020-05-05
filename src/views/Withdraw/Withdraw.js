@@ -39,7 +39,7 @@ const Withdraw = ({
     }
 
     tx.send({ from: account })
-     .once('transactionHash', () => setStep('withdrawing'))
+      .once('transactionHash', () => setStep('withdrawing'))
       .once('confirmation', handleConfirmation)
       .on('error', () => setStep('error'))
 
