@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import config from '../../mainnet.config.json'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDiscord, faTwitter, } from '@fortawesome/free-brands-svg-icons'
+import { faDiscord, faTelegram, faTwitter, } from '@fortawesome/free-brands-svg-icons'
 
 import etherscan from "../../assets/etherscan-logo-light-circle.svg"
 
@@ -38,9 +38,11 @@ const Footer = () => (
       <StyledSocialIcon target="_blank" href="https://twitter.com/shellprotocol">
         <FontAwesomeIcon icon={faTwitter} size="lg" />
       </StyledSocialIcon>
+      <StyledSocialIcon target="_blank" href="https://t.me/joinchat/IXE6vxd2VqQT1-VyAxAqig">
+        <FontAwesomeIcon icon={faTelegram} size="lg" />
+      </StyledSocialIcon>
       <StyledSocialIcon target="_blank" href={"https://etherscan.io/address/" + config.LOIHI} >
         <img src={etherscan} style={{width:'1.33em'}}/>
-        {/* <FontAwesomeIcon icon={etherscan} /> */}
       </StyledSocialIcon>
       <StyledSocialIcon target="_blank" href="https://discord.gg/ZqMJPr4">
         <FontAwesomeIcon icon={faDiscord} size="lg" />

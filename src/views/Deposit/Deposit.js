@@ -32,6 +32,7 @@ const Deposit = ({
   } = useContext(DashboardContext)
 
   const [step, setStep] = useState('start')
+  const [txHash, setTxHash] = useState('')
 
   // should change to useReducer
   const [unlocking, setUnlocking] = useState({})
@@ -64,7 +65,8 @@ const Deposit = ({
       .once('confirmation', confirmation)
       .on('error', error)
 
-      function txHash () {
+      function txHash (hash) {
+        setTxHash(hash)
         setUnlocking({ ...unlocking, [tokenKey]: true })
         setStep('unlocking')
       }
@@ -108,7 +110,7 @@ const Deposit = ({
       )}
 
       {step === 'unlocking' && (
-        <UnlockingModal />
+        <UnlockingModal txHash={txHash}/>
       )}
 
       {step === 'deposit-success' && (

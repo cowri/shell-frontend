@@ -10,10 +10,10 @@ import ModalTitle from '../ModalTitle'
 
 const ModalConfirmMetamask = () => (
   <Modal>
+    <ModalTitle> Confirming with MetaMask </ModalTitle>
     <ModalIcon>
       <img src={metamaskLogo} style={{ height: 96 }} />
     </ModalIcon>
-    <ModalTitle>Confirming with MetaMask</ModalTitle>
     <ModalActions>
       <div style={{ width: '100%' }}>
       <Loader />

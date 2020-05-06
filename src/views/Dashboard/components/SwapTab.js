@@ -10,7 +10,7 @@ import DashboardContext from '../context'
 import ModalConfirmMetamask from '../../../components/ModalConfirmMetamask'
 import ModalError from '../../../components/ModalError'
 import ModalSuccess from '../../../components/ModalSuccess'
-import SwappingModal from '../../../components/ModalAwaitingTx'
+import ModalTx from '../../../components/ModalAwaitingTx'
 
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem';
@@ -144,6 +144,7 @@ const SwapTab = () => {
   const [swapType, setSwapType] = useState('origin')
   const [slippage, setSlippage] = useState(0)
   const [priceMessage, setPriceMessage] = useState('')
+  const [txHash, setTxHash] = useState('')
 
 
   const origin = erc20s[originSlot]
@@ -399,9 +400,14 @@ const SwapTab = () => {
     )
 
     tx.send({ from: account })
-      .once('transactionHash', () =>  setStep('swapping'))
+      .once('transactionHash', handleTransactionHash)
       .once('confirmation', handleConfirmation)
       .on('error', handleError)
+
+    function handleTransactionHash (hash) {
+      setTxHash(hash)
+      setStep('swapping')
+    }
 
     function handleConfirmation () {
       setOriginValue('0')
@@ -427,7 +433,8 @@ const SwapTab = () => {
       .once('confirmation', onConfirmation)
       .on('error', onError)
 
-    function onTxHash () {
+    function onTxHash (hash) {
+      setTxHash(hash)
       setStep('unlocking')
     }
 
@@ -533,7 +540,7 @@ const SwapTab = () => {
 
     <StyledSwapTab>
       { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
-      { (step == 'swapping' || step == 'unlocking') && <SwappingModal/> }
+      { (step == 'swapping' || step == 'unlocking') && <ModalTx tx={txHash} /> }
       { step == 'success' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
       { step == 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
       { step == 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
