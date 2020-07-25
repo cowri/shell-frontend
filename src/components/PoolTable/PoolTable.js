@@ -7,9 +7,7 @@ import UsdcIcon from '../icons/Usdc'
 import Row from '../Row'
 import TokenIcon from '../TokenIcon'
 
-const StyledPoolTable = styled.div`
-
-`
+const StyledPoolTable = styled.div``
 
 const StyledTokenName = styled.span`
   flex: 3;

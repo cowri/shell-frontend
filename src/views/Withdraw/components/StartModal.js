@@ -6,7 +6,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Tooltip from '@material-ui/core/Tooltip';
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles, withTheme } from '@material-ui/core/styles'
+import { makeStyles } from '@material-ui/core/styles'
 
 import daiIcon from '../../../assets/dai.svg'
 import susdIcon from '../../../assets/susd.svg'
@@ -63,14 +63,6 @@ const StyledForm = styled.form`
 const StyledRows = styled.div`
   margin-top: -24px;
 `
-const StyledLabelBar = withTheme(styled.div`
-  align-items: center;
-  color: ${props => props.theme.palette.grey[500]};
-  display: flex;
-  height: 32px;
-  justify-content: space-between;
-  margin-top: 24px;
-`)
 
 const StyledShells = styled.div`
   align-items: center;
@@ -160,9 +152,15 @@ const StartModal = ({
       setUsdtInputAmt(epsilonRemovedAmount(balances.usdt, 6))
       setSusdInputAmt(epsilonRemovedAmount(balances.susd, 18))
 
-      const shells = (<span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { displayAmount(balances.shell, 18, 2) } <img style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} src={tinyShellIcon} /> 
-      </span>)
+      const shells = (
+        <span style={{position: 'relative', paddingRight: '17.5px'}}> 
+          { displayAmount(balances.shell, 18, 2) } 
+          <img alt=""
+            src={tinyShellIcon} 
+            style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} 
+          /> 
+        </span>
+      )
 
       setFeeMessage(<div> You will burn {shells} and pay a 0.0175% fee to liquidity providers </div> )
 
@@ -178,7 +176,7 @@ const StartModal = ({
   const handleInput = (e, type, setter) => {
     e.preventDefault()
     if (!isNaN(e.target.value)) {
-      if (e.target.value == '') {
+      if (e.target.value === '') {
         setter(e.target.value)
         primeWithdraw({ type: type, value: '0'})
       } else {
@@ -234,7 +232,11 @@ const StartModal = ({
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(reservesChange)).multipliedBy(100)
 
     const shells = (<span style={{position: 'relative', paddingRight: '17.5px'}}> 
-        { displayAmount(shellsToBurn, 18, 2) } <img style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} src={tinyShellIcon} /> 
+        { displayAmount(shellsToBurn, 18, 2) } 
+        <img alt=""
+          src={tinyShellIcon} 
+          style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} 
+        /> 
     </span>)
 
     if (slippage.isNegative()) {
@@ -365,7 +367,7 @@ const TokenInput = ({
         endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
         startAdornment: (
           <StyledStartAdornment>
-            <TokenIcon size={24}> <img src={icon} /> </TokenIcon>
+            <TokenIcon size={24}> <img src={icon} alt="" /> </TokenIcon>
           </StyledStartAdornment>
         )
       }}

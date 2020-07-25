@@ -6,7 +6,7 @@ import {
   getAllowances,
   getContracts,
   getLoihiBalances,
-  getReserves,
+  getLiquidity,
   getWalletBalances,
 } from '../utils/web3Utils'
 
@@ -17,39 +17,33 @@ const withWallet = (WrappedComponent) => {
     const [allowances, setAllowances] = useState({})
     const [balances, setBalances] = useState({})
     const [contracts, setContracts] = useState({})
-    const [reserves, setReserves] = useState({})
+    const [loihi, setLoihi] = useState({})
+    const [liquidity, setLiquidity] = useState({})
     const [networkId, setNetworkId] = useState(1)
     const [walletBalances, setWalletBalances] = useState({})
 
     const fetchAllowances = async (_account, _contracts) => {
-      const allowances = await getAllowances(
-        _account ? _account : account, 
-        _contracts ? _contracts : contracts
-      )
+      const allowances = await getAllowances(contracts, account)
+      window.allowances = allowances
       setAllowances(allowances)
     }
 
-    const fetchBalances = async (_account, _loihi, _reserves) => {
-      const balances = await getLoihiBalances(
-        _account ? _account : account, 
-        _loihi ? _loihi : contracts.loihi, 
-        _reserves ? _reserves : reserves
-      )
-      setBalances(balances)
+    const fetchLiquidity = async () => {
+      const liquidity = await getLiquidity(loihi)
+      window.liquidity = liquidity
+      setLiquidity(liquidity)
     }
 
-    const fetchReserves = async (_loihi) => {
-      const reserves = await getReserves(_loihi ? _loihi : contracts.loihi)
-      window.reserves = reserves
-      setReserves(reserves)
-    }
-
-    const fetchWalletBalances = async (_account, _contracts) => {
-      const walletBalances = await getWalletBalances(
-        _account ?  _account : account, 
-        _contracts ? _contracts : contracts
-      )
+    const fetchWalletBalances = async () => {
+      const walletBalances = await getWalletBalances(account, contracts)
+      window.walletBalances = walletBalances
       setWalletBalances(walletBalances)
+    }
+    
+    const fetchBalances = async (_account, _loihi, _liquidity) => {
+      const balances = await getLoihiBalances( account, loihi, liquidity)
+      window.balances = balances
+      setBalances(balances)
     }
 
     const handleEnable = () => {
@@ -63,57 +57,66 @@ const withWallet = (WrappedComponent) => {
       })
     }
 
-    // init web3, account
+    // init application
     useEffect(() => {
-      async function init() {
-        if (window.ethereum) {
-          const web3 = new Web3(window.ethereum)
-          window.thing = web3
-          const accounts = await web3.eth.getAccounts()
-          const networkId = await web3.eth.net.getId()
 
-          setNetworkId(networkId)
-          setWeb3(web3)
-          setAccount(accounts[0])
+      (async function init() {
 
-          window.ethereum.on('accountsChanged', async function () {
-            const accounts = await web3.eth.getAccounts()
-            setAccount(accounts[0])
-            fetchReserves(window.contracts.loihi)
-            fetchAllowances(accounts[0], window.contracts)
-            fetchBalances(accounts[0], window.contracts.loihi, window.reserves)
-            fetchWalletBalances(accounts[0], window.contracts)
-          })
+        const web3 = new Web3(window.ethereum)
+        const accounts = await web3.eth.getAccounts()
+        const networkId = await web3.eth.net.getId()
 
-        }
-      }
-      init()
-    }, [])
 
-    // init contracts
-    useEffect(() => {
-      if (web3) {
+        setWeb3(web3)
+        setNetworkId(networkId)
+        setAccount(accounts[0])
+
         const _contracts = getContracts(web3)
         window.contracts = _contracts
+
+        const _liquidity = await getLiquidity(_contracts.loihi)
+        const _allowances = await getAllowances(_contracts, accounts[0])
+        const _walletBalances = await getWalletBalances(_contracts, accounts[0])
+        const _balances = await getLoihiBalances(_liquidity, _contracts.loihi, accounts[0])
+
         setContracts(_contracts)
-      }
-    }, [web3])
+        setLoihi(_contracts.loihi)
+        setLiquidity(_liquidity)
+        setAllowances(_allowances)
+        setWalletBalances(_walletBalances)
+        setBalances(_balances)
 
-    // init reserves
-    useEffect(() => {
-      if (contracts.loihi) {
-        fetchReserves()
-      }
-    }, [contracts])
+        window.ethereum.on('accountsChanged', async function () {
 
-    // init balances
-    useEffect(() => {
-      if (account && reserves.totalReserves) {
-        fetchAllowances()
-        fetchBalances()
-        fetchWalletBalances()
-      }
-    }, [account, reserves])
+          const accounts = await web3.eth.getAccounts()
+          setAccount(accounts[0])
+          fetchLiquidity()
+          fetchAllowances()
+          fetchBalances()
+          fetchWalletBalances()
+
+        })
+          
+      })()
+
+    }, [])
+
+    // useEffect(() => {
+    //   console.log("ping liq")
+    //   if (loihi) {
+    //     console.log("loihi", loihi)
+    //     fetchLiquidity(loihi)
+    //   }
+    // }, [loihi])
+
+    // // init liquidity, allowances, balances, wallet balances
+    // useEffect(() => {
+    //   if (account && liquidity) {
+    //     fetchAllowances()
+    //     fetchBalances()
+    //     fetchWalletBalances()
+    //   }
+    // }, [liquidity])
 
     return (
       <>
@@ -128,10 +131,10 @@ const withWallet = (WrappedComponent) => {
           onEnable={handleEnable}
           onUpdateAllowances={() => fetchAllowances()}
           onUpdateBalances={() => fetchBalances()}
-          onUpdateReserves={() => fetchReserves()}
+          onUpdateLiquidity={() => fetchLiquidity()}
           onUpdateWalletBalances={() => fetchWalletBalances()}
           networkId={networkId}
-          reserves={reserves}
+          liquidity={liquidity}
           walletBalances={walletBalances}
           web3={web3}
         />

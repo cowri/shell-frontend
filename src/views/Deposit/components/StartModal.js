@@ -97,7 +97,7 @@ const StartModal = ({
 
   function composeToolTip (payload) {
 
-    if (payload.type == 'error') {
+    if (payload.type === 'error') {
 
       setToolTip('Deposit amounts trigger halt check')
 
@@ -105,10 +105,10 @@ const StartModal = ({
 
       payload.setter(payload.trigger ? 'amount is greater than your balance' : '')
 
-      const setDai = (payload.type == 'dai' && payload.trigger) || (payload.type != 'dai' && !!daiError.length)
-      const setUsdc = (payload.type == 'usdc' && payload.trigger) || (payload.type != 'usdc' && !!usdcError.length)
-      const setUsdt = (payload.type == 'usdt' && payload.trigger) || (payload.type != 'usdt' && !!usdtError.length)
-      const setSusd = (payload.type == 'susd' && payload.trigger) || (payload.type != 'susd' && !!susdError.length)
+      const setDai = (payload.type === 'dai' && payload.trigger) || (payload.type !== 'dai' && !!daiError.length)
+      const setUsdc = (payload.type === 'usdc' && payload.trigger) || (payload.type !== 'usdc' && !!usdcError.length)
+      const setUsdt = (payload.type === 'usdt' && payload.trigger) || (payload.type !== 'usdt' && !!usdtError.length)
+      const setSusd = (payload.type === 'susd' && payload.trigger) || (payload.type !== 'susd' && !!susdError.length)
 
       if (!setDai && !setUsdc && !setUsdt && !setSusd) {
 
@@ -118,39 +118,26 @@ const StartModal = ({
 
         let tip = ' in your wallet'
         let count = 0;
-        if (setDai) {
-          tip = ' DAI' + tip
-          count++
-        }
-        if (setUsdc) {
-          if (count == 0) tip = ' USDC' + tip
-          else if (count == 1) tip = ' USDC and' + tip
-          count++
-        }
-        if (setUsdt) {
-          if (count == 0) tip = ' USDT' + tip
-          else if (count == 1) tip = ' USDT and' + tip
-          else tip = ' USDT,' + tip
-          count++
-        }
-        if (setSusd) {
-          if (count == 0) tip = ' SUSD' + tip
-          else if (count == 1) tip = ' SUSD and' + tip 
-          else tip = ' SUSD,' + tip
-          count++
-        }
+
+        if (setDai) buildTip("DAI")
+        if (setUsdc) buildTip("USDC")
+        if (setUsdt) buildTip("USDT")
+        if (setSusd) buildTip("SUSD")
 
         tip = 'Insufficient' + tip
 
-        setToolTip(tip)
+        return setToolTip(tip)
+
+        function buildTip (piece) {
+          if (count === 0) tip = ' ' + piece + tip
+          else if (count === 1) tip = ' ' + piece + ' and' + tip
+          else tip = ' ' + piece + ','  + tip
+          count++
+        }
 
       }
 
-
     }
-
-
-
 
   }
 
@@ -162,7 +149,7 @@ const StartModal = ({
   const handleInput = (e, type, setter) => {
     e.preventDefault()
     if (!isNaN(e.target.value)) {
-      if (e.target.value == '') {
+      if (e.target.value === '') {
         setter(e.target.value)
         primeDeposit({ type: type, value: '0'})
       } else {
@@ -172,17 +159,19 @@ const StartModal = ({
     }
   }
 
-  const primeDeposit = async ( inputPayload) => {
+  const primeDeposit = async (inputPayload) => {
+
+    console.log("prime deposit")
 
     if (bnAmount(inputPayload.value, contracts[inputPayload.type].decimals).isGreaterThan(walletBalances[inputPayload.type])) {
-      if (inputPayload.type == 'dai') composeToolTip({ setter: setDaiError, trigger: true, type: 'dai'})
-      else if (inputPayload.type == 'usdc') composeToolTip({ setter: setUsdcError, trigger: true, type: 'usdc'})
-      else if (inputPayload.type == 'usdt') composeToolTip({ setter: setUsdtError, trigger: true, type: 'usdt'})
-      else if (inputPayload.type == 'susd') composeToolTip({ setter: setSusdError, trigger: true, type: 'susd'})
-    } else if (inputPayload.type == 'dai') composeToolTip({ setter: setDaiError, trigger: false, type: 'dai'})
-    else if (inputPayload.type == 'usdc') composeToolTip({ setter: setUsdcError, trigger: false, type: 'usdc'})
-    else if (inputPayload.type == 'usdt') composeToolTip({ setter: setUsdtError, trigger: false, type: 'usdt'})
-    else if (inputPayload.type == 'susd') composeToolTip({ setter: setSusdError, trigger: false, type: 'susd'})
+      if (inputPayload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: true, type: 'dai'})
+      else if (inputPayload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: true, type: 'usdc'})
+      else if (inputPayload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: true, type: 'usdt'})
+      else if (inputPayload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: true, type: 'susd'})
+    } else if (inputPayload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: false, type: 'dai'})
+    else if (inputPayload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: false, type: 'usdc'})
+    else if (inputPayload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: false, type: 'usdt'})
+    else if (inputPayload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: false, type: 'susd'})
 
     const addresses = [
       contracts.dai.options.address,
@@ -197,6 +186,8 @@ const StartModal = ({
       bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputValue ? usdtInputValue : 0, contracts.usdt.decimals).toFixed(),
       bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputValue ? susdInputValue : 0, contracts.susd.decimals).toFixed(),
     ]
+
+    console.log("amounts", amounts);
 
     const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
     if (sum.isZero()) return setFeeMessage('')
@@ -224,20 +215,40 @@ const StartModal = ({
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(reservesChange)).multipliedBy(100)
 
     if (slippage.isNegative()) {
-      // setFeeMessage("You will mint " + displayAmount(shellsToMint, 18, 2) + " Shells and earn a " + Math.abs(slippage.toFixed(4)) + "% rebalancing subsidy")
-      setFeeMessage(<div> 
-        You will mint <span style={{position: 'relative', paddingRight: '17.5px'}}> { displayAmount(shellsToMint, 18, 2) } <img style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} src={shellIcon} /> </span> and earn a { Math.abs(slippage.toFixed(4)) } % rebalancing subsidy
-      </div>)
+
+      const feeMessage = <div>
+        You will mint 
+          <span style={{position: 'relative', paddingRight: '17.5px'}}> 
+            { displayAmount(shellsToMint, 18, 2) } 
+            <img alt="" 
+              src={shellIcon} 
+              style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
+            /> 
+          </span> 
+        and earn a { Math.abs(slippage.toFixed(4)) } % rebalancing subsidy
+      </div>
+
+      setFeeMessage(feeMessage)
+      
     } else {
-      // setFeeMessage("You will mint " + displayAmount(shellsToMint, 18, 2) + " Shells and pay a " + slippage.toFixed(4) + "% fee to liquidity providers")
-      setFeeMessage(<div>
-        You will mint <span style={{position:'relative', paddingRight: '17.5px' }}> { displayAmount(shellsToMint, 18, 2) } <img style={{position:'absolute', top: '0px', right: '5px', height: '20px'}} src={shellIcon} /> </span> and pay a { slippage.toFixed(4) } % fee to liquidity providers
-      </div>)
+
+      const feeMessage = <div>
+        You will mint 
+          <span style={{position:'relative', paddingRight: '17.5px' }}> 
+            { displayAmount(shellsToMint, 18, 2) } 
+            <img alt="" 
+              src={shellIcon} 
+              style={{position:'absolute', top: '0px', right: '5px', height: '20px'}} 
+            /> 
+          </span> 
+        and pay a { slippage.toFixed(4) } % fee to liquidity providers
+      </div>
+
+      setFeeMessage(feeMessage)
         
     }
 
   }
-
 
   const handleDeposit = async (
     daiValue,
@@ -438,7 +449,7 @@ const TokenInput = ({
         startAdornment: (
           <StyledStartAdornment>
             <TokenIcon size={24}>
-              <img src={icon} />
+              <img src={icon} alt="" />
             </TokenIcon>
           </StyledStartAdornment>
         )

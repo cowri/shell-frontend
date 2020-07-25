@@ -29,8 +29,8 @@ const AwaitingTxModal = (props) => {
         <HourglassFullIcon />
       </ModalIcon>
       <StyledViewOnEtherscan>
-        <a style={{textDecoration:'none', color:'inherit'}} target="_blank" href={"https://etherscan.io/tx/" + txHash}>
-          <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} />
+        <a href={"https://etherscan.io/tx/" + txHash} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
+          <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
           <span>
             View On Etherscan
           </span>

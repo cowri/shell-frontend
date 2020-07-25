@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import config from '../../mainnet.config.json'
+import config from '../../kovan.config.json'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDiscord, faTelegram, faTwitter, } from '@fortawesome/free-brands-svg-icons'
@@ -42,7 +42,7 @@ const Footer = () => (
         <FontAwesomeIcon icon={faTelegram} size="lg" />
       </StyledSocialIcon>
       <StyledSocialIcon target="_blank" href={"https://etherscan.io/address/" + config.LOIHI} >
-        <img src={etherscan} style={{width:'1.33em'}}/>
+        <img src={etherscan} style={{width:'1.33em'}} alt="" />
       </StyledSocialIcon>
       <StyledSocialIcon target="_blank" href="https://discord.gg/ZqMJPr4">
         <FontAwesomeIcon icon={faDiscord} size="lg" />

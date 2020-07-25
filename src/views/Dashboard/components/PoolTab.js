@@ -63,37 +63,23 @@ const PoolTab = () => {
     balances,
     presentDeposit,
     presentWithdraw,
-    reserves,
+    liquidity,
   } = useContext(DashboardContext)
 
-  const {
-    totalReserves,
-    daiReserve,
-    susdReserve,
-    usdcReserve,
-    usdtReserve,
-  } = reserves
+  window.poolTabBalances = balances
 
-  const {
-    dai: daiBalance,
-    susd: susdBalance,
-    usdc: usdcBalance,
-    usdt: usdtBalance,
-    shell: shellBalance,
-  } = balances
+  const totalBalance = balances.shells ? `$${displayAmount(balances.shells, 18, 2)}` : '--'
+  const totalPoolLiquidity = liquidity.total ? `$${displayAmount(liquidity.total, 18, 2)}` : '--'
 
-  const totalBalance = shellBalance ? `$${displayAmount(shellBalance, 18, 2)}` : '--'
-  const totalPoolLiquidity = totalReserves ? `$${displayAmount(totalReserves, 18, 2)}` : '--'
+  const daiLiquidityDisplay = liquidity.dai ? `$${displayAmount(liquidity.dai, 18, 2)}` : '--'
+  const usdcLiquidityDisplay = liquidity.usdc ? `$${displayAmount(liquidity.usdc, 18, 2)}` : '--'
+  const usdtLiquidityDisplay = liquidity.usdt ? `$${displayAmount(liquidity.usdt, 18, 2)}` : '--'
+  const susdLiquidityDisplay = liquidity.susd ? `$${displayAmount(liquidity.susd, 18, 2)}` : '--'
 
-  const daiReserveDisplay = daiReserve ? `$${displayAmount(daiReserve, 18, 2)}` : '--'
-  const susdReserveDisplay = susdReserve ? `$${displayAmount(susdReserve, 18, 2)}` : '--'
-  const usdcReserveDisplay = usdcReserve ? `$${displayAmount(usdcReserve, 18, 2)}` : '--'
-  const usdtReserveDisplay = usdtReserve ? `$${displayAmount(usdtReserve, 18, 2)}` : '--'
-
-  const daiBalanceDisplay = daiBalance ? `$${displayAmount(daiBalance, 18, 2)}` : '--'
-  const usdcBalanceDisplay = usdcBalance ? `$${displayAmount(usdcBalance, 6, 2)}` : '--'
-  const usdtBalanceDisplay = usdtBalance ? `$${displayAmount(usdtBalance, 6, 2)}` : '--'
-  const susdBalanceDisplay = susdBalance ? `$${displayAmount(susdBalance, 18, 2)}` : '--'
+  const daiBalanceDisplay = balances.dai ? `$${displayAmount(balances.dai, 18, 2)}` : '--'
+  const usdcBalanceDisplay = balances.usdc ? `$${displayAmount(balances.usdc, 6, 2)}` : '--'
+  const usdtBalanceDisplay = balances.usdt ? `$${displayAmount(balances.usdt, 6, 2)}` : '--'
+  const susdBalanceDisplay = balances.susd ? `$${displayAmount(balances.susd, 6, 2)}` : '--'
 
   return (
     <StyledPoolTab>
@@ -114,13 +100,13 @@ const PoolTab = () => {
         <Row>
           <StyledTokenName>
             <TokenIcon>
-              <img src={daiIcon} />
+              <img alt="" src={daiIcon} />
             </TokenIcon>
             <div style={{ width: 12 }} />
             <LabelledValue label="DAI" value="Dai" />
           </StyledTokenName>
           <StyledBalance>
-            {daiReserveDisplay}
+            {daiLiquidityDisplay}
           </StyledBalance>
           <StyledBalance>
             {daiBalanceDisplay}
@@ -129,13 +115,13 @@ const PoolTab = () => {
         <Row>
           <StyledTokenName>
             <TokenIcon>
-              <img src={usdcIcon} />
+              <img alt="" src={usdcIcon} />
             </TokenIcon>
             <div style={{ width: 12 }} />
             <LabelledValue label="USDC" value="USD Coin" />
           </StyledTokenName>
           <StyledBalance>
-            {usdcReserveDisplay}
+            {usdcLiquidityDisplay}
           </StyledBalance>
           <StyledBalance>
             {usdcBalanceDisplay}
@@ -144,13 +130,13 @@ const PoolTab = () => {
         <Row>
           <StyledTokenName>
             <TokenIcon>
-              <img src={usdtIcon} />
+              <img alt="" src={usdtIcon} />
             </TokenIcon>
             <div style={{ width: 12 }} />
             <LabelledValue label="USDT" value="Tether" />
           </StyledTokenName>
           <StyledBalance>
-            {usdtReserveDisplay}
+            {usdtLiquidityDisplay}
           </StyledBalance>
           <StyledBalance>
             {usdtBalanceDisplay}
@@ -159,13 +145,13 @@ const PoolTab = () => {
         <Row>
           <StyledTokenName>
             <TokenIcon>
-              <img src={susdIcon} />
+              <img alt="" src={susdIcon} />
             </TokenIcon>
             <div style={{ width: 12 }} />
             <LabelledValue label="SUSD" value="Sythentix USD" />
           </StyledTokenName>
           <StyledBalance hasBalance>
-            {susdReserveDisplay}
+            {susdLiquidityDisplay}
           </StyledBalance>
           <StyledBalance>
             {susdBalanceDisplay}

@@ -1,7 +1,5 @@
 import React, { useContext, useState } from 'react'
 
-import { bnAmount } from '../../utils/web3Utils'
-
 import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
 import WithdrawingModal from '../../components/ModalAwaitingTx'
 
@@ -19,7 +17,7 @@ const Withdraw = ({
     balances,
     contracts,
     onUpdateBalances,
-    onUpdateReserves,
+    onUpdateLiquidity,
     onUpdateWalletBalances,
     reserves,
   } = useContext(DashboardContext)
@@ -45,7 +43,7 @@ const Withdraw = ({
 
     function handleConfirmation () {
       onUpdateBalances()
-      onUpdateReserves()
+      onUpdateLiquidity()
       onUpdateWalletBalances()
       setStep('succes')
     }

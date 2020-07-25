@@ -6,7 +6,6 @@ import Button from '../../../components/Button'
 import Loader from '../../../components/Loader'
 import Modal from '../../../components/Modal'
 import ModalActions from '../../../components/ModalActions'
-import ModalContent from '../../../components/ModalContent'
 import ModalIcon from '../../../components/ModalIcon'
 import ModalTitle from '../../../components/ModalTitle'
 
@@ -27,7 +26,7 @@ const Unlock = () => {
     return (
       <Modal onDismiss={() => setIsRequesting(false)}>
         <ModalIcon>
-          <img src={metamaskLogo} style={{ height: 96 }} />
+          <img src={metamaskLogo} style={{ height: 96 }} alt="" />
         </ModalIcon>
         <ModalTitle>Confirming with MetaMask</ModalTitle>
         <ModalActions>

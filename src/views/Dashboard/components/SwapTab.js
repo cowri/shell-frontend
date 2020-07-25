@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 
 import BigNumber from 'bignumber.js'
@@ -24,19 +24,6 @@ import Button from '../../../components/Button'
 
 import TokenIcon from '../../../components/TokenIcon'
 
-import daiIcon from '../../../assets/dai.svg'
-import cdaiIcon from '../../../assets/cdai.svg'
-import chaiIcon from '../../../assets/chai.png'
-
-import susdIcon from '../../../assets/susd.svg'
-import asusdIcon from '../../../assets/aSUSD.svg'
-
-import usdcIcon from '../../../assets/usdc.svg'
-import cusdcIcon from '../../../assets/cusdc.svg'
-
-import usdtIcon from '../../../assets/usdt.svg'
-import ausdtIcon from '../../../assets/aUSDT.svg'
-
 const StyledStartAdornment = styled.div`
   align-items: center;
   display: flex;
@@ -46,10 +33,7 @@ const StyledStartAdornment = styled.div`
   padding-left: 22px;
   padding-right: 12px;
 `
-const StyledEndAdornment = styled.div`
-  padding-left: 6px;
-  padding-right: 12px;
-`
+
 const StyledSwapTab = styled.div`
   display: flex;
   flex: 1;
@@ -126,7 +110,6 @@ const SwapTab = () => {
     onUpdateBalances,
     onUpdateWalletBalances,
     walletBalances,
-    web3
   } = useContext(DashboardContext)
 
   const erc20s = contracts.erc20s
@@ -158,14 +141,14 @@ const SwapTab = () => {
   const targetAvailable = walletBalances[target.symbol.toLowerCase()]
     ? displayAmount(walletBalances[target.symbol.toLowerCase()], target.decimals, 4) : 0
 
-  const initiallyLocked = allowances[origin.symbol.toLowerCase()] == 0
+  const initiallyLocked = allowances[origin.symbol.toLowerCase()] === 0
   const [unlocked, setUnlocked] = useState(false)
 
   const primeSwap = async (swapPayload, slotPayload) => {
 
     let { origin, target } = setSlots(slotPayload)
 
-    if (swapPayload.type == 'switch') {
+    if (swapPayload.type === 'switch') {
 
       setTargetValue(originValue)
       setOriginValue(targetValue)
@@ -175,7 +158,7 @@ const SwapTab = () => {
 
     }
 
-    if (swapPayload.value == '') {
+    if (swapPayload.value === '') {
       setOriginValue(swapPayload.value)
       setTargetValue(swapPayload.value)
       return setPriceMessage('')
@@ -189,14 +172,14 @@ const SwapTab = () => {
 
       const value = Number(+swapPayload.value)
 
-      if (swapPayload.type == 'origin'){
+      if (swapPayload.type === 'origin'){
 
         setSwapType(swapPayload.type)
         const { theseChickens, thoseChickens } = await getChickens(swapPayload.type, value)
         setValues(swapPayload.type, theseChickens, thoseChickens)
         setPriceIndication(swapPayload.type, theseChickens, thoseChickens)
 
-      } else if (swapPayload.type == 'target'){
+      } else if (swapPayload.type === 'target'){
 
         setSwapType(swapPayload.type)
         const { theseChickens, thoseChickens } = await getChickens(swapPayload.type, value)
@@ -212,19 +195,19 @@ const SwapTab = () => {
 
       console.log("setSlots", arguments)
 
-      if (slotPayload.type == 'origin') {
+      if (slotPayload.type === 'origin') {
 
         setOriginSlot(slotPayload.value)
         origin = erc20s[slotPayload.value]
         target = erc20s[targetSlot]
 
-      } else if (slotPayload.type == 'target') {
+      } else if (slotPayload.type === 'target') {
 
         setTargetSlot(slotPayload.value)
         origin = erc20s[originSlot]
         target = erc20s[slotPayload.value]
 
-      } else if (slotPayload.type == 'switch') {
+      } else if (slotPayload.type === 'switch') {
 
         setOriginSlot(targetSlot)
         setTargetSlot(originSlot)
@@ -249,14 +232,14 @@ const SwapTab = () => {
 
       let theseChickens, thoseChickens
 
-      if (value == 0) {
+      if (value === 0) {
 
         setOriginValue(0)
         setTargetValue(0)
         theseChickens = new BigNumber(0)
         thoseChickens = new BigNumber(0)
 
-      } else if (type == 'origin') {
+      } else if (type === 'origin') {
 
 
         setOriginValue(value)
@@ -267,7 +250,7 @@ const SwapTab = () => {
           theseChickens.toFixed()
         ).call())
 
-      } else if (type == 'target') {
+      } else if (type === 'target') {
 
         setTargetValue(value)
         theseChickens = bnAmount(value, target.decimals)
@@ -290,12 +273,12 @@ const SwapTab = () => {
       const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
       const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
 
-      if (type == 'origin') {
+      if (type === 'origin') {
 
         setTargetHelperText('')
         setTargetError(false)
 
-        if (thoseChickens.comparedTo(reverted) == 0) {
+        if (thoseChickens.comparedTo(reverted) === 0) {
           setOriginError(true)
           setOriginHelperText(haltCheckMessage)
           setTargetValue('')
@@ -312,12 +295,12 @@ const SwapTab = () => {
           setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
         }
 
-      } else if (type == 'target') {
+      } else if (type === 'target') {
 
         setOriginHelperText('')
         setOriginError(false)
 
-        if (thoseChickens.comparedTo(reverted) == 0) {
+        if (thoseChickens.comparedTo(reverted) === 0) {
           setOriginValue('')
           setTargetError(true)
           setTargetHelperText(haltCheckMessage)
@@ -340,8 +323,8 @@ const SwapTab = () => {
     async function setPriceIndication (type, theseChickens, thoseChickens) {
 
       const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
-      if (theseChickens.comparedTo(reverted) == 0) return setPriceMessage('')
-      if (thoseChickens.comparedTo(reverted) == 0) return setPriceMessage('')
+      if (theseChickens.comparedTo(reverted) === 0) return setPriceMessage('')
+      if (thoseChickens.comparedTo(reverted) === 0) return setPriceMessage('')
       if (theseChickens.isZero() || thoseChickens.isZero()) return setPriceMessage('')
 
       let oNAmt, tNAmt
@@ -359,13 +342,13 @@ const SwapTab = () => {
       const tSymbol = target.symbol
 
       let message = ''
-      if (oSymbol == 'cUSDC' || oSymbol == 'cDAI' || oSymbol == 'CHAI') {
+      if (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') {
         message += '$1.00 of ' + oSymbol + ' is worth '
       } else {
         message += '1.0000 ' + oSymbol + ' is worth '
       }
 
-      if (tSymbol == 'cUSDC' || tSymbol == 'cDAI' || tSymbol == 'CHAI') {
+      if (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI') {
         message += '$' + tPrice + ' of ' + tSymbol + ' for this trade'
       } else {
         message += tPrice + ' ' + tSymbol + ' for this trade'
@@ -383,7 +366,7 @@ const SwapTab = () => {
 
 
     let originInput, targetInput
-    if (swapType == 'origin') {
+    if (swapType === 'origin') {
       originInput = originValue
       targetInput = Math.floor(targetValue * .99)
     } else {
@@ -391,7 +374,7 @@ const SwapTab = () => {
       targetInput = targetValue
     }
 
-    const tx = loihi.methods[swapType == 'origin' ? 'swapByOrigin' : 'swapByTarget'](
+    const tx = loihi.methods[swapType === 'origin' ? 'swapByOrigin' : 'swapByTarget'](
       origin.options.address,
       target.options.address,
       bnAmount(originInput, origin.decimals).toFixed(),
@@ -452,8 +435,8 @@ const SwapTab = () => {
 
   const handleOriginSelect = e => {
     e.preventDefault()
-    if (e.target.value != targetSlot) {
-      const swapPayload = { type: swapType, value: swapType == 'origin' ? originValue : targetValue }
+    if (e.target.value !== targetSlot) {
+      const swapPayload = { type: swapType, value: swapType === 'origin' ? originValue : targetValue }
       const slotPayload = { type: 'origin', value: e.target.value }
       primeSwap(swapPayload, slotPayload)
     } else primeSwap({type: 'switch'}, {type: 'switch'})
@@ -461,8 +444,8 @@ const SwapTab = () => {
 
   const handleTargetSelect = e => {
     e.preventDefault()
-    if (e.target.value != originSlot) {
-      const swapPayload = { type: swapType, value: swapType == 'origin' ? originValue : targetValue }
+    if (e.target.value !== originSlot) {
+      const swapPayload = { type: swapType, value: swapType === 'origin' ? originValue : targetValue }
       const slotPayload = { type: 'target', value: e.target.value }
       primeSwap(swapPayload, slotPayload)
     } else primeSwap({type: 'switch' }, {type: 'switch' })
@@ -489,11 +472,6 @@ const SwapTab = () => {
       <MenuItem className={selectionClass.root} key={1} value={1} > { erc20s[1].symbol } </MenuItem>,
       <MenuItem className={selectionClass.root} key={2} value={2} > { erc20s[2].symbol } </MenuItem>,
       <MenuItem className={selectionClass.root} key={3} value={3} > { erc20s[3].symbol } </MenuItem>,
-      <MenuItem className={selectionClass.root} key={4} value={4} > { erc20s[4].symbol } </MenuItem>,
-      <MenuItem className={selectionClass.root} key={5} value={5} > { erc20s[5].symbol } </MenuItem>,
-      <MenuItem className={selectionClass.root} key={6} value={6} > { erc20s[6].symbol } </MenuItem>,
-      <MenuItem className={selectionClass.root} key={7} value={7} > { erc20s[7].symbol } </MenuItem>,
-      <MenuItem className={selectionClass.root} key={8} value={8} > { erc20s[8].symbol } </MenuItem>
   ]
 
   const getDropdown = (handler, value) => {
@@ -516,10 +494,10 @@ const SwapTab = () => {
 
   let toolTipMsg = ''
   if (originError){ 
-    if (originError == haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
+    if (originError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
     else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
   } else if (targetError) {
-    if (targetError == haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
+    if (targetError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
     else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
   }
 
@@ -539,11 +517,11 @@ const SwapTab = () => {
   return (
 
     <StyledSwapTab>
-      { step == 'confirmingMetamask' && <ModalConfirmMetamask /> }
-      { (step == 'swapping' || step == 'unlocking') && <ModalTx tx={txHash} /> }
-      { step == 'success' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
-      { step == 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
-      { step == 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
+      { step === 'confirmingMetamask' && <ModalConfirmMetamask /> }
+      { (step === 'swapping' || step === 'unlocking') && <ModalTx tx={txHash} /> }
+      { step === 'success' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
+      { step === 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
+      { step === 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
       <StyledRows>
         <StyledWarning> This is an unaudited product, so please only use nonessential funds. The audit is currently under way. </StyledWarning>
         <AmountInput 
@@ -580,7 +558,7 @@ const SwapTab = () => {
         /> 
         <StyledPriceMessage> { priceMessage } </StyledPriceMessage>
         <>
-          { slippage == 0 ? '' : slippage < 0 ? 'slippage: ' + slippage : 'anti-slippage:' + slippage }
+          { slippage === 0 ? '' : slippage < 0 ? 'slippage: ' + slippage : 'anti-slippage:' + slippage }
         </>
       </StyledRows>
       <StyledActions>
@@ -639,7 +617,7 @@ const AmountInput = ({
           ),
           startAdornment: (
             <StyledStartAdornment>
-              <TokenIcon > <img src={icon} /> </TokenIcon>
+              <TokenIcon > <img src={icon} alt="" /> </TokenIcon>
             </StyledStartAdornment>
           )
         }}

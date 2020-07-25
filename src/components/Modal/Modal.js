@@ -3,14 +3,6 @@ import styled, { keyframes } from 'styled-components'
 
 import Surface from '../Surface'
 
-const modalKeyframes = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-`
 const contentKeyframes = keyframes`
   from {
     opacity: 0;

@@ -12,7 +12,7 @@ const ModalConfirmMetamask = () => (
   <Modal>
     <ModalTitle> Confirming with MetaMask </ModalTitle>
     <ModalIcon>
-      <img src={metamaskLogo} style={{ height: 96 }} />
+      <img alt="Metamask Logo" src={metamaskLogo} style={{ height: 96 }} />
     </ModalIcon>
     <ModalActions>
       <div style={{ width: '100%' }}>

@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import Intercom from 'react-intercom'
 import cookie from 'js-cookie'
 import randomWords from 'random-words'
+import config from "../../kovan.config.json";
 
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
@@ -37,11 +38,11 @@ const Dashboard = ({
   hasMetamask,
   isUnlocked,
   networkId,
-  reserves,
+  liquidity,
   onEnable,
   onUpdateAllowances,
   onUpdateBalances,
-  onUpdateReserves,
+  onUpdateLiquidity,
   onUpdateWalletBalances,
   walletBalances,
   web3,
@@ -60,7 +61,7 @@ const Dashboard = ({
     if (!hasMetamask) {
       return <span style={{ color: '#FFF' }}>Metamask not found.</span>
     }
-    if (networkId !== 1) {
+    if (networkId !== config.network) {
       return <NetworkModal />
     }
     if (!isUnlocked) {
@@ -80,15 +81,15 @@ const Dashboard = ({
         onEnable,
         onUpdateAllowances,
         onUpdateBalances,
-        onUpdateReserves,
+        onUpdateLiquidity,
         onUpdateWalletBalances,
         presentDeposit: () => setDepositModal(true),
         presentWithdraw: () => setWithdrawModal(true),
-        reserves,
+        liquidity,
         walletBalances,
         web3,
       }}>
-          <Intercom appID='zr42wlxq' user_id={userId} />
+          {/* <Intercom appID='zr42wlxq' user_id={userId} /> */}
           <StyledDashboard>
             <Header />
             {renderContent()}

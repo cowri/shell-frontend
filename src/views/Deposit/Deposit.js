@@ -1,9 +1,5 @@
 import React, { useContext, useState } from 'react'
 
-import { bnAmount } from '../../utils/web3Utils'
-
-import BigNumber from 'bignumber.js'
-
 import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
 import DepositingModal from '../../components/ModalAwaitingTx'
 import UnlockingModal from '../../components/ModalAwaitingTx'
@@ -24,11 +20,10 @@ const Deposit = ({
     contracts,
     onUpdateAllowances,
     onUpdateBalances,
-    onUpdateReserves,
+    onUpdateLiquidity,
     onUpdateWalletBalances,
     reserves,
-    walletBalances,
-    web3
+    walletBalances
   } = useContext(DashboardContext)
 
   const [step, setStep] = useState('start')
@@ -41,6 +36,7 @@ const Deposit = ({
     setStep('confirmingMetamask')
 
     const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+    
     tx.send({ from: account })
       .on('transactionHash', () => setStep('depositing'))
       .once('confirmation', handleConfirmation)
@@ -49,7 +45,7 @@ const Deposit = ({
     function handleConfirmation () {
       setStep('deposit-success')
       onUpdateBalances()
-      onUpdateReserves()
+      onUpdateLiquidity()
       onUpdateWalletBalances()
     }
 
