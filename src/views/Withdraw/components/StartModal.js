@@ -90,10 +90,14 @@ const StartModal = ({
   contracts,
   onDismiss,
   onWithdraw,
-  reserves,
+  liquidity,
   setWithdrawEverything,
   withdrawEverything
 }) => {
+
+  console.log("balances", balances)
+  window.liquidity = liquidity
+  window.balances = balances
 
   const [daiInputAmt, setDaiInputAmt] = useState('')
   const [usdcInputAmt, setUsdcInputAmt] = useState('')
@@ -154,7 +158,7 @@ const StartModal = ({
 
       const shells = (
         <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { displayAmount(balances.shell, 18, 2) } 
+          { displayAmount(balances.shells, 18, 2) } 
           <img alt=""
             src={tinyShellIcon} 
             style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} 
@@ -202,6 +206,8 @@ const StartModal = ({
       bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputAmt ? susdInputAmt : 0, contracts.susd.decimals).toFixed(),
     ]
 
+    console.log("bnAmount", amounts)
+
     const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
     if (sum.isZero()) return setFeeMessage('')
 
@@ -211,38 +217,47 @@ const StartModal = ({
     if (isReverted) {
       setError('This amount triggers the halt check')
       return setFeeMessage('')
-    } else if (shellsToBurn.isGreaterThan(balances.shell)) {
+    } else if (shellsToBurn.isGreaterThan(balances.shells)) {
       setError('You can not withdraw more than your balance')
       return setFeeMessage('')
     } else {
       setError('')
     }
 
-    const numeraireAmounts = [
-      new BigNumber(await contracts.dai.adapter.methods.viewNumeraireAmount(amounts[0]).call()),
-      new BigNumber(await contracts.usdc.adapter.methods.viewNumeraireAmount(amounts[1]).call()),
-      new BigNumber(await contracts.usdt.adapter.methods.viewNumeraireAmount(amounts[2]).call()),
-      new BigNumber(await contracts.susd.adapter.methods.viewNumeraireAmount(amounts[3]).call())
-    ]
+    const totalWithdraw = bnAmount(inputPayload.type === 'dai' ? inputPayload.value : daiInputAmt ? daiInputAmt : 0, 18)
+      .plus(bnAmount(inputPayload.type === 'usdc' ? inputPayload.value : usdcInputAmt ? usdcInputAmt : 0, 18))
+      .plus(bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputAmt ? usdtInputAmt : 0, 18))
+      .plus(bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputAmt ? susdInputAmt : 0, 18))
 
-    const totalWithdraw = numeraireAmounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
+    console.log("total withdraw", totalWithdraw.toString())
 
-    const reservesChange = totalWithdraw.dividedBy(reserves.totalReserves)
-    const shellsChange = shellsToBurn.dividedBy(balances.totalShells)
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(reservesChange)).multipliedBy(100)
+    const liquidityChange = totalWithdraw.dividedBy(liquidity.total)
 
-    const shells = (<span style={{position: 'relative', paddingRight: '17.5px'}}> 
+    console.log("liquidity change", liquidityChange.toString())
+
+    const shellsChange = shellsToBurn.dividedBy(balances.shells)
+
+    console.log("shellsChange", shellsChange.toString())
+
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
+
+    console.log("slippage", slippage.toString())
+
+    const shells = (
+      <span style={{position: 'relative', paddingRight: '17.5px'}}> 
         { displayAmount(shellsToBurn, 18, 2) } 
-        <img alt=""
-          src={tinyShellIcon} 
-          style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} 
-        /> 
-    </span>)
+        <img alt="" src={tinyShellIcon} style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} /> 
+      </span>
+    )
 
     if (slippage.isNegative()) {
-      setFeeMessage(<div> You will burn {shells} and pay a {Math.abs(slippage.toFixed(4))} % fee to liquidity providers </div> )
+      
+      setFeeMessage( <div> You will burn {shells} and pay a { Math.abs(slippage.toFixed(4)) } % fee to liquidity providers </div> )
+
     } else {
-      setFeeMessage(<div> You will burn {shells} and earn a {slippage.toFixed(4)} % rebalancing subsidy </div>)
+
+      setFeeMessage( <div> You will burn {shells} and earn a {slippage.toFixed(4)} % rebalancing subsidy </div> )
+
     }
 
   }
@@ -270,7 +285,7 @@ const StartModal = ({
           <StyledRows>
             <StyledShells>
                 <StyledShellIcon src={shellIcon}/>
-                <StyledShellBalance> { displayAmount(balances.shell, 18, 2) + ' Shells'} </StyledShellBalance>
+                <StyledShellBalance> { displayAmount(balances.shells, 18, 2) + ' Shells'} </StyledShellBalance>
             </StyledShells>
             <StyledFeeMessage> { feeMessage } </StyledFeeMessage>
             <TokenInput

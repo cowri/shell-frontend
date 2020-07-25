@@ -22,7 +22,7 @@ const withWallet = (WrappedComponent) => {
     const [networkId, setNetworkId] = useState(1)
     const [walletBalances, setWalletBalances] = useState({})
 
-    const fetchAllowances = async (_account, _contracts) => {
+    const fetchAllowances = async (_contracts, _account) => {
       const allowances = await getAllowances(contracts, account)
       window.allowances = allowances
       setAllowances(allowances)
@@ -35,13 +35,13 @@ const withWallet = (WrappedComponent) => {
     }
 
     const fetchWalletBalances = async () => {
-      const walletBalances = await getWalletBalances(account, contracts)
+      const walletBalances = await getWalletBalances(contracts, account)
       window.walletBalances = walletBalances
       setWalletBalances(walletBalances)
     }
     
-    const fetchBalances = async (_account, _loihi, _liquidity) => {
-      const balances = await getLoihiBalances( account, loihi, liquidity)
+    const fetchBalances = async (_liquidity, _loihi, _account) => {
+      const balances = await getLoihiBalances(liquidity, loihi, account)
       window.balances = balances
       setBalances(balances)
     }
@@ -65,7 +65,6 @@ const withWallet = (WrappedComponent) => {
         const web3 = new Web3(window.ethereum)
         const accounts = await web3.eth.getAccounts()
         const networkId = await web3.eth.net.getId()
-
 
         setWeb3(web3)
         setNetworkId(networkId)

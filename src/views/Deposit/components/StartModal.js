@@ -78,7 +78,7 @@ const StartModal = ({
   onDeposit,
   onDismiss,
   onUnlock,
-  reserves,
+  liquidity,
   unlocking,
   walletBalances,
 }) => {
@@ -187,8 +187,6 @@ const StartModal = ({
       bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputValue ? susdInputValue : 0, contracts.susd.decimals).toFixed(),
     ]
 
-    console.log("amounts", amounts);
-
     const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
     if (sum.isZero()) return setFeeMessage('')
 
@@ -201,52 +199,34 @@ const StartModal = ({
       setError('')
     }
 
-    const numeraireAmounts = [
-      new BigNumber(await contracts.dai.adapter.methods.viewNumeraireAmount(amounts[0]).call()),
-      new BigNumber(await contracts.usdc.adapter.methods.viewNumeraireAmount(amounts[1]).call()),
-      new BigNumber(await contracts.usdt.adapter.methods.viewNumeraireAmount(amounts[2]).call()),
-      new BigNumber(await contracts.susd.adapter.methods.viewNumeraireAmount(amounts[3]).call())
-    ]
+    const totalDeposit = bnAmount(inputPayload.type === 'dai' ? inputPayload.value : daiInputValue, 18)
+      .plus(bnAmount(inputPayload.type === 'usdc' ? inputPayload.value : usdcInputValue, 18))
+      .plus(bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputValue, 18))
+      .plus(bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputValue, 18))
 
-    const totalDeposit = numeraireAmounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
+    const liquidityChange = totalDeposit.dividedBy(liquidity.total)
+    const shellsChange = shellsToMint.dividedBy(balances.total)
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
 
-    const reservesChange = totalDeposit.dividedBy(reserves.totalReserves)
-    const shellsChange = shellsToMint.dividedBy(balances.totalShells)
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(reservesChange)).multipliedBy(100)
+    const slippageMessage = slippage.absoluteValue().isGreaterThan(0.0001)
+      ? slippage.isNegative()
+        ? <span> and earn a { Math.abs(slippage.toFixed(4)) } % rebalancing subsidy </span> 
+        : <span> and pay a { slippage.toFixed(4) } % fee to liquidity providers </span>
+      : ''
+    
+    const feeMessage = <div>
+      You will mint 
+        <span style={{position: 'relative', paddingRight: '17.5px'}}> 
+          { displayAmount(shellsToMint, 18, 2) } 
+          <img alt="" 
+            src={shellIcon} 
+            style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
+          /> 
+        </span> 
+      { slippageMessage }
+    </div>
 
-    if (slippage.isNegative()) {
-
-      const feeMessage = <div>
-        You will mint 
-          <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-            { displayAmount(shellsToMint, 18, 2) } 
-            <img alt="" 
-              src={shellIcon} 
-              style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
-            /> 
-          </span> 
-        and earn a { Math.abs(slippage.toFixed(4)) } % rebalancing subsidy
-      </div>
-
-      setFeeMessage(feeMessage)
-      
-    } else {
-
-      const feeMessage = <div>
-        You will mint 
-          <span style={{position:'relative', paddingRight: '17.5px' }}> 
-            { displayAmount(shellsToMint, 18, 2) } 
-            <img alt="" 
-              src={shellIcon} 
-              style={{position:'absolute', top: '0px', right: '5px', height: '20px'}} 
-            /> 
-          </span> 
-        and pay a { slippage.toFixed(4) } % fee to liquidity providers
-      </div>
-
-      setFeeMessage(feeMessage)
-        
-    }
+    setFeeMessage(feeMessage)
 
   }
 

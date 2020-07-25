@@ -168,8 +168,6 @@ const SwapTab = () => {
 
     async function setSwap (swapPayload)  {
 
-      console.log("setSwap", arguments)
-
       const value = Number(+swapPayload.value)
 
       if (swapPayload.type === 'origin'){
@@ -228,8 +226,6 @@ const SwapTab = () => {
 
     async function getChickens (type, value) {
 
-      console.log("getChickens", arguments)
-
       let theseChickens, thoseChickens
 
       if (value === 0) {
@@ -241,10 +237,9 @@ const SwapTab = () => {
 
       } else if (type === 'origin') {
 
-
         setOriginValue(value)
         theseChickens = bnAmount(value, origin.decimals)
-        thoseChickens = new BigNumber(await loihi.methods.viewOriginTrade(
+        thoseChickens = new BigNumber(await loihi.methods.viewOriginSwap(
           origin.options.address,
           target.options.address,
           theseChickens.toFixed()
@@ -254,7 +249,7 @@ const SwapTab = () => {
 
         setTargetValue(value)
         theseChickens = bnAmount(value, target.decimals)
-        thoseChickens = new BigNumber(await loihi.methods.viewTargetTrade(
+        thoseChickens = new BigNumber(await loihi.methods.viewTargetSwap(
           origin.options.address,
           target.options.address,
           theseChickens.toFixed()
@@ -327,14 +322,13 @@ const SwapTab = () => {
       if (thoseChickens.comparedTo(reverted) === 0) return setPriceMessage('')
       if (theseChickens.isZero() || thoseChickens.isZero()) return setPriceMessage('')
 
+      console.log("these chickens", theseChickens.toFixed())
+      console.log("those chickens", thoseChickens.toFixed())
+
       let oNAmt, tNAmt
-      if (type === 'origin') {
-        oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
-        tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
-      } else {
-        oNAmt = new BigNumber(await origin.adapter.methods.viewNumeraireAmount(thoseChickens.toFixed()).call())
-        tNAmt = new BigNumber(await target.adapter.methods.viewNumeraireAmount(theseChickens.toFixed()).call())
-      }
+
+      oNAmt = type === 'origin' ? theseChickens : thoseChickens
+      tNAmt = type === 'origin' ? thoseChickens : theseChickens
 
       const tPrice = tNAmt.dividedBy(oNAmt).toFixed(4)
 
@@ -374,7 +368,7 @@ const SwapTab = () => {
       targetInput = targetValue
     }
 
-    const tx = loihi.methods[swapType === 'origin' ? 'swapByOrigin' : 'swapByTarget'](
+    const tx = loihi.methods[swapType === 'origin' ? 'originSwap' : 'targetSwap'](
       origin.options.address,
       target.options.address,
       bnAmount(originInput, origin.decimals).toFixed(),
@@ -493,16 +487,25 @@ const SwapTab = () => {
 
 
   let toolTipMsg = ''
+  
   if (originError){ 
+
     if (originError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
+
     else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
+
   } else if (targetError) {
+
     if (targetError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
+
     else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
+
   }
 
   if (initiallyLocked && !unlocked) {
+
     toolTipMsg = 'You must unlock ' + origin.symbol + ' to swap'
+
   }
 
   const inputStyles = makeStyles({

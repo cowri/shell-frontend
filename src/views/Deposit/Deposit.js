@@ -22,7 +22,7 @@ const Deposit = ({
     onUpdateBalances,
     onUpdateLiquidity,
     onUpdateWalletBalances,
-    reserves,
+    liquidity,
     walletBalances
   } = useContext(DashboardContext)
 
@@ -36,7 +36,7 @@ const Deposit = ({
     setStep('confirmingMetamask')
 
     const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
-    
+
     tx.send({ from: account })
       .on('transactionHash', () => setStep('depositing'))
       .once('confirmation', handleConfirmation)
@@ -91,7 +91,7 @@ const Deposit = ({
           onDismiss={onDismiss}
           onDeposit={handleDeposit}
           onUnlock={handleUnlock}
-          reserves={reserves}
+          liquidity={liquidity}
           unlocking={unlocking}
           walletBalances={walletBalances}
         />

@@ -19,7 +19,7 @@ const Withdraw = ({
     onUpdateBalances,
     onUpdateLiquidity,
     onUpdateWalletBalances,
-    reserves,
+    liquidity,
   } = useContext(DashboardContext)
 
   const [step, setStep] = useState('start')
@@ -31,9 +31,9 @@ const Withdraw = ({
 
     let tx
     if (withdrawEverything) {
-      tx = contracts.loihi.methods.proportionalWithdraw(balances.shell.toFixed())
+      tx = contracts.loihi.methods.proportionalWithdraw(balances.shells.toFixed())
     } else {
-      tx = contracts.loihi.methods.selectiveWithdraw(addresses, amounts, balances.shell.toFixed(), Date.now())
+      tx = contracts.loihi.methods.selectiveWithdraw(addresses, amounts, balances.shells.toFixed(), Date.now())
     }
 
     tx.send({ from: account })
@@ -42,13 +42,16 @@ const Withdraw = ({
       .on('error', () => setStep('error'))
 
     function handleConfirmation () {
+      console.log("confirmation")
+      setStep('success')
       onUpdateBalances()
       onUpdateLiquidity()
       onUpdateWalletBalances()
-      setStep('succes')
     }
 
   }
+
+  console.log("step", step)
 
   return (
     <>
@@ -58,7 +61,7 @@ const Withdraw = ({
           contracts={contracts}
           onDismiss={onDismiss}
           onWithdraw={handleWithdraw}
-          reserves={reserves}
+          liquidity={liquidity}
           setWithdrawEverything={setWithdrawEverything}
           withdrawEverything={withdrawEverything}
         />
@@ -79,6 +82,7 @@ const Withdraw = ({
       {step === 'error' && (
         <ModalError buttonBlurb={'Finish'} onDismiss={onDismiss} title={'An error occurred.'} />
       )}
+      
     </>
   )
 }

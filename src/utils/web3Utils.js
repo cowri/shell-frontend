@@ -4,18 +4,12 @@ import config from '../kovan.config.json'
 
 import erc20ABI from '../abi/ERC20.abi.json'
 import loihiABI from '../abi/Loihi.abi.json'
+import assimilatorABI from '../abi/Assimilator.abi.json'
 
 import daiIcon from '../assets/dai.svg'
 import usdcIcon from '../assets/usdc.svg'
 import usdtIcon from '../assets/usdt.svg'
 import susdIcon from '../assets/susd.svg'
-
-const loihiAddress = config.LOIHI
-
-const daiAddress = config.DAI
-const usdcAddress = config.USDC
-const usdtAddress = config.USDT
-const susdAddress = config.SUSD
 
 export const displayAmount = (value, decimals, precision) => {
 
@@ -66,6 +60,9 @@ export const getLiquidity = async (loihi) => {
 
 export const getWalletBalances = async (contracts, walletAddress) => {
 
+  console.log("contracts", contracts)
+  console.log("walletAddress", walletAddress)
+
   return {
     dai: new BigNumber(await contracts.dai.methods.balanceOf(walletAddress).call()),
     usdc: new BigNumber(await contracts.usdc.methods.balanceOf(walletAddress).call()),
@@ -78,10 +75,10 @@ export const getWalletBalances = async (contracts, walletAddress) => {
 export const getAllowances = async (contracts, walletAddress) => {
 
   return {
-    dai: new BigNumber(await contracts.dai.methods.allowance(walletAddress, loihiAddress).call()),
-    usdc: new BigNumber(await contracts.usdc.methods.allowance(walletAddress, loihiAddress).call()),
-    usdt: new BigNumber(await contracts.usdt.methods.allowance(walletAddress, loihiAddress).call()),
-    susd: new BigNumber(await contracts.susd.methods.allowance(walletAddress, loihiAddress).call())
+    dai: new BigNumber(await contracts.dai.methods.allowance(walletAddress, config.LOIHI).call()),
+    usdc: new BigNumber(await contracts.usdc.methods.allowance(walletAddress, config.LOIHI).call()),
+    usdt: new BigNumber(await contracts.usdt.methods.allowance(walletAddress, config.LOIHI).call()),
+    susd: new BigNumber(await contracts.susd.methods.allowance(walletAddress, config.LOIHI).call())
   }
   
 }
@@ -89,10 +86,10 @@ export const getAllowances = async (contracts, walletAddress) => {
 export const getContracts = function (web3) {
 
     const contractObjects = [
-      new web3.eth.Contract(erc20ABI, daiAddress),
-      new web3.eth.Contract(erc20ABI, usdcAddress),
-      new web3.eth.Contract(erc20ABI, usdtAddress),
-      new web3.eth.Contract(erc20ABI, susdAddress)
+      new web3.eth.Contract(erc20ABI, config.DAI),
+      new web3.eth.Contract(erc20ABI, config.USDC),
+      new web3.eth.Contract(erc20ABI, config.USDT),
+      new web3.eth.Contract(erc20ABI, config.SUSD)
     ]
 
     contractObjects[0].name = 'MultiCollateral Dai'
@@ -120,12 +117,23 @@ export const getContracts = function (web3) {
     contractObjects[2].getDisplay = function (amount) { return displayAmount(amount, 6) }
     contractObjects[3].getDisplay = function (amount) { return displayAmount(amount, 6) }
 
+
+    function getNumeraireAmount (amount) { 
+      console.log("amount", amount)
+      // return amount.multipliedBy(new BigNumber(10).pow(18 - this.decimals)) 
+    }
+
+    contractObjects[0].getNumeraireAmount = getNumeraireAmount
+    contractObjects[1].getNumeraireAmount = getNumeraireAmount
+    contractObjects[2].getNumeraireAmount = getNumeraireAmount
+    contractObjects[3].getNumeraireAmount = getNumeraireAmount
+
     return {
       erc20s: contractObjects,
       dai: contractObjects[0],
       usdc: contractObjects[1],
       usdt: contractObjects[2],
       susd: contractObjects[3],
-      loihi: new web3.eth.Contract(loihiABI, loihiAddress)
+      loihi: new web3.eth.Contract(loihiABI, config.LOIHI)
     }
 }
