@@ -68,7 +68,7 @@ const PoolTab = () => {
 
   window.poolTabBalances = balances
 
-  const totalBalance = balances.shells ? `$${displayAmount(balances.shells, 18, 2)}` : '--'
+  const totalBalance = balances.value ? `$${displayAmount(balances.value, 18, 2)}` : '--'
   const totalPoolLiquidity = liquidity.total ? `$${displayAmount(liquidity.total, 18, 2)}` : '--'
 
   const daiLiquidityDisplay = liquidity.dai ? `$${displayAmount(liquidity.dai, 18, 2)}` : '--'

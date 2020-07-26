@@ -337,15 +337,23 @@ const SwapTab = () => {
 
       let message = ''
       if (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') {
+
         message += '$1.00 of ' + oSymbol + ' is worth '
+
       } else {
+
         message += '1.0000 ' + oSymbol + ' is worth '
+
       }
 
       if (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI') {
+
         message += '$' + tPrice + ' of ' + tSymbol + ' for this trade'
+        
       } else {
+
         message += tPrice + ' ' + tSymbol + ' for this trade'
+        
       }
 
       setPriceMessage(message)
@@ -487,7 +495,7 @@ const SwapTab = () => {
 
 
   let toolTipMsg = ''
-  
+
   if (originError){ 
 
     if (originError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'

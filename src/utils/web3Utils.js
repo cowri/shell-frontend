@@ -32,10 +32,12 @@ export const getLoihiBalances = async function (liquidity, loihi, walletAddress)
   const shells = new BigNumber(await loihi.methods.balanceOf(walletAddress).call())
   const total = new BigNumber(await loihi.methods.totalSupply().call())
   const liqRatio = shells.dividedBy(total)
+  const value = liquidity.total.multipliedBy(liqRatio)
 
   return {
     total,
     shells,
+    value,
     dai: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.dai),
     usdc: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.usdc).dividedBy(1e12),
     usdt: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.usdt).dividedBy(1e12),

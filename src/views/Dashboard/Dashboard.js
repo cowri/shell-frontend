@@ -71,8 +71,6 @@ const Dashboard = ({
     return <DashboardContent />
   }
 
-  console.log("what is withdraw modal doing", withdrawModal)
-
   return (
     <>
       <DashboardContext.Provider value={{
@@ -86,7 +84,7 @@ const Dashboard = ({
         onUpdateLiquidity,
         onUpdateWalletBalances,
         presentDeposit: () => setDepositModal(true),
-        presentWithdraw: () => { console.log("presnt withdraw"); setWithdrawModal(true) },
+        presentWithdraw: () => { setWithdrawModal(true) },
         liquidity,
         walletBalances,
         web3,
