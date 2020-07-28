@@ -31,9 +31,6 @@ const Withdraw = ({
 
     setStep('confirmingMetamask')
 
-    console.log("addresses", addresses)
-    console.log("amounts", amounts)
-
     const tx = withdrawEverything
       ? loihi.proportionalWithdraw(loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)
       : loihi.selectiveWithdraw(addresses, amounts, loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)

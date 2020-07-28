@@ -100,7 +100,7 @@ const Dashboard = ({
             <Footer />
           </StyledDashboard>
           {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
-          {withdrawModal && <Withdraw onDismiss={() => { console.log("dismissed wthdrw"); setWithdrawModal(false)}} />}
+          {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
       </DashboardContext.Provider>
 
     </>

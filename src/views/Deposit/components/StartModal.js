@@ -103,7 +103,6 @@ const StartModal = ({
       setToolTip('Deposit amounts trigger halt check')
 
     } else {
-      console.log("payload.trigger", payload.trigger)
 
       payload.setter(payload.trigger ? 'amount is greater than your balance' : '')
 
@@ -147,8 +146,6 @@ const StartModal = ({
   const availableUsdc = walletBalances.usdc ? contracts.usdc.getDisplayFromNumeraire(walletBalances.usdc, 4) : '--'
   const availableUsdt = walletBalances.usdt ? contracts.usdt.getDisplayFromNumeraire(walletBalances.usdt, 4) : '--'
   const availableSusd = walletBalances.susd ? contracts.susd.getDisplayFromNumeraire(walletBalances.susd, 4) : '--'
-
-  console.log("available dai", availableDai)
 
   const handleInput = (e, type, setter) => {
     e.preventDefault()

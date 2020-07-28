@@ -126,23 +126,6 @@ const withWallet = (WrappedComponent) => {
 
     }, [])
 
-    // useEffect(() => {
-    //   console.log("ping liq")
-    //   if (loihi) {
-    //     console.log("loihi", loihi)
-    //     updateLiquidity(loihi)
-    //   }
-    // }, [loihi])
-
-    // // init liquidity, allowances, balances, wallet balances
-    // useEffect(() => {
-    //   if (account && liquidity) {
-    //     updateAllowances()
-    //     updateBalances()
-    //     updateWalletBalances()
-    //   }
-    // }, [liquidity])
-
     return (
       <>
         <WrappedComponent
