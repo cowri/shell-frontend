@@ -96,12 +96,6 @@ const StartModal = ({
   withdrawEverything
 }) => {
 
-  const viewRevertedValue = new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')
-
-  console.log("balances", balances)
-  window.liquidity = liquidity
-  window.balances = balances
-
   const [daiInputAmt, setDaiInputAmt] = useState('')
   const [usdcInputAmt, setUsdcInputAmt] = useState('')
   const [usdtInputAmt, setUsdtInputAmt] = useState('')
@@ -186,7 +180,7 @@ const StartModal = ({
       setUsdtInputAmt('')
       setSusdInputAmt('')
       setFeeMessage('')
-      
+
     }
 
   }
@@ -231,7 +225,7 @@ const StartModal = ({
 
     const shellsToBurn = await loihi.viewSelectiveWithdraw(addresses, amounts)
 
-    if (shellsToBurn.comparedTo(viewRevertedValue) === 0) {
+    if (shellsToBurn === false) {
 
       setError('This amount triggers the halt check')
 

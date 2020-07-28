@@ -51,7 +51,6 @@ export class Loihi extends NumericFormats {
         super()
 
         this.contract = new web3.eth.Contract(LoihiABI, address)
-        console.log("loihi contract", this.contract.methods.viewSelectiveDeposit)
         this.address = address
         this.name = name
         this.symbol = symbol
@@ -91,10 +90,18 @@ export class Loihi extends NumericFormats {
     }
 
     async viewSelectiveDeposit (addresses, amounts) {
+        
+        try {
 
-        const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(addresses, amounts).call() )
+            const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(addresses, amounts).call() )
 
-        return this.getNumeraireFromRaw(shells)
+            return this.getNumeraireFromRaw(shells)
+
+        } catch {
+
+            return false
+
+        }
 
     }
 
@@ -106,9 +113,17 @@ export class Loihi extends NumericFormats {
 
     async viewSelectiveWithdraw (addresses, amounts) {
 
-        const shellsToBurn = new BigNumber( await this.contract.methods.viewSelectiveWithdraw(addresses, amounts).call() )
+        try {
 
-        return this.getNumeraireFromRaw(shellsToBurn)
+            const shellsToBurn = new BigNumber( await this.contract.methods.viewSelectiveWithdraw(addresses, amounts).call() )
+
+            return this.getNumeraireFromRaw(shellsToBurn)
+
+        } catch {
+            
+            return false
+
+        }
 
     }
 
@@ -126,13 +141,29 @@ export class Loihi extends NumericFormats {
 
     async viewOriginSwap (origin, target, amount) {
 
-        return new BigNumber( await this.contract.methods.viewOriginSwap(origin, target, amount).call() )
+        try {
+
+            return new BigNumber( await this.contract.methods.viewOriginSwap(origin, target, amount).call() )
+
+        } catch { 
+
+            return false
+
+        }
 
     }
 
     async viewTargetSwap (origin, target, amount) {
 
-       return new BigNumber( await this.contract.methods.viewTargetSwap(origin, target, amount).call() )
+        try {
+
+            return new BigNumber( await this.contract.methods.viewTargetSwap(origin, target, amount).call() )
+
+        } catch {
+
+            return false 
+
+        }
         
     }
 

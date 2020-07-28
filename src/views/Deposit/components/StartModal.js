@@ -165,8 +165,6 @@ const StartModal = ({
 
   const primeDeposit = async (payload) => {
 
-    const viewRevertedValue = new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')
-
     if ( contracts[payload.type].getNumeraireFromDisplay(payload.value).isGreaterThan(walletBalances[payload.type]) ) {
 
       if (payload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: true, type: 'dai'})
@@ -206,7 +204,7 @@ const StartModal = ({
 
     const shellsToMint = await loihi.viewSelectiveDeposit(addresses, amounts)
 
-    if (shellsToMint.comparedTo(viewRevertedValue) === 0) {
+    if (shellsToMint === false) {
 
       setError('This amount triggers the halt check')
 
@@ -224,7 +222,7 @@ const StartModal = ({
       .plus(contracts.susd.getNumeraireFromDisplay(susdAmount))
 
     const liquidityChange = totalDeposit.dividedBy(liquidity.total)
-    
+
     const shellsChange = shellsToMint.dividedBy(balances.total)
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))

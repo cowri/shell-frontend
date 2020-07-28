@@ -106,15 +106,12 @@ const SwapTab = () => {
     account,
     allowances,
     contracts,
+    updateAllState,
     updateAllowances,
     updateBalances,
     updateWalletBalances,
     walletBalances,
   } = useContext(DashboardContext)
-
-  console.log("contracts", contracts)
-
-  const viewRevertedValue = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
 
   const erc20s = contracts.erc20s
   const loihi = contracts.loihi
@@ -133,17 +130,14 @@ const SwapTab = () => {
   const [priceMessage, setPriceMessage] = useState('')
   const [txHash, setTxHash] = useState('')
 
-
   const origin = erc20s[originSlot]
   const target = erc20s[targetSlot]
 
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
 
-  const originAvailable = walletBalances[origin.symbol.toLowerCase()]
-    ? displayAmount(walletBalances[origin.symbol.toLowerCase()], origin.decimals, 4) : 0
-  const targetAvailable = walletBalances[target.symbol.toLowerCase()]
-    ? displayAmount(walletBalances[target.symbol.toLowerCase()], target.decimals, 4) : 0
+  const originAvailable = origin.getDisplayFromNumeraire(walletBalances[origin.symbol.toLowerCase()], 4)
+  const targetAvailable = target.getDisplayFromNumeraire(walletBalances[target.symbol.toLowerCase()], 4)
 
   const initiallyLocked = allowances[origin.symbol.toLowerCase()] === 0
   const [unlocked, setUnlocked] = useState(false)
@@ -195,8 +189,6 @@ const SwapTab = () => {
     function setSlots (slotPayload) {
       let origin, target
 
-      console.log("setSlots", arguments)
-
       if (slotPayload.type === 'origin') {
 
         setOriginSlot(slotPayload.value)
@@ -245,11 +237,15 @@ const SwapTab = () => {
 
         theseChickens = origin.getNumeraireFromDisplay(value)
 
-        thoseChickens = target.getNumeraireFromRaw( await loihi.viewOriginSwap(
+        const targetAmount = await loihi.viewOriginSwap(
           origin.address,
           target.address,
           origin.getRawFromNumeraire(theseChickens)
-        ))
+        )
+
+        thoseChickens = targetAmount !== false 
+          ? target.getNumeraireFromRaw(targetAmount)
+          : false
 
       } else if (type === 'target') {
 
@@ -257,11 +253,15 @@ const SwapTab = () => {
 
         theseChickens = target.getNumeraireFromDisplay(value)
 
-        thoseChickens = origin.getNumeraireFromRaw( await loihi.viewTargetSwap(
+        const originAmount = await loihi.viewTargetSwap(
           origin.address,
           target.address,
           target.getRawFromNumeraire(theseChickens)
-        ))
+        )
+
+        thoseChickens = originAmount !== false 
+          ? origin.getNumeraireFromRaw(originAmount)
+          : false
 
       }
 
@@ -274,7 +274,7 @@ const SwapTab = () => {
 
       const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
       
-      if (thoseChickens.comparedTo(viewRevertedValue) === 0) {
+      if (thoseChickens === false) {
         
         type === 'origin' ? setOriginError(true) : setTargetError(true)
         type === 'origin' ? setTargetValue('') : setOriginValue('')
@@ -323,46 +323,25 @@ const SwapTab = () => {
 
     async function setPriceIndication (type, theseChickens, thoseChickens) {
 
-      const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
-      if (theseChickens.comparedTo(reverted) === 0) return setPriceMessage('')
-      if (thoseChickens.comparedTo(reverted) === 0) return setPriceMessage('')
+      if (thoseChickens === false) return setPriceMessage('')
       if (theseChickens.isZero() || thoseChickens.isZero()) return setPriceMessage('')
-
-      console.log("these chickens", theseChickens.toFixed())
-      console.log("those chickens", thoseChickens.toFixed())
 
       const oNAmt = type === 'origin' ? theseChickens : thoseChickens
       const tNAmt = type === 'origin' ? thoseChickens : theseChickens
-
-      console.log("oNAmt", oNAmt)
-      console.log("tNAmt", tNAmt)
 
       const tPrice = tNAmt.dividedBy(oNAmt).toFixed(4)
 
       const oSymbol = origin.symbol
       const tSymbol = target.symbol
 
-      let message = ''
-      if (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') {
+      let message = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
+        ? '$1.00 of ' + oSymbol + ' is worth '
+        : '1.0000 ' + oSymbol + ' is worth '
 
-        message += '$1.00 of ' + oSymbol + ' is worth '
-
-      } else {
-
-        message += '1.0000 ' + oSymbol + ' is worth '
-
-      }
-
-      if (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI') {
-
-        message += '$' + tPrice + ' of ' + tSymbol + ' for this trade'
-
-      } else {
-
-        message += tPrice + ' ' + tSymbol + ' for this trade'
+      message += (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI')
+        ? '$' + tPrice + ' of ' + tSymbol + ' for this trade'
+        : tPrice + ' ' + tSymbol + ' for this trade'
         
-      }
-
       setPriceMessage(message)
 
     }
@@ -418,8 +397,7 @@ const SwapTab = () => {
       setOriginValue('0')
       setTargetValue('0')
       setStep('success')
-      updateBalances()
-      updateWalletBalances()
+      updateAllState()
     }
 
     function handleError () {

@@ -23,6 +23,7 @@ const withWallet = (WrappedComponent) => {
     const [walletBalances, setWalletBalances] = useState({})
 
     const updateAllState = async () => {
+
       const _allowances = await getAllowances(contracts, account)
       const _liquidity = await getLiquidity(loihi)
       const _walletBalances = await getWalletBalances(contracts, account)
@@ -36,39 +37,51 @@ const withWallet = (WrappedComponent) => {
     }
 
     const updateAllowances = async (_contracts, _account) => {
+
       const allowances = await getAllowances(contracts, account)
-      window.allowances = allowances
+
       setAllowances(allowances)
+      
     }
 
     const updateLiquidity = async () => {
+
       const liquidity = await getLiquidity(loihi)
-      window.liquidity = liquidity
+
       setLiquidity(liquidity)
+      
     }
 
     const updateWalletBalances = async () => {
+
       const walletBalances = await getWalletBalances(contracts, account)
-      window.walletBalances = walletBalances
+
       setWalletBalances(walletBalances)
+
     }
     
     const updateBalances = async (_liquidity, _loihi, _account) => {
+
       const balances = await getLoihiBalances(liquidity, loihi, account)
-      console.log("set balances", balances)
-      window.balances = balances
+
       setBalances(balances)
+
     }
 
     const handleEnable = () => {
+
       return new Promise((resolve, reject) => {
-        window.ethereum.enable()
-          .then(accounts => {
-            setAccount(accounts[0])
-            resolve(accounts)
-          })
-          .catch(e => reject(e))
+
+        window.ethereum.enable().then(accounts => {
+
+          setAccount(accounts[0])
+
+          resolve(accounts)
+
+        }).catch(e => reject(e))
+
       })
+
     }
 
     // init application
@@ -85,7 +98,6 @@ const withWallet = (WrappedComponent) => {
         setAccount(accounts[0])
 
         const _contracts = getContracts(web3)
-        window.contracts = _contracts
 
         const _liquidity = await getLiquidity(_contracts.loihi)
         const _allowances = await getAllowances(_contracts, accounts[0])
