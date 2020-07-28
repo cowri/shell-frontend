@@ -18,10 +18,12 @@ const Deposit = ({
     allowances,
     balances,
     contracts,
-    onUpdateAllowances,
-    onUpdateBalances,
-    onUpdateLiquidity,
-    onUpdateWalletBalances,
+    loihi,
+    updateAllState,
+    updateAllowances,
+    updateBalances,
+    updateLiquidity,
+    updateWalletBalances,
     liquidity,
     walletBalances
   } = useContext(DashboardContext)
@@ -35,7 +37,7 @@ const Deposit = ({
   const handleDeposit = async (addresses, amounts) => {
     setStep('confirmingMetamask')
 
-    const tx = contracts.loihi.methods.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+    const tx = loihi.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
 
     tx.send({ from: account })
       .on('transactionHash', () => setStep('depositing'))
@@ -44,9 +46,10 @@ const Deposit = ({
 
     function handleConfirmation () {
       setStep('deposit-success')
-      onUpdateBalances()
-      onUpdateLiquidity()
-      onUpdateWalletBalances()
+      updateAllState()
+      // updateBalances()
+      // updateLiquidity()
+      // updateWalletBalances()
     }
 
   }
@@ -55,7 +58,8 @@ const Deposit = ({
     setStep('confirmingMetamask')
 
     // Should be abstracted to web3Utils / withWallet
-    const tx = contracts[tokenKey].methods.approve(contracts.loihi.options.address, '115792089237316195423570985008687907853269984665640564039457584007913129639935')
+    const tx = contracts[tokenKey].approve(loihi.address, '115792089237316195423570985008687907853269984665640564039457584007913129639935')
+
     tx.send({ from: account })
       .once('transactionHash', txHash)
       .once('confirmation', confirmation)
@@ -69,7 +73,7 @@ const Deposit = ({
 
       function confirmation () {
         setUnlocking({...unlocking, [tokenKey]: false })
-        onUpdateAllowances()
+        updateAllowances()
         setStep('unlocking-success')
       }
 
@@ -88,6 +92,7 @@ const Deposit = ({
           allowances={allowances}
           balances={balances}
           contracts={contracts}
+          loihi={loihi}
           onDismiss={onDismiss}
           onDeposit={handleDeposit}
           onUnlock={handleUnlock}

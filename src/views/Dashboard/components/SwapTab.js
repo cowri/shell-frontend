@@ -106,11 +106,15 @@ const SwapTab = () => {
     account,
     allowances,
     contracts,
-    onUpdateAllowances,
-    onUpdateBalances,
-    onUpdateWalletBalances,
+    updateAllowances,
+    updateBalances,
+    updateWalletBalances,
     walletBalances,
   } = useContext(DashboardContext)
+
+  console.log("contracts", contracts)
+
+  const viewRevertedValue = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
 
   const erc20s = contracts.erc20s
   const loihi = contracts.loihi
@@ -238,23 +242,26 @@ const SwapTab = () => {
       } else if (type === 'origin') {
 
         setOriginValue(value)
-        theseChickens = bnAmount(value, origin.decimals)
-        thoseChickens = new BigNumber(await loihi.methods.viewOriginSwap(
-          origin.options.address,
-          target.options.address,
-          theseChickens.toFixed()
-        ).call())
+
+        theseChickens = origin.getNumeraireFromDisplay(value)
+
+        thoseChickens = target.getNumeraireFromRaw( await loihi.viewOriginSwap(
+          origin.address,
+          target.address,
+          origin.getRawFromNumeraire(theseChickens)
+        ))
 
       } else if (type === 'target') {
 
         setTargetValue(value)
-        theseChickens = bnAmount(value, target.decimals)
-        thoseChickens = new BigNumber(await loihi.methods.viewTargetSwap(
-          origin.options.address,
-          target.options.address,
-          theseChickens.toFixed()
-        ).call())
 
+        theseChickens = target.getNumeraireFromDisplay(value)
+
+        thoseChickens = origin.getNumeraireFromRaw( await loihi.viewTargetSwap(
+          origin.address,
+          target.address,
+          target.getRawFromNumeraire(theseChickens)
+        ))
 
       }
 
@@ -265,52 +272,51 @@ const SwapTab = () => {
 
     function setValues (type, theseChickens, thoseChickens) {
 
-      const reverted = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
       const availableOrigin = walletBalances[origin.symbol.toLowerCase()]
+      
+      if (thoseChickens.comparedTo(viewRevertedValue) === 0) {
+        
+        type === 'origin' ? setOriginError(true) : setTargetError(true)
+        type === 'origin' ? setTargetValue('') : setOriginValue('')
+        type === 'origin' ? setOriginHelperText(haltCheckMessage) : setTargetHelperText(haltCheckMessage)
+
+        return
+        
+      } 
 
       if (type === 'origin') {
 
         setTargetHelperText('')
         setTargetError(false)
 
-        if (thoseChickens.comparedTo(reverted) === 0) {
-          setOriginError(true)
-          setOriginHelperText(haltCheckMessage)
-          setTargetValue('')
-          return
-        } 
-
         if (theseChickens.isGreaterThan(availableOrigin)) {
           setOriginError(true)
           setOriginHelperText(insufficientBalanceMessage)
-          setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
         } else {
           setOriginError(false)
           setOriginHelperText('')
-          setTargetValue(displayAmount(thoseChickens, target.decimals, 4))
         }
+        
+        setTargetValue(origin.getDisplayFromNumeraire(thoseChickens, 4))
 
       } else if (type === 'target') {
 
         setOriginHelperText('')
         setOriginError(false)
 
-        if (thoseChickens.comparedTo(reverted) === 0) {
-          setOriginValue('')
-          setTargetError(true)
-          setTargetHelperText(haltCheckMessage)
-          return 
-        }
-
         if (thoseChickens.isGreaterThan(availableOrigin)) {
-          setOriginValue(String(displayAmount(thoseChickens, origin.decimals, 4)))
+
           setTargetHelperText('equivalent ' + origin.symbol + ' ' + insufficientBalanceMessage)
           setTargetError(true)
+
         } else {
-          setOriginValue(String(displayAmount(thoseChickens, origin.decimals, 4)))
+
           setTargetHelperText('')
           setTargetError(false)
+
         }
+
+        setOriginValue(origin.getDisplayFromNumeraire(thoseChickens, 4))
 
       }
     }
@@ -325,10 +331,11 @@ const SwapTab = () => {
       console.log("these chickens", theseChickens.toFixed())
       console.log("those chickens", thoseChickens.toFixed())
 
-      let oNAmt, tNAmt
+      const oNAmt = type === 'origin' ? theseChickens : thoseChickens
+      const tNAmt = type === 'origin' ? thoseChickens : theseChickens
 
-      oNAmt = type === 'origin' ? theseChickens : thoseChickens
-      tNAmt = type === 'origin' ? thoseChickens : theseChickens
+      console.log("oNAmt", oNAmt)
+      console.log("tNAmt", tNAmt)
 
       const tPrice = tNAmt.dividedBy(oNAmt).toFixed(4)
 
@@ -349,7 +356,7 @@ const SwapTab = () => {
       if (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI') {
 
         message += '$' + tPrice + ' of ' + tSymbol + ' for this trade'
-        
+
       } else {
 
         message += tPrice + ' ' + tSymbol + ' for this trade'
@@ -363,24 +370,37 @@ const SwapTab = () => {
   }
 
   const handleSwap = async (e) => {
-    e.preventDefault()
-    setStep('confirmingMetamask')
 
+    e.preventDefault()
+
+    setStep('confirmingMetamask')
 
     let originInput, targetInput
     if (swapType === 'origin') {
-      originInput = originValue
-      targetInput = Math.floor(targetValue * .99)
+
+      originInput = origin.getRawFromDisplay(originValue)
+
+      const targetNumeraire = target.getNumeraireFromDisplay(targetValue)
+        .multipliedBy(new BigNumber(.99))
+
+      targetInput = target.getRawFromNumeraire(targetNumeraire)
+
     } else {
-      originInput = Math.floor(originValue * 1.01)
-      targetInput = targetValue
+
+      const originNumeraire = origin.getNumeraireFromDisplay(originValue)
+        .multipliedBy(new BigNumber(1.01))
+
+      originInput = origin.getRawFromNumeraire(originNumeraire)
+
+      targetInput = target.getRawFromDisplay(targetValue)
+
     }
 
-    const tx = loihi.methods[swapType === 'origin' ? 'originSwap' : 'targetSwap'](
-      origin.options.address,
-      target.options.address,
-      bnAmount(originInput, origin.decimals).toFixed(),
-      bnAmount(targetInput, target.decimals).toFixed(),
+    const tx = loihi[swapType === 'origin' ? 'originSwap' : 'targetSwap'](
+      origin.address,
+      target.address,
+      originInput,
+      targetInput,
       Math.floor((Date.now()/1000) + 900)
     )
 
@@ -398,8 +418,8 @@ const SwapTab = () => {
       setOriginValue('0')
       setTargetValue('0')
       setStep('success')
-      onUpdateBalances()
-      onUpdateWalletBalances()
+      updateBalances()
+      updateWalletBalances()
     }
 
     function handleError () {
@@ -409,9 +429,10 @@ const SwapTab = () => {
   }
 
   const handleUnlock = async () => {
+
     setStep('confirmingMetamask')
 
-    const tx = origin.methods.approve(loihi.options.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
+    const tx = origin.methods.approve(loihi.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
 
     tx.send({ from: account })
       .once('transactionHash', onTxHash)
@@ -426,7 +447,7 @@ const SwapTab = () => {
     function onConfirmation () {
       setStep('unlockSuccess')
       setUnlocked(true)
-      onUpdateAllowances()
+      updateAllowances()
     }
 
     function onError () {

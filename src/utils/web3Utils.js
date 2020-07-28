@@ -11,6 +11,10 @@ import usdcIcon from '../assets/usdc.svg'
 import usdtIcon from '../assets/usdt.svg'
 import susdIcon from '../assets/susd.svg'
 
+import { ERC20, Loihi } from "./web3Classes.js"
+
+window.BigNumber = BigNumber
+
 export const displayAmount = (value, decimals, precision) => {
 
   const amount = value.dividedBy(new BigNumber(10).pow(decimals))
@@ -29,8 +33,8 @@ export const bnAmount = (value, decimals) => {
 
 export const getLoihiBalances = async function (liquidity, loihi, walletAddress) {
 
-  const shells = new BigNumber(await loihi.methods.balanceOf(walletAddress).call())
-  const total = new BigNumber(await loihi.methods.totalSupply().call())
+  const shells = await loihi.balanceOf(walletAddress)
+  const total = await loihi.totalSupply()
   const liqRatio = shells.dividedBy(total)
   const value = liquidity.total.multipliedBy(liqRatio)
 
@@ -39,37 +43,26 @@ export const getLoihiBalances = async function (liquidity, loihi, walletAddress)
     shells,
     value,
     dai: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.dai),
-    usdc: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.usdc).dividedBy(1e12),
-    usdt: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.usdt).dividedBy(1e12),
-    susd: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.susd).dividedBy(1e12),
+    usdc: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.usdc),
+    usdt: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.usdt),
+    susd: total === 0 ? 0 : liqRatio.multipliedBy(liquidity.susd)
   }
 
 }
 
 export const getLiquidity = async (loihi) => {
 
-  const liquidity = await loihi.methods.liquidity().call()
-
-  return {
-    total: new BigNumber(liquidity[0]),
-    dai: new BigNumber(liquidity[1][0]),
-    usdc: new BigNumber(liquidity[1][1]),
-    usdt: new BigNumber(liquidity[1][2]),
-    susd: new BigNumber(liquidity[1][3])
-  }
+  return await loihi.liquidity()
 
 }
 
 export const getWalletBalances = async (contracts, walletAddress) => {
 
-  console.log("contracts", contracts)
-  console.log("walletAddress", walletAddress)
-
   return {
-    dai: new BigNumber(await contracts.dai.methods.balanceOf(walletAddress).call()),
-    usdc: new BigNumber(await contracts.usdc.methods.balanceOf(walletAddress).call()),
-    usdt: new BigNumber(await contracts.usdt.methods.balanceOf(walletAddress).call()),
-    susd: new BigNumber(await contracts.susd.methods.balanceOf(walletAddress).call())
+    dai: await contracts.dai.balanceOf(walletAddress),
+    usdc: await contracts.usdc.balanceOf(walletAddress),
+    usdt: await contracts.usdt.balanceOf(walletAddress),
+    susd: await contracts.susd.balanceOf(walletAddress)
   }
 
 }
@@ -77,10 +70,10 @@ export const getWalletBalances = async (contracts, walletAddress) => {
 export const getAllowances = async (contracts, walletAddress) => {
 
   return {
-    dai: new BigNumber(await contracts.dai.methods.allowance(walletAddress, config.LOIHI).call()),
-    usdc: new BigNumber(await contracts.usdc.methods.allowance(walletAddress, config.LOIHI).call()),
-    usdt: new BigNumber(await contracts.usdt.methods.allowance(walletAddress, config.LOIHI).call()),
-    susd: new BigNumber(await contracts.susd.methods.allowance(walletAddress, config.LOIHI).call())
+    dai: await contracts.dai.allowance(walletAddress, config.LOIHI),
+    usdc: await contracts.usdc.allowance(walletAddress, config.LOIHI),
+    usdt: await contracts.usdt.allowance(walletAddress, config.LOIHI),
+    susd: await contracts.susd.allowance(walletAddress, config.LOIHI)
   }
   
 }
@@ -88,47 +81,13 @@ export const getAllowances = async (contracts, walletAddress) => {
 export const getContracts = function (web3) {
 
     const contractObjects = [
-      new web3.eth.Contract(erc20ABI, config.DAI),
-      new web3.eth.Contract(erc20ABI, config.USDC),
-      new web3.eth.Contract(erc20ABI, config.USDT),
-      new web3.eth.Contract(erc20ABI, config.SUSD)
+      new ERC20(web3, config.DAI, 'MultiCollateral Dai', 'DAI', daiIcon, 18),
+      new ERC20(web3, config.USDC, 'USD Coin', 'USDC', usdcIcon, 6),
+      new ERC20(web3, config.USDT, 'Tether Stablecoin', 'USDT', usdtIcon, 6),
+      new ERC20(web3, config.SUSD, 'Synthetix USD', 'SUSD', susdIcon, 6)
     ]
 
-    contractObjects[0].name = 'MultiCollateral Dai'
-    contractObjects[1].name = 'USD Coin'
-    contractObjects[2].name = 'Tether Stablecoin'
-    contractObjects[3].name = 'Synthetix USD'
-
-    contractObjects[0].symbol = 'DAI'
-    contractObjects[1].symbol = 'USDC'
-    contractObjects[2].symbol = 'USDT'
-    contractObjects[3].symbol = 'SUSD'
-
-    contractObjects[0].icon = daiIcon
-    contractObjects[1].icon = usdcIcon
-    contractObjects[2].icon = usdtIcon
-    contractObjects[3].icon = susdIcon
-
-    contractObjects[0].decimals = 18
-    contractObjects[1].decimals = 6
-    contractObjects[2].decimals = 6 
-    contractObjects[3].decimals = 6 
-
-    contractObjects[0].getDisplay = function (amount) { return displayAmount(amount, 18) }
-    contractObjects[1].getDisplay = function (amount) { return displayAmount(amount, 6) }
-    contractObjects[2].getDisplay = function (amount) { return displayAmount(amount, 6) }
-    contractObjects[3].getDisplay = function (amount) { return displayAmount(amount, 6) }
-
-
-    function getNumeraireAmount (amount) { 
-      console.log("amount", amount)
-      // return amount.multipliedBy(new BigNumber(10).pow(18 - this.decimals)) 
-    }
-
-    contractObjects[0].getNumeraireAmount = getNumeraireAmount
-    contractObjects[1].getNumeraireAmount = getNumeraireAmount
-    contractObjects[2].getNumeraireAmount = getNumeraireAmount
-    contractObjects[3].getNumeraireAmount = getNumeraireAmount
+    const loihi = new Loihi(web3, config.LOIHI, "Shell Protocol", "SHL", null, 18)
 
     return {
       erc20s: contractObjects,
@@ -136,6 +95,7 @@ export const getContracts = function (web3) {
       usdc: contractObjects[1],
       usdt: contractObjects[2],
       susd: contractObjects[3],
-      loihi: new web3.eth.Contract(loihiABI, config.LOIHI)
+      loihi
     }
+
 }

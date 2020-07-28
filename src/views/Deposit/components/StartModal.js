@@ -75,6 +75,7 @@ const StartModal = ({
   allowances,
   balances,
   contracts,
+  loihi,
   onDeposit,
   onDismiss,
   onUnlock,
@@ -102,6 +103,7 @@ const StartModal = ({
       setToolTip('Deposit amounts trigger halt check')
 
     } else {
+      console.log("payload.trigger", payload.trigger)
 
       payload.setter(payload.trigger ? 'amount is greater than your balance' : '')
 
@@ -141,10 +143,12 @@ const StartModal = ({
 
   }
 
-  const availableDai = walletBalances.dai ? displayAmount(walletBalances.dai, contracts.dai.decimals, 4) : '--'
-  const availableUsdc = walletBalances.usdc ? displayAmount(walletBalances.usdc, contracts.usdc.decimals, 4) : '--'
-  const availableUsdt = walletBalances.usdt ? displayAmount(walletBalances.usdt, contracts.usdt.decimals, 4) : '--'
-  const availableSusd = walletBalances.susd ? displayAmount(walletBalances.susd, contracts.susd.decimals, 4) : '--'
+  const availableDai = walletBalances.dai ? contracts.dai.getDisplayFromNumeraire(walletBalances.dai, 4) : '--'
+  const availableUsdc = walletBalances.usdc ? contracts.usdc.getDisplayFromNumeraire(walletBalances.usdc, 4) : '--'
+  const availableUsdt = walletBalances.usdt ? contracts.usdt.getDisplayFromNumeraire(walletBalances.usdt, 4) : '--'
+  const availableSusd = walletBalances.susd ? contracts.susd.getDisplayFromNumeraire(walletBalances.susd, 4) : '--'
+
+  console.log("available dai", availableDai)
 
   const handleInput = (e, type, setter) => {
     e.preventDefault()
@@ -159,54 +163,71 @@ const StartModal = ({
     }
   }
 
-  const primeDeposit = async (inputPayload) => {
+  const primeDeposit = async (payload) => {
 
-    console.log("prime deposit")
+    const viewRevertedValue = new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')
 
-    if (bnAmount(inputPayload.value, contracts[inputPayload.type].decimals).isGreaterThan(walletBalances[inputPayload.type])) {
-      if (inputPayload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: true, type: 'dai'})
-      else if (inputPayload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: true, type: 'usdc'})
-      else if (inputPayload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: true, type: 'usdt'})
-      else if (inputPayload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: true, type: 'susd'})
-    } else if (inputPayload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: false, type: 'dai'})
-    else if (inputPayload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: false, type: 'usdc'})
-    else if (inputPayload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: false, type: 'usdt'})
-    else if (inputPayload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: false, type: 'susd'})
+    if ( contracts[payload.type].getNumeraireFromDisplay(payload.value).isGreaterThan(walletBalances[payload.type]) ) {
+
+      if (payload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: true, type: 'dai'})
+      if (payload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: true, type: 'usdc'})
+      if (payload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: true, type: 'usdt'})
+      if (payload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: true, type: 'susd'})
+
+    } else {
+      
+      if (payload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: false, type: 'dai'})
+      if (payload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: false, type: 'usdc'})
+      if (payload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: false, type: 'usdt'})
+      if (payload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: false, type: 'susd'})
+      
+    }
+
+    const daiAmount = payload.type === 'dai' ? payload.value : daiInputValue ? daiInputValue : 0
+    const usdcAmount = payload.type === 'usdc' ? payload.value : usdcInputValue ? usdcInputValue : 0
+    const usdtAmount = payload.type === 'usdt' ? payload.value : usdtInputValue ? usdtInputValue : 0
+    const susdAmount = payload.type === 'susd' ? payload.value : susdInputValue ? susdInputValue : 0
 
     const addresses = [
-      contracts.dai.options.address,
-      contracts.usdc.options.address,
-      contracts.usdt.options.address,
-      contracts.susd.options.address,
+      contracts.dai.address,
+      contracts.usdc.address,
+      contracts.usdt.address,
+      contracts.susd.address
     ]
 
     const amounts = [
-      bnAmount(inputPayload.type === 'dai' ? inputPayload.value : daiInputValue ? daiInputValue : 0, contracts.dai.decimals).toFixed(),
-      bnAmount(inputPayload.type === 'usdc' ? inputPayload.value : usdcInputValue ? usdcInputValue : 0, contracts.usdc.decimals).toFixed(),
-      bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputValue ? usdtInputValue : 0, contracts.usdt.decimals).toFixed(),
-      bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputValue ? susdInputValue : 0, contracts.susd.decimals).toFixed(),
+      contracts.dai.getRawFromDisplay(daiAmount),
+      contracts.usdc.getRawFromDisplay(usdcAmount),
+      contracts.usdt.getRawFromDisplay(usdtAmount),
+      contracts.susd.getRawFromDisplay(susdAmount)
     ]
 
-    const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
-    if (sum.isZero()) return setFeeMessage('')
+    if (amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0)).isZero()) return setFeeMessage('')
 
-    const shellsToMint = new BigNumber(await contracts.loihi.methods.viewSelectiveDeposit(addresses, amounts).call())
-    const isReverted = shellsToMint.comparedTo(new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')) === 0
-    if (isReverted) {
+    const shellsToMint = await loihi.viewSelectiveDeposit(addresses, amounts)
+
+    if (shellsToMint.comparedTo(viewRevertedValue) === 0) {
+
       setError('This amount triggers the halt check')
+
       return setFeeMessage('')
+
     } else {
+
       setError('')
+
     }
 
-    const totalDeposit = bnAmount(inputPayload.type === 'dai' ? inputPayload.value : daiInputValue, 18)
-      .plus(bnAmount(inputPayload.type === 'usdc' ? inputPayload.value : usdcInputValue, 18))
-      .plus(bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputValue, 18))
-      .plus(bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputValue, 18))
+    var totalDeposit = contracts.dai.getNumeraireFromDisplay(daiAmount)
+      .plus(contracts.usdc.getNumeraireFromDisplay(usdcAmount))
+      .plus(contracts.usdt.getNumeraireFromDisplay(usdtAmount))
+      .plus(contracts.susd.getNumeraireFromDisplay(susdAmount))
 
     const liquidityChange = totalDeposit.dividedBy(liquidity.total)
+    
     const shellsChange = shellsToMint.dividedBy(balances.total)
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
+
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
 
     const slippageMessage = slippage.absoluteValue().isGreaterThan(0.0001)
       ? slippage.isNegative()
@@ -217,7 +238,7 @@ const StartModal = ({
     const feeMessage = <div>
       You will mint 
         <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { displayAmount(shellsToMint, 18, 2) } 
+          { loihi.getDisplayFromNumeraire(shellsToMint, 2) } 
           <img alt="" 
             src={shellIcon} 
             style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
@@ -239,10 +260,10 @@ const StartModal = ({
 
     // Should be abstracted to web3Utils / withWallet
     const addresses = [
-      contracts.dai.options.address,
-      contracts.usdc.options.address,
-      contracts.usdt.options.address,
-      contracts.susd.options.address,
+      contracts.dai.address,
+      contracts.usdc.address,
+      contracts.usdt.address,
+      contracts.susd.address,
     ]
 
     const amounts = [

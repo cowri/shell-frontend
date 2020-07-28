@@ -16,10 +16,12 @@ const Withdraw = ({
     account,
     balances,
     contracts,
-    onUpdateBalances,
-    onUpdateLiquidity,
-    onUpdateWalletBalances,
     liquidity,
+    loihi,
+    updateAllState,
+    updateBalances,
+    updateLiquidity,
+    updateWalletBalances,
   } = useContext(DashboardContext)
 
   const [step, setStep] = useState('start')
@@ -29,12 +31,12 @@ const Withdraw = ({
 
     setStep('confirmingMetamask')
 
-    let tx
-    if (withdrawEverything) {
-      tx = contracts.loihi.methods.proportionalWithdraw(balances.shells.toFixed())
-    } else {
-      tx = contracts.loihi.methods.selectiveWithdraw(addresses, amounts, balances.shells.toFixed(), Date.now())
-    }
+    console.log("addresses", addresses)
+    console.log("amounts", amounts)
+
+    const tx = withdrawEverything
+      ? loihi.proportionalWithdraw(loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)
+      : loihi.selectiveWithdraw(addresses, amounts, loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)
 
     tx.send({ from: account })
       .once('transactionHash', () => setStep('withdrawing'))
@@ -42,16 +44,14 @@ const Withdraw = ({
       .on('error', () => setStep('error'))
 
     function handleConfirmation () {
-      console.log("confirmation")
       setStep('success')
-      onUpdateBalances()
-      onUpdateLiquidity()
-      onUpdateWalletBalances()
+      updateAllState()
+      // updateBalances()
+      // updateLiquidity()
+      // updateWalletBalances()
     }
 
   }
-
-  console.log("step", step)
 
   return (
     <>
@@ -59,9 +59,10 @@ const Withdraw = ({
         <StartModal
           balances={balances}
           contracts={contracts}
+          liquidity={liquidity}
+          loihi={loihi}
           onDismiss={onDismiss}
           onWithdraw={handleWithdraw}
-          liquidity={liquidity}
           setWithdrawEverything={setWithdrawEverything}
           withdrawEverything={withdrawEverything}
         />
@@ -82,7 +83,7 @@ const Withdraw = ({
       {step === 'error' && (
         <ModalError buttonBlurb={'Finish'} onDismiss={onDismiss} title={'An error occurred.'} />
       )}
-      
+
     </>
   )
 }

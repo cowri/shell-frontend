@@ -88,12 +88,15 @@ const StyledFeeMessage = styled.div`
 const StartModal = ({
   balances,
   contracts,
+  liquidity,
+  loihi,
   onDismiss,
   onWithdraw,
-  liquidity,
   setWithdrawEverything,
   withdrawEverything
 }) => {
+
+  const viewRevertedValue = new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')
 
   console.log("balances", balances)
   window.liquidity = liquidity
@@ -106,10 +109,12 @@ const StartModal = ({
   const [feeMessage, setFeeMessage] = useState(null)
   const [error, setError] = useState('')
 
-  const epsilonRemovedAmount = (amount, decimals) => {
-    const one = new BigNumber(1).pow(decimals)
-    const epsilon = new BigNumber(0.000175).pow(decimals)
-    return displayAmount(amount.multipliedBy(one.minus(epsilon)), decimals, 4)
+  const epsilonRemoved = (amount) => {
+
+    const epsilon = new BigNumber(1).minus(0.000175)
+
+    return amount.multipliedBy(epsilon)
+
   }
 
   const handleSubmit = (e) => {
@@ -124,22 +129,22 @@ const StartModal = ({
       const addresses = []
       const amounts = []
       if (Number(daiInputAmt)) {
-        addresses.push(contracts.dai.options.address)
+        addresses.push(contracts.dai.address)
         amounts.push(bnAmount(daiInputAmt, contracts.dai.decimals).toFixed())
       }
 
       if (Number(usdcInputAmt)) {
-        addresses.push(contracts.usdc.options.address)
+        addresses.push(contracts.usdc.address)
         amounts.push(bnAmount(usdcInputAmt, contracts.usdc.decimals).toFixed())
       }
 
       if (Number(usdtInputAmt)) {
-        addresses.push(contracts.usdt.options.address)
+        addresses.push(contracts.usdt.address)
         amounts.push(bnAmount(usdtInputAmt, contracts.usdt.decimals).toFixed())
       }
 
       if (Number(susdInputAmt)) {
-        addresses.push(contracts.susd.options.address)
+        addresses.push(contracts.susd.address)
         amounts.push(bnAmount(susdInputAmt, contracts.susd.decimals).toFixed())
       }
 
@@ -151,10 +156,16 @@ const StartModal = ({
   const handleWithdrawEverythingCheckbox = (e) => {
     setWithdrawEverything(e.target.checked)
     if (e.target.checked) {
-      setDaiInputAmt(epsilonRemovedAmount(balances.dai, 18))
-      setUsdcInputAmt(epsilonRemovedAmount(balances.usdc, 6))
-      setUsdtInputAmt(epsilonRemovedAmount(balances.usdt, 6))
-      setSusdInputAmt(epsilonRemovedAmount(balances.susd, 18))
+
+      const daiToSet = contracts.dai.getDisplayFromNumeraire(epsilonRemoved(balances.dai), 4)
+      const usdcToSet = contracts.usdc.getDisplayFromNumeraire(epsilonRemoved(balances.usdc), 4)
+      const usdtToSet = contracts.usdt.getDisplayFromNumeraire(epsilonRemoved(balances.usdt), 4)
+      const susdToSet = contracts.susd.getDisplayFromNumeraire(epsilonRemoved(balances.susd), 4)
+
+      setDaiInputAmt(daiToSet)
+      setUsdcInputAmt(usdcToSet)
+      setUsdtInputAmt(usdtToSet)
+      setSusdInputAmt(susdToSet)
 
       const shells = (
         <span style={{position: 'relative', paddingRight: '17.5px'}}> 
@@ -169,12 +180,15 @@ const StartModal = ({
       setFeeMessage(<div> You will burn {shells} and pay a 0.0175% fee to liquidity providers </div> )
 
     } else {
+
       setDaiInputAmt('')
       setUsdcInputAmt('')
       setUsdtInputAmt('')
       setSusdInputAmt('')
       setFeeMessage('')
+      
     }
+
   }
 
   const handleInput = (e, type, setter) => {
@@ -190,75 +204,76 @@ const StartModal = ({
     }
   }
 
-  const primeWithdraw = async (inputPayload) => {
+  const primeWithdraw = async (payload) => {
+
+    const daiAmount = payload.type === 'dai' ? payload.value : daiInputAmt ? daiInputAmt : 0 
+    const usdcAmount = payload.type === 'usdc' ? payload.value : usdcInputAmt ? usdcInputAmt : 0
+    const usdtAmount = payload.type === 'usdt' ? payload.value : usdtInputAmt ? usdtInputAmt : 0
+    const susdAmount = payload.type === 'susd' ? payload.value : susdInputAmt ? susdInputAmt : 0
 
     const addresses = [
-      contracts.dai.options.address,
-      contracts.usdc.options.address,
-      contracts.usdt.options.address,
-      contracts.susd.options.address,
+      contracts.dai.address,
+      contracts.usdc.address,
+      contracts.usdt.address,
+      contracts.susd.address,
     ]
 
     const amounts = [
-      bnAmount(inputPayload.type === 'dai' ? inputPayload.value : daiInputAmt ? daiInputAmt : 0, contracts.dai.decimals).toFixed(),
-      bnAmount(inputPayload.type === 'usdc' ? inputPayload.value : usdcInputAmt ? usdcInputAmt : 0, contracts.usdc.decimals).toFixed(),
-      bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputAmt ? usdtInputAmt : 0, contracts.usdt.decimals).toFixed(),
-      bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputAmt ? susdInputAmt : 0, contracts.susd.decimals).toFixed(),
+      contracts.dai.getRawFromDisplay(daiAmount),
+      contracts.usdc.getRawFromDisplay(usdcAmount),
+      contracts.usdt.getRawFromDisplay(usdtAmount),
+      contracts.susd.getRawFromDisplay(susdAmount)
     ]
 
-    console.log("bnAmount", amounts)
-
     const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
+
     if (sum.isZero()) return setFeeMessage('')
 
-    const shellsToBurn = new BigNumber(await contracts.loihi.methods.viewSelectiveWithdraw(addresses, amounts).call())
-    const isReverted = shellsToBurn.comparedTo(new BigNumber('3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75')) === 0
+    const shellsToBurn = await loihi.viewSelectiveWithdraw(addresses, amounts)
 
-    if (isReverted) {
+    if (shellsToBurn.comparedTo(viewRevertedValue) === 0) {
+
       setError('This amount triggers the halt check')
+
       return setFeeMessage('')
+
     } else if (shellsToBurn.isGreaterThan(balances.shells)) {
+
       setError('You can not withdraw more than your balance')
+
       return setFeeMessage('')
+
     } else {
+
       setError('')
+
     }
 
-    const totalWithdraw = bnAmount(inputPayload.type === 'dai' ? inputPayload.value : daiInputAmt ? daiInputAmt : 0, 18)
-      .plus(bnAmount(inputPayload.type === 'usdc' ? inputPayload.value : usdcInputAmt ? usdcInputAmt : 0, 18))
-      .plus(bnAmount(inputPayload.type === 'usdt' ? inputPayload.value : usdtInputAmt ? usdtInputAmt : 0, 18))
-      .plus(bnAmount(inputPayload.type === 'susd' ? inputPayload.value : susdInputAmt ? susdInputAmt : 0, 18))
-
-    console.log("total withdraw", totalWithdraw.toString())
+    const totalWithdraw = contracts.dai.getNumeraireFromDisplay(daiAmount)
+      .plus(contracts.usdc.getNumeraireFromDisplay(usdcAmount))
+      .plus(contracts.usdt.getNumeraireFromDisplay(usdtAmount))
+      .plus(contracts.susd.getNumeraireFromDisplay(susdAmount))
 
     const liquidityChange = totalWithdraw.dividedBy(liquidity.total)
 
-    console.log("liquidity change", liquidityChange.toString())
-
     const shellsChange = shellsToBurn.dividedBy(balances.shells)
 
-    console.log("shellsChange", shellsChange.toString())
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
 
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
+    const slippageMessage = slippage.isNegative()
+      ? <span> and pay a { Math.abs(slippage.toFixed(4)) } % fee to liquidity providers </span>
+      : <span> and earn a { slippage.toFixed(4) } % rebalancing subsidy </span>
 
-    console.log("slippage", slippage.toString())
-
-    const shells = (
+    const shells = <div>
+      You will burn
       <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-        { displayAmount(shellsToBurn, 18, 2) } 
+        { loihi.getDisplayFromNumeraire(shellsToBurn, 2) } 
         <img alt="" src={tinyShellIcon} style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} /> 
       </span>
-    )
+      { slippageMessage }
+    </div>
 
-    if (slippage.isNegative()) {
-      
-      setFeeMessage( <div> You will burn {shells} and pay a { Math.abs(slippage.toFixed(4)) } % fee to liquidity providers </div> )
-
-    } else {
-
-      setFeeMessage( <div> You will burn {shells} and earn a {slippage.toFixed(4)} % rebalancing subsidy </div> )
-
-    }
+    setFeeMessage(shells)
 
   }
 
@@ -285,7 +300,7 @@ const StartModal = ({
           <StyledRows>
             <StyledShells>
                 <StyledShellIcon src={shellIcon}/>
-                <StyledShellBalance> { displayAmount(balances.shells, 18, 2) + ' Shells'} </StyledShellBalance>
+                <StyledShellBalance> { loihi.getDisplayFromNumeraire(balances.shells, 2) + ' Shells'} </StyledShellBalance>
             </StyledShells>
             <StyledFeeMessage> { feeMessage } </StyledFeeMessage>
             <TokenInput

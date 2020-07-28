@@ -22,26 +22,40 @@ const withWallet = (WrappedComponent) => {
     const [networkId, setNetworkId] = useState(1)
     const [walletBalances, setWalletBalances] = useState({})
 
-    const fetchAllowances = async (_contracts, _account) => {
+    const updateAllState = async () => {
+      const _allowances = await getAllowances(contracts, account)
+      const _liquidity = await getLiquidity(loihi)
+      const _walletBalances = await getWalletBalances(contracts, account)
+      const _balances = await getLoihiBalances(_liquidity, loihi, account)
+
+      setAllowances(_allowances)
+      setBalances(_balances)
+      setWalletBalances(_walletBalances)
+      setLiquidity(_liquidity)
+
+    }
+
+    const updateAllowances = async (_contracts, _account) => {
       const allowances = await getAllowances(contracts, account)
       window.allowances = allowances
       setAllowances(allowances)
     }
 
-    const fetchLiquidity = async () => {
+    const updateLiquidity = async () => {
       const liquidity = await getLiquidity(loihi)
       window.liquidity = liquidity
       setLiquidity(liquidity)
     }
 
-    const fetchWalletBalances = async () => {
+    const updateWalletBalances = async () => {
       const walletBalances = await getWalletBalances(contracts, account)
       window.walletBalances = walletBalances
       setWalletBalances(walletBalances)
     }
     
-    const fetchBalances = async (_liquidity, _loihi, _account) => {
+    const updateBalances = async (_liquidity, _loihi, _account) => {
       const balances = await getLoihiBalances(liquidity, loihi, account)
+      console.log("set balances", balances)
       window.balances = balances
       setBalances(balances)
     }
@@ -89,10 +103,10 @@ const withWallet = (WrappedComponent) => {
 
           const accounts = await web3.eth.getAccounts()
           setAccount(accounts[0])
-          fetchLiquidity()
-          fetchAllowances()
-          fetchBalances()
-          fetchWalletBalances()
+          updateLiquidity()
+          updateAllowances()
+          updateBalances()
+          updateWalletBalances()
 
         })
           
@@ -104,16 +118,16 @@ const withWallet = (WrappedComponent) => {
     //   console.log("ping liq")
     //   if (loihi) {
     //     console.log("loihi", loihi)
-    //     fetchLiquidity(loihi)
+    //     updateLiquidity(loihi)
     //   }
     // }, [loihi])
 
     // // init liquidity, allowances, balances, wallet balances
     // useEffect(() => {
     //   if (account && liquidity) {
-    //     fetchAllowances()
-    //     fetchBalances()
-    //     fetchWalletBalances()
+    //     updateAllowances()
+    //     updateBalances()
+    //     updateWalletBalances()
     //   }
     // }, [liquidity])
 
@@ -125,13 +139,15 @@ const withWallet = (WrappedComponent) => {
           allowances={allowances}
           balances={balances}
           contracts={contracts}
+          loihi={contracts.loihi}
           hasMetamask={!!window.ethereum}
           isUnlocked={!!account}
           onEnable={handleEnable}
-          onUpdateAllowances={() => fetchAllowances()}
-          onUpdateBalances={() => fetchBalances()}
-          onUpdateLiquidity={() => fetchLiquidity()}
-          onUpdateWalletBalances={() => fetchWalletBalances()}
+          updateAllState={() => updateAllState()}
+          updateAllowances={() => updateAllowances()}
+          updateBalances={() => updateBalances()}
+          updateLiquidity={() => updateLiquidity()}
+          updateWalletBalances={() => updateWalletBalances()}
           networkId={networkId}
           liquidity={liquidity}
           walletBalances={walletBalances}

@@ -61,6 +61,7 @@ const StyledRows = styled.div`
 const PoolTab = () => {
   const {
     balances,
+    loihi,
     presentDeposit,
     presentWithdraw,
     liquidity,
@@ -68,18 +69,18 @@ const PoolTab = () => {
 
   window.poolTabBalances = balances
 
-  const totalBalance = balances.value ? `$${displayAmount(balances.value, 18, 2)}` : '--'
-  const totalPoolLiquidity = liquidity.total ? `$${displayAmount(liquidity.total, 18, 2)}` : '--'
+  const totalBalance = balances.value ? `$${loihi.getDisplayFromNumeraire(balances.value, 2)}` : '--'
+  const totalPoolLiquidity = liquidity.total ? `$${loihi.getDisplayFromNumeraire(liquidity.total, 2)}` : '--'
 
-  const daiLiquidityDisplay = liquidity.dai ? `$${displayAmount(liquidity.dai, 18, 2)}` : '--'
-  const usdcLiquidityDisplay = liquidity.usdc ? `$${displayAmount(liquidity.usdc, 18, 2)}` : '--'
-  const usdtLiquidityDisplay = liquidity.usdt ? `$${displayAmount(liquidity.usdt, 18, 2)}` : '--'
-  const susdLiquidityDisplay = liquidity.susd ? `$${displayAmount(liquidity.susd, 18, 2)}` : '--'
+  const daiLiquidityDisplay = liquidity.dai ? `$${loihi.getDisplayFromNumeraire(liquidity.dai, 2)}` : '--'
+  const usdcLiquidityDisplay = liquidity.usdc ? `$${loihi.getDisplayFromNumeraire(liquidity.usdc, 2)}` : '--'
+  const usdtLiquidityDisplay = liquidity.usdt ? `$${loihi.getDisplayFromNumeraire(liquidity.usdt, 2)}` : '--'
+  const susdLiquidityDisplay = liquidity.susd ? `$${loihi.getDisplayFromNumeraire(liquidity.susd, 2)}` : '--'
 
-  const daiBalanceDisplay = balances.dai ? `$${displayAmount(balances.dai, 18, 2)}` : '--'
-  const usdcBalanceDisplay = balances.usdc ? `$${displayAmount(balances.usdc, 6, 2)}` : '--'
-  const usdtBalanceDisplay = balances.usdt ? `$${displayAmount(balances.usdt, 6, 2)}` : '--'
-  const susdBalanceDisplay = balances.susd ? `$${displayAmount(balances.susd, 6, 2)}` : '--'
+  const daiBalanceDisplay = balances.dai ? `$${loihi.getDisplayFromNumeraire(balances.dai, 2)}` : '--'
+  const usdcBalanceDisplay = balances.usdc ? `$${loihi.getDisplayFromNumeraire(balances.usdc, 2)}` : '--'
+  const usdtBalanceDisplay = balances.usdt ? `$${loihi.getDisplayFromNumeraire(balances.usdt, 2)}` : '--'
+  const susdBalanceDisplay = balances.susd ? `$${loihi.getDisplayFromNumeraire(balances.susd, 2)}` : '--'
 
   return (
     <StyledPoolTab>
