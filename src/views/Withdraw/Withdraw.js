@@ -31,6 +31,10 @@ const Withdraw = ({
 
     setStep('confirmingMetamask')
 
+    console.log("balances.shells", balances.shells)
+    console.log("balances.shells.toString()", balances.shells.toString())
+    console.log("loihi get raw from numeraire", loihi.getRawFromNumeraire(balances.shells))
+
     const tx = withdrawEverything
       ? loihi.proportionalWithdraw(loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)
       : loihi.selectiveWithdraw(addresses, amounts, loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)
@@ -41,11 +45,11 @@ const Withdraw = ({
       .on('error', () => setStep('error'))
 
     function handleConfirmation () {
+
       setStep('success')
+
       updateAllState()
-      // updateBalances()
-      // updateLiquidity()
-      // updateWalletBalances()
+
     }
 
   }

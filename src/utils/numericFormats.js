@@ -16,13 +16,13 @@ export default class NumericFormats {
 
     getRawFromNumeraire (numeraire) {
 
-      return numeraire.multipliedBy(10 ** this.decimals).toString()
+      return numeraire.multipliedBy(10 ** this.decimals).toFixed()
 
     }
 
     getRawFromDisplay (display) {
 
-      return new BigNumber(display).multipliedBy(10 ** this.decimals).toString()
+      return new BigNumber(display).multipliedBy(10 ** this.decimals).toFixed()
 
     }
 
