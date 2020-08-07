@@ -20,7 +20,7 @@ export class ERC20 extends NumericFormats {
 
     }
 
-    async approve (address, amount) {
+    approve (address, amount) {
 
         return this.contract.methods.approve(address, amount);
 

@@ -35,7 +35,7 @@ export const getLoihiBalances = async function (liquidity, loihi, walletAddress)
 
   const shells = await loihi.balanceOf(walletAddress)
   const total = await loihi.totalSupply()
-  const liqRatio = shells.dividedBy(total)
+  const liqRatio = total.isZero() ? total : shells.dividedBy(total)
   const value = liquidity.total.multipliedBy(liqRatio)
 
   return {
