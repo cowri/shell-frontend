@@ -18,8 +18,6 @@ const StyledViewOnEtherscan = styled.div`
   margin-top: 18px;
 `
 
-
-
 const AwaitingTxModal = (props) => {
   const { txHash } = props
   return (

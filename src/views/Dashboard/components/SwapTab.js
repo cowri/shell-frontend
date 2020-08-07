@@ -400,19 +400,29 @@ const SwapTab = () => {
       .on('error', handleError)
 
     function handleTransactionHash (hash) {
+
       setTxHash(hash)
+
       setStep('swapping')
+
     }
 
     function handleConfirmation () {
+
       setOriginValue('0')
+
       setTargetValue('0')
+
       setStep('success')
+
       updateAllState()
+
     }
 
     function handleError () {
+
       setStep('error')
+
     }
 
   }
@@ -539,8 +549,8 @@ const SwapTab = () => {
 
     <StyledSwapTab>
       { step === 'confirmingMetamask' && <ModalConfirmMetamask /> }
-      { (step === 'swapping' || step === 'unlocking') && <ModalTx tx={txHash} /> }
-      { step === 'success' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
+      { (step === 'swapping' || step === 'unlocking') && <ModalTx txHash={txHash} /> }
+      { step === 'success' && <ModalSuccess buttonBlurb={'Finish'} txHash={txHash} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
       { step === 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
       { step === 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
       <StyledRows>
@@ -585,10 +595,12 @@ const SwapTab = () => {
       <StyledActions>
         <Tooltip arrow={true} placement={'top'} title={toolTipMsg} style={targetError || originError || (initiallyLocked && !unlocked) ? { cursor: 'no-drop'} : null } >
           <div>
-            <Button disabled={( isZero || targetError || originError || (initiallyLocked && !unlocked))}
+            <Button 
+              disabled={( isZero || targetError || originError || (initiallyLocked && !unlocked))}
               onClick={handleSwap}
-              outlined={initiallyLocked && !unlocked}>
-                Swap
+              outlined={initiallyLocked && !unlocked}
+            >
+              Swap
             </Button> 
           </div>
         </Tooltip>
