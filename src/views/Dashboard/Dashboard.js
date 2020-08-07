@@ -59,18 +59,28 @@ const Dashboard = ({
   const [depositModal, setDepositModal] = useState(false)
   const [withdrawModal, setWithdrawModal] = useState(false)
 
+  const disableClick = !contracts.erc20s ? true : false
+
   const renderContent = () => {
+
     if (!hasMetamask) {
+
       return <span style={{ color: '#FFF' }}>Metamask not found.</span>
-    }
-    if (networkId !== config.network) {
+
+    } else if (networkId !== config.network) {
+
       return <NetworkModal />
-    }
-    if (!isUnlocked) {
+
+    } else if (!isUnlocked) {
+
       return <UnlockModal />
+
+    } else {
+
+      return <DashboardContent buttonsDisabled={disableClick} />
+
     }
 
-    return <DashboardContent />
   }
 
   return (
@@ -88,7 +98,7 @@ const Dashboard = ({
         updateLiquidity,
         updateWalletBalances,
         presentDeposit: () => setDepositModal(true),
-        presentWithdraw: () => { setWithdrawModal(true) },
+        presentWithdraw: () => setWithdrawModal(true),
         liquidity,
         walletBalances,
         web3,
@@ -96,13 +106,12 @@ const Dashboard = ({
           {/* <Intercom appID='zr42wlxq' user_id={userId} /> */}
           <StyledDashboard>
             <Header />
-            {renderContent()}
+            { renderContent() }
             <Footer />
           </StyledDashboard>
           {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
           {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
       </DashboardContext.Provider>
-
     </>
   )
 }

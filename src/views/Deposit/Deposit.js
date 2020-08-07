@@ -45,11 +45,11 @@ const Deposit = ({
       .on('error', () => setStep('error'))
 
     function handleConfirmation () {
+
       setStep('deposit-success')
+
       updateAllState()
-      // updateBalances()
-      // updateLiquidity()
-      // updateWalletBalances()
+
     }
 
   }
@@ -66,21 +66,33 @@ const Deposit = ({
       .on('error', error)
 
       function txHash (hash) {
+
         setTxHash(hash)
+
         setUnlocking({ ...unlocking, [tokenKey]: true })
+
         setStep('unlocking')
+
       }
 
       function confirmation () {
+
         setUnlocking({...unlocking, [tokenKey]: false })
+
         updateAllowances()
+        
         setStep('unlocking-success')
+
       }
 
       function error () {
+
         setUnlocking({ ...unlocking, [tokenKey]: false })
+
         setStep('error')
+        
       }
+
   }
 
   const onUnlockSuccessDismiss = () => setStep('start')

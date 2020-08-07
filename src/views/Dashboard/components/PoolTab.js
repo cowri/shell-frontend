@@ -58,7 +58,9 @@ const StyledRows = styled.div`
   margin-bottom: 12px;
 `
 
-const PoolTab = () => {
+const PoolTab = ({
+  buttonsDisabled
+}) => {
   const {
     balances,
     loihi,
@@ -160,9 +162,9 @@ const PoolTab = () => {
         </Row>
       </StyledRows>
       <StyledActions>
-        <Button onClick={presentDeposit}>Deposit</Button>
+        <Button disabled={buttonsDisabled} onClick={presentDeposit}>Deposit</Button>
         <div style={{ width: 12 }} />
-        <Button outlined onClick={presentWithdraw}>Withdraw</Button>
+        <Button disabled={buttonsDisabled} outlined onClick={presentWithdraw}>Withdraw</Button>
       </StyledActions>
     </StyledPoolTab>
   )
