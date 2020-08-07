@@ -123,6 +123,7 @@ const SwapTab = () => {
   const [targetValue, setTargetValue] = useState('0')
   const [originError, setOriginError] = useState(false)
   const [targetError, setTargetError] = useState(false)
+  const [isZero, setIsZero ] = useState(true)
   const [originHelperText, setOriginHelperText] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
@@ -283,6 +284,16 @@ const SwapTab = () => {
         return
         
       } 
+
+      if (theseChickens.isZero && thoseChickens.isZero()) {
+
+        setIsZero(true)
+
+      } else {
+        
+        setIsZero(false)
+
+      }
 
       if (type === 'origin') {
 
@@ -574,7 +585,7 @@ const SwapTab = () => {
       <StyledActions>
         <Tooltip arrow={true} placement={'top'} title={toolTipMsg} style={targetError || originError || (initiallyLocked && !unlocked) ? { cursor: 'no-drop'} : null } >
           <div>
-            <Button disabled={(targetError || originError || (initiallyLocked && !unlocked))}
+            <Button disabled={( isZero || targetError || originError || (initiallyLocked && !unlocked))}
               onClick={handleSwap}
               outlined={initiallyLocked && !unlocked}>
                 Swap
