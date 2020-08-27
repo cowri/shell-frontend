@@ -69,8 +69,6 @@ const PoolTab = ({
     liquidity,
   } = useContext(DashboardContext)
 
-  window.poolTabBalances = balances
-
   const totalBalance = balances.value ? `$${loihi.getDisplayFromNumeraire(balances.value, 2)}` : '--'
   const totalPoolLiquidity = liquidity.total ? `$${loihi.getDisplayFromNumeraire(liquidity.total, 2)}` : '--'
 

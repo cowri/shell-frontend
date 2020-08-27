@@ -18,8 +18,11 @@ const Unlock = () => {
   const [isRequesting, setIsRequesting] = useState()
 
   const handleUnlockClick = () => {
+
     setIsRequesting(true)
+
     onEnable().catch(e => setIsRequesting(false))
+    
   }
   
   if (isRequesting) {

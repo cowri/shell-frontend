@@ -148,7 +148,9 @@ const StartModal = ({
   }
 
   const handleWithdrawEverythingCheckbox = (e) => {
+
     setWithdrawEverything(e.target.checked)
+
     if (e.target.checked) {
 
       const daiToSet = contracts.dai.getDisplayFromNumeraire(epsilonRemoved(balances.dai), 4)
@@ -171,7 +173,7 @@ const StartModal = ({
         </span>
       )
 
-      setFeeMessage(<div> You will burn {shells} and pay a 0.0175% fee to liquidity providers </div> )
+      setFeeMessage(<div> You will burn { shells } and pay a 0.0175% fee to liquidity providers </div> )
 
     } else {
 
@@ -250,9 +252,9 @@ const StartModal = ({
 
     const liquidityChange = totalWithdraw.dividedBy(liquidity.total)
 
-    const shellsChange = shellsToBurn.dividedBy(balances.shells)
+    const shellsChange = shellsToBurn.dividedBy(balances.total)
 
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
 
     const slippageMessage = slippage.isNegative()
       ? <span> and pay a { Math.abs(slippage.toFixed(4)) } % fee to liquidity providers </span>
