@@ -63,9 +63,9 @@ const Dashboard = ({
 
   const renderContent = () => {
 
-    if (!hasMetamask) {
+    if (!web3) {
 
-      return <span style={{ color: '#FFF' }}>Metamask not found.</span>
+      // return <span style={{ color: '#FFF' }}>Metamask not found.</span>
 
     } else if (networkId !== config.network) {
 
