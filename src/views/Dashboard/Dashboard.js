@@ -15,6 +15,7 @@ import Withdraw from '../Withdraw'
 
 import DashboardContent from './components/DashboardContent'
 import NetworkModal from './components/NetworkModal'
+import SelectWalletModal from './components/SelectWalletModal'
 import UnlockModal from './components/UnlockModal'
 
 import DashboardContext from './context'
@@ -41,19 +42,24 @@ const Dashboard = ({
   networkId,
   liquidity,
   onEnable,
+  selectWallet,
   updateAllState,
   updateAllowances,
   updateBalances,
   updateLiquidity,
   updateWalletBalances,
   walletBalances,
+  walletSelected,
   web3,
 }) => {
 
   let userId = cookie.get('userId')
   if (!userId) {
+
     userId = randomWords(3).join('-')
+
     cookie.set('userId', userId)
+
   } 
 
   const [depositModal, setDepositModal] = useState(false)
@@ -63,7 +69,11 @@ const Dashboard = ({
 
   const renderContent = () => {
 
-    if (!web3) {
+    if (!walletSelected) {
+      
+      return <SelectWalletModal selectWallet={selectWallet} />
+
+    } else if (!web3) {
 
       // return <span style={{ color: '#FFF' }}>Metamask not found.</span>
 
@@ -73,7 +83,7 @@ const Dashboard = ({
 
     } else if (!isUnlocked) {
 
-      return <UnlockModal />
+      // return <UnlockModal />
 
     } else {
 

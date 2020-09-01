@@ -13,9 +13,11 @@ import {
   getWalletBalances,
 } from '../utils/web3Utils'
 
+let web3
+let onboard
+
 const withWallet = (WrappedComponent) => {
   return (props) => {
-    const [web3, setWeb3] = useState()
     const [account, setAccount] = useState()
     const [allowances, setAllowances] = useState({})
     const [balances, setBalances] = useState({})
@@ -24,6 +26,7 @@ const withWallet = (WrappedComponent) => {
     const [liquidity, setLiquidity] = useState({})
     const [networkId, setNetworkId] = useState(1)
     const [walletBalances, setWalletBalances] = useState({})
+    const [walletSelected, setWalletSelected] = useState(true)
 
     const updateAllState = async (_account, _contracts) => {
 
@@ -97,64 +100,91 @@ const withWallet = (WrappedComponent) => {
 
     }
 
+    const selectWallet = async () => {
+
+        setWalletSelected(true)
+
+        const walletSelected = await onboard.walletSelect()
+
+        if (!walletSelected) return setWalletSelected(false)
+
+        const walletChecked = await onboard.walletCheck()
+
+        if (!walletChecked) return setWalletSelected(false)
+
+    }
+
     // init application
-    useEffect(async () => {
-
-      console.log("wtf")
-              
-      const onboard = Onboard({
-        dappId: config.blocknative,       // [String] The API key created by step one above
-        networkId: config.network, // [Integer] The Ethereum network ID your Dapp uses.
-        subscriptions: {
-          wallet: async wallet => {
-          
-            const web3 = new Web3(wallet.provider)
-           
-            const accounts = await web3.eth.getAccounts()
-            const networkId = await web3.eth.net.getId()
-
-            setWeb3(web3)
-            setNetworkId(networkId)
-            setAccount(accounts[0])
-            
-            const _contracts = getContracts(web3)
-
-            window.contracts = _contracts
-
-            const _liquidity = await getLiquidity(_contracts.loihi)
-            const _allowances = await getAllowances(_contracts, accounts[0])
-            const _walletBalances = await getWalletBalances(_contracts, accounts[0])
-            const _balances = await getLoihiBalances(_liquidity, _contracts.loihi, accounts[0])
-            
-            setContracts(_contracts)
-            setLoihi(_contracts.loihi)
-            setLiquidity(_liquidity)
-            setAllowances(_allowances)
-            setWalletBalances(_walletBalances)
-            setBalances(_balances)
-            
-            window.ethereum.on('accountsChanged', async function () {
-
-              let _accounts = await web3.eth.getAccounts()
-
-              setAccount(_accounts[0])
-
-              updateAllState(_accounts[0], window.contracts)
-
-            })
-          },
-        },
-        walletSelect: {
-          wallets: [
-            { walletName: "metamask", preferred: true },
-            { walletName: "walletConnect", preferred: true, infuraKey: config.defaultWeb3Provider },
-          ]
-        }
-      });
-
-      await onboard.walletSelect();
+    useEffect(() => {
       
-      await onboard.walletCheck();
+      init()
+    
+      async function init () {
+
+        onboard = Onboard({
+          dappId: config.blocknative,       // [String] The API key created by step one above
+          networkId: config.network, // [Integer] The Ethereum network ID your Dapp uses.
+          subscriptions: {
+            address: async function (address){
+
+              if (!address) {
+
+                return selectWallet()
+
+              } else {
+
+                setAccount(address)
+                
+                const _contracts = getContracts(web3)
+
+                window.contracts = _contracts
+
+                const _liquidity = await getLiquidity(_contracts.loihi)
+                const _allowances = await getAllowances(_contracts, address)
+                const _walletBalances = await getWalletBalances(_contracts, address)
+                const _balances = await getLoihiBalances(_liquidity, _contracts.loihi, address)
+                
+                setContracts(_contracts)
+                setLoihi(_contracts.loihi)
+                setLiquidity(_liquidity)
+                setAllowances(_allowances)
+                setWalletBalances(_walletBalances)
+                setBalances(_balances)
+                
+              }
+
+            },
+            wallet: async wallet => {
+            
+              web3 = new Web3(wallet.provider)
+             
+              const networkId = await web3.eth.net.getId()
+
+              setNetworkId(networkId)
+              
+              const accounts = await web3.eth.getAccounts()
+
+            },
+          },
+          walletSelect: {
+            wallets: [
+              { walletName: "metamask", preferred: true },
+              { walletName: "walletConnect", preferred: true, infuraKey: config.defaultWeb3Provider },
+            ]
+          }
+        });
+
+
+        const walletSelected = await onboard.walletSelect();
+
+        if (!walletSelected) return setWalletSelected(false)
+        
+        const walletChecked = await onboard.walletCheck();
+
+        if (!walletChecked) return setWalletSelected(false)
+
+      }
+
 
     }, [])
 
@@ -170,6 +200,7 @@ const withWallet = (WrappedComponent) => {
           hasMetamask={!!window.ethereum}
           isUnlocked={!!account}
           onEnable={handleEnable}
+          selectWallet={selectWallet}
           updateAllState={() => updateAllState()}
           updateAllowances={() => updateAllowances()}
           updateBalances={() => updateBalances()}
@@ -178,6 +209,7 @@ const withWallet = (WrappedComponent) => {
           networkId={networkId}
           liquidity={liquidity}
           walletBalances={walletBalances}
+          walletSelected={walletSelected}
           web3={web3}
         />
       </>
