@@ -49,7 +49,9 @@ export default class NumericFormats {
 
     }
 
-    getDisplayFromRaw (raw, decimals) {
+    getDisplayFromRaw (raw) {
+
+      console.log(this.name + " display from raw " + raw + " " + this.decimals)
 
       return new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(2)
 

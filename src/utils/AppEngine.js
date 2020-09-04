@@ -83,14 +83,16 @@ export default class AppEngine extends SwapEngine {
             const allowance = await asset.allowance(shellAddr, account)
 
             const balance = await asset.balanceOf(account)
-            
-            const rawBalInShell = ownedLiqRatio.multipliedBy(shellLiq[1][ix].raw)
+
+            const liqInShell = shellLiq[1][ix].raw.dividedBy(10 ** (18 - asset.decimals))
+
+            const rawBalInShell = ownedLiqRatio.multipliedBy(shellLiq[1][ix].raw).div(10 ** (18 - asset.decimals))
 
             return {
                 allowance: allowance,
                 balance: balance,
                 balanceInShell: shell.getAllFormatsFromRaw(rawBalInShell),
-                liquidityInShell: shellLiq[1][ix]
+                liquidityInShell: asset.getAllFormatsFromRaw(liqInShell)
             }
 
         }))
