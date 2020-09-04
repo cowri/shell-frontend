@@ -15,6 +15,8 @@
     "@testing-library/user-event": "^7.1.2",
     "bignumber.js": "^9.0.0",
     "bnc-onboard": "^1.12.0",
+    "immutable": "^4.0.0-rc.12",
+    "immutable-js": "^0.3.1-6",
     "js-cookie": "^2.2.1",
     "random-words": "^1.1.1",
     "react": "^16.13.1",

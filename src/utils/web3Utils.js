@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import config from '../kovan.config.json'
 
 import erc20ABI from '../abi/ERC20.abi.json'
-import loihiABI from '../abi/Loihi.abi.json'
+import shellABI from '../abi/Shell.abi.json'
 import assimilatorABI from '../abi/Assimilator.abi.json'
 
 import daiIcon from '../assets/dai.svg'
@@ -11,7 +11,8 @@ import usdcIcon from '../assets/usdc.svg'
 import usdtIcon from '../assets/usdt.svg'
 import susdIcon from '../assets/susd.svg'
 
-import { ERC20, Loihi } from "./web3Classes.js"
+import { ERC20, Shell } from "./web3Classes.js"
+import Asset from './Asset'
 
 window.BigNumber = BigNumber
 
@@ -31,10 +32,10 @@ export const bnAmount = (value, decimals) => {
 
 }
 
-export const getLoihiBalances = async function (liquidity, loihi, walletAddress) {
+export const getShellBalances = async function (liquidity, shell, walletAddress) {
 
-  const shells = await loihi.balanceOf(walletAddress)
-  const total = await loihi.totalSupply()
+  const shells = await shell.balanceOf(walletAddress)
+  const total = await shell.totalSupply()
   const liqRatio = total.isZero() ? total : shells.dividedBy(total)
   const value = liquidity.total.multipliedBy(liqRatio)
 
@@ -50,9 +51,9 @@ export const getLoihiBalances = async function (liquidity, loihi, walletAddress)
 
 }
 
-export const getLiquidity = async (loihi) => {
+export const getLiquidity = async (shell) => {
 
-  return await loihi.liquidity()
+  return await shell.liquidity()
 
 }
 
@@ -70,32 +71,36 @@ export const getWalletBalances = async (contracts, walletAddress) => {
 export const getAllowances = async (contracts, walletAddress) => {
 
   return {
-    dai: await contracts.dai.allowance(walletAddress, config.LOIHI),
-    usdc: await contracts.usdc.allowance(walletAddress, config.LOIHI),
-    usdt: await contracts.usdt.allowance(walletAddress, config.LOIHI),
-    susd: await contracts.susd.allowance(walletAddress, config.LOIHI)
+    dai: await contracts.dai.allowance(walletAddress, config.shell),
+    usdc: await contracts.usdc.allowance(walletAddress, config.shell),
+    usdt: await contracts.usdt.allowance(walletAddress, config.shell),
+    susd: await contracts.susd.allowance(walletAddress, config.shell)
   }
   
 }
 
 export const getContracts = function (web3) {
 
-    const contractObjects = [
-      new ERC20(web3, config.DAI, 'MultiCollateral Dai', 'DAI', daiIcon, 18),
-      new ERC20(web3, config.USDC, 'USD Coin', 'USDC', usdcIcon, 6),
-      new ERC20(web3, config.USDT, 'Tether Stablecoin', 'USDT', usdtIcon, 6),
-      new ERC20(web3, config.SUSD, 'Synthetix USD', 'SUSD', susdIcon, 6)
-    ]
+  let contractObjects = { erc20s: [] }
 
-    const loihi = new Loihi(web3, config.LOIHI, "Shell Protocol", "SHL", null, 18)
+  contractObjects['shell'] = new Shell(web3, config.shell, "Shell Protocol", "SHL", null, 18)
 
-    return {
-      erc20s: contractObjects,
-      dai: contractObjects[0],
-      usdc: contractObjects[1],
-      usdt: contractObjects[2],
-      susd: contractObjects[3],
-      loihi
-    }
+  for (let erc20 in config.assets) {
+
+    const erc20Object = new ERC20(
+      web3,
+      config.assets[erc20].address,
+      config.assets[erc20].name,
+      config.assets[erc20].symbol, 
+      config.assets[erc20].decimals
+    )
+
+    contractObjects[erc20] = erc20Object
+    
+    contractObjects.erc20s.push(erc20Object)
+
+  }
+
+  return contractObjects
 
 }

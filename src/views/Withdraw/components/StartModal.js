@@ -89,7 +89,7 @@ const StartModal = ({
   balances,
   contracts,
   liquidity,
-  loihi,
+  shell,
   onDismiss,
   onWithdraw,
   setWithdrawEverything,
@@ -225,7 +225,7 @@ const StartModal = ({
 
     if (sum.isZero()) return setFeeMessage('')
 
-    const shellsToBurn = await loihi.viewSelectiveWithdraw(addresses, amounts)
+    const shellsToBurn = await shell.viewSelectiveWithdraw(addresses, amounts)
 
     if (shellsToBurn === false) {
 
@@ -263,7 +263,7 @@ const StartModal = ({
     const shells = <div>
       You will burn
       <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-        { loihi.getDisplayFromNumeraire(shellsToBurn, 2) } 
+        { shell.getDisplayFromNumeraire(shellsToBurn, 2) } 
         <img alt="" src={tinyShellIcon} style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} /> 
       </span>
       { slippageMessage }
@@ -296,7 +296,7 @@ const StartModal = ({
           <StyledRows>
             <StyledShells>
                 <StyledShellIcon src={shellIcon}/>
-                <StyledShellBalance> { loihi.getDisplayFromNumeraire(balances.shells, 2) + ' Shells'} </StyledShellBalance>
+                <StyledShellBalance> { shell.getDisplayFromNumeraire(balances.shells, 2) + ' Shells'} </StyledShellBalance>
             </StyledShells>
             <StyledFeeMessage> { feeMessage } </StyledFeeMessage>
             <TokenInput

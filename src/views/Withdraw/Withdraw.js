@@ -17,7 +17,7 @@ const Withdraw = ({
     balances,
     contracts,
     liquidity,
-    loihi,
+    shell,
     updateAllState,
     updateBalances,
     updateLiquidity,
@@ -33,13 +33,13 @@ const Withdraw = ({
 
     console.log("balances.shells", balances.shells)
     console.log("balances.shells.toString()", balances.shells.toString())
-    console.log("loihi get raw from numeraire", loihi.getRawFromNumeraire(balances.shells))
+    console.log("shell get raw from numeraire", shell.getRawFromNumeraire(balances.shells))
 
-    console.log("RAW SHELLS", loihi.getRawFromNumeraire(balances.shells))
+    console.log("RAW SHELLS", shell.getRawFromNumeraire(balances.shells))
 
     const tx = withdrawEverything
-      ? loihi.proportionalWithdraw(loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)
-      : loihi.selectiveWithdraw(addresses, amounts, loihi.getRawFromNumeraire(balances.shells), Date.now() + 500)
+      ? shell.proportionalWithdraw(shell.getRawFromNumeraire(balances.shells), Date.now() + 500)
+      : shell.selectiveWithdraw(addresses, amounts, shell.getRawFromNumeraire(balances.shells), Date.now() + 500)
 
     tx.send({ from: account })
       .once('transactionHash', () => setStep('withdrawing'))
@@ -63,7 +63,7 @@ const Withdraw = ({
           balances={balances}
           contracts={contracts}
           liquidity={liquidity}
-          loihi={loihi}
+          shell={shell}
           onDismiss={onDismiss}
           onWithdraw={handleWithdraw}
           setWithdrawEverything={setWithdrawEverything}

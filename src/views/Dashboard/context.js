@@ -6,7 +6,7 @@ export default React.createContext({
   allowances: {},
   balances: {},
   contracts: {},
-  loihi: {},
+  shell: {},
   liquidity: {},
   totalShells: new BigNumber(0),
   onEnable: () => {},
@@ -18,4 +18,7 @@ export default React.createContext({
   presentWithdraw: () => {},
   walletBalances: {},
   web3: undefined,
+  engine: {},
+  state: {},
+  login: {}
 })

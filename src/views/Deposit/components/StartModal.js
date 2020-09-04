@@ -75,7 +75,7 @@ const StartModal = ({
   allowances,
   balances,
   contracts,
-  loihi,
+  shell,
   onDeposit,
   onDismiss,
   onUnlock,
@@ -199,7 +199,7 @@ const StartModal = ({
 
     if (amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0)).isZero()) return setFeeMessage('')
 
-    const shellsToMint = await loihi.viewSelectiveDeposit(addresses, amounts)
+    const shellsToMint = await shell.viewSelectiveDeposit(addresses, amounts)
 
     if (shellsToMint === false) {
 
@@ -233,7 +233,7 @@ const StartModal = ({
     const feeMessage = <div>
       You will mint 
         <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { loihi.getDisplayFromNumeraire(shellsToMint, 2) } 
+          { shell.getDisplayFromNumeraire(shellsToMint, 2) } 
           <img alt="" 
             src={shellIcon} 
             style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
@@ -405,8 +405,6 @@ const TokenInput = ({
   value
 }) => {
 
-
-  
   return ( <>
     <StyledLabelBar>
       <span>Available: {available} {symbol}</span>
@@ -444,9 +442,7 @@ const TokenInput = ({
         ),
         startAdornment: (
           <StyledStartAdornment>
-            <TokenIcon size={24}>
-              <img src={icon} alt="" />
-            </TokenIcon>
+            <TokenIcon icon={icon} size={24} />
           </StyledStartAdornment>
         )
       }}

@@ -26,10 +26,10 @@ const ModalSuccess = ({
 }) => {
   return (
     <Modal>
+      <ModalTitle>{title}</ModalTitle>
       <ModalIcon>
         <DoneIcon />
       </ModalIcon>
-      <ModalTitle>{title}</ModalTitle>
       {
         txHash ? <StyledViewOnEtherscan>
               <a href={"https://etherscan.io/tx/" + txHash} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">

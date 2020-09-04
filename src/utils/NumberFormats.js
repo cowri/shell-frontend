@@ -8,9 +8,32 @@ export default class NumericFormats {
 
     }
 
+    getAllFormatsFromDisplay (display) {
+
+      return {
+        display: display,
+        numeraire: this.getNumeraireFromDisplay(display),
+        raw: this.getRawFromDisplay(display)
+      }
+      
+    }
+
     getNumeraireFromRaw (raw) {
 
       return raw.dividedBy(10 ** this.decimals)
+
+    }
+
+
+    getAllFormatsFromRaw (raw) {
+
+      raw = new BigNumber(raw)
+
+      return {
+        raw: raw,
+        display: this.getDisplayFromRaw(raw),
+        numeraire: this.getNumeraireFromRaw(raw)
+      }
 
     }
 
@@ -28,7 +51,7 @@ export default class NumericFormats {
 
     getDisplayFromRaw (raw, decimals) {
 
-      return new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(decimals)
+      return new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(2)
 
     }
 

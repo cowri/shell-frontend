@@ -18,7 +18,7 @@ const Deposit = ({
     allowances,
     balances,
     contracts,
-    loihi,
+    shell,
     updateAllState,
     updateAllowances,
     updateBalances,
@@ -37,7 +37,7 @@ const Deposit = ({
   const handleDeposit = async (addresses, amounts) => {
     setStep('confirmingMetamask')
 
-    const tx = loihi.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+    const tx = shell.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
 
     tx.send({ from: account })
       .on('transactionHash', () => setStep('depositing'))
@@ -58,7 +58,7 @@ const Deposit = ({
     setStep('confirmingMetamask')
 
     // Should be abstracted to web3Utils / withWallet
-    const tx = contracts[tokenKey].approve(loihi.address, '115792089237316195423570985008687907853269984665640564039457584007913129639935')
+    const tx = contracts[tokenKey].approve(shell.address, '115792089237316195423570985008687907853269984665640564039457584007913129639935')
 
     tx.send({ from: account })
       .once('transactionHash', txHash)
@@ -104,7 +104,7 @@ const Deposit = ({
           allowances={allowances}
           balances={balances}
           contracts={contracts}
-          loihi={loihi}
+          shell={shell}
           onDismiss={onDismiss}
           onDeposit={handleDeposit}
           onUnlock={handleUnlock}

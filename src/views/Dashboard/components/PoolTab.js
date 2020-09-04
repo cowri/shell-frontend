@@ -10,13 +10,6 @@ import OverviewSection from '../../../components/OverviewSection'
 import Row from '../../../components/Row'
 import TokenIcon from '../../../components/TokenIcon'
 
-import daiIcon from '../../../assets/dai.svg'
-import susdIcon from '../../../assets/susd.svg'
-import usdcIcon from '../../../assets/usdc.svg'
-import usdtIcon from '../../../assets/usdt.svg'
-
-import { displayAmount } from '../../../utils/web3Utils'
-
 import DashboardContext from '../context'
 
 const StyledPoolTab = styled.div`
@@ -62,34 +55,51 @@ const PoolTab = ({
   buttonsDisabled
 }) => {
   const {
-    balances,
-    loihi,
     presentDeposit,
     presentWithdraw,
-    liquidity,
+    engine,
+    state
   } = useContext(DashboardContext)
 
-  const totalBalance = balances.value ? `$${loihi.getDisplayFromNumeraire(balances.value, 2)}` : '--'
-  const totalPoolLiquidity = liquidity.total ? `$${loihi.getDisplayFromNumeraire(liquidity.total, 2)}` : '--'
+  console.log("app state in pool tab", state.has('assets'))
 
-  const daiLiquidityDisplay = liquidity.dai ? `$${loihi.getDisplayFromNumeraire(liquidity.dai, 2)}` : '--'
-  const usdcLiquidityDisplay = liquidity.usdc ? `$${loihi.getDisplayFromNumeraire(liquidity.usdc, 2)}` : '--'
-  const usdtLiquidityDisplay = liquidity.usdt ? `$${loihi.getDisplayFromNumeraire(liquidity.usdt, 2)}` : '--'
-  const susdLiquidityDisplay = liquidity.susd ? `$${loihi.getDisplayFromNumeraire(liquidity.susd, 2)}` : '--'
+  const rows = state.has('assets') ? engine.assets.map( (asset, ix) => { 
 
-  const daiBalanceDisplay = balances.dai ? `$${loihi.getDisplayFromNumeraire(balances.dai, 2)}` : '--'
-  const usdcBalanceDisplay = balances.usdc ? `$${loihi.getDisplayFromNumeraire(balances.usdc, 2)}` : '--'
-  const usdtBalanceDisplay = balances.usdt ? `$${loihi.getDisplayFromNumeraire(balances.usdt, 2)}` : '--'
-  const susdBalanceDisplay = balances.susd ? `$${loihi.getDisplayFromNumeraire(balances.susd, 2)}` : '--'
+    const assetState = state.get('assets').get(ix)
+
+    const liquidity = assetState.get('liquidityInShell').get('display')
+
+    const balance = assetState.get('balanceInShell').get('display')
+
+    return (
+      <Row>
+        <StyledTokenName>
+          <TokenIcon> <img alt="" src={asset.icon} /> </TokenIcon>
+          <div style={{ width: 12 }} />
+          <LabelledValue label={asset.symbol} value={asset.name} />
+        </StyledTokenName>
+        <StyledBalance>
+          { '$' + liquidity }
+        </StyledBalance>
+        <StyledBalance>
+          { '$' + balance}
+        </StyledBalance>
+      </Row>
+    )
+  }) : [] 
+
+  const totalLiq = state.has('shell') ? state.get('shell').get('totalLiq').get('display') : 0
+
+  const ownedLiq = state.has('shell') ? state.get('shell').get('ownedLiq').get('display') : 0
 
   return (
     <StyledPoolTab>
       <Overview>
         <OverviewSection>
-          <LabelledValue label="Pool Balance" value={totalPoolLiquidity} />
+          <LabelledValue label="Pool Balance" value={ '$' + totalLiq } />
         </OverviewSection>
         <OverviewSection>
-          <LabelledValue label="Your Balance" value={totalBalance} />
+          <LabelledValue label="Your Balance" value={ '$' + ownedLiq } />
         </OverviewSection>
       </Overview>
       <StyledRows>
@@ -98,71 +108,12 @@ const PoolTab = ({
           <span style={{ flex: 1, textAlign: 'right' }}>Pool Balance</span>
           <span style={{ flex: 1, textAlign: 'right' }}>My Balance</span>
         </Row>
-        <Row>
-          <StyledTokenName>
-            <TokenIcon>
-              <img alt="" src={daiIcon} />
-            </TokenIcon>
-            <div style={{ width: 12 }} />
-            <LabelledValue label="DAI" value="Dai" />
-          </StyledTokenName>
-          <StyledBalance>
-            {daiLiquidityDisplay}
-          </StyledBalance>
-          <StyledBalance>
-            {daiBalanceDisplay}
-          </StyledBalance>
-        </Row>
-        <Row>
-          <StyledTokenName>
-            <TokenIcon>
-              <img alt="" src={usdcIcon} />
-            </TokenIcon>
-            <div style={{ width: 12 }} />
-            <LabelledValue label="USDC" value="USD Coin" />
-          </StyledTokenName>
-          <StyledBalance>
-            {usdcLiquidityDisplay}
-          </StyledBalance>
-          <StyledBalance>
-            {usdcBalanceDisplay}
-          </StyledBalance>
-        </Row>
-        <Row>
-          <StyledTokenName>
-            <TokenIcon>
-              <img alt="" src={usdtIcon} />
-            </TokenIcon>
-            <div style={{ width: 12 }} />
-            <LabelledValue label="USDT" value="Tether" />
-          </StyledTokenName>
-          <StyledBalance>
-            {usdtLiquidityDisplay}
-          </StyledBalance>
-          <StyledBalance>
-            {usdtBalanceDisplay}
-          </StyledBalance>
-        </Row>
-        <Row>
-          <StyledTokenName>
-            <TokenIcon>
-              <img alt="" src={susdIcon} />
-            </TokenIcon>
-            <div style={{ width: 12 }} />
-            <LabelledValue label="SUSD" value="Sythentix USD" />
-          </StyledTokenName>
-          <StyledBalance hasBalance>
-            {susdLiquidityDisplay}
-          </StyledBalance>
-          <StyledBalance>
-            {susdBalanceDisplay}
-          </StyledBalance>
-        </Row>
+        { rows }
       </StyledRows>
       <StyledActions>
-        <Button disabled={buttonsDisabled} onClick={presentDeposit}>Deposit</Button>
+        <Button disabled={!state.has('assets')} onClick={presentDeposit}>Deposit</Button>
         <div style={{ width: 12 }} />
-        <Button disabled={buttonsDisabled} outlined onClick={presentWithdraw}>Withdraw</Button>
+        <Button disabled={!state.has('assets')} outlined onClick={presentWithdraw}>Withdraw</Button>
       </StyledActions>
     </StyledPoolTab>
   )

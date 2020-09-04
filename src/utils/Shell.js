@@ -1,50 +1,10 @@
 import BigNumber from 'bignumber.js';
 
-import ERC20ABI from '../abi/ERC20.abi.json';
 import ShellABI from '../abi/Shell.abi.json';
 
 import NumericFormats from "./NumberFormats.js";
 
-export class ERC20 extends NumericFormats {
-
-    constructor (web3, address, name, symbol, icon, decimals) {
-
-        super()
-
-        this.contract = new web3.eth.Contract(ERC20ABI, address)
-        this.address = address
-        this.name = name
-        this.symbol = symbol
-        this.icon = icon
-        this.decimals = decimals
-
-    }
-
-    approve (address, amount) {
-
-        return this.contract.methods.approve(address, amount);
-
-    }
-
-    async allowance (owner, spender) {
-
-        const allowance = new BigNumber( await this.contract.methods.allowance(owner, spender).call() )
-
-        return this.getNumeraireFromRaw(allowance)
-
-    }
-
-    async balanceOf (account) {
-
-        const balance = new BigNumber( await this.contract.methods.balanceOf(account).call() )
-
-        return this.getNumeraireFromRaw(balance)
-
-    }
-
-}
-
-export class Shell extends NumericFormats {
+export default class Shell extends NumericFormats {
 
     constructor (web3, address, name, symbol, icon, decimals) {
 
@@ -61,31 +21,29 @@ export class Shell extends NumericFormats {
     
     async balanceOf (account) {
 
-        const balance = new BigNumber( await this.contract.methods.balanceOf(account).call() )
+        const balance = await this.contract.methods.balanceOf(account).call() 
 
-        return this.getNumeraireFromRaw(balance)
-        
+        return this.getAllFormatsFromRaw(balance)
+
     }
 
     async totalSupply () {
 
-        const totalSupply = new BigNumber( await this.contract.methods.totalSupply().call() )
+        const supply = await this.contract.methods.totalSupply().call() 
 
-        return this.getNumeraireFromRaw(totalSupply)
+        return this.getAllFormatsFromRaw(supply)
 
     }
 
     async liquidity () {
 
-        const liquidity = await this.contract.methods.liquidity().call()
+        const liq = await this.contract.methods.liquidity().call()
 
-        return {
-            total: new BigNumber(liquidity[0]).dividedBy(1e18),
-            dai: new BigNumber(liquidity[1][0]).dividedBy(1e18),
-            usdc: new BigNumber(liquidity[1][1]).dividedBy(1e18),
-            usdt: new BigNumber(liquidity[1][2]).dividedBy(1e18),
-            susd: new BigNumber(liquidity[1][3]).dividedBy(1e18)
-        }
+        liq[0] = this.getAllFormatsFromRaw(liq[0])
+
+        liq[1] = liq[1].map(_liq => this.getAllFormatsFromRaw(_liq))
+
+        return liq
 
     }
 

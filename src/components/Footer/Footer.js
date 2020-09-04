@@ -41,7 +41,7 @@ const Footer = () => (
       <StyledSocialIcon target="_blank" href="https://t.me/joinchat/IXE6vxd2VqQT1-VyAxAqig">
         <FontAwesomeIcon icon={faTelegram} size="lg" />
       </StyledSocialIcon>
-      <StyledSocialIcon target="_blank" href={"https://etherscan.io/address/" + config.LOIHI} >
+      <StyledSocialIcon target="_blank" href={"https://etherscan.io/address/" + config.shell} >
         <img src={etherscan} style={{width:'1.33em'}} alt="" />
       </StyledSocialIcon>
       <StyledSocialIcon target="_blank" href="https://discord.gg/ZqMJPr4">

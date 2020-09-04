@@ -36,10 +36,10 @@ const Dashboard = ({
   allowances,
   balances,
   contracts,
-  loihi,
+  shell,
   hasMetamask,
   isUnlocked,
-  networkId,
+  network,
   liquidity,
   onEnable,
   selectWallet,
@@ -51,9 +51,16 @@ const Dashboard = ({
   walletBalances,
   walletSelected,
   web3,
+  engine,
+  state,
+  login
 }) => {
 
+  console.log("---- engine -----", engine)
+  console.log("---- state -----", state)
+  
   let userId = cookie.get('userId')
+
   if (!userId) {
 
     userId = randomWords(3).join('-')
@@ -65,29 +72,37 @@ const Dashboard = ({
   const [depositModal, setDepositModal] = useState(false)
   const [withdrawModal, setWithdrawModal] = useState(false)
 
-  const disableClick = !contracts.erc20s ? true : false
+  console.log("selected", login.get('walletSelected'))
+
+  console.log("checked", login.get('walletChecked'))
 
   const renderContent = () => {
 
-    if (!walletSelected) {
+    if (!login.get('walletSelected')) {
+
+      if (!login.get('walletSelecting')) {
+
+        return <SelectWalletModal selectWallet={selectWallet} />
       
-      return <SelectWalletModal selectWallet={selectWallet} />
+      }
+
+    } else if (!login.get('walletChecked')) {
+
+      if (!login.get('walletChecking')) { }
 
     } else if (!web3) {
 
-      // return <span style={{ color: '#FFF' }}>Metamask not found.</span>
-
-    } else if (networkId !== config.network) {
+    } else if (network != config.network) {
 
       return <NetworkModal />
 
-    } else if (!isUnlocked) {
+    } else if (!state.get('account') && !login.get('walletSelecting')) {
 
-      // return <UnlockModal />
+      return <UnlockModal />
 
     } else {
 
-      return <DashboardContent buttonsDisabled={disableClick} />
+      return <DashboardContent />
 
     }
 
@@ -100,7 +115,7 @@ const Dashboard = ({
         allowances,
         balances,
         contracts,
-        loihi,
+        shell,
         onEnable,
         updateAllState,
         updateAllowances,
@@ -112,6 +127,9 @@ const Dashboard = ({
         liquidity,
         walletBalances,
         web3,
+        engine,
+        state,
+        login
       }}>
           {/* <Intercom appID='zr42wlxq' user_id={userId} /> */}
           <StyledDashboard>
@@ -119,8 +137,8 @@ const Dashboard = ({
             { renderContent() }
             <Footer />
           </StyledDashboard>
-          {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
-          {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
+          {/* {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
+          {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />} */}
       </DashboardContext.Provider>
     </>
   )
