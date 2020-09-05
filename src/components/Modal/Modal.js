@@ -36,7 +36,7 @@ const StyledModalContent = styled.div`
   display: flex;
   flex-direction: column;
   max-height: calc(100% - 12px);
-  max-width: 420px;
+  max-width: 450px;
   position: sticky;
   width: calc(100% - 12px);
   margin: 6px;

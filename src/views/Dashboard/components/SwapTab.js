@@ -148,25 +148,21 @@ const SwapTab = () => {
     setPriceMessage('')
   }
 
-  const primeSwapNew = async (swap, index) => {
+  const primeSwap = async (swap, index) => {
 
-    setSlots(index)
+    setIndexes(index)
 
-    console.log("swap", swap)
-    console.log("index", index)
-
+    console.log("prime swap", swap)
+    console.log("prime ix ", index)
 
     if (swap.value == 0) return setZeroes(swap.value)
     if (swap.type == 'origin') {
       if (!index.type) primeOrigin(originIx, targetIx, swap.value)
       if (index.type == 'origin') primeOrigin(index.value, targetIx, swap.value)
-      if (index.type == 'target') {
-        console.log("type is target", index.value)
-        primeOrigin(originIx, index.value, swap.value)
-      }
+      if (index.type == 'target') primeOrigin(originIx, index.value, swap.value)
     }
     if (swap.type == 'target') {
-      if (!index.type) primeOrigin(originIx, targetIx, swap.value)
+      if (!index.type) primeTarget(originIx, targetIx, swap.value)
       if (index.type == 'origin') primeTarget(index.value, targetIx, swap.value)
       if (index.type == 'target') primeTarget(originIx, index.value, swap.value)
     }
@@ -177,11 +173,11 @@ const SwapTab = () => {
 
   }
   
-  const setSlots = (indexPayload) => {
+  const setIndexes = (index) => {
 
-    if (indexPayload.type === 'origin') setOriginIx(indexPayload.value)
-    if (indexPayload.type === 'target') setTargetIx(indexPayload.value)
-    if (indexPayload.type === 'switch') {
+    if (index.type === 'origin') setOriginIx(index.value)
+    if (index.type === 'target') setTargetIx(index.value)
+    if (index.type === 'switch') {
       setOriginIx(targetIx)
       setTargetIx(originIx)
     } 
@@ -193,21 +189,26 @@ const SwapTab = () => {
     setTargetValue(amount)
     setSwapType('target')
 
-    const {
-      originAmount,
-      targetAmount
-    } = await engine.viewTargetSwap(_originIx, _targetIx, targetValue)
+    try {
 
-    setOriginValue(originAmount.display)
+      const {
+        originAmount,
+        targetAmount
+      } = await engine.viewTargetSwap(_originIx, _targetIx, targetValue)
 
-    // console.log("originAmount.display", originAmount.numeraire.toString())
-    // console.log("targetAmount.display", targetAmount.numeraire.toString())
-    setPriceIndication(
-      _originIx, 
-      _targetIx, 
-      originAmount.numeraire, 
-      targetAmount.numeraire
-    )
+      setOriginValue(originAmount.display)
+
+      setPriceIndication(
+        _originIx, 
+        _targetIx, 
+        originAmount.numeraire, 
+        targetAmount.numeraire
+      )
+      
+    } catch (e) {
+
+    }
+
 
   }
 
@@ -216,25 +217,27 @@ const SwapTab = () => {
     setOriginValue(amount)
     setSwapType('origin')
 
-    console.log("originIx", _originIx)
-    console.log("targetIx", _targetIx)
+    try{
 
-    const { 
-      originAmount,
-      targetAmount
-    } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
+      const { 
+        originAmount,
+        targetAmount
+      } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
 
-    // console.log("originAmount.display", originAmount.numeraire.toString())
-    // console.log("targetAmount.display", targetAmount.numeraire.toString())
+      setTargetValue(targetAmount.display)
 
-    setTargetValue(targetAmount.display)
+      setPriceIndication(
+        _originIx, 
+        _targetIx, 
+        originAmount.numeraire, 
+        targetAmount.numeraire
+      )
+    
+    } catch (e) {
 
-    setPriceIndication(
-      _originIx, 
-      _targetIx, 
-      originAmount.numeraire, 
-      targetAmount.numeraire
-    )
+      console.log("e",e)
+
+    }
 
   }
 
@@ -335,11 +338,11 @@ const SwapTab = () => {
         ? { type: 'origin', value: originValue }
         : { type: 'target', value: targetValue }
         
-      primeSwapNew(swapPayload, { type: 'origin', value: e.target.value })
+      primeSwap(swapPayload, { type: 'origin', value: e.target.value })
 
     } else {
       
-      primeSwapNew({type: 'switch'}, {type: 'switch'})
+      primeSwap({type: 'switch'}, {type: 'switch'})
 
     }
 
@@ -353,11 +356,11 @@ const SwapTab = () => {
         ? { type: 'origin', value: originValue }
         : { type: 'target', value: targetValue }
         
-      primeSwapNew(swapPayload, { type: 'target', value: e.target.value })
+      primeSwap(swapPayload, { type: 'target', value: e.target.value })
       
     } else { 
       
-      primeSwapNew({type: 'switch' }, {type: 'switch' })
+      primeSwap({type: 'switch' }, {type: 'switch' })
 
     }
     
@@ -418,18 +421,6 @@ const SwapTab = () => {
     }
   })()
   
-  // console.log("is zero", isZero)
-  // console.log("target error", targetError)
-  // console.log("origin error", originError)
-  // console.log("initially locked", initiallyLocked)
-  // console.log("unlocked", unlocked)
-  // console.log("acount", account)
-  // console.log("state.account", state.get('account'))
-
-  // console.log("originIx", originIx)
-  // console.log("targetIx", targetIx)
-  // console.log("swap type", swapType)
-
   return (
 
     <StyledSwapTab>
@@ -439,13 +430,12 @@ const SwapTab = () => {
       { step === 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
       { step === 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
       <StyledRows>
-        <StyledWarning> This is an unaudited product, so please only use nonessential funds. The audit is currently under way. </StyledWarning>
         <AmountInput 
           available={state.get('assets').get(originIx).get('balance').get('display')}
           error={originError}
           icon={origin.icon}
           helperText={originHelperText}
-          onChange={e => primeSwapNew({type:'origin', value: e.target.value}, {})}
+          onChange={e => primeSwap({type:'origin', value: e.target.value}, {})}
           selections={getDropdown(handleOriginSelect, originIx)}
           styles={inputStyles}
           symbol={origin.symbol}
@@ -455,7 +445,7 @@ const SwapTab = () => {
         <StyledSwapRow>
           <IconButton 
             className={iconClasses.root} 
-            onClick={e=> primeSwapNew({type:'switch'}, {type:'switch'})}
+            onClick={e=> primeSwap({type:'switch'}, {type:'switch'})}
           >
             <SwapCallsIcon fontSize={'large'}/>
           </IconButton>
@@ -464,7 +454,7 @@ const SwapTab = () => {
           error={targetError}
           icon={target.icon}
           helperText={targetHelperText}
-          onChange={e => primeSwapNew({type:'target', value: e.target.value}, {})}
+          onChange={e => primeSwap({type:'target', value: e.target.value}, {})}
           selections={getDropdown(handleTargetSelect, targetIx)}
           styles={inputStyles}
           symbol={target.symbol}

@@ -80,7 +80,9 @@ export default class AppEngine extends SwapEngine {
         
         const assets = await Promise.all(this.assets.map(async function (asset, ix) {
 
-            const allowance = await asset.allowance(shellAddr, account)
+            const allowance = await asset.allowance(account, shellAddr)
+
+            console.log("~@~@~ allowance", allowance.raw.toString())
 
             const balance = await asset.balanceOf(account)
 
@@ -91,13 +93,11 @@ export default class AppEngine extends SwapEngine {
             return {
                 allowance: allowance,
                 balance: balance,
-                balanceInShell: shell.getAllFormatsFromRaw(rawBalInShell),
+                balanceInShell: asset.getAllFormatsFromRaw(rawBalInShell),
                 liquidityInShell: asset.getAllFormatsFromRaw(liqInShell)
             }
 
         }))
-
-        console.log("assets", assets)
 
         this.state = fromJS({
             account: account,
@@ -112,6 +112,30 @@ export default class AppEngine extends SwapEngine {
 
 
         this.setState(this.state)
+
+    }
+
+
+
+    unlock (index, amount, onHash, onConfirmation, onError) {
+
+        const tx = this.assets[index].approve(this.shell.address, amount)
+
+        tx.send({ from: this.account })
+            .once('transactionHash', onHash)
+            .once('confirmation', onConfirmation)
+            .on('error', onError)
+
+    }
+
+    selectiveDeposit (addresses, amounts, onHash, onConfirmation, onError) {
+
+        const tx = this.shell.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+
+        tx.send({ from: this.account })
+            .on('transactionHash', onHash)
+            .on('confirmation', onConfirmation)
+            .on('error', onError)
 
     }
 

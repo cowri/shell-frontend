@@ -21,9 +21,11 @@ import ModalContent from '../../../components/ModalContent'
 import ModalTitle from '../../../components/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
 
-import { bnAmount, displayAmount } from '../../../utils/web3Utils'
-
 import BigNumber from 'bignumber.js'
+
+const MAX_APPROVAL = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+
+const ZERO = new BigNumber(0)
 
 const StyledStartAdornment = styled.div`
   align-items: center;
@@ -72,155 +74,86 @@ const StyledFeeMessage = styled.div`
 `
 
 const StartModal = ({
-  allowances,
-  balances,
-  contracts,
-  shell,
+  engine,
+  localState,
   onDeposit,
   onDismiss,
   onUnlock,
-  liquidity,
-  unlocking,
-  walletBalances,
+  setLocalState,
+  state
 }) => {
 
-  const [daiInputValue, setDaiInputValue] = useState('')
-  const [usdcInputValue, setUsdcInputValue] = useState('')
-  const [usdtInputValue, setUsdtInputValue] = useState('')
-  const [susdInputValue, setSusdInputValue] = useState('')
-  const [daiError, setDaiError] = useState('')
-  const [usdcError, setUsdcError] = useState('')
-  const [usdtError, setUsdtError] = useState('')
-  const [susdError, setSusdError] = useState('')
-  const [error, setError] = useState('')
-  const [feeMessage, setFeeMessage] = useState('')
-  const [toolTip, setToolTip] = useState('')
+  function applyTips (val, ix) {
+    
+    let newLocalState = localState.setIn(['assets', ix, 'input'], val)
 
-  function composeToolTip (payload) {
+    setLocalState(newLocalState)
 
-    if (payload.type === 'error') {
+    console.log("...VAL", val)
+    val = engine.assets[ix].getNumeraireFromDisplay(val)
 
-      setToolTip('Deposit amounts trigger halt check')
+    console.log("VAL", val)
 
-    } else {
+    const allowance = state.get('assets').get(ix).get('allowance').get('numeraire')
+    const balance = state.get('assets').get(ix).get('balance').get('numeraire')
 
-      payload.setter(payload.trigger ? 'amount is greater than your balance' : '')
+    if (val.isGreaterThan(balance)) {
 
-      const setDai = (payload.type === 'dai' && payload.trigger) || (payload.type !== 'dai' && !!daiError.length)
-      const setUsdc = (payload.type === 'usdc' && payload.trigger) || (payload.type !== 'usdc' && !!usdcError.length)
-      const setUsdt = (payload.type === 'usdt' && payload.trigger) || (payload.type !== 'usdt' && !!usdtError.length)
-      const setSusd = (payload.type === 'susd' && payload.trigger) || (payload.type !== 'susd' && !!susdError.length)
+      newLocalState = newLocalState.setIn(['assets', ix, 'error'], 'Amount is greater than your wallet\'s balance')
 
-      if (!setDai && !setUsdc && !setUsdt && !setSusd) {
+    } else if (val.isGreaterThan(allowance)) {
 
-        return setToolTip('')
-
-      } else {
-
-        let tip = ' in your wallet'
-        let count = 0;
-
-        if (setDai) buildTip("DAI")
-        if (setUsdc) buildTip("USDC")
-        if (setUsdt) buildTip("USDT")
-        if (setSusd) buildTip("SUSD")
-
-        tip = 'Insufficient' + tip
-
-        return setToolTip(tip)
-
-        function buildTip (piece) {
-          if (count === 0) tip = ' ' + piece + tip
-          else if (count === 1) tip = ' ' + piece + ' and' + tip
-          else tip = ' ' + piece + ','  + tip
-          count++
-        }
-
-      }
-
-    }
-
-  }
-
-  const availableDai = walletBalances.dai ? contracts.dai.getDisplayFromNumeraire(walletBalances.dai, 4) : '--'
-  const availableUsdc = walletBalances.usdc ? contracts.usdc.getDisplayFromNumeraire(walletBalances.usdc, 4) : '--'
-  const availableUsdt = walletBalances.usdt ? contracts.usdt.getDisplayFromNumeraire(walletBalances.usdt, 4) : '--'
-  const availableSusd = walletBalances.susd ? contracts.susd.getDisplayFromNumeraire(walletBalances.susd, 4) : '--'
-
-  const handleInput = (e, type, setter) => {
-    e.preventDefault()
-    if (!isNaN(e.target.value)) {
-      if (e.target.value === '') {
-        setter(e.target.value)
-        primeDeposit({ type: type, value: '0'})
-      } else {
-        setter(Math.abs(+e.target.value))
-        primeDeposit({ type: type, value: Math.abs(+e.target.value)})
-      }
-    }
-  }
-
-  const primeDeposit = async (payload) => {
-
-    if ( contracts[payload.type].getNumeraireFromDisplay(payload.value).isGreaterThan(walletBalances[payload.type]) ) {
-
-      if (payload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: true, type: 'dai'})
-      if (payload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: true, type: 'usdc'})
-      if (payload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: true, type: 'usdt'})
-      if (payload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: true, type: 'susd'})
+      newLocalState = newLocalState.setIn(['assets', ix, 'error'], 'Amount is greater than Shell\'s allowance')
 
     } else {
-      
-      if (payload.type === 'dai') composeToolTip({ setter: setDaiError, trigger: false, type: 'dai'})
-      if (payload.type === 'usdc') composeToolTip({ setter: setUsdcError, trigger: false, type: 'usdc'})
-      if (payload.type === 'usdt') composeToolTip({ setter: setUsdtError, trigger: false, type: 'usdt'})
-      if (payload.type === 'susd') composeToolTip({ setter: setSusdError, trigger: false, type: 'susd'})
-      
+
+      newLocalState = newLocalState.setIn(['assets', ix, 'error' ], '')
+
     }
 
-    const daiAmount = payload.type === 'dai' ? payload.value : daiInputValue ? daiInputValue : 0
-    const usdcAmount = payload.type === 'usdc' ? payload.value : usdcInputValue ? usdcInputValue : 0
-    const usdtAmount = payload.type === 'usdt' ? payload.value : usdtInputValue ? usdtInputValue : 0
-    const susdAmount = payload.type === 'susd' ? payload.value : susdInputValue ? susdInputValue : 0
+    return newLocalState
+    
+  }
 
-    const addresses = [
-      contracts.dai.address,
-      contracts.usdc.address,
-      contracts.usdt.address,
-      contracts.susd.address
-    ]
+  // const availableDai = walletBalances.dai ? contracts.dai.getDisplayFromNumeraire(walletBalances.dai, 4) : '--'
+  // const availableUsdc = walletBalances.usdc ? contracts.usdc.getDisplayFromNumeraire(walletBalances.usdc, 4) : '--'
+  // const availableUsdt = walletBalances.usdt ? contracts.usdt.getDisplayFromNumeraire(walletBalances.usdt, 4) : '--'
+  // const availableSusd = walletBalances.susd ? contracts.susd.getDisplayFromNumeraire(walletBalances.susd, 4) : '--'
 
-    const amounts = [
-      contracts.dai.getRawFromDisplay(daiAmount),
-      contracts.usdc.getRawFromDisplay(usdcAmount),
-      contracts.usdt.getRawFromDisplay(usdtAmount),
-      contracts.susd.getRawFromDisplay(susdAmount)
-    ]
+  const primeDeposit = async (val, ix) => {
 
-    if (amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0)).isZero()) return setFeeMessage('')
+    console.log("val", val)
 
-    const shellsToMint = await shell.viewSelectiveDeposit(addresses, amounts)
+    if (isNaN(val)) return
+
+    val = val === '' ? '' : Math.abs(+val)
+
+    let newLocalState = applyTips(val, ix)
+
+    const { addresses, amounts } = getAddressesAndAmounts(newLocalState)
+
+    const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
 
     if (shellsToMint === false) {
 
-      setError('This amount triggers the halt check')
-
-      return setFeeMessage('')
+      return setLocalState(newLocalState
+        .set('error', "Deposit triggers Shell's Safety Check")
+        .delete('feeTip')
+      )
 
     } else {
 
-      setError('')
+      newLocalState = newLocalState.delete('error')
+
+      setLocalState(newLocalState)
 
     }
 
-    var totalDeposit = contracts.dai.getNumeraireFromDisplay(daiAmount)
-      .plus(contracts.usdc.getNumeraireFromDisplay(usdcAmount))
-      .plus(contracts.usdt.getNumeraireFromDisplay(usdtAmount))
-      .plus(contracts.susd.getNumeraireFromDisplay(susdAmount))
+    const totalDeposit = amounts.reduce( (a, c, i) => a.plus(engine.assets[i].getNumeraireFromRaw(c)), new BigNumber(0) )
 
-    const liquidityChange = totalDeposit.dividedBy(liquidity.total)
+    const liquidityChange = totalDeposit.dividedBy(state.get('shell').get('totalLiq').get('numeraire'))
 
-    const shellsChange = shellsToMint.dividedBy(balances.total)
+    const shellsChange = shellsToMint.dividedBy(state.get('shell').get('totalShells').get('numeraire'))
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
 
@@ -233,7 +166,7 @@ const StartModal = ({
     const feeMessage = <div>
       You will mint 
         <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { shell.getDisplayFromNumeraire(shellsToMint, 2) } 
+          { engine.shell.getDisplayFromNumeraire(shellsToMint, 2) } 
           <img alt="" 
             src={shellIcon} 
             style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
@@ -242,43 +175,23 @@ const StartModal = ({
       { slippageMessage }
     </div>
 
-    setFeeMessage(feeMessage)
+    setLocalState(newLocalState.set('feeTip', feeMessage))
 
   }
 
-  const handleDeposit = async (
-    daiValue,
-    usdcValue,
-    usdtValue,
-    susdValue,
-  ) => {
+  const getAddressesAndAmounts = (currentState) => {
 
-    // Should be abstracted to web3Utils / withWallet
-    const addresses = [
-      contracts.dai.address,
-      contracts.usdc.address,
-      contracts.usdt.address,
-      contracts.susd.address,
-    ]
+    const addresses = engine.assets.map( asset => asset.address )
 
-    const amounts = [
-      bnAmount(daiValue ? daiValue : 0, contracts.dai.decimals).toFixed(),
-      bnAmount(usdcValue ? usdcValue : 0, contracts.usdc.decimals).toFixed(),
-      bnAmount(usdtValue ? usdtValue : 0, contracts.usdt.decimals).toFixed(),
-      bnAmount(susdValue ? susdValue : 0, contracts.susd.decimals).toFixed(),
-    ]
+    const amounts = engine.assets.map( (asset, ix) => {
 
-    const sum = amounts.reduce(function(accu, val) { return accu.plus(val) }, new BigNumber(0))
+      const input = currentState.get('assets').get(ix).get('input')
 
-    if (sum.isZero()) {
-      setError("You can not deposit 0 value")
-      setFeeMessage(null)
-      return
-    } else {
-      setError('')
-    }
-    
-    onDeposit(addresses, amounts)
+      return asset.getRawFromDisplay(input == '' ? 0 : input)
+
+    })
+
+    return { addresses, amounts }
 
   }
 
@@ -288,7 +201,12 @@ const StartModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    handleDeposit(daiInputValue, usdcInputValue, usdtInputValue, susdInputValue)
+    
+    const { addresses, amounts } = getAddressesAndAmounts(localState)
+
+    console.log("addresses", addresses)
+ 
+
   }
 
   const inputStyles = makeStyles({
@@ -300,83 +218,56 @@ const StartModal = ({
     }
   })()
 
+  const tokenInputs = engine.assets.map( (asset, ix) => {
+
+    const assetState = state.get('assets').get(ix)
+    const localAssetState = localState.get('assets').get(ix)
+
+    return (
+      <TokenInput
+        available={assetState.get('balance').get('display')}
+        icon={asset.icon}
+        isError={ localAssetState.get('error') ? true : false }
+        helperText={localAssetState.get('error')}
+        locked={assetState.get('allowance').get('raw').isZero()}
+        onChange={e => primeDeposit(e.target.value, ix)}
+        // onUnlock={e => onUnlock('dai')}
+        styles={inputStyles}
+        symbol={asset.symbol}
+        value={localState.get('assets').get(ix).get('input')}
+      />
+    )
+
+  })
+
+  const isInputError = localState.get('error') == '' ? true : localState.get('assets').reduce( (x,y) => x ? true : y.get('error') == '' ? false : true, false)
+  // const isInputError = localState.get('assets').reduce( (x,y) => (console.log("x,y", x,y.get('error')), y.get('error') ? true : false), false)
+
+  console.log("isInputError", isInputError)
+
+
+
   return (
     <Modal onDismiss={onDismiss}>
       <ModalTitle>Deposit Funds</ModalTitle>
       <ModalContent>
         <StyledForm onSubmit={handleSubmit}>
           <StyledRows>
-            <StyledWarning> This is an unaudited product, so please only use nonessential funds. The audit is currently under way. </StyledWarning>
-            <TokenInput
-              available={availableDai}
-              error={!!error.length || !!daiError.length}
-              icon={daiIcon}
-              helperText={daiError}
-              locked={allowances.dai.isZero()}
-              onChange={e => handleInput(e, 'dai', setDaiInputValue)}
-              onUnlock={e => onUnlock('dai')}
-              styles={inputStyles}
-              symbol="DAI"
-              unlocking={unlocking.dai}
-              value={daiInputValue}
-            />
-            <TokenInput
-              available={availableUsdc}
-              error={!!error.length || !!usdcError.length}
-              icon={usdcIcon}
-              helperText={usdcError}
-              locked={allowances.usdc.isZero()}
-              onChange={e =>  handleInput(e, 'usdc', setUsdcInputValue)}
-              onUnlock={e => onUnlock('usdc')}
-              unlocking={unlocking.usdc}
-              styles={inputStyles}
-              symbol="USDC"
-              value={usdcInputValue}
-            />
-            <TokenInput
-              available={availableUsdt}
-              error={!!error.length || !!usdtError.length}
-              icon={usdtIcon}
-              helperText={usdtError}
-              locked={allowances.usdt.isZero()}
-              onChange={e => handleInput(e, 'usdt', setUsdtInputValue)}
-              onUnlock={e => onUnlock('usdt')}
-              unlocking={unlocking.usdt}
-              styles={inputStyles}
-              symbol="USDT"
-              value={usdtInputValue}
-            />
-            <TokenInput
-              available={availableSusd}
-              error={!!error.length || !!susdError.length}
-              icon={susdIcon}
-              helperText={susdError}
-              locked={allowances.susd.isZero()}
-              onChange={e => handleInput(e, 'susd', setSusdInputValue)}
-              onUnlock={e => onUnlock('susd')}
-              unlocking={unlocking.susd}
-              styles={inputStyles}
-              symbol="SUSD"
-              value={susdInputValue}
-            />
+            { tokenInputs }
           </StyledRows>
-          <StyledFeeMessage> { feeMessage } </StyledFeeMessage>
+          <StyledFeeMessage> { localState.get('feeTip') } </StyledFeeMessage>
         </StyledForm>
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
-        <Tooltip arrow={true} placement={'top'} title={toolTip} style={ error || !!daiError.length || !!usdcError.length || !!usdtError.length || !! susdError.length ? { cursor: 'no-drop'} : null } >
-          <div>
-            <Button disabled={ error || !!daiError.length || !!usdcError.length || !!usdtError.length || !! susdError.length } onClick={handleSubmit}> Deposit </Button>
-          </div>
-        </Tooltip>
+        <Button disabled={ isInputError } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button>
       </ModalActions>
       <Snackbar 
         anchorOrigin={{vertical: 'center', horizontal: 'center'}} 
         autoHideDuration={6000} 
         onClose={handleErrorSnackbarClose}
         style={{'marginTop': '65px'}}
-        open={error ? true : false} 
+        open={localState.get('error') ? true : false} 
       >
         <MuiAlert 
           elevation={6}
@@ -384,7 +275,7 @@ const StartModal = ({
           severity={'error'} 
           variant="filled"
         >
-          { error }
+          { localState.get('error') }
         </MuiAlert>
       </Snackbar>
     </Modal>
@@ -393,7 +284,7 @@ const StartModal = ({
 
 const TokenInput = ({
   available,
-  error,
+  isError,
   icon,
   helperText,
   locked,
@@ -407,11 +298,12 @@ const TokenInput = ({
 
   return ( <>
     <StyledLabelBar>
-      <span>Available: {available} {symbol}</span>
+      <span>  Shell's allowance: {available} {symbol} </span>
     </StyledLabelBar>
     <TextField fullWidth
+      defaultColor="red"
       disabled={locked}
-      error={error}
+      error={isError}
       FormHelperTextProps={{className: styles.helperText}}
       helperText={helperText}
       onChange={onChange}
@@ -420,6 +312,7 @@ const TokenInput = ({
       value={value}
       onKeyDown={e => { if (e.keyCode === 189) e.preventDefault() }}
       InputProps={{
+        style: isError ? { color: 'red' } : null,
         min: "0",
         endAdornment: locked ? (
           <div style={{ marginRight: 6 }}>
@@ -442,7 +335,7 @@ const TokenInput = ({
         ),
         startAdornment: (
           <StyledStartAdornment>
-            <TokenIcon icon={icon} size={24} />
+            <TokenIcon size={24}> <img alt="" src={icon} /> </TokenIcon>
           </StyledStartAdornment>
         )
       }}

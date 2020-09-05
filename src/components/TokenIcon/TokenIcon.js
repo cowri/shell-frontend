@@ -12,7 +12,7 @@ const StyledTokenIcon = styled.div`
   }
 `
 
-const TokenIcon = ({ icon, children, color, size = 36 }) => (
+const TokenIcon = ({ children, color, size = 36 }) => (
   <StyledTokenIcon color={color} size={size}>
     {children}
   </StyledTokenIcon>

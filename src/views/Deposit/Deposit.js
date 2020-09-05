@@ -10,107 +10,99 @@ import ModalError from '../../components/ModalError'
 import StartModal from './components/StartModal'
 import ModalSuccess from '../../components/ModalSuccess'
 
+import { fromJS } from 'immutable'
+import BigNumber from 'bignumber.js'
+
+const MAX_APPROVAL = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+
+const ZERO = new BigNumber(0)
+
 const Deposit = ({
-  onDismiss
+    onDismiss
 }) => {
   const { 
-    account,
-    allowances,
-    balances,
-    contracts,
-    shell,
-    updateAllState,
-    updateAllowances,
-    updateBalances,
-    updateLiquidity,
-    updateWalletBalances,
-    liquidity,
-    walletBalances
+    engine,
+    state
   } = useContext(DashboardContext)
 
-  const [step, setStep] = useState('start')
   const [txHash, setTxHash] = useState('')
-
-  // should change to useReducer
-  const [unlocking, setUnlocking] = useState({})
+  const [step, setStep] = useState('start')
+  const [localState, setLocalState] = useState(fromJS({
+    assets: new Array(engine.assets.length).fill({
+      error: false,
+      input: ''
+    }),
+    error: '',
+    feeTip: '',
+    balTip: '',
+  }))
 
   const handleDeposit = async (addresses, amounts) => {
-    setStep('confirmingMetamask')
 
-    const tx = shell.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+    setLocalState(localState
+      .delete('error')
+      .set('step', 'confirmingMetamask')
+    )
 
-    tx.send({ from: account })
-      .on('transactionHash', () => setStep('depositing'))
-      .once('confirmation', handleConfirmation)
-      .on('error', () => setStep('error'))
-
-    function handleConfirmation () {
-
-      setStep('deposit-success')
-
-      updateAllState()
-
-    }
-
-  }
-
-  const handleUnlock = async (tokenKey) => {
-    setStep('confirmingMetamask')
-
-    // Should be abstracted to web3Utils / withWallet
-    const tx = contracts[tokenKey].approve(shell.address, '115792089237316195423570985008687907853269984665640564039457584007913129639935')
-
-    tx.send({ from: account })
-      .once('transactionHash', txHash)
-      .once('confirmation', confirmation)
-      .on('error', error)
-
-      function txHash (hash) {
-
+    engine.selectiveDeposit(
+      addresses,
+      amounts,
+      (hash) => {
         setTxHash(hash)
-
-        setUnlocking({ ...unlocking, [tokenKey]: true })
-
-        setStep('unlocking')
-
-      }
-
-      function confirmation () {
-
-        setUnlocking({...unlocking, [tokenKey]: false })
-
-        updateAllowances()
-        
-        setStep('unlocking-success')
-
-      }
-
-      function error () {
-
-        setUnlocking({ ...unlocking, [tokenKey]: false })
-
+        setStep('depositing')
+      },
+      () => {
+        setStep('deposit-success')
+        setLocalState(localState
+          .delete('fee')
+          .update('assets', assets => assets.map(asset => asset.set('input', ''))))
+      },
+      () => {
         setStep('error')
-        
+        setLocalState(localState
+          .delete('fee')
+          .update('assets', assets => assets.map(asset => asset.set('input', ''))))
       }
+    )
 
   }
 
-  const onUnlockSuccessDismiss = () => setStep('start')
+  const handleUnlock = async (index) => {
+
+    setLocalState(localState.set('step', 'confirmingMetamask'))
+
+    engine.unlock(
+      index,
+      MAX_APPROVAL,
+      (hash) => {
+        setStep('unlocking')
+        setTxHash(hash)
+      },
+      () => setStep('unlocking-success'),
+      () => setStep('error')
+    )
+
+  }
+
+  const dismissSubmodal = () => {
+
+    setTxHash('')
+    setStep('start')
+
+  }
 
   return (
     <>
+
       {step === 'start' && (
         <StartModal
-          allowances={allowances}
-          balances={balances}
-          contracts={contracts}
-          shell={shell}
-          onDismiss={onDismiss}
+          engine={engine}
+          localState={localState}
           onDeposit={handleDeposit}
           onUnlock={handleUnlock}
-          liquidity={liquidity}
-          unlocking={unlocking}
-          walletBalances={walletBalances}
+          onDismiss={onDismiss}
+          setLocalState={setLocalState}
+          state={state}
         />
       )}
 
@@ -127,15 +119,15 @@ const Deposit = ({
       )}
 
       {step === 'deposit-success' && (
-        <ModalSuccess buttonBlurb={'Finish'} onDismiss={onDismiss} title={'Deposit Successful.'} />
+        <ModalSuccess buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'Deposit Successful.'} txHash={txHash} />
       )}
 
       {step === 'unlocking-success' && (
-        <ModalSuccess buttonBlurb={'Finish'} onDismiss={onUnlockSuccessDismiss} title={'Approval Successful.'} />
+        <ModalSuccess buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'Approval Successful.'} txHash={txHash} />
       )}
 
       {step === 'error' && (
-        <ModalError buttonBlurb={'Finish'} onDismiss={onDismiss} title={'An error occurred'} />
+        <ModalError buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'An error occurred'} txHash={txHash} />
       )}
     </>
   )

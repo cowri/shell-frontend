@@ -8,6 +8,7 @@ export default class SwapEngine {
 
         let origin = this.assets[originIndex]
         let target = this.assets[targetIndex]
+        console.log("origin swap")
         console.log("origin index", originIndex)
         console.log("target index", targetIndex)
         console.log("origin name", origin.name)
@@ -21,15 +22,17 @@ export default class SwapEngine {
             originAmount.raw
         )
 
-        console.log("target amount", targetAmount.toString())
+        if (!targetAmount) {
 
-        // console.log("target amount", targetAmount)
-        // console.log("originAmount.raw", originAmount.raw.toString())
-        // console.log("targetAmount.raw", target.getAllFormatsFromRaw(targetAmount).raw.toString())
+            throw(new Error("Reverted"))
 
-        return {
-            originAmount: originAmount,
-            targetAmount: target.getAllFormatsFromRaw(targetAmount)
+        } else {
+            
+            return {
+                originAmount: originAmount,
+                targetAmount: target.getAllFormatsFromRaw(targetAmount)
+            }
+
         }
 
     }
@@ -46,9 +49,6 @@ export default class SwapEngine {
             target.address,
             targetAmount.raw
         )
-
-        console.log("targetAmount.raw", targetAmount.raw.toString())
-        console.log("originAmount.raw", origin.getAllFormatsFromRaw(originAmount).raw.toString())
 
         return {
             originAmount: origin.getAllFormatsFromRaw(originAmount),

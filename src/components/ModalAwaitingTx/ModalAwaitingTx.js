@@ -18,22 +18,23 @@ const StyledViewOnEtherscan = styled.div`
   margin-top: 18px;
 `
 
-const AwaitingTxModal = (props) => {
-  const { txHash } = props
+const AwaitingTxModal = ({ txHash }) => {
   return (
     <Modal>
       <ModalTitle> Please wait while your transaction confirms </ModalTitle>
       <ModalIcon>
         <HourglassFullIcon />
       </ModalIcon>
-      <StyledViewOnEtherscan>
-        <a href={"https://etherscan.io/tx/" + txHash} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
-          <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
-          <span>
-            View On Etherscan
-          </span>
-        </a>
-      </StyledViewOnEtherscan>
+      {
+        txHash ?  <StyledViewOnEtherscan>
+          <a href={"https://etherscan.io/tx/" + txHash} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
+            <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
+            <span>
+              View On Etherscan
+            </span>
+          </a>
+        </StyledViewOnEtherscan> : null
+      }
       <ModalActions>
         <div style={{ flex: 1 }}>
           <Loader />
