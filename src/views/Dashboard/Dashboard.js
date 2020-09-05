@@ -56,9 +56,6 @@ const Dashboard = ({
   login
 }) => {
 
-  console.log("---- engine -----", engine)
-  console.log("---- state -----", state)
-  
   let userId = cookie.get('userId')
 
   if (!userId) {

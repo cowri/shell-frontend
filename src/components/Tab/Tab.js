@@ -10,6 +10,7 @@ const StyledTab = styled.div`
   flex: 1;
   font-weight: 700;
   height: 72px;
+  font-size: 18px;
   justify-content: center;
   opacity: ${props => props.active ? 1 : 0.5};
   pointer-events: ${props => props.disabled ? 'none' : 'all'};

@@ -29,7 +29,7 @@ const Deposit = ({
   const [step, setStep] = useState('start')
   const [localState, setLocalState] = useState(fromJS({
     assets: new Array(engine.assets.length).fill({
-      error: false,
+      error: '',
       input: ''
     }),
     error: '',

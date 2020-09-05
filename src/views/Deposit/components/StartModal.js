@@ -245,8 +245,6 @@ const StartModal = ({
 
   console.log("isInputError", isInputError)
 
-
-
   return (
     <Modal onDismiss={onDismiss}>
       <ModalTitle>Deposit Funds</ModalTitle>
@@ -298,7 +296,9 @@ const TokenInput = ({
 
   return ( <>
     <StyledLabelBar>
-      <span>  Shell's allowance: {available} {symbol} </span>
+      <span>  Shell's allowance:
+        <span class="number"> ${available} </span>
+      </span> 
     </StyledLabelBar>
     <TextField fullWidth
       defaultColor="red"

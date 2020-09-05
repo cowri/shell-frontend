@@ -129,7 +129,7 @@ const SwapTab = () => {
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
   const [slippage, setSlippage] = useState(0)
-  const [priceMessage, setPriceMessage] = useState('')
+  const [priceMessage, setPriceMessage] = useState('Your price for this trade will be...')
   const [txHash, setTxHash] = useState('')
 
   const origin = engine.assets[originIx]
@@ -145,15 +145,12 @@ const SwapTab = () => {
     console.log("set zeroes")
     setOriginValue(value)
     setTargetValue(value)
-    setPriceMessage('')
+    setPriceMessage('Your price for this trade will be...')
   }
 
   const primeSwap = async (swap, index) => {
 
     setIndexes(index)
-
-    console.log("prime swap", swap)
-    console.log("prime ix ", index)
 
     if (swap.value == 0) return setZeroes(swap.value)
     if (swap.type == 'origin') {
@@ -248,15 +245,15 @@ const SwapTab = () => {
     const oSymbol = engine.assets[_originIx].symbol
     const tSymbol = engine.assets[_targetIx].symbol
 
-    let message = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
-      ? '$1.00 of ' + oSymbol + ' is worth '
-      : '1.0000 ' + oSymbol + ' is worth '
+    let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
+      ? <span> $ <span> 1.00 </span> of { oSymbol } is worth </span>
+      : <span> <span> 1.00 </span> { oSymbol } is worth </span>
 
-    message += (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI')
-      ? '$' + tPrice + ' of ' + tSymbol + ' for this trade'
-      : tPrice + ' ' + tSymbol + ' for this trade'
+    let right = (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI')
+      ? <span> $ <span> { tPrice } </span> of { tSymbol } for this trade </span>
+      : <span> <span> { tPrice } </span> { tSymbol } for this trade </span>
       
-    setPriceMessage(message)
+    setPriceMessage(<span> {left} {right} </span>)
 
   }
 
@@ -367,7 +364,7 @@ const SwapTab = () => {
   }
 
   const selectionCss = makeStyles({
-    root: { 'fontSize': '22px' }
+    root: { 'fontFamily': 'Geomanist', 'fontSize': '17.5px' }
   })()
 
   const selections = engine.assets.map( (asset, ix) => {
@@ -379,6 +376,7 @@ const SwapTab = () => {
   const getDropdown = (handler, value) => {
 
     return ( <TextField select
+      InputProps={{ className: selectionCss.root }}
       children={selections}
       onChange={e => handler(e)}
       value={value}
@@ -388,7 +386,8 @@ const SwapTab = () => {
 
   const iconClasses = makeStyles({
       root: { position: 'absolute', right: '12.5px', top: '-25px' }
-  }, { name: 'MuiIconButton' })()
+    }, { name: 'MuiIconButton' }
+  )()
 
   let toolTipMsg = ''
 
@@ -413,7 +412,7 @@ const SwapTab = () => {
   }
 
   const inputStyles = makeStyles({
-    inputBase: { fontSize: '22px', height: '60px' },
+    inputBase: { fontSize: '20px', height: '60px' },
     helperText: {
       color: 'red', 
       fontSize: '16px',
@@ -518,7 +517,7 @@ const AmountInput = ({
         InputProps={{
           className: styles.inputBase,
           endAdornment: ( 
-            <div style={{ marginRight: 6 }}> 
+            <div style={{ marginRight: 6, fontFamily: 'Geomanist' }}> 
               { selections } 
             </div>
           ),

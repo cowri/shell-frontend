@@ -1,11 +1,20 @@
+
+
+@font-face {
+  font-family: 'Geomanist';
+  src: local('Geomanist'), url(./fonts/geomanist-book-webfont.ttf) format('truetype');
+}
+
+.number {
+  font-family: Arial;
+}
+
 body {
   background-color: #f0f4f8;
   color: #00010f;
   margin: 0;
   font-size: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: Geomanist;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

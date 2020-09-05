@@ -16,6 +16,7 @@ const StyledLabel = withTheme(styled.span`
 const StyledValue = withTheme(styled.h3`
   font-size: 1em;
   font-weight: 400;
+  font-family: Arial;
   margin: 0;
   padding: 0;
 `)

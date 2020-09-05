@@ -21,14 +21,14 @@ const StyledPoolTab = styled.div`
 const StyledTokenName = styled.span`
   align-items: center;
   display: flex;
-  flex: 1;
-  opacity: 0.75;
+  flex: 1.5;
 `
 
 const StyledBalance = styled.div`
   display: flex;
   flex: 1;
   font-size: 22px;
+  font-family: Arial;
   justify-content: flex-end;
   text-align: right;
   @media (max-width: 512px) {
@@ -78,7 +78,7 @@ const PoolTab = ({
           <div style={{ width: 12 }} />
           <LabelledValue label={asset.symbol} value={asset.name} />
         </StyledTokenName>
-        <StyledBalance>
+        <StyledBalance className="number">
           { '$' + liquidity }
         </StyledBalance>
         <StyledBalance>
@@ -104,7 +104,7 @@ const PoolTab = ({
       </Overview>
       <StyledRows>
         <Row head>
-          <span style={{ flex: 1 }}>Token</span>
+          <span style={{ flex: 1.5 }}>Token</span>
           <span style={{ flex: 1, textAlign: 'right' }}>Pool Balance</span>
           <span style={{ flex: 1, textAlign: 'right' }}>My Balance</span>
         </Row>

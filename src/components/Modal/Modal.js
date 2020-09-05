@@ -16,7 +16,6 @@ const contentKeyframes = keyframes`
 
 const StyledModal = styled.div`
   align-items: center;
-  // backdrop-filter: blur(100px);
   display: flex;
   justify-content: center;
   text-align: center;
@@ -39,6 +38,8 @@ const StyledModalContent = styled.div`
   max-width: 450px;
   position: sticky;
   width: calc(100% - 12px);
+  top: -55px;
+  position:relative;
   margin: 6px;
 `
 

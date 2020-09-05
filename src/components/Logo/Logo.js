@@ -21,7 +21,7 @@ const Logo = ({ color = "#FFF" }) => (
   <StyledLogo color={color}>
     <StyledImg src={logo} />
     <div style={{ width: 4 }} />
-    <span>Shell</span>
+    <span>Shell Protocol</span>
   </StyledLogo>
 )
 
