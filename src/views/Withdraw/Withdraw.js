@@ -1,5 +1,7 @@
 import React, { useContext, useState } from 'react'
 
+import { fromJS } from 'immutable'
+
 import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
 import WithdrawingModal from '../../components/ModalAwaitingTx'
 
@@ -13,46 +15,53 @@ const Withdraw = ({
   onDismiss
 }) => {
   const { 
-    account,
-    balances,
-    contracts,
-    liquidity,
-    shell,
-    updateAllState,
-    updateBalances,
-    updateLiquidity,
-    updateWalletBalances,
+    engine,
+    state
   } = useContext(DashboardContext)
 
+  const [txHash, setTxHash] = useState('')
   const [step, setStep] = useState('start')
   const [withdrawEverything, setWithdrawEverything] = useState(false)
+  const [localState, setLocalState] = useState(fromJS({
+    assets: new Array(engine.assets.length).fill({
+      error: '',
+      input: ''
+    }),
+    error: '',
+    feeTip: 'Your rate on this withdrawal will be...',
+    proportional: false
+  }))
+
+  const handleTxHash = (hash) => ( setStep('withdrawing'), setTxHash(hash) )
+
+  const handleConfirmation = () => setStep('success')
+
+  const handleError = () => setStep('error')
+
+  const handleProportionalWithdraw = async (amount) => {
+
+    setStep('confirmingMetamask')
+
+    engine.proportionalWithdraw(
+      amount,
+      handleTxHash,
+      handleConfirmation,
+      handleError
+    )
+
+  }
 
   const handleWithdraw = async (addresses, amounts) => {
 
     setStep('confirmingMetamask')
 
-    console.log("balances.shells", balances.shells)
-    console.log("balances.shells.toString()", balances.shells.toString())
-    console.log("shell get raw from numeraire", shell.getRawFromNumeraire(balances.shells))
-
-    console.log("RAW SHELLS", shell.getRawFromNumeraire(balances.shells))
-
-    const tx = withdrawEverything
-      ? shell.proportionalWithdraw(shell.getRawFromNumeraire(balances.shells), Date.now() + 500)
-      : shell.selectiveWithdraw(addresses, amounts, shell.getRawFromNumeraire(balances.shells), Date.now() + 500)
-
-    tx.send({ from: account })
-      .once('transactionHash', () => setStep('withdrawing'))
-      .once('confirmation', handleConfirmation)
-      .on('error', () => setStep('error'))
-
-    function handleConfirmation () {
-
-      setStep('success')
-
-      updateAllState()
-
-    }
+    engine.selectiveWithdraw(
+      addresses,
+      amounts,
+      handleTxHash,
+      handleConfirmation,
+      handleError
+    )
 
   }
 
@@ -60,14 +69,13 @@ const Withdraw = ({
     <>
       {step === 'start' && (
         <StartModal
-          balances={balances}
-          contracts={contracts}
-          liquidity={liquidity}
-          shell={shell}
+          engine={engine}
+          localState={localState}
           onDismiss={onDismiss}
+          onProportionalWithdraw={handleProportionalWithdraw}
           onWithdraw={handleWithdraw}
-          setWithdrawEverything={setWithdrawEverything}
-          withdrawEverything={withdrawEverything}
+          setLocalState={setLocalState}
+          state={state}
         />
       )}
 

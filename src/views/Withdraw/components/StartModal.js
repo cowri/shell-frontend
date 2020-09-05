@@ -86,22 +86,14 @@ const StyledFeeMessage = styled.div`
 `
 
 const StartModal = ({
-  balances,
-  contracts,
-  liquidity,
-  shell,
-  onDismiss,
+  engine, 
+  localState,
+  onProportionalWithdraw,
   onWithdraw,
-  setWithdrawEverything,
-  withdrawEverything
+  onDismiss,
+  setLocalState,
+  state
 }) => {
-
-  const [daiInputAmt, setDaiInputAmt] = useState('')
-  const [usdcInputAmt, setUsdcInputAmt] = useState('')
-  const [usdtInputAmt, setUsdtInputAmt] = useState('')
-  const [susdInputAmt, setSusdInputAmt] = useState('')
-  const [feeMessage, setFeeMessage] = useState(null)
-  const [error, setError] = useState('')
 
   const epsilonRemoved = (amount) => {
 
@@ -114,145 +106,117 @@ const StartModal = ({
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    if (withdrawEverything) {
+    if (localState.get('proportional')) {
 
-      onWithdraw()
+      onProportionalWithdraw(state.getIn([ 'shell', 'shells', 'raw' ]))
 
     } else {
 
-      const addresses = []
-      const amounts = []
-      if (Number(daiInputAmt)) {
-        addresses.push(contracts.dai.address)
-        amounts.push(bnAmount(daiInputAmt, contracts.dai.decimals).toFixed())
-      }
-
-      if (Number(usdcInputAmt)) {
-        addresses.push(contracts.usdc.address)
-        amounts.push(bnAmount(usdcInputAmt, contracts.usdc.decimals).toFixed())
-      }
-
-      if (Number(usdtInputAmt)) {
-        addresses.push(contracts.usdt.address)
-        amounts.push(bnAmount(usdtInputAmt, contracts.usdt.decimals).toFixed())
-      }
-
-      if (Number(susdInputAmt)) {
-        addresses.push(contracts.susd.address)
-        amounts.push(bnAmount(susdInputAmt, contracts.susd.decimals).toFixed())
-      }
+      const {
+        addresses,
+        amounts
+      } = getAddressesAndAmounts(localState)
 
       onWithdraw(addresses, amounts)
 
     }
   }
 
-  const handleWithdrawEverythingCheckbox = (e) => {
+  const getAddressesAndAmounts = (currentState) => {
 
-    setWithdrawEverything(e.target.checked)
+    const addresses = engine.assets.map( asset => asset.address )
 
-    if (e.target.checked) {
+    const amounts = engine.assets.map( (asset, ix) => {
 
-      const daiToSet = contracts.dai.getDisplayFromNumeraire(epsilonRemoved(balances.dai), 4)
-      const usdcToSet = contracts.usdc.getDisplayFromNumeraire(epsilonRemoved(balances.usdc), 4)
-      const usdtToSet = contracts.usdt.getDisplayFromNumeraire(epsilonRemoved(balances.usdt), 4)
-      const susdToSet = contracts.susd.getDisplayFromNumeraire(epsilonRemoved(balances.susd), 4)
+      const input = currentState.get('assets').get(ix).get('input')
 
-      setDaiInputAmt(daiToSet)
-      setUsdcInputAmt(usdcToSet)
-      setUsdtInputAmt(usdtToSet)
-      setSusdInputAmt(susdToSet)
+      return asset.getRawFromDisplay(input == '' ? 0 : input)
+
+    })
+
+    return { addresses, amounts }
+
+  }
+
+  const primeProportionalWithdraw = (yes) => {
+
+    if (yes) {
 
       const shells = (
         <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { displayAmount(balances.shells, 18, 2) } 
+          { state.getIn([ 'shell', 'shells', 'display' ])} 
           <img alt=""
             src={tinyShellIcon} 
             style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} 
           /> 
         </span>
       )
-
-      setFeeMessage(<div> You will burn { shells } and pay a 0.0175% fee to liquidity providers </div> )
+      
+      setLocalState(localState
+        .update('assets', as => as.map( (a, ix) => {
+          a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']))
+        }))
+        .set('feeTip', <div> For this withdrawal you will burn { shells } and pay a 0.0175% fee to liquidity providers </div>)
+        .set('proportional', true)
+      )
 
     } else {
 
-      setDaiInputAmt('')
-      setUsdcInputAmt('')
-      setUsdtInputAmt('')
-      setSusdInputAmt('')
-      setFeeMessage('')
+      setLocalState(localState
+        .update('assets', as => as.map( a => a.set('input', '')))
+        .set('feeTip', 'Your rate on this withdrawal will be...')
+        .set('proportional', false)
+      )
 
     }
 
   }
 
-  const handleInput = (e, type, setter) => {
-    e.preventDefault()
-    if (!isNaN(e.target.value)) {
-      if (e.target.value === '') {
-        setter(e.target.value)
-        primeWithdraw({ type: type, value: '0'})
-      } else {
-        setter(Math.abs(+e.target.value))
-        primeWithdraw({ type: type, value: Math.abs(+e.target.value)})
-      }
-    }
-  }
+  const primeWithdraw = async (val, ix) => {
 
-  const primeWithdraw = async (payload) => {
+    if (isNaN(val)) return
 
-    const daiAmount = payload.type === 'dai' ? payload.value : daiInputAmt ? daiInputAmt : 0 
-    const usdcAmount = payload.type === 'usdc' ? payload.value : usdcInputAmt ? usdcInputAmt : 0
-    const usdtAmount = payload.type === 'usdt' ? payload.value : usdtInputAmt ? usdtInputAmt : 0
-    const susdAmount = payload.type === 'susd' ? payload.value : susdInputAmt ? susdInputAmt : 0
+    val = val === '' ? '' : Math.abs(+val)
 
-    const addresses = [
-      contracts.dai.address,
-      contracts.usdc.address,
-      contracts.usdt.address,
-      contracts.susd.address,
-    ]
+    let newLocalState = localState.setIn(['assets', ix, 'input'], val)
 
-    const amounts = [
-      contracts.dai.getRawFromDisplay(daiAmount),
-      contracts.usdc.getRawFromDisplay(usdcAmount),
-      contracts.usdt.getRawFromDisplay(usdtAmount),
-      contracts.susd.getRawFromDisplay(susdAmount)
-    ]
+    const { 
+      addresses,
+      amounts
+    } = getAddressesAndAmounts(newLocalState)
 
     const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
 
-    if (sum.isZero()) return setFeeMessage('')
+    if (sum.isZero()) return setLocalState(newLocalState.set('feeTip', 'Your rate for this withdrawal will be...'))
 
-    const shellsToBurn = await shell.viewSelectiveWithdraw(addresses, amounts)
+    const shellsToBurn = await engine.shell.viewSelectiveWithdraw(addresses, amounts)
 
     if (shellsToBurn === false) {
 
-      setError('This amount triggers the halt check')
+      return setLocalState(newLocalState
+        .set('error', 'This withdrawal triggers Shell\'s Safety Check')
+        .set('feeTip', 'Your rate for this withdrawal will be...')
+      )
 
-      return setFeeMessage('')
+    } else if (shellsToBurn.isGreaterThan(state.getIn(['shell', 'shells', 'raw']))) {
 
-    } else if (shellsToBurn.isGreaterThan(balances.shells)) {
+      const shellBalance = state.getIn([ 'shell', 'shells', 'display' ])
 
-      setError('You can not withdraw more than your balance')
-
-      return setFeeMessage('')
+      return setLocalState(newLocalState
+        .set('error', 'Withdraw exceeds balance')
+        .set('feeTip', 'You can not withdraw more than your ' + shellBalance + ' Shell balance'))
 
     } else {
 
-      setError('')
+      newLocalState = newLocalState.set('error', '')
 
     }
 
-    const totalWithdraw = contracts.dai.getNumeraireFromDisplay(daiAmount)
-      .plus(contracts.usdc.getNumeraireFromDisplay(usdcAmount))
-      .plus(contracts.usdt.getNumeraireFromDisplay(usdtAmount))
-      .plus(contracts.susd.getNumeraireFromDisplay(susdAmount))
+    const totalWithdraw = amounts.reduce( (a,c,i) => a.plus(engine.assets[i].getNumeraireFromRaw(c)), new BigNumber(0))
 
-    const liquidityChange = totalWithdraw.dividedBy(liquidity.total)
+    const liquidityChange = totalWithdraw.dividedBy(state.getIn(['shell', 'totalLiq', 'numeraire']))
 
-    const shellsChange = shellsToBurn.dividedBy(balances.total)
+    const shellsChange = shellsToBurn.dividedBy(state.getIn(['shell', 'totalShells', 'numeraire']))
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
 
@@ -263,13 +227,13 @@ const StartModal = ({
     const shells = <div>
       You will burn
       <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-        { shell.getDisplayFromNumeraire(shellsToBurn, 2) } 
+        { engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) } 
         <img alt="" src={tinyShellIcon} style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} /> 
       </span>
       { slippageMessage }
     </div>
 
-    setFeeMessage(shells)
+    return setLocalState(newLocalState.set('feeTip', shells))
 
   }
 
@@ -288,6 +252,20 @@ const StartModal = ({
     }
   }, { name: 'MuiCheckbox' })()
 
+  const tokenInputs = engine.assets.map( (asset, ix) => { 
+    
+    return (
+      <TokenInput
+        disabled={localState.get('proportional')}
+        icon={asset.icon}
+        onChange={e => primeWithdraw(e.target.value, ix) }
+        symbol="DAI"
+        value={localState.getIn([ 'assets', ix, 'input' ])}
+      />
+    )
+
+  })
+
   return (
     <Modal onDismiss={onDismiss}>
       <ModalTitle>Withdraw Funds</ModalTitle>
@@ -296,10 +274,11 @@ const StartModal = ({
           <StyledRows>
             <StyledShells>
                 <StyledShellIcon src={shellIcon}/>
-                <StyledShellBalance> { shell.getDisplayFromNumeraire(balances.shells, 2) + ' Shells'} </StyledShellBalance>
+                <StyledShellBalance> { state.getIn([ 'shell', 'shells', 'display' ]) + ' Shells'} </StyledShellBalance>
             </StyledShells>
-            <StyledFeeMessage> { feeMessage } </StyledFeeMessage>
-            <TokenInput
+            <StyledFeeMessage> { localState.get('feeTip') } </StyledFeeMessage>
+            { tokenInputs }
+            {/* <TokenInput
               disabled={withdrawEverything}
               error={!!error.length}
               icon={daiIcon}
@@ -330,12 +309,12 @@ const StartModal = ({
               onChange={e => handleInput(e, 'susd', setSusdInputAmt) }
               symbol="SUSD"
               value={susdInputAmt}
-            />
+            /> */}
             <StyledWithdrawEverything>
               <Checkbox 
-                checked={ withdrawEverything }
+                checked={ localState.get('proportional') }
                 className={ checkboxClasses.root }
-                onChange={ handleWithdrawEverythingCheckbox }
+                onChange={ e => primeProportionalWithdraw(e.target.checked) }
               >
               </Checkbox>
                 Withdraw Everything
@@ -345,9 +324,9 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
-        <Tooltip placement={'top'} title={error} style={ error ? { cursor: 'no-drop'} : null }>
+        <Tooltip placement={'top'} title={ localState.get('error') } style={ localState.get('error') ? { cursor: 'no-drop'} : null }>
           <div>
-            <Button disabled={error ? true : false } onClick={handleSubmit}>{ withdrawEverything ? 'Withdraw Everything' : 'Withdraw' } </Button>
+            <Button disabled={ localState.get('error') ? true : false } onClick={handleSubmit}>{ localState.get('proportional') ? 'Withdraw Everything' : 'Withdraw' } </Button>
           </div>
         </Tooltip>
       </ModalActions>
@@ -356,7 +335,7 @@ const StartModal = ({
         autoHideDuration={6000} 
         onClose={handleErrorSnackbarClose}
         style={{'marginTop': '65px'}}
-        open={!!error.length} 
+        open={!!localState.get('error').length} 
       >
         <MuiAlert 
           elevation={6}
@@ -364,7 +343,7 @@ const StartModal = ({
           severity={'error'} 
           variant="filled"
         >
-          { error }
+          { localState.get('error') }
         </MuiAlert>
       </Snackbar>
     </Modal>

@@ -82,8 +82,6 @@ export default class AppEngine extends SwapEngine {
 
             const allowance = await asset.allowance(account, shellAddr)
 
-            console.log("~@~@~ allowance", allowance.raw.toString())
-
             const balance = await asset.balanceOf(account)
 
             const liqInShell = shellLiq[1][ix].raw.dividedBy(10 ** (18 - asset.decimals))
@@ -131,6 +129,34 @@ export default class AppEngine extends SwapEngine {
     selectiveDeposit (addresses, amounts, onHash, onConfirmation, onError) {
 
         const tx = this.shell.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+
+        tx.send({ from: this.account })
+            .on('transactionHash', onHash)
+            .on('confirmation', onConfirmation)
+            .on('error', onError)
+
+    }
+
+    selectiveWithdraw (addresses, amounts, onHash, onConfirmation, onError) {
+
+        const limit = this.state.getIn([ 'shell', 'shells', 'raw' ])
+
+        console.log("limit", limit.toFixed())
+
+        const tx = this.shell.selectiveWithdraw(addresses, amounts, limit.toFixed(), Date.now() + 2000)
+
+        tx.send({ from: this.account })
+            .on('transactionHash', onHash)
+            .on('confirmation', onConfirmation)
+            .on('error', onError)
+
+    }
+
+    proportionalWithdraw (amount, onHash, onConfirmation, onError) {
+
+        console.log("amount", amount.toFixed())
+
+        const tx = this.shell.proportionalWithdraw(amount.toFixed(), Date.now() + 2000)
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)

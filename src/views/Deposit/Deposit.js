@@ -34,7 +34,6 @@ const Deposit = ({
     }),
     error: '',
     feeTip: '',
-    balTip: '',
   }))
 
   const handleDeposit = async (addresses, amounts) => {

@@ -115,11 +115,6 @@ const StartModal = ({
     
   }
 
-  // const availableDai = walletBalances.dai ? contracts.dai.getDisplayFromNumeraire(walletBalances.dai, 4) : '--'
-  // const availableUsdc = walletBalances.usdc ? contracts.usdc.getDisplayFromNumeraire(walletBalances.usdc, 4) : '--'
-  // const availableUsdt = walletBalances.usdt ? contracts.usdt.getDisplayFromNumeraire(walletBalances.usdt, 4) : '--'
-  // const availableSusd = walletBalances.susd ? contracts.susd.getDisplayFromNumeraire(walletBalances.susd, 4) : '--'
-
   const primeDeposit = async (val, ix) => {
 
     console.log("val", val)
@@ -204,8 +199,7 @@ const StartModal = ({
     
     const { addresses, amounts } = getAddressesAndAmounts(localState)
 
-    console.log("addresses", addresses)
- 
+    onDeposit(addresses, amounts)
 
   }
 
