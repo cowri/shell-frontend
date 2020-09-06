@@ -89,13 +89,11 @@ const StartModal = ({
 
     setLocalState(newLocalState)
 
-    console.log("...VAL", val)
     val = engine.assets[ix].getNumeraireFromDisplay(val)
 
-    console.log("VAL", val)
+    const allowance = state.getIn([ 'assets', ix, 'allowance', 'numeraire' ])
 
-    const allowance = state.get('assets').get(ix).get('allowance').get('numeraire')
-    const balance = state.get('assets').get(ix).get('balance').get('numeraire')
+    const balance = state.getIn([ 'assets', ix, 'balance', 'numeraire' ])
 
     if (val.isGreaterThan(balance)) {
 
@@ -117,8 +115,6 @@ const StartModal = ({
 
   const primeDeposit = async (val, ix) => {
 
-    console.log("val", val)
-
     if (isNaN(val)) return
 
     val = val === '' ? '' : Math.abs(+val)
@@ -126,6 +122,14 @@ const StartModal = ({
     let newLocalState = applyTips(val, ix)
 
     const { addresses, amounts } = getAddressesAndAmounts(newLocalState)
+    
+    const totalDeposit = amounts.reduce( (a, c, i) => a.plus(engine.assets[i].getNumeraireFromRaw(c)), new BigNumber(0) )
+
+    if (totalDeposit.isZero()) {
+
+      return setLocalState(newLocalState.set('feeTip', ''))
+
+    }
 
     const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
 
@@ -144,7 +148,6 @@ const StartModal = ({
 
     }
 
-    const totalDeposit = amounts.reduce( (a, c, i) => a.plus(engine.assets[i].getNumeraireFromRaw(c)), new BigNumber(0) )
 
     const liquidityChange = totalDeposit.dividedBy(state.get('shell').get('totalLiq').get('numeraire'))
 
@@ -176,15 +179,34 @@ const StartModal = ({
 
   const getAddressesAndAmounts = (currentState) => {
 
-    const addresses = engine.assets.map( asset => asset.address )
+    const addresses = []
+    const amounts = []
 
-    const amounts = engine.assets.map( (asset, ix) => {
+    currentState.get('assets').forEach( (asset, ix) => {
 
-      const input = currentState.get('assets').get(ix).get('input')
+      const amount = asset.get('input')
 
-      return asset.getRawFromDisplay(input == '' ? 0 : input)
+      if (0 < amount) {
+
+        const asset = engine.assets[ix]
+
+        addresses.push(asset.address)
+
+        amounts.push(asset.getRawFromDisplay(amount)) 
+
+      }
 
     })
+
+    // const addresses = engine.assets.reduce( asset => asset.address )
+
+    // const amounts = engine.assets.reduce( (asset, ix) => {
+
+    //   const input = currentState.get('assets').get(ix).get('input')
+
+    //   return asset.getRawFromDisplay(input == '' ? 0 : input)
+
+    // })
 
     return { addresses, amounts }
 

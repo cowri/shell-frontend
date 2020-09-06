@@ -221,16 +221,17 @@ const StartModal = ({
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
 
     const slippageMessage = slippage.isNegative()
-      ? <span> and pay a { Math.abs(slippage.toFixed(4)) } % fee to liquidity providers </span>
-      : <span> and earn a { slippage.toFixed(4) } % rebalancing subsidy </span>
+      ? <span> and pay a { Math.abs(slippage.toFixed(4)) }% fee to liquidity providers </span>
+      : <span> and earn a { slippage.toFixed(4) }% rebalancing subsidy </span>
 
     const shells = <div>
-      You will burn
+      You will burn 
       <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-        { engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) } 
+        { engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) }
         <img alt="" src={tinyShellIcon} style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} /> 
       </span>
       { slippageMessage }
+      for this withdrawal
     </div>
 
     return setLocalState(newLocalState.set('feeTip', shells))

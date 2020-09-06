@@ -58,7 +58,7 @@ export default class AppEngine extends SwapEngine {
 
     }
 
-    async init (account) {
+    async sync (account) {
 
         console.log("account", account)
 
@@ -121,7 +121,10 @@ export default class AppEngine extends SwapEngine {
 
         tx.send({ from: this.account })
             .once('transactionHash', onHash)
-            .once('confirmation', onConfirmation)
+            .once('confirmation', () => {
+                onConfirmation()
+                this.sync(this.account)
+            })
             .on('error', onError)
 
     }
@@ -132,7 +135,10 @@ export default class AppEngine extends SwapEngine {
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
-            .on('confirmation', onConfirmation)
+            .on('confirmation', () => {
+                onConfirmation()
+                this.sync(this.account)
+            })
             .on('error', onError)
 
     }

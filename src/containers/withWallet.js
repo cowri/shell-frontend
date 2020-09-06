@@ -185,7 +185,7 @@ const withWallet = (WrappedComponent) => {
 
                 console.log('address state network', state.get('network'))
 
-                engine.init(address)
+                engine.sync(address)
 
                 // const _contracts = getContracts(web3)
 

@@ -69,10 +69,6 @@ const Dashboard = ({
   const [depositModal, setDepositModal] = useState(false)
   const [withdrawModal, setWithdrawModal] = useState(false)
 
-  console.log("selected", login.get('walletSelected'))
-
-  console.log("checked", login.get('walletChecked'))
-
   const renderContent = () => {
 
     if (!login.get('walletSelected')) {
