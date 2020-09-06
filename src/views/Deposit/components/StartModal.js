@@ -127,9 +127,18 @@ const StartModal = ({
 
     if (totalDeposit.isZero()) {
 
-      return setLocalState(newLocalState.set('feeTip', ''))
+      return setLocalState(newLocalState
+        .set('feeTip', '')
+        .set('zero', true)
+        .set('error', '')
+      )
+
+    } else {
+
+      newLocalState = newLocalState.set('zero', false)
 
     }
+
 
     const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
 
@@ -256,7 +265,7 @@ const StartModal = ({
 
   })
 
-  const isInputError = localState.get('error') == '' ? true : localState.get('assets').reduce( (x,y) => x ? true : y.get('error') == '' ? false : true, false)
+  const isInputError = localState.get('error') != '' ? true : localState.get('assets').reduce( (x,y) => x ? true : y.get('error') == '' ? false : true, false)
   // const isInputError = localState.get('assets').reduce( (x,y) => (console.log("x,y", x,y.get('error')), y.get('error') ? true : false), false)
 
   console.log("isInputError", isInputError)
@@ -274,7 +283,7 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
-        <Button disabled={ isInputError } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button>
+        <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button>
       </ModalActions>
       <Snackbar 
         anchorOrigin={{vertical: 'center', horizontal: 'center'}} 
