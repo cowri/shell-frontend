@@ -32,10 +32,13 @@ export default class AppEngine extends SwapEngine {
         )
 
         this.assets = [ ]
+        this.derivativeIx = { }
 
         for (const ix in config.assets) {
 
             const _asset_ = config.assets[ix]
+
+            this.derivativeIx[_asset_.address] = ix
 
             const asset = new Asset(
                 this.web3,
@@ -59,8 +62,6 @@ export default class AppEngine extends SwapEngine {
     }
 
     async sync (account) {
-
-        console.log("account", account)
 
         this.account = account
 
@@ -147,8 +148,6 @@ export default class AppEngine extends SwapEngine {
 
         const limit = this.state.getIn([ 'shell', 'shells', 'raw' ])
 
-        console.log("limit", limit.toFixed())
-
         const tx = this.shell.selectiveWithdraw(addresses, amounts, limit.toFixed(), Date.now() + 2000)
 
         tx.send({ from: this.account })
@@ -159,8 +158,6 @@ export default class AppEngine extends SwapEngine {
     }
 
     proportionalWithdraw (amount, onHash, onConfirmation, onError) {
-
-        console.log("amount", amount.toFixed())
 
         const tx = this.shell.proportionalWithdraw(amount.toFixed(), Date.now() + 2000)
 

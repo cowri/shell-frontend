@@ -183,26 +183,8 @@ const withWallet = (WrappedComponent) => {
 
                 engine = engine ? engine : new AppEngine(web3, setState) 
 
-                console.log('address state network', state.get('network'))
-
                 engine.sync(address)
 
-                // const _contracts = getContracts(web3)
-
-                // window.contracts = _contracts
-
-                // const _liquidity = await getLiquidity(_contracts.shell)
-                // const _allowances = await getAllowances(_contracts, address)
-                // const _walletBalances = await getWalletBalances(_contracts, address)
-                // const _balances = await getShellBalances(_liquidity, _contracts.shell, address)
-                
-                // setContracts(_contracts)
-                // setShell(_contracts.shell)
-                // setLiquidity(_liquidity)
-                // setAllowances(_allowances)
-                // setWalletBalances(_walletBalances)
-                // setBalances(_balances)
-                
               }
 
             },

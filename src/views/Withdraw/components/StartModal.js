@@ -80,10 +80,11 @@ const StyledShellBalance = styled.div`
   font-weight: 300;
 `
 
-const StyledFeeMessage = styled.div`
+const StyledWithdrawMessage = styled.div`
   padding: 20px 10px 10px 10px;
   font-size: 22px;
 `
+
 
 const StartModal = ({
   engine, 
@@ -94,6 +95,15 @@ const StartModal = ({
   setLocalState,
   state
 }) => {
+
+  const errorStyles = {
+    color: 'red',
+    fontSize: '26px',
+    fontWeight: 'bold'
+  }
+  
+  const SAFETY_CHECK = <span style={errorStyles}> These amounts trigger Shell's Safety Check  </span>
+  const EXCEEDS_BALANCE = <span style={errorStyles}> This withdrawal exceeds your Shell balance </span>
 
   const epsilonRemoved = (amount) => {
 
@@ -124,13 +134,23 @@ const StartModal = ({
 
   const getAddressesAndAmounts = (currentState) => {
 
-    const addresses = engine.assets.map( asset => asset.address )
+    const addresses = []
 
-    const amounts = engine.assets.map( (asset, ix) => {
+    const amounts = []
 
-      const input = currentState.get('assets').get(ix).get('input')
+    currentState.get('assets').forEach( (asset, ix) => {
 
-      return asset.getRawFromDisplay(input == '' ? 0 : input)
+      const amount = asset.get('input')
+
+      if (0 < amount) {
+
+        const asset = engine.assets[ix]
+
+        addresses.push(asset.address)
+
+        amounts.push(asset.getRawFromDisplay(amount)) 
+
+      }
 
     })
 
@@ -180,39 +200,48 @@ const StartModal = ({
 
     let newLocalState = localState.setIn(['assets', ix, 'input'], val)
 
-    const { 
-      addresses,
-      amounts
-    } = getAddressesAndAmounts(newLocalState)
+    const { addresses, amounts } = getAddressesAndAmounts(newLocalState)
 
-    const sum = amounts.reduce((accu, val) => accu.plus(val), new BigNumber(0))
+    const totalWithdraw = amounts.reduce( (a,c,i) => {
 
-    if (sum.isZero()) return setLocalState(newLocalState.set('feeTip', 'Your rate for this withdrawal will be...'))
+      const asset = engine.assets[engine.derivativeIx[addresses[i]]]
+
+      return a.plus(asset.getNumeraireFromRaw(c))
+
+    }, new BigNumber(0))
+
+    if (totalWithdraw.isZero()) {
+
+      return setLocalState(newLocalState
+        .set('feeTip', 'Your rate for this withdrawal will be...')
+        .delete('error')
+      )
+
+    }
 
     const shellsToBurn = await engine.shell.viewSelectiveWithdraw(addresses, amounts)
 
     if (shellsToBurn === false) {
 
       return setLocalState(newLocalState
-        .set('error', 'This withdrawal triggers Shell\'s Safety Check')
-        .set('feeTip', 'Your rate for this withdrawal will be...')
+        .set('error', SAFETY_CHECK)
+        .delete('feeTip')
       )
 
-    } else if (shellsToBurn.isGreaterThan(state.getIn(['shell', 'shells', 'raw']))) {
+    } else if (shellsToBurn.isGreaterThan(state.getIn(['shell', 'shells', 'numeraire']))) {
 
       const shellBalance = state.getIn([ 'shell', 'shells', 'display' ])
 
       return setLocalState(newLocalState
-        .set('error', 'Withdraw exceeds balance')
-        .set('feeTip', 'You can not withdraw more than your ' + shellBalance + ' Shell balance'))
+        .set('error', EXCEEDS_BALANCE)
+        .delete('feeTip')
+      )
 
     } else {
 
-      newLocalState = newLocalState.set('error', '')
+      newLocalState = newLocalState.delete('error')
 
     }
-
-    const totalWithdraw = amounts.reduce( (a,c,i) => a.plus(engine.assets[i].getNumeraireFromRaw(c)), new BigNumber(0))
 
     const liquidityChange = totalWithdraw.dividedBy(state.getIn(['shell', 'totalLiq', 'numeraire']))
 
@@ -221,8 +250,8 @@ const StartModal = ({
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
 
     const slippageMessage = slippage.isNegative()
-      ? <span> and pay a { Math.abs(slippage.toFixed(4)) }% fee to liquidity providers </span>
-      : <span> and earn a { slippage.toFixed(4) }% rebalancing subsidy </span>
+      ? <span>and pay a { Math.abs(slippage.toFixed(4)) }% fee to liquidity providers </span>
+      : <span>and earn a { slippage.toFixed(4) }% rebalancing subsidy </span>
 
     const shells = <div>
       You will burn 
@@ -277,40 +306,8 @@ const StartModal = ({
                 <StyledShellIcon src={shellIcon}/>
                 <StyledShellBalance> { state.getIn([ 'shell', 'shells', 'display' ]) + ' Shells'} </StyledShellBalance>
             </StyledShells>
-            <StyledFeeMessage> { localState.get('feeTip') } </StyledFeeMessage>
+            <StyledWithdrawMessage> { localState.get('error') || localState.get('feeTip') } </StyledWithdrawMessage>
             { tokenInputs }
-            {/* <TokenInput
-              disabled={withdrawEverything}
-              error={!!error.length}
-              icon={daiIcon}
-              onChange={e => handleInput(e, 'dai', setDaiInputAmt) }
-              symbol="DAI"
-              value={daiInputAmt}
-            />
-            <TokenInput
-              disabled={withdrawEverything}
-              error={!!error.length}
-              icon={usdcIcon}
-              onChange={e => handleInput(e, 'usdc', setUsdcInputAmt) }
-              symbol="USDC"
-              value={usdcInputAmt}
-            />
-            <TokenInput
-              disabled={withdrawEverything}
-              error={!!error.length}
-              icon={usdtIcon}
-              onChange={e => handleInput(e, 'usdt', setUsdtInputAmt) }
-              symbol="USDT"
-              value={usdtInputAmt}
-            />
-            <TokenInput
-              disabled={withdrawEverything}
-              error={!!error.length}
-              icon={susdIcon}
-              onChange={e => handleInput(e, 'susd', setSusdInputAmt) }
-              symbol="SUSD"
-              value={susdInputAmt}
-            /> */}
             <StyledWithdrawEverything>
               <Checkbox 
                 checked={ localState.get('proportional') }
@@ -324,29 +321,14 @@ const StartModal = ({
         </StyledForm>
       </ModalContent>
       <ModalActions>
-        <Button outlined onClick={onDismiss}>Cancel</Button>
-        <Tooltip placement={'top'} title={ localState.get('error') } style={ localState.get('error') ? { cursor: 'no-drop'} : null }>
-          <div>
-            <Button disabled={ localState.get('error') ? true : false } onClick={handleSubmit}>{ localState.get('proportional') ? 'Withdraw Everything' : 'Withdraw' } </Button>
-          </div>
-        </Tooltip>
-      </ModalActions>
-      <Snackbar 
-        anchorOrigin={{vertical: 'center', horizontal: 'center'}} 
-        autoHideDuration={6000} 
-        onClose={handleErrorSnackbarClose}
-        style={{'marginTop': '65px'}}
-        open={!!localState.get('error').length} 
-      >
-        <MuiAlert 
-          elevation={6}
-          onClose={handleErrorSnackbarClose}   
-          severity={'error'} 
-          variant="filled"
+        <Button onClick={onDismiss} outlined >Cancel</Button>
+        <Button onClick={handleSubmit}
+          style={ localState.get('error') ? { cursor: 'no-drop'} : null }
+          disabled={ localState.get('error') ? true : false } 
         >
-          { localState.get('error') }
-        </MuiAlert>
-      </Snackbar>
+          { localState.get('proportional') ? 'Withdraw Everything' : 'Withdraw' }
+       </Button>
+      </ModalActions>
     </Modal>
   )
 }

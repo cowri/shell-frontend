@@ -8,11 +8,6 @@ export default class SwapEngine {
 
         let origin = this.assets[originIndex]
         let target = this.assets[targetIndex]
-        console.log("origin swap")
-        console.log("origin index", originIndex)
-        console.log("target index", targetIndex)
-        console.log("origin name", origin.name)
-        console.log("target name", target.name)
 
         let originAmount = origin.getAllFormatsFromDisplay(amount)
 

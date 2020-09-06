@@ -20,7 +20,9 @@ export default class NumericFormats {
 
     getNumeraireFromRaw (raw) {
 
-      return new BigNumber(raw).dividedBy(10 ** this.decimals)
+      const numeraire = new BigNumber(raw).dividedBy(10 ** this.decimals)
+
+      return numeraire
 
     }
 

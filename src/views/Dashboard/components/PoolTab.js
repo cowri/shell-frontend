@@ -61,8 +61,6 @@ const PoolTab = ({
     state
   } = useContext(DashboardContext)
 
-  console.log("app state in pool tab", state.has('assets'))
-
   const rows = state.has('assets') ? engine.assets.map( (asset, ix) => { 
 
     const assetState = state.get('assets').get(ix)

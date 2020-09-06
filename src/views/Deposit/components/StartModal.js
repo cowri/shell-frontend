@@ -5,13 +5,8 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from '@material-ui/lab/Alert';
 import TextField from '@material-ui/core/TextField'
-import Tooltip from '@material-ui/core/Tooltip';
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 
-import daiIcon from '../../../assets/dai.svg'
-import susdIcon from '../../../assets/susd.svg'
-import usdcIcon from '../../../assets/usdc.svg'
-import usdtIcon from '../../../assets/usdt.svg'
 import shellIcon from '../../../assets/cowri-logo.svg'
 
 import Button from '../../../components/Button'
@@ -67,10 +62,9 @@ const StyledWarning = styled.div`
   color: red;
 `
 
-const StyledFeeMessage = styled.div`
-  margin: 10px auto;
-  width: 82.5%;
-  font-size: 19px;
+const StyledDepositMessage = styled.div`
+  padding: 20px 10px 10px 10px;
+  font-size: 22px;
 `
 
 const StartModal = ({
@@ -82,6 +76,14 @@ const StartModal = ({
   setLocalState,
   state
 }) => {
+  
+  const errorStyles = {
+    color: 'red',
+    fontSize: '26px',
+    fontWeight: 'bold'
+  }
+  
+  const SAFETY_CHECK = <span style={errorStyles}> These amounts trigger Shell's Safety Check  </span>
 
   function applyTips (val, ix) {
     
@@ -123,14 +125,20 @@ const StartModal = ({
 
     const { addresses, amounts } = getAddressesAndAmounts(newLocalState)
     
-    const totalDeposit = amounts.reduce( (a, c, i) => a.plus(engine.assets[i].getNumeraireFromRaw(c)), new BigNumber(0) )
+    const totalDeposit = amounts.reduce( (a, c, i) => {
+
+      const asset = engine.assets[engine.derivativeIx[addresses[i]]]
+
+      return a.plus(asset.getNumeraireFromRaw(c))
+
+    }, new BigNumber(0))
 
     if (totalDeposit.isZero()) {
 
       return setLocalState(newLocalState
-        .set('feeTip', '')
+        .set('feeTip', 'Your rate on this deposit will be...')
         .set('zero', true)
-        .set('error', '')
+        .delete('error')
       )
 
     } else {
@@ -139,13 +147,12 @@ const StartModal = ({
 
     }
 
-
     const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
 
     if (shellsToMint === false) {
 
       return setLocalState(newLocalState
-        .set('error', "Deposit triggers Shell's Safety Check")
+        .set('error', SAFETY_CHECK)
         .delete('feeTip')
       )
 
@@ -153,27 +160,24 @@ const StartModal = ({
 
       newLocalState = newLocalState.delete('error')
 
-      setLocalState(newLocalState)
-
     }
 
+    const liquidityChange = totalDeposit.dividedBy(state.getIn([ 'shell', 'totalLiq', 'numeraire' ]))
 
-    const liquidityChange = totalDeposit.dividedBy(state.get('shell').get('totalLiq').get('numeraire'))
-
-    const shellsChange = shellsToMint.dividedBy(state.get('shell').get('totalShells').get('numeraire'))
+    const shellsChange = shellsToMint.dividedBy(state.getIn([ 'shell', 'totalShells', 'numeraire' ]))
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
 
     const slippageMessage = slippage.absoluteValue().isGreaterThan(0.0001)
       ? slippage.isNegative()
-        ? <span> and earn a { Math.abs(slippage.toFixed(4)) } % rebalancing subsidy </span> 
-        : <span> and pay a { slippage.toFixed(4) } % fee to liquidity providers </span>
+        ? <span> and earn a { Math.abs(slippage.toFixed(4)) }% rebalancing subsidy </span> 
+        : <span> and pay a { slippage.toFixed(4) }% fee to liquidity providers </span>
       : ''
     
     const feeMessage = <div>
       You will mint 
-        <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { engine.shell.getDisplayFromNumeraire(shellsToMint, 2) } 
+        <span style={{position: 'relative', paddingRight: '17.5px'}}>
+          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint, 2) } 
           <img alt="" 
             src={shellIcon} 
             style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
@@ -189,6 +193,7 @@ const StartModal = ({
   const getAddressesAndAmounts = (currentState) => {
 
     const addresses = []
+
     const amounts = []
 
     currentState.get('assets').forEach( (asset, ix) => {
@@ -207,26 +212,17 @@ const StartModal = ({
 
     })
 
-    // const addresses = engine.assets.reduce( asset => asset.address )
-
-    // const amounts = engine.assets.reduce( (asset, ix) => {
-
-    //   const input = currentState.get('assets').get(ix).get('input')
-
-    //   return asset.getRawFromDisplay(input == '' ? 0 : input)
-
-    // })
-
     return { addresses, amounts }
 
   }
 
   const handleErrorSnackbarClose = (event, reason) => {
+
     if (reason === 'clickaway') return;
+
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
     
     const { addresses, amounts } = getAddressesAndAmounts(localState)
 
@@ -265,10 +261,9 @@ const StartModal = ({
 
   })
 
-  const isInputError = localState.get('error') != '' ? true : localState.get('assets').reduce( (x,y) => x ? true : y.get('error') == '' ? false : true, false)
-  // const isInputError = localState.get('assets').reduce( (x,y) => (console.log("x,y", x,y.get('error')), y.get('error') ? true : false), false)
-
-  console.log("isInputError", isInputError)
+  const isInputError = localState.get('error') != '' 
+    ? true 
+    : localState.get('assets').reduce( (x,y) => x ? true : y.get('error') == '' ? false : true, false)
 
   return (
     <Modal onDismiss={onDismiss}>
@@ -276,31 +271,15 @@ const StartModal = ({
       <ModalContent>
         <StyledForm onSubmit={handleSubmit}>
           <StyledRows>
+            <StyledDepositMessage> { localState.get('error') || localState.get('feeTip') } </StyledDepositMessage>
             { tokenInputs }
           </StyledRows>
-          <StyledFeeMessage> { localState.get('feeTip') } </StyledFeeMessage>
         </StyledForm>
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
         <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button>
       </ModalActions>
-      <Snackbar 
-        anchorOrigin={{vertical: 'center', horizontal: 'center'}} 
-        autoHideDuration={6000} 
-        onClose={handleErrorSnackbarClose}
-        style={{'marginTop': '65px'}}
-        open={localState.get('error') ? true : false} 
-      >
-        <MuiAlert 
-          elevation={6}
-          onClose={handleErrorSnackbarClose}   
-          severity={'error'} 
-          variant="filled"
-        >
-          { localState.get('error') }
-        </MuiAlert>
-      </Snackbar>
     </Modal>
   )
 }

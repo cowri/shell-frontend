@@ -25,8 +25,6 @@ const ModalSuccess = ({
   txHash
 }) => {
 
-  console.log(" --- TX HASH --- ", txHash)
-
   return (
     <Modal>
       <ModalTitle>{title}</ModalTitle>

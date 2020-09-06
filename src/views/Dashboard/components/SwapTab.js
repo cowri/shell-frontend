@@ -142,7 +142,6 @@ const SwapTab = () => {
   const [unlocked, setUnlocked] = useState(false)
 
   function setZeroes (value) {
-    console.log("set zeroes")
     setOriginValue(value)
     setTargetValue(value)
     setPriceMessage('Your price for this trade will be...')
@@ -262,9 +261,6 @@ const SwapTab = () => {
     e.preventDefault()
 
     setStep('confirmingMetamask')
-
-    console.log("origin ix", originIx)
-    console.log("target ix", targetIx)
 
     let tx = swapType === 'origin'
       ? engine.executeOriginSwap(originIx, targetIx, originValue)
