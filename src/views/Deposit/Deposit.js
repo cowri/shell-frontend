@@ -67,7 +67,7 @@ const Deposit = ({
   }
 
   const handleUnlock = async (index) => {
-
+    
     setLocalState(localState.set('step', 'confirmingMetamask'))
 
     engine.unlock(

@@ -21,7 +21,6 @@ const Withdraw = ({
 
   const [txHash, setTxHash] = useState('')
   const [step, setStep] = useState('start')
-  const [withdrawEverything, setWithdrawEverything] = useState(false)
   const [localState, setLocalState] = useState(fromJS({
     assets: new Array(engine.assets.length).fill({
       error: '',

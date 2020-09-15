@@ -70,15 +70,15 @@ const StyledSwapRow = styled.div`
   height: 0px;
 `
 
-const StyledPriceMessage = styled.div`
-font-size: 20px;
-padding: 10px;
+const StyledMessage = styled.div`
+  font-size: 20px;
+  padding: 40px;
   height: 0px;
 `
 
 const StyledRows = styled.div`
-  margin-bottom: 48px;
-  margin-top: 24px;
+  margin-top: 48px;
+  margin-bottom: 30px;
   text-align: center;
 `
 
@@ -122,14 +122,10 @@ const SwapTab = () => {
   const [targetIx, setTargetIx] = useState(3)
   const [originValue, setOriginValue] = useState('0')
   const [targetValue, setTargetValue] = useState('0')
-  const [originError, setOriginError] = useState(false)
-  const [targetError, setTargetError] = useState(false)
-  const [isZero, setIsZero ] = useState(true)
-  const [originHelperText, setOriginHelperText] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
-  const [slippage, setSlippage] = useState(0)
   const [priceMessage, setPriceMessage] = useState('Your price for this trade will be...')
+  const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
 
   const origin = engine.assets[originIx]
@@ -191,7 +187,7 @@ const SwapTab = () => {
         originAmount,
         targetAmount
       } = await engine.viewTargetSwap(_originIx, _targetIx, targetValue)
-
+      
       setOriginValue(originAmount.display)
 
       setPriceIndication(
@@ -202,9 +198,11 @@ const SwapTab = () => {
       )
       
     } catch (e) {
+      
+      setOriginValue('')
+      setHaltIndication()
 
     }
-
 
   }
 
@@ -231,11 +229,22 @@ const SwapTab = () => {
     
     } catch (e) {
 
-      console.log("e",e)
+      setTargetValue('')
+      setHaltIndication()
 
     }
 
   }
+  
+  function setHaltIndication () {
+    
+    const errorStyles = { color: 'red', fontSize: '26px', fontWeight: 'bold' }
+
+    setHaltMessage(<span style={errorStyles}> This amount triggers Shell's Safety Check </span>)
+
+    setPriceMessage('')
+
+  } 
 
   async function setPriceIndication (_originIx, _targetIx, originAmount, targetAmount) {
 
@@ -253,6 +262,7 @@ const SwapTab = () => {
       : <span> <span> { tPrice } </span> { tSymbol } for this trade </span>
       
     setPriceMessage(<span> {left} {right} </span>)
+    setHaltMessage('')
 
   }
 
@@ -263,8 +273,8 @@ const SwapTab = () => {
     setStep('confirmingMetamask')
 
     let tx = swapType === 'origin'
-      ? engine.executeOriginSwap(originIx, targetIx, originValue)
-      : engine.executeTargetSwap(originIx, targetIx, targetValue)
+      ? engine.executeOriginSwap(originIx, targetIx, originValue, targetValue)
+      : engine.executeTargetSwap(originIx, targetIx, originValue, targetValue)
 
     tx.send({ from: state.get('account') })
       .once('transactionHash', handleTransactionHash)
@@ -387,19 +397,19 @@ const SwapTab = () => {
 
   let toolTipMsg = ''
 
-  if (originError){ 
+  // if (originError){ 
 
-    if (originError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
+  //   if (originError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
 
-    else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
+  //   else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
 
-  } else if (targetError) {
+  // } else if (targetError) {
 
-    if (targetError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
+  //   if (targetError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
 
-    else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
+  //   else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
 
-  }
+  // }
 
   if (initiallyLocked && !unlocked) {
 
@@ -425,11 +435,12 @@ const SwapTab = () => {
       { step === 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
       { step === 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
       <StyledRows>
+        <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
         <AmountInput 
           available={state.get('assets').get(originIx).get('balance').get('display')}
-          error={originError}
+          // error={}
           icon={origin.icon}
-          helperText={originHelperText}
+          // helperText={originHelperText}
           onChange={e => primeSwap({type:'origin', value: e.target.value}, {})}
           selections={getDropdown(handleOriginSelect, originIx)}
           styles={inputStyles}
@@ -438,17 +449,16 @@ const SwapTab = () => {
           value={originValue}
         />
         <StyledSwapRow>
-          <IconButton 
-            className={iconClasses.root} 
+          <IconButton className={iconClasses.root} 
             onClick={e=> primeSwap({type:'switch'}, {type:'switch'})}
           >
             <SwapCallsIcon fontSize={'large'}/>
           </IconButton>
         </StyledSwapRow>
         <AmountInput 
-          error={targetError}
+          // error={}
           icon={target.icon}
-          helperText={targetHelperText}
+          // helperText={targetHelperText}
           onChange={e => primeSwap({type:'target', value: e.target.value}, {})}
           selections={getDropdown(handleTargetSelect, targetIx)}
           styles={inputStyles}
@@ -456,23 +466,16 @@ const SwapTab = () => {
           title={'To'}
           value={targetValue}
         /> 
-        <StyledPriceMessage> { priceMessage } </StyledPriceMessage>
-        <>
-          { slippage === 0 ? '' : slippage < 0 ? 'slippage: ' + slippage : 'anti-slippage:' + slippage }
-        </>
       </StyledRows>
       <StyledActions>
-        <Tooltip arrow={true} placement={'top'} title={toolTipMsg} style={targetError || originError || (initiallyLocked && !unlocked) ? { cursor: 'no-drop'} : null } >
-          <div>
-            <Button 
-              disabled={( (targetValue == 0 || originValue == 0) || targetError || originError || (initiallyLocked && !unlocked))}
-              onClick={handleSwap}
-              outlined={initiallyLocked && !unlocked}
-            >
-              Swap
-            </Button> 
-          </div>
-        </Tooltip>
+        <Button 
+          // disabled={( (targetValue == 0 || originValue == 0) || targetError || originError || (initiallyLocked && !unlocked))}
+          disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
+          onClick={handleSwap}
+          outlined={initiallyLocked && !unlocked}
+        >
+          Swap
+        </Button> 
         <div style={{ width: 12 }} />
         { (initiallyLocked && !unlocked) ? <Button onClick={handleUnlock}> Unlock { origin.symbol } </Button> : null } 
       </StyledActions>

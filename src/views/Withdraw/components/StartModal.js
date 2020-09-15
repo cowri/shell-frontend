@@ -173,9 +173,7 @@ const StartModal = ({
       )
       
       setLocalState(localState
-        .update('assets', as => as.map( (a, ix) => {
-          a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']))
-        }))
+        .update('assets', as => as.map( (a, ix) => a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']))))
         .set('feeTip', <div> For this withdrawal you will burn { shells } and pay a 0.0175% fee to liquidity providers </div>)
         .set('proportional', true)
       )
@@ -289,7 +287,7 @@ const StartModal = ({
         disabled={localState.get('proportional')}
         icon={asset.icon}
         onChange={e => primeWithdraw(e.target.value, ix) }
-        symbol="DAI"
+        symbol={asset.symbol}
         value={localState.getIn([ 'assets', ix, 'input' ])}
       />
     )

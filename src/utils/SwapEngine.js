@@ -52,14 +52,14 @@ export default class SwapEngine {
 
     }
 
-    executeOriginSwap (originIndex, targetIndex, amount) {
+    executeOriginSwap (originIndex, targetIndex, originAmount, minTargetAmount) {
 
         let origin = this.assets[originIndex]
         let target = this.assets[targetIndex]
 
-        let originAmount = origin.getAllFormatsFromDisplay(amount)
+        originAmount = origin.getAllFormatsFromDisplay(originAmount)
 
-        let minTarget = originAmount.numeraire.multipliedBy(new BigNumber(.99))
+        let minTarget = target.getNumeraireFromDisplay(minTargetAmount).multipliedBy(new BigNumber(.99))
 
         let deadline = Math.floor(Date.now() /1000 + 900)
 
@@ -72,6 +72,28 @@ export default class SwapEngine {
         )
 
     }
+
+    executeTargetSwap (originIndex, targetIndex, maxOriginAmount, targetAmount) {
+
+        let origin = this.assets[originIndex]
+        let target = this.assets[targetIndex]
+
+        targetAmount = target.getAllFormatsFromDisplay(targetAmount)
+
+        let maxOrigin =  origin.getNumeraireFromDisplay(maxOriginAmount).multipliedBy(new BigNumber(1.01))
+
+        let deadline = Math.floor(Date.now() / 1000 + 900)
+
+        return this.shell.originSwap(
+            origin.address,
+            target.address,
+            origin.getRawFromNumeraire(maxOrigin),
+            targetAmount.raw,
+            deadline
+        )
+        
+    }
+
     
 
 

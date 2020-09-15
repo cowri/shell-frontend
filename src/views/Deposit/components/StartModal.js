@@ -252,7 +252,7 @@ const StartModal = ({
         helperText={localAssetState.get('error')}
         locked={assetState.get('allowance').get('raw').isZero()}
         onChange={e => primeDeposit(e.target.value, ix)}
-        // onUnlock={e => onUnlock('dai')}
+        onUnlock={e => onUnlock(ix) }
         styles={inputStyles}
         symbol={asset.symbol}
         value={localState.get('assets').get(ix).get('input')}
@@ -261,7 +261,7 @@ const StartModal = ({
 
   })
 
-  const isInputError = localState.get('error') != '' 
+  const isInputError = localState.has('error') 
     ? true 
     : localState.get('assets').reduce( (x,y) => x ? true : y.get('error') == '' ? false : true, false)
 
