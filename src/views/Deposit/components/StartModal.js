@@ -211,6 +211,9 @@ const StartModal = ({
       }
 
     })
+    
+    console.log("addresses", addresses)
+    console.log("amounts", amounts)
 
     return { addresses, amounts }
 
@@ -278,7 +281,8 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
-        <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button>
+        {/* <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button> */}
+        <Button  style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button>
       </ModalActions>
     </Modal>
   )

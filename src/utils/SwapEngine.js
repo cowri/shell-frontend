@@ -44,10 +44,18 @@ export default class SwapEngine {
             target.address,
             targetAmount.raw
         )
+        
+        if (!originAmount) {
+            
+            throw(new Error("Reverted"))
 
-        return {
-            originAmount: origin.getAllFormatsFromRaw(originAmount),
-            targetAmount: targetAmount,
+        } else {
+
+            return {
+                originAmount: origin.getAllFormatsFromRaw(originAmount),
+                targetAmount: targetAmount,
+            }
+
         }
 
     }

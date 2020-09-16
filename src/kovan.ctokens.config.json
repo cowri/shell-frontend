@@ -18,7 +18,7 @@
       "symbol": "USDC"
     },
     { 
-      "address": "0x13512979ADE267AB5100878E2e0f485B568328a4", 
+      "address": "0x07de306FF27a2B630B1141956844eB1552B956B5", 
       "decimals": 6,
       "icon": "usdt.svg",
       "name": "Tether Stablecoin",
@@ -32,5 +32,5 @@
       "symbol": "SUSD"
     }
   ],
-  "shell": "0x3A0524EE968dF526c8D031367Eb0feca5E2Def6B"
+  "shell": "0x321753253Cb40bCc6004113d9B63bE7346da0027"
 }

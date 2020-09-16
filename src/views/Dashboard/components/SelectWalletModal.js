@@ -8,18 +8,21 @@ import ModalActions from '../../../components/ModalActions'
 import ModalIcon from '../../../components/ModalIcon'
 import ModalTitle from '../../../components/ModalTitle'
 
-const SelectWallet = (props) => {
+const SelectWallet = ({
+  selectWallet,
+  ...props
+}) => {
 
   return (
     <Modal>
-      <ModalIcon>
-        <ErrorIcon style={{ fontSize: 48 }} />
-      </ModalIcon>
       <ModalTitle>
         Select Your Wallet
       </ModalTitle>
+      <ModalIcon>
+        <ErrorIcon style={{ fontSize: 48 }} />
+      </ModalIcon>
       <ModalActions centered={true}>
-        <Button onClick={() => props.selectWallet() }>Refresh</Button>
+        <Button onClick={() => selectWallet() }>Refresh</Button>
       </ModalActions>
     </Modal>
   )

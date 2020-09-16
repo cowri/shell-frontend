@@ -38,8 +38,6 @@ const StyledModalContent = styled.div`
   max-width: 450px;
   position: sticky;
   width: calc(100% - 12px);
-  top: -55px;
-  position:relative;
   margin: 6px;
 `
 

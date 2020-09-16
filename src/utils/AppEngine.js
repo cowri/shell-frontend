@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../kovan.config.json"
+import config from "../kovan.ctokens.config.json"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"

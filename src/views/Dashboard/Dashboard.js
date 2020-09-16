@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Intercom from 'react-intercom'
 import cookie from 'js-cookie'
 import randomWords from 'random-words'
-import config from "../../kovan.config.json";
+import config from "../../kovan.ctokens.config.json";
 
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
@@ -53,7 +53,7 @@ const Dashboard = ({
   web3,
   engine,
   state,
-  login
+  loggedIn
 }) => {
 
   let userId = cookie.get('userId')
@@ -71,27 +71,9 @@ const Dashboard = ({
 
   const renderContent = () => {
 
-    if (!login.get('walletSelected')) {
-
-      if (!login.get('walletSelecting')) {
-
-        return <SelectWalletModal selectWallet={selectWallet} />
-      
-      }
-
-    } else if (!login.get('walletChecked')) {
-
-      if (!login.get('walletChecking')) { }
+    if (!loggedIn) {
 
     } else if (!web3) {
-
-    } else if (network != config.network) {
-
-      return <NetworkModal />
-
-    } else if (!state.get('account') && !login.get('walletSelecting')) {
-
-      return <UnlockModal />
 
     } else {
 
@@ -122,7 +104,6 @@ const Dashboard = ({
         web3,
         engine,
         state,
-        login
       }}>
           {/* <Intercom appID='zr42wlxq' user_id={userId} /> */}
           <StyledDashboard>

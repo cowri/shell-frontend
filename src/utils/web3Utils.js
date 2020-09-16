@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import config from '../kovan.config.json'
+import config from '../kovan.ctokens.config.json'
 
 import erc20ABI from '../abi/ERC20.abi.json'
 import shellABI from '../abi/Shell.abi.json'

@@ -5,7 +5,7 @@ import { Map } from 'immutable'
 import Web3 from 'web3'
 import Onboard from 'bnc-onboard'
 
-import config from "../kovan.config.json"
+import config from "../kovan.ctokens.config.json"
 
 import {
   getAllowances,
@@ -20,6 +20,7 @@ let web3
 let onboard
 let engine
 let network
+let address
 
 const withWallet = (WrappedComponent) => {
 
@@ -27,12 +28,7 @@ const withWallet = (WrappedComponent) => {
 
     const [state, setState] = useState(Map({}))
 
-    const [login, setLogin] = useState(Map({
-      walletSelecting: true,
-      walletSelected: false, 
-      walletChecking: false,
-      walletChecked: false 
-    }))
+    const [loggedIn, setLoggedIn] = useState(false)
 
     const [account, setAccount] = useState()
     const [allowances, setAllowances] = useState({})
@@ -40,7 +36,6 @@ const withWallet = (WrappedComponent) => {
     const [contracts, setContracts] = useState({})
     const [shell, setShell] = useState({})
     const [liquidity, setLiquidity] = useState({})
-    const [networkId, setNetworkId] = useState(1)
     const [walletBalances, setWalletBalances] = useState({})
     const [walletSelected, setWalletSelected] = useState(true)
     const [user, setUser] = useState({})
@@ -122,44 +117,25 @@ const withWallet = (WrappedComponent) => {
         const walletSelected = await onboard.walletSelect();
 
         if (walletSelected) {
+
+          const walletChecked = await onboard.walletCheck();
+
+          if (!walletChecked) { 
+
+            selectWallet() 
+
+          } else {
+
+            setLoggedIn(true)
+
+          }
           
-          setLogin( login
-            .set('walletSelected', true)
-            .set('walletChecking', true)
-          )
-
         } else {
-
-          return setLogin( login
-            .set('walletSelected', false)
-            .set('walletSelecting', false)
-            .set('walletChecked', false)
-            .set('walletChecked', false)
-          )
+          
+          selectWallet()
 
         }
         
-        const walletChecked = await onboard.walletCheck();
-        
-        if (walletChecked) {
-          
-          setLogin( login
-            .set('walletSelected', true)
-            .set('walletChecking', true)
-            .set('walletChecked', true) 
-          )
-
-        } else {
-
-          return setLogin( login
-            .set('walletSelected', false)
-            .set('walletSelecting', false)
-            .set('walletChecked', false)
-            .set('walletChecked', false)
-          )
-
-        }
-
     }
 
     // init application
@@ -173,19 +149,39 @@ const withWallet = (WrappedComponent) => {
           dappId: config.blocknative, // [String] The API key created by step one above
           networkId: config.network, // [Integer] The Ethereum network ID your Dapp uses.
           subscriptions: {
-            address: async function (address){
+            address: async _address => {
+              
+              address = _address
 
-              if (!address) {
+              if (!_address) {
 
-                return selectWallet()
+                return await selectWallet()
 
-              } else {
+              } else if (network == config.network) {
 
                 engine = engine ? engine : new AppEngine(web3, setState) 
 
                 engine.sync(address)
 
               }
+
+            },
+            network: async _network => {
+
+              network = _network
+
+              if (address && _network == config.network) {
+
+                engine = engine ? engine : new AppEngine(web3, setState) 
+
+                engine.sync(address)
+
+              } else if (_network != config.network) {
+                
+                onboard.walletCheck()
+                
+              }
+
 
             },
             wallet: async wallet => {
@@ -235,7 +231,7 @@ const withWallet = (WrappedComponent) => {
           walletSelected={walletSelected}
           web3={web3}
           engine={engine}
-          login={login}
+          loggedIn={loggedIn}
           state={state}
         />
       </>

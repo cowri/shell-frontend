@@ -58,7 +58,7 @@ const StyledAvailability = withTheme(styled.div`
   color: ${props => props.theme.palette.grey[500]};
   margin-left: 8px;
   font-size: 16px;
-  margin-bottom: 5px;
+  margin-bottom: 6.5px;
 `)
 
 const StyledInput = styled.div`
@@ -72,12 +72,11 @@ const StyledSwapRow = styled.div`
 
 const StyledMessage = styled.div`
   font-size: 20px;
-  padding: 40px;
-  height: 0px;
+  padding: 30px;
 `
 
 const StyledRows = styled.div`
-  margin-top: 48px;
+  margin-top: 30px;
   margin-bottom: 30px;
   text-align: center;
 `
@@ -120,8 +119,8 @@ const SwapTab = () => {
   const [step, setStep] = useState('start')
   const [originIx, setOriginIx] = useState(0)
   const [targetIx, setTargetIx] = useState(3)
-  const [originValue, setOriginValue] = useState('0')
-  const [targetValue, setTargetValue] = useState('0')
+  const [originValue, setOriginValue] = useState('')
+  const [targetValue, setTargetValue] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
   const [priceMessage, setPriceMessage] = useState('Your price for this trade will be...')
@@ -180,13 +179,20 @@ const SwapTab = () => {
     
     setTargetValue(amount)
     setSwapType('target')
+    
+    console.log("origin ix", _originIx)
+    console.log("target ix", _targetIx)
+    console.log("amount", amount)
 
     try {
 
       const {
         originAmount,
         targetAmount
-      } = await engine.viewTargetSwap(_originIx, _targetIx, targetValue)
+      } = await engine.viewTargetSwap(_originIx, _targetIx, amount)
+      
+      console.log("origin amount", originAmount)
+      console.log("target amount", targetAmount)
       
       setOriginValue(originAmount.display)
 
@@ -198,6 +204,8 @@ const SwapTab = () => {
       )
       
     } catch (e) {
+      
+      console.log("failed")
       
       setOriginValue('')
       setHaltIndication()
@@ -217,6 +225,9 @@ const SwapTab = () => {
         originAmount,
         targetAmount
       } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
+      
+      console.log("origin amount", originAmount)
+      console.log("target amount", targetAmount)
 
       setTargetValue(targetAmount.display)
 
@@ -290,9 +301,9 @@ const SwapTab = () => {
 
     function handleConfirmation () {
 
-      setOriginValue('0')
-      setTargetValue('0')
-      setPriceMessage('')
+      setOriginValue('')
+      setTargetValue('')
+      setPriceMessage('Your price for this trade will be...')
       setStep('success')
 
     }
