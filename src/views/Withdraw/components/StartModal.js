@@ -161,14 +161,16 @@ const StartModal = ({
   const primeProportionalWithdraw = (yes) => {
 
     if (yes) {
+      
+      console.log("proprotional withdraw")
 
       const shells = (
-        <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-          { state.getIn([ 'shell', 'shells', 'display' ])} 
+        <span style={{ display: 'inline-block', position: 'relative', paddingLeft: '17.5px' }}> 
           <img alt=""
             src={tinyShellIcon} 
-            style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} 
+            style={{position:'absolute', top:'2.5px', left: '5px', height: '20px' }} 
           /> 
+          { state.getIn([ 'shell', 'shells', 'display' ])} 
         </span>
       )
       
@@ -254,11 +256,11 @@ const StartModal = ({
     const shells = <div>
       You will burn 
       <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-        { engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) }
         <img alt="" src={tinyShellIcon} style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} /> 
+        { engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) }
       </span>
       { slippageMessage }
-      for this withdrawal
+      Shells for this withdrawal
     </div>
 
     return setLocalState(newLocalState.set('feeTip', shells))
@@ -322,7 +324,7 @@ const StartModal = ({
         <Button onClick={onDismiss} outlined >Cancel</Button>
         <Button onClick={handleSubmit}
           style={ localState.get('error') ? { cursor: 'no-drop'} : null }
-          disabled={ localState.get('error') ? true : false } 
+          // disabled={ localState.get('error') ? true : false } 
         >
           { localState.get('proportional') ? 'Withdraw Everything' : 'Withdraw' }
        </Button>

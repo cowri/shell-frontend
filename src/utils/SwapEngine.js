@@ -92,7 +92,7 @@ export default class SwapEngine {
 
         let deadline = Math.floor(Date.now() / 1000 + 900)
 
-        return this.shell.originSwap(
+        return this.shell.targetSwap(
             origin.address,
             target.address,
             origin.getRawFromNumeraire(maxOrigin),

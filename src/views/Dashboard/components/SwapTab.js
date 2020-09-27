@@ -102,23 +102,13 @@ const StyledActions = withTheme(styled.div`
 const SwapTab = () => {
 
   const {
-    account,
-    allowances,
-    contracts,
-    updateAllState,
-    updateAllowances,
-    updateBalances,
-    updateWalletBalances,
-    walletBalances,
     state,
     engine
   } = useContext(DashboardContext)
 
-  const shell = contracts.shell
-
   const [step, setStep] = useState('start')
   const [originIx, setOriginIx] = useState(0)
-  const [targetIx, setTargetIx] = useState(3)
+  const [targetIx, setTargetIx] = useState(1)
   const [originValue, setOriginValue] = useState('')
   const [targetValue, setTargetValue] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
@@ -133,7 +123,7 @@ const SwapTab = () => {
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
 
-  const initiallyLocked = allowances[origin.symbol.toLowerCase()] === 0
+  const initiallyLocked = state.getIn(['assets', originIx, 'allowance']) == 0
   const [unlocked, setUnlocked] = useState(false)
 
   function setZeroes (value) {
@@ -305,6 +295,7 @@ const SwapTab = () => {
       setTargetValue('')
       setPriceMessage('Your price for this trade will be...')
       setStep('success')
+      engine.sync()
 
     }
 
@@ -320,9 +311,9 @@ const SwapTab = () => {
 
     setStep('confirmingMetamask')
 
-    const tx = origin.methods.approve(shell.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
+    const tx = origin.methods.approve(engine.shell.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
 
-    tx.send({ from: account })
+    tx.send({ from: state.get('account') })
       .once('transactionHash', onTxHash)
       .once('confirmation', onConfirmation)
       .on('error', onError)
@@ -335,7 +326,7 @@ const SwapTab = () => {
     function onConfirmation () {
       setStep('unlockSuccess')
       setUnlocked(true)
-      updateAllowances()
+      engine.sync()
     }
 
     function onError () {
@@ -409,17 +400,11 @@ const SwapTab = () => {
   let toolTipMsg = ''
 
   // if (originError){ 
-
   //   if (originError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
-
   //   else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
-
   // } else if (targetError) {
-
   //   if (targetError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
-
   //   else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
-
   // }
 
   if (initiallyLocked && !unlocked) {

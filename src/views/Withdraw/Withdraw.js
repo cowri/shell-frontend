@@ -33,7 +33,7 @@ const Withdraw = ({
 
   const handleTxHash = (hash) => ( setStep('withdrawing'), setTxHash(hash) )
 
-  const handleConfirmation = () => setStep('success')
+  const handleConfirmation = () => ( engine.sync(), setStep('success') )
 
   const handleError = () => setStep('error')
 

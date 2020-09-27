@@ -63,6 +63,8 @@ export default class AppEngine extends SwapEngine {
 
     async sync (account) {
 
+        account = account ? account : this.account
+        
         this.account = account
 
         const shellAddr = this.shell.address

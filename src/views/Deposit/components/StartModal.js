@@ -16,6 +16,8 @@ import ModalContent from '../../../components/ModalContent'
 import ModalTitle from '../../../components/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
 
+import WarningModal from './WarningModal'
+
 import BigNumber from 'bignumber.js'
 
 const MAX_APPROVAL = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
@@ -219,12 +221,6 @@ const StartModal = ({
 
   }
 
-  const handleErrorSnackbarClose = (event, reason) => {
-
-    if (reason === 'clickaway') return;
-
-  };
-
   const handleSubmit = (e) => {
     
     const { addresses, amounts } = getAddressesAndAmounts(localState)
@@ -270,9 +266,17 @@ const StartModal = ({
 
   return (
     <Modal onDismiss={onDismiss}>
+      {
+        localState.get('prompting') && (
+          <WarningModal 
+            onCancel={() => setLocalState(localState.delete('prompting')) } 
+            onContinue={handleSubmit} 
+          />
+        )
+      }
       <ModalTitle>Deposit Funds</ModalTitle>
       <ModalContent>
-        <StyledForm onSubmit={handleSubmit}>
+        <StyledForm onSubmit={ () => setLocalState(localState.set('prompting', true))}>
           <StyledRows>
             <StyledDepositMessage> { localState.get('error') || localState.get('feeTip') } </StyledDepositMessage>
             { tokenInputs }
@@ -282,7 +286,8 @@ const StartModal = ({
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
         {/* <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button> */}
-        <Button  style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button>
+        {/* <Button  style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button> */}
+        <Button  style={{cursor: 'no-drop'}} onClick={() => setLocalState(localState.set('prompting', true))}> Deposit </Button>
       </ModalActions>
     </Modal>
   )
@@ -303,6 +308,8 @@ const TokenInput = ({
 }) => {
 
   return ( <>
+    
+    
     <StyledLabelBar>
       <span>  Shell's allowance:
         <span class="number"> ${available} </span>
@@ -312,6 +319,7 @@ const TokenInput = ({
       defaultColor="red"
       disabled={locked}
       error={isError}
+      
       FormHelperTextProps={{className: styles.helperText}}
       helperText={helperText}
       onChange={onChange}

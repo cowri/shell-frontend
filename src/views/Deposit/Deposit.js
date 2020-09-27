@@ -35,31 +35,33 @@ const Deposit = ({
     error: '',
     feeTip: 'Your rate on this deposit will be...',
   }))
-
+  
   const handleDeposit = async (addresses, amounts) => {
 
-    setLocalState(localState
-      .delete('error')
-      .set('step', 'confirmingMetamask')
-    )
+    setStep('confirming-metamask')
+
+    setLocalState(localState.delete('error'))
 
     engine.selectiveDeposit(
       addresses,
       amounts,
-      (hash) => {
+      function onTxHash (hash) {
         setTxHash(hash)
         setStep('depositing')
       },
-      () => {
+      function onConfirmation () {
+        engine.sync()
         setStep('deposit-success')
         setLocalState(localState
           .delete('fee')
+          .delete('prompting')
           .update('assets', assets => assets.map(asset => asset.set('input', ''))))
       },
-      () => {
+      function onError () {
         setStep('error')
         setLocalState(localState
           .delete('fee')
+          .delete('prompting')
           .update('assets', assets => assets.map(asset => asset.set('input', ''))))
       }
     )
@@ -68,17 +70,22 @@ const Deposit = ({
 
   const handleUnlock = async (index) => {
     
-    setLocalState(localState.set('step', 'confirmingMetamask'))
+    setStep('confirming-metamask')
 
     engine.unlock(
       index,
       MAX_APPROVAL,
-      (hash) => {
+      function onTxHash (hash) {
         setStep('unlocking')
         setTxHash(hash)
       },
-      () => setStep('unlocking-success'),
-      () => setStep('error')
+      function onConfirmation () {
+        engine.sync()
+        setStep('unlocking-success')
+      },
+      function onError () {
+        setStep('error')
+      }
     )
 
   }
@@ -105,7 +112,15 @@ const Deposit = ({
         />
       )}
 
-      {step === 'confirmingMetamask' && (
+      {step === 'unlocking' && (
+        <UnlockingModal txHash={txHash}/>
+      )}
+
+      {step === 'unlocking-success' && (
+        <ModalSuccess buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'Approval Successful.'} txHash={txHash} />
+      )}
+
+      {step === 'confirming-metamask' && (
         <ModalConfirmMetamask />
       )}
 
@@ -113,20 +128,12 @@ const Deposit = ({
         <DepositingModal />
       )}
 
-      {step === 'unlocking' && (
-        <UnlockingModal txHash={txHash}/>
-      )}
-
       {step === 'deposit-success' && (
         <ModalSuccess buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'Deposit Successful.'} txHash={txHash} />
       )}
 
-      {step === 'unlocking-success' && (
-        <ModalSuccess buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'Approval Successful.'} txHash={txHash} />
-      )}
-
       {step === 'error' && (
-        <ModalError buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'An error occurred'} txHash={txHash} />
+        <ModalError buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'An error occurred.'} txHash={txHash} />
       )}
     </>
   )
