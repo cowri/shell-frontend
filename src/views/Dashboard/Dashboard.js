@@ -32,18 +32,6 @@ const StyledDashboard = styled.div`
 `
 
 const Dashboard = ({
-  account,
-  allowances,
-  balances,
-  contracts,
-  shell,
-  hasMetamask,
-  isUnlocked,
-  network,
-  liquidity,
-  onEnable,
-  selectWallet,
-  updateAllState,
   web3,
   engine,
   state,
@@ -80,10 +68,6 @@ const Dashboard = ({
   return (
     <>
       <DashboardContext.Provider value={{
-        account,
-        shell,
-        onEnable,
-        updateAllState,
         presentDeposit: () => setDepositModal(true),
         presentWithdraw: () => setWithdrawModal(true),
         web3,

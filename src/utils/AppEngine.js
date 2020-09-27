@@ -62,6 +62,8 @@ export default class AppEngine extends SwapEngine {
     }
 
     async sync (account) {
+        
+        console.log("syncing")
 
         account = account ? account : this.account
         

@@ -21,6 +21,7 @@ let onboard
 let engine
 let network
 let address
+let syncer
 
 const withWallet = (WrappedComponent) => {
 
@@ -64,54 +65,6 @@ const withWallet = (WrappedComponent) => {
 
     }
 
-    const updateAllowances = async (_contracts, _account) => {
-
-      const allowances = await getAllowances(contracts, account)
-
-      setAllowances(allowances)
-      
-    }
-
-    const updateLiquidity = async () => {
-
-      const liquidity = await getLiquidity(shell)
-
-      setLiquidity(liquidity)
-      
-    }
-
-    const updateWalletBalances = async () => {
-
-      const walletBalances = await getWalletBalances(contracts, account)
-
-      setWalletBalances(walletBalances)
-
-    }
-    
-    const updateBalances = async (_liquidity, _shell, _account) => {
-
-      const balances = await getShellBalances(liquidity, shell, account)
-
-      setBalances(balances)
-
-    }
-
-    const handleEnable = () => {
-
-      return new Promise((resolve, reject) => {
-
-        window.ethereum.enable().then(accounts => {
-
-          setAccount(accounts[0])
-
-          resolve(accounts)
-
-        }).catch(e => reject(e))
-
-      })
-
-    }
-
     const selectWallet = async () => {
       
         const walletSelected = await onboard.walletSelect();
@@ -137,7 +90,7 @@ const withWallet = (WrappedComponent) => {
         }
         
     }
-
+    
     // init application
     useEffect(() => {
       
@@ -162,6 +115,8 @@ const withWallet = (WrappedComponent) => {
                 engine = engine ? engine : new AppEngine(web3, setState) 
 
                 engine.sync(address)
+                
+                if (!syncer) syncer = setInterval(() => engine.sync(), 7500)
 
               }
 
@@ -176,12 +131,13 @@ const withWallet = (WrappedComponent) => {
 
                 engine.sync(address)
 
+                if (!syncer) syncer = setInterval(() => engine.sync(), 7500)
+
               } else if (_network != config.network) {
                 
                 onboard.walletCheck()
                 
               }
-
 
             },
             wallet: async wallet => {
@@ -211,23 +167,10 @@ const withWallet = (WrappedComponent) => {
       <>
         <WrappedComponent
           {...props}
-          account={account}
-          allowances={allowances}
-          balances={balances}
-          contracts={contracts}
-          shell={contracts.shell}
           hasMetamask={!!window.ethereum}
           isUnlocked={!!account}
-          onEnable={handleEnable}
           selectWallet={selectWallet}
-          updateAllState={() => updateAllState()}
-          updateAllowances={() => updateAllowances()}
-          updateBalances={() => updateBalances()}
-          updateLiquidity={() => updateLiquidity()}
-          updateWalletBalances={() => updateWalletBalances()}
           network={network}
-          liquidity={liquidity}
-          walletBalances={walletBalances}
           walletSelected={walletSelected}
           web3={web3}
           engine={engine}
