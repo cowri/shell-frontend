@@ -53,13 +53,13 @@ export default class NumericFormats {
 
     getDisplayFromRaw (raw) {
 
-      return new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(2)
+      return Number(new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(2)).toLocaleString()
 
     }
 
     getDisplayFromNumeraire (numeraire, decimals) {
 
-      return numeraire.toFixed(decimals)
+      return Number(numeraire.toFixed(decimals)).toLocaleString()
 
     }
 }
