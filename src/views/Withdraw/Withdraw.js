@@ -28,7 +28,8 @@ const Withdraw = ({
     }),
     error: '',
     feeTip: 'Your rate on this withdrawal will be...',
-    proportional: false
+    proportional: false,
+    zero: true
   }))
 
   const handleTxHash = (hash) => ( setStep('withdrawing'), setTxHash(hash) )

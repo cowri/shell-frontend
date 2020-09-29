@@ -1,6 +1,8 @@
 import BigNumber from "bignumber.js"
 import { Shell } from "./web3Classes"
 
+const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
+
 
 export default class SwapEngine {
 
@@ -16,8 +18,8 @@ export default class SwapEngine {
             target.address,
             originAmount.raw
         )
-
-        if (!targetAmount) {
+        
+        if (!targetAmount || targetAmount.toString() == REVERTED) {
 
             throw(new Error("Reverted"))
 
@@ -45,7 +47,7 @@ export default class SwapEngine {
             targetAmount.raw
         )
         
-        if (!originAmount) {
+        if (!originAmount || originAmount.toString() == REVERTED) {
             
             throw(new Error("Reverted"))
 

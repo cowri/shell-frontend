@@ -3,8 +3,6 @@ import styled from 'styled-components'
 
 import BigNumber from 'bignumber.js'
 
-import { bnAmount, displayAmount } from '../../../utils/web3Utils'
-
 import DashboardContext from '../context'
 
 import ModalConfirmMetamask from '../../../components/ModalConfirmMetamask'
@@ -170,19 +168,12 @@ const SwapTab = () => {
     setTargetValue(amount)
     setSwapType('target')
     
-    console.log("origin ix", _originIx)
-    console.log("target ix", _targetIx)
-    console.log("amount", amount)
-
     try {
 
       const {
         originAmount,
         targetAmount
       } = await engine.viewTargetSwap(_originIx, _targetIx, amount)
-      
-      console.log("origin amount", originAmount)
-      console.log("target amount", targetAmount)
       
       setOriginValue(originAmount.display)
 
@@ -194,8 +185,6 @@ const SwapTab = () => {
       )
       
     } catch (e) {
-      
-      console.log("failed")
       
       setOriginValue('')
       setHaltIndication()
@@ -216,9 +205,6 @@ const SwapTab = () => {
         targetAmount
       } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
       
-      console.log("origin amount", originAmount)
-      console.log("target amount", targetAmount)
-
       setTargetValue(targetAmount.display)
 
       setPriceIndication(

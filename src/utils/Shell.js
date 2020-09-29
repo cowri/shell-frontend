@@ -9,6 +9,8 @@ export default class Shell extends NumericFormats {
     constructor (web3, address, name, symbol, icon, decimals) {
 
         super()
+        
+        console.log("address", address)
 
         this.contract = new web3.eth.Contract(ShellABI, address)
         this.address = address

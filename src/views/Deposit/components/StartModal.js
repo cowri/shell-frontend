@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField'
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 
 import shellIcon from '../../../assets/cowri-logo.svg'
+import tinyShellIcon from '../../../assets/shell_icon_24.svg'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
@@ -20,9 +21,7 @@ import WarningModal from './WarningModal'
 
 import BigNumber from 'bignumber.js'
 
-const MAX_APPROVAL = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-
-const ZERO = new BigNumber(0)
+const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
 
 const StyledStartAdornment = styled.div`
   align-items: center;
@@ -150,8 +149,8 @@ const StartModal = ({
     }
 
     const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
-
-    if (shellsToMint === false) {
+    
+    if (shellsToMint === false || shellsToMint.toString() === REVERTED) {
 
       return setLocalState(newLocalState
         .set('error', SAFETY_CHECK)
@@ -178,12 +177,12 @@ const StartModal = ({
     
     const feeMessage = <div>
       You will mint 
-        <span style={{position: 'relative', paddingRight: '17.5px'}}>
-          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint, 2) } 
+        <span style={{position: 'relative', paddingLeft: '16.5px'}}>
           <img alt="" 
-            src={shellIcon} 
-            style={{position:'absolute', top:'0px', right: '5px', height: '20px' }} 
+            src={tinyShellIcon} 
+            style={{position:'absolute', top:'1px', left: '0px' }} 
           /> 
+          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint, 2) } 
         </span> 
       { slippageMessage }
     </div>
@@ -213,9 +212,6 @@ const StartModal = ({
       }
 
     })
-    
-    console.log("addresses", addresses)
-    console.log("amounts", amounts)
 
     return { addresses, amounts }
 
@@ -285,9 +281,7 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}>Cancel</Button>
-        {/* <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button> */}
-        {/* <Button  style={{cursor: 'no-drop'}} onClick={handleSubmit}> Deposit </Button> */}
-        <Button  style={{cursor: 'no-drop'}} onClick={() => setLocalState(localState.set('prompting', true))}> Deposit </Button>
+        <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={() => setLocalState(localState.set('prompting', true))}> Deposit </Button>
       </ModalActions>
     </Modal>
   )

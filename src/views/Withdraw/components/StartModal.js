@@ -8,12 +8,9 @@ import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles'
 
-import daiIcon from '../../../assets/dai.svg'
-import susdIcon from '../../../assets/susd.svg'
-import usdcIcon from '../../../assets/usdc.svg'
-import usdtIcon from '../../../assets/usdt.svg'
 import shellIcon from '../../../assets/logo.png'
-import tinyShellIcon from '../../../assets/cowri-logo.svg'
+
+import tinyShellIcon from '../../../assets/shell_icon_24.svg'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
@@ -22,9 +19,9 @@ import ModalContent from '../../../components/ModalContent'
 import ModalTitle from '../../../components/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
 
-import { bnAmount, displayAmount } from '../../../utils/web3Utils'
-
 import BigNumber from 'bignumber.js'
+
+const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
 
 const StyledInput = styled.div`
   margin: 24px 0;
@@ -162,21 +159,21 @@ const StartModal = ({
 
     if (yes) {
       
-      console.log("proprotional withdraw")
-
-      const shells = (
-        <span style={{ display: 'inline-block', position: 'relative', paddingLeft: '17.5px' }}> 
+      const feeMessage = <div>
+        You will burn
+        <span style={{ position: 'relative', paddingLeft: '16.5px' }}> 
           <img alt=""
             src={tinyShellIcon} 
-            style={{position:'absolute', top:'2.5px', left: '5px', height: '20px' }} 
+            style={{position:'absolute', top:'1px', left: '0px' }} 
           /> 
-          { state.getIn([ 'shell', 'shells', 'display' ])} 
+          { ' ' + state.getIn([ 'shell', 'shells', 'display' ]) } 
         </span>
-      )
+        <span> and pay a 0.0175% fee to liquidity providers for this withdrawal </span>
+      </div>
       
       setLocalState(localState
         .update('assets', as => as.map( (a, ix) => a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']))))
-        .set('feeTip', <div> For this withdrawal you will burn { shells } and pay a 0.0175% fee to liquidity providers </div>)
+        .set('feeTip', feeMessage)
         .set('proportional', true)
       )
 
@@ -214,14 +211,19 @@ const StartModal = ({
 
       return setLocalState(newLocalState
         .set('feeTip', 'Your rate for this withdrawal will be...')
+        .set('zero', true)
         .delete('error')
       )
+
+    } else {
+
+      setLocalState( newLocalState.delete('zero') )
 
     }
 
     const shellsToBurn = await engine.shell.viewSelectiveWithdraw(addresses, amounts)
-
-    if (shellsToBurn === false) {
+    
+    if (shellsToBurn === false || shellsToBurn.toString() == REVERTED) {
 
       return setLocalState(newLocalState
         .set('error', SAFETY_CHECK)
@@ -250,17 +252,17 @@ const StartModal = ({
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
 
     const slippageMessage = slippage.isNegative()
-      ? <span>and pay a { Math.abs(slippage.toFixed(4)) }% fee to liquidity providers </span>
-      : <span>and earn a { slippage.toFixed(4) }% rebalancing subsidy </span>
+      ? <span> and pay a { Math.abs(slippage.toFixed(4)) }% fee to liquidity providers </span>
+      : <span> and earn a { slippage.toFixed(4) }% rebalancing subsidy </span>
 
     const shells = <div>
       You will burn 
-      <span style={{position: 'relative', paddingRight: '17.5px'}}> 
-        <img alt="" src={tinyShellIcon} style={{position:'absolute', top:'2.5px', right: '5px', height: '20px' }} /> 
-        { engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) }
+      <span style={{position: 'relative', paddingLeft: '16.5px'}}> 
+        <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '0px' }} /> 
+        { ' ' + engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) }
       </span>
       { slippageMessage }
-      Shells for this withdrawal
+      for this withdrawal
     </div>
 
     return setLocalState(newLocalState.set('feeTip', shells))
@@ -324,7 +326,7 @@ const StartModal = ({
         <Button onClick={onDismiss} outlined >Cancel</Button>
         <Button onClick={handleSubmit}
           style={ localState.get('error') ? { cursor: 'no-drop'} : null }
-          // disabled={ localState.get('error') ? true : false } 
+          disabled={ localState.get('error') || localState.get('zero') } 
         >
           { localState.get('proportional') ? 'Withdraw Everything' : 'Withdraw' }
        </Button>

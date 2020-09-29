@@ -51,9 +51,7 @@ const StyledRows = styled.div`
   margin-bottom: 12px;
 `
 
-const PoolTab = ({
-  buttonsDisabled
-}) => {
+const PoolTab = ({ buttonsDisabled }) => {
   const {
     presentDeposit,
     presentWithdraw,
@@ -86,15 +84,15 @@ const PoolTab = ({
     )
   }) : [] 
 
-  const totalLiq = state.has('shell') ? state.get('shell').get('totalLiq').get('display') : 0
+  const totalLiq = state.has('shell') ? state.getIn(['shell', 'totalLiq', 'display']) : 0
 
-  const ownedLiq = state.has('shell') ? state.get('shell').get('ownedLiq').get('display') : 0
-
+  const ownedLiq = state.has('shell') ? state.getIn(['shell', 'ownedLiq', 'display']) : 0
+  
   return (
     <StyledPoolTab>
       <Overview>
         <OverviewSection>
-          <LabelledValue label="Pool Balance" value={ '$' + totalLiq } />
+          <LabelledValue label="Pool Balance" value={ '$' + totalLiq.toLocaleString() } />
         </OverviewSection>
         <OverviewSection>
           <LabelledValue label="Your Balance" value={ '$' + ownedLiq } />
@@ -102,9 +100,9 @@ const PoolTab = ({
       </Overview>
       <StyledRows>
         <Row head>
-          <span style={{ flex: 1.5 }}>Token</span>
-          <span style={{ flex: 1, textAlign: 'right' }}>Pool Balance</span>
-          <span style={{ flex: 1, textAlign: 'right' }}>My Balance</span>
+          <span style={{ flex: 1.5 }}> Token </span>
+          <span style={{ flex: 1, textAlign: 'right' }}> Pool Balance </span>
+          <span style={{ flex: 1, textAlign: 'right' }}> My Balance </span>
         </Row>
         { rows }
       </StyledRows>

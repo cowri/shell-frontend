@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import config from '../../kovan.ctokens.config.json'
+import config from '../../mainnet.config'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDiscord, faTelegram, faTwitter, } from '@fortawesome/free-brands-svg-icons'

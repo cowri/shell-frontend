@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../kovan.ctokens.config.json"
+import config from "../../mainnet.config"
 
 import styled from 'styled-components'
 

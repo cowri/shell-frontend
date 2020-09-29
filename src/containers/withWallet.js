@@ -5,15 +5,8 @@ import { Map } from 'immutable'
 import Web3 from 'web3'
 import Onboard from 'bnc-onboard'
 
-import config from "../kovan.ctokens.config.json"
+import config from "../mainnet.config"
 
-import {
-  getAllowances,
-  getContracts,
-  getShellBalances,
-  getLiquidity,
-  getWalletBalances,
-} from '../utils/web3Utils'
 import AppEngine from '../utils/AppEngine'
 
 let web3
@@ -31,39 +24,7 @@ const withWallet = (WrappedComponent) => {
 
     const [loggedIn, setLoggedIn] = useState(false)
 
-    const [account, setAccount] = useState()
-    const [allowances, setAllowances] = useState({})
-    const [balances, setBalances] = useState({})
-    const [contracts, setContracts] = useState({})
-    const [shell, setShell] = useState({})
-    const [liquidity, setLiquidity] = useState({})
-    const [walletBalances, setWalletBalances] = useState({})
     const [walletSelected, setWalletSelected] = useState(true)
-    const [user, setUser] = useState({})
-
-    const updateAllState = async (_account, _contracts) => {
-
-      const __account = _account ? _account : account
-
-      const __contracts = _contracts ? _contracts : contracts
-
-      const _liquidity = await getLiquidity(__contracts.shell)
-
-      const _balances = await getShellBalances(_liquidity, __contracts.shell, __account)
-
-      const _allowances = await getAllowances(__contracts, __account)
-
-      const _walletBalances = await getWalletBalances(__contracts, __account)
-
-      setAllowances(_allowances)
-
-      setBalances(_balances)
-
-      setWalletBalances(_walletBalances)
-
-      setLiquidity(_liquidity)
-
-    }
 
     const selectWallet = async () => {
       
@@ -168,7 +129,6 @@ const withWallet = (WrappedComponent) => {
         <WrappedComponent
           {...props}
           hasMetamask={!!window.ethereum}
-          isUnlocked={!!account}
           selectWallet={selectWallet}
           network={network}
           walletSelected={walletSelected}
