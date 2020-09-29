@@ -175,7 +175,7 @@ const SwapTab = () => {
         targetAmount
       } = await engine.viewTargetSwap(_originIx, _targetIx, amount)
       
-      setOriginValue(originAmount.display)
+      setOriginValue(originAmount.display.replace(',',''))
 
       setPriceIndication(
         _originIx, 
@@ -205,7 +205,7 @@ const SwapTab = () => {
         targetAmount
       } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
       
-      setTargetValue(targetAmount.display)
+      setTargetValue(targetAmount.display.replace(',',''))
 
       setPriceIndication(
         _originIx, 
