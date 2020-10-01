@@ -114,7 +114,7 @@ const withWallet = (WrappedComponent) => {
           walletSelect: {
             wallets: [
               { walletName: "metamask", preferred: true },
-              { walletName: "walletConnect", preferred: true, infuraKey: config.defaultWeb3Provider },
+              // { walletName: "walletConnect", preferred: true, infuraKey: config.defaultWeb3Provider },
             ]
           }
         });
