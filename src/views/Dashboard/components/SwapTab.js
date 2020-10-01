@@ -404,14 +404,6 @@ const SwapTab = () => {
 
   let toolTipMsg = ''
 
-  // if (originError){ 
-  //   if (originError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
-  //   else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
-  // } else if (targetError) {
-  //   if (targetError === haltCheckMessage) toolTipMsg = 'This amount triggers safety halts'
-  //   else toolTipMsg = 'Your wallet has insufficient ' + origin.symbol 
-  // }
-
   if (initiallyLocked && !unlocked) {
 
     toolTipMsg = 'You must unlock ' + origin.symbol + ' to swap'
@@ -439,9 +431,7 @@ const SwapTab = () => {
         <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
         <AmountInput 
           available={state.get('assets').get(originIx).get('balance').get('display')}
-          // error={}
           icon={origin.icon}
-          // helperText={originHelperText}
           onChange={e => primeSwap({type:'origin', value: e.target.value}, {})}
           selections={getDropdown(handleOriginSelect, originIx)}
           styles={inputStyles}
@@ -457,9 +447,7 @@ const SwapTab = () => {
           </IconButton>
         </StyledSwapRow>
         <AmountInput 
-          // error={}
           icon={target.icon}
-          // helperText={targetHelperText}
           onChange={e => primeSwap({type:'target', value: e.target.value}, {})}
           selections={getDropdown(handleTargetSelect, targetIx)}
           styles={inputStyles}
@@ -470,7 +458,6 @@ const SwapTab = () => {
       </StyledRows>
       <StyledActions>
         <Button 
-          // disabled={( (targetValue == 0 || originValue == 0) || targetError || originError || (initiallyLocked && !unlocked))}
           disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
           onClick={handleSwap}
           outlined={initiallyLocked && !unlocked}
