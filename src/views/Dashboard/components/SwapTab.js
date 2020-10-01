@@ -12,13 +12,11 @@ import ModalTx from '../../../components/ModalAwaitingTx'
 
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem';
-import Tooltip from '@material-ui/core/Tooltip';
 import IconButton from '@material-ui/core/IconButton';
 import SwapCallsIcon from '@material-ui/icons/SwapCalls';
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 
 import Button from '../../../components/Button'
-
 
 import TokenIcon from '../../../components/TokenIcon'
 
@@ -121,7 +119,7 @@ const SwapTab = () => {
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
 
-  const initiallyLocked = state.getIn(['assets', originIx, 'allowance']) == 0
+  const initiallyLocked = state.getIn(['assets', originIx, 'allowance', 'raw']) == 0
   const [unlocked, setUnlocked] = useState(false)
 
   function setZeroes (value) {
@@ -154,11 +152,32 @@ const SwapTab = () => {
   
   const setIndexes = (index) => {
 
-    if (index.type === 'origin') setOriginIx(index.value)
-    if (index.type === 'target') setTargetIx(index.value)
+    if (index.type === 'origin') {
+
+      const allowance = state.getIn(['assets', index.value, 'allowance', 'raw'])
+
+      setUnlocked(allowance != 0)
+
+      setOriginIx(index.value)
+      
+    }
+
+    if (index.type === 'target') {
+
+      setTargetIx(index.value)
+
+    }
+
     if (index.type === 'switch') {
+
+      const allowance = state.getIn(['assets', targetIx, 'allowance', 'raw'])
+
+      setUnlocked(allowance != 0)
+
       setOriginIx(targetIx)
       setTargetIx(originIx)
+      
+
     } 
 
   }
@@ -297,7 +316,7 @@ const SwapTab = () => {
 
     setStep('confirmingMetamask')
 
-    const tx = origin.methods.approve(engine.shell.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
+    const tx = origin.approve(engine.shell.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
 
     tx.send({ from: state.get('account') })
       .once('transactionHash', onTxHash)
