@@ -37,7 +37,7 @@ const ModalWarning = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onCancel}> Cancel </Button>
-        <Button disabled onClick={onContinue}> Continue </Button>
+        <Button onClick={onContinue}> Continue </Button>
       </ModalActions>
     </Modal>
   )

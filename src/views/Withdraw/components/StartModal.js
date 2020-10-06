@@ -175,6 +175,7 @@ const StartModal = ({
         .update('assets', as => as.map( (a, ix) => a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']).replace(',',''))))
         .set('feeTip', feeMessage)
         .set('proportional', true)
+        .delete('zero')
       )
 
     } else {
@@ -183,6 +184,7 @@ const StartModal = ({
         .update('assets', as => as.map( a => a.set('input', '')))
         .set('feeTip', 'Your rate on this withdrawal will be...')
         .set('proportional', false)
+        .set('zero', true)
       )
 
     }
