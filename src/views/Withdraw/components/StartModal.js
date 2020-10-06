@@ -210,6 +210,8 @@ const StartModal = ({
     }, new BigNumber(0))
 
     if (totalWithdraw.isZero()) {
+      
+      console.log("IS zero")
 
       return setLocalState(newLocalState
         .set('feeTip', 'Your rate for this withdrawal will be...')
@@ -218,9 +220,9 @@ const StartModal = ({
       )
 
     } else {
-
-      setLocalState( newLocalState.delete('zero') )
-
+      
+      newLocalState = newLocalState.set('zero', false)
+      
     }
 
     const shellsToBurn = await engine.shell.viewSelectiveWithdraw(addresses, amounts)
@@ -299,6 +301,10 @@ const StartModal = ({
     )
 
   })
+  
+  console.log("is zero", localState.get('zero'))
+  console.log("is error", localState.get('error'))
+  
 
   return (
     <Modal onDismiss={onDismiss}>
