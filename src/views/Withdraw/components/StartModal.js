@@ -168,11 +168,11 @@ const StartModal = ({
           /> 
           { ' ' + state.getIn([ 'shell', 'shells', 'display' ]) } 
         </span>
-        <span> and pay a 0.0175% fee to liquidity providers for this withdrawal </span>
+        <span> and pay a 0.035% fee to liquidity providers for this withdrawal </span>
       </div>
       
       setLocalState(localState
-        .update('assets', as => as.map( (a, ix) => a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']))))
+        .update('assets', as => as.map( (a, ix) => a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']).replace(',',''))))
         .set('feeTip', feeMessage)
         .set('proportional', true)
       )

@@ -32,8 +32,8 @@ const ModalWarning = ({
     <Modal>
       <ModalTitle> Caution </ModalTitle>
       <ModalContent>
-        <p> Shell Protocol is not yet live, but it will be soon. </p>
-        {/* <p> Please do not deposit any funds you can not afford to lose. </p> */}
+        <p> Shell Protocol is in beta. </p>
+        <p> Please do not deposit any funds you can not afford to lose. </p>
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onCancel}> Cancel </Button>
