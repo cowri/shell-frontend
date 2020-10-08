@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 
 import DashboardContext from '../context'
 
-import ModalConfirmMetamask from '../../../components/ModalConfirmMetamask'
+import ModalConfirm from '../../../components/ModalConfirm'
 import ModalError from '../../../components/ModalError'
 import ModalSuccess from '../../../components/ModalSuccess'
 import ModalTx from '../../../components/ModalAwaitingTx'
@@ -286,16 +286,19 @@ const SwapTab = () => {
       .once('transactionHash', handleTransactionHash)
       .once('confirmation', handleConfirmation)
       .on('error', handleError)
+    
+    let success = false
 
     function handleTransactionHash (hash) {
-
+      
       setTxHash(hash)
       setStep('swapping')
 
     }
 
-    function handleConfirmation () {
-
+    function handleConfirmation (conf) {
+      
+      success = true
       setOriginValue('')
       setTargetValue('')
       setPriceMessage('Your price for this trade will be...')
@@ -304,9 +307,9 @@ const SwapTab = () => {
 
     }
 
-    function handleError () {
-
-      setStep('error')
+    function handleError (e) {
+      
+      if (!success) setStep('error')
 
     }
 
@@ -422,7 +425,7 @@ const SwapTab = () => {
   return (
 
     <StyledSwapTab>
-      { step === 'confirmingMetamask' && <ModalConfirmMetamask /> }
+      { step === 'confirmingMetamask' && <ModalConfirm wallet={engine.wallet} /> }
       { (step === 'swapping' || step === 'unlocking') && <ModalTx txHash={txHash} /> }
       { step === 'success' && <ModalSuccess buttonBlurb={'Finish'} txHash={txHash} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
       { step === 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }

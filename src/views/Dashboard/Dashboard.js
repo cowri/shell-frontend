@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import Intercom from 'react-intercom'
 import cookie from 'js-cookie'
 import randomWords from 'random-words'
-import config from '../../mainnet.config';
 
 import Footer from '../../components/Footer'
 import Header from '../../components/Header'
@@ -14,9 +13,6 @@ import Deposit from '../Deposit'
 import Withdraw from '../Withdraw'
 
 import DashboardContent from './components/DashboardContent'
-import NetworkModal from './components/NetworkModal'
-import SelectWalletModal from './components/SelectWalletModal'
-import UnlockModal from './components/UnlockModal'
 
 import DashboardContext from './context'
 

@@ -1,6 +1,7 @@
 import React from 'react'
 
 import metamaskLogo from '../../assets/metamask.svg'
+import walletConnectLogo from '../../assets/walletConnectLogo.png'
 
 import Loader from '../Loader'
 import Modal from '../Modal'
@@ -8,11 +9,18 @@ import ModalActions from '../ModalActions'
 import ModalIcon from '../ModalIcon'
 import ModalTitle from '../ModalTitle'
 
-const ModalConfirmMetamask = () => (
+const ModalConfirm = ({wallet}) => (
   <Modal>
-    <ModalTitle> Confirming with MetaMask </ModalTitle>
+    <ModalTitle> Confirming with { wallet } </ModalTitle>
     <ModalIcon>
-      <img alt="Metamask Logo" src={metamaskLogo} style={{ height: 96 }} />
+      <img 
+        alt="Wallet Logo"
+        src={ wallet == 'MetaMask' ? metamaskLogo :
+              wallet == 'WalletConnect' ? walletConnectLogo :
+              ''
+            } 
+        style={{ height: 96 }} 
+      />
     </ModalIcon>
     <ModalActions>
       <div style={{ width: '100%' }}>
@@ -22,4 +30,4 @@ const ModalConfirmMetamask = () => (
   </Modal>
 )
 
-export default ModalConfirmMetamask
+export default ModalConfirm

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 
-import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
+import ModalConfirm from '../../components/ModalConfirm'
 import DepositingModal from '../../components/ModalAwaitingTx'
 import UnlockingModal from '../../components/ModalAwaitingTx'
 
@@ -41,6 +41,8 @@ const Deposit = ({
     setStep('confirming-metamask')
 
     setLocalState(localState.delete('error'))
+    
+    let success = false
 
     engine.selectiveDeposit(
       addresses,
@@ -50,6 +52,7 @@ const Deposit = ({
         setStep('depositing')
       },
       function onConfirmation () {
+        success = true
         engine.sync()
         setStep('deposit-success')
         setLocalState(localState
@@ -57,12 +60,14 @@ const Deposit = ({
           .delete('prompting')
           .update('assets', assets => assets.map(asset => asset.set('input', ''))))
       },
-      function onError () {
-        setStep('error')
-        setLocalState(localState
-          .delete('fee')
-          .delete('prompting')
-          .update('assets', assets => assets.map(asset => asset.set('input', ''))))
+      function onError (e) {
+        if (!success) {
+          setStep('error')
+          setLocalState(localState
+            .delete('fee')
+            .delete('prompting')
+            .update('assets', assets => assets.map(asset => asset.set('input', ''))))
+        }
       }
     )
 
@@ -121,7 +126,7 @@ const Deposit = ({
       )}
 
       {step === 'confirming-metamask' && (
-        <ModalConfirmMetamask />
+        <ModalConfirm wallet={engine.wallet} />
       )}
 
       {step === 'depositing' && (

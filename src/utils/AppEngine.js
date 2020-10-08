@@ -60,11 +60,9 @@ export default class AppEngine extends SwapEngine {
         this.setState(this.state.set('network', network))
 
     }
-
+    
     async sync (account) {
         
-        console.log("syncing")
-
         account = account ? account : this.account
         
         this.account = account

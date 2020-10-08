@@ -83,38 +83,40 @@ const withWallet = (WrappedComponent) => {
 
             },
             network: async _network => {
-
+              
               network = _network
 
               if (address && _network == config.network) {
 
                 engine = engine ? engine : new AppEngine(web3, setState) 
-
+                
                 engine.sync(address)
 
-                if (!syncer) syncer = setInterval(() => engine.sync(), 7500)
+                if (!syncer) syncer = setInterval(() => engine.sync(address), 7500)
 
               } else if (_network != config.network) {
                 
-                onboard.walletCheck()
+                selectWallet()
                 
               }
 
             },
             wallet: async wallet => {
-            
+              
+              if (wallet.name == undefined) return
+              
               web3 = new Web3(wallet.provider)
              
-              network = await web3.eth.net.getId()
-
-              engine = engine ? engine : new AppEngine(web3, setState) 
+              engine = new AppEngine(web3, setState) 
+              
+              engine.wallet = wallet.name
 
             },
           },
           walletSelect: {
             wallets: [
               { walletName: "metamask", preferred: true },
-              // { walletName: "walletConnect", preferred: true, infuraKey: config.defaultWeb3Provider },
+              { walletName: "walletConnect", preferred: true, infuraKey: config.infuraKey },
             ]
           }
         });

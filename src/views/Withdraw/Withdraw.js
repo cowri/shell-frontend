@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react'
 
 import { fromJS } from 'immutable'
 
-import ModalConfirmMetamask from '../../components/ModalConfirmMetamask'
+import ModalConfirm from '../../components/ModalConfirm'
 import WithdrawingModal from '../../components/ModalAwaitingTx'
 
 import DashboardContext from '../Dashboard/context'
@@ -31,12 +31,14 @@ const Withdraw = ({
     proportional: false,
     zero: true
   }))
+  
+  let success = false 
 
   const handleTxHash = (hash) => ( setStep('withdrawing'), setTxHash(hash) )
 
-  const handleConfirmation = () => ( engine.sync(), setStep('success') )
+  const handleConfirmation = () => ( success = true, engine.sync(), setStep('success') )
 
-  const handleError = () => setStep('error')
+  const handleError = () => { if (!success) setStep('error') }
 
   const handleProportionalWithdraw = async (amount) => {
 
@@ -80,7 +82,7 @@ const Withdraw = ({
       )}
 
       {step === 'confirmingMetamask' && (
-        <ModalConfirmMetamask />
+        <ModalConfirm wallet={engine.wallet} />
       )}
 
       {step === 'withdrawing' && (

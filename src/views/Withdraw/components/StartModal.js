@@ -1,11 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import TextField from '@material-ui/core/TextField'
 import Checkbox from '@material-ui/core/Checkbox';
-import Tooltip from '@material-ui/core/Tooltip';
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles'
 
 import shellIcon from '../../../assets/logo.png'
@@ -203,8 +200,6 @@ const StartModal = ({
 
     if (totalWithdraw.isZero()) {
       
-      console.log("IS zero")
-
       return setLocalState(newLocalState
         .set('feeTip', 'Your rate for this withdrawal will be...')
         .set('zero', true)
@@ -294,10 +289,6 @@ const StartModal = ({
 
   })
   
-  console.log("is zero", localState.get('zero'))
-  console.log("is error", localState.get('error'))
-  
-
   return (
     <Modal onDismiss={onDismiss}>
       <ModalTitle>Withdraw Funds</ModalTitle>
