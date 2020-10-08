@@ -167,7 +167,7 @@ const StartModal = ({
 
     const shellsChange = shellsToMint.dividedBy(state.getIn([ 'shell', 'totalShells', 'numeraire' ]))
 
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
 
     const slippageMessage = slippage.absoluteValue().isGreaterThan(0.0001)
       ? slippage.isNegative()
@@ -313,7 +313,6 @@ const TokenInput = ({
       defaultColor="red"
       disabled={locked}
       error={isError}
-      
       FormHelperTextProps={{className: styles.helperText}}
       helperText={helperText}
       onChange={onChange}

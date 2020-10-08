@@ -102,14 +102,6 @@ const StartModal = ({
   const SAFETY_CHECK = <span style={errorStyles}> These amounts trigger Shell's Safety Check  </span>
   const EXCEEDS_BALANCE = <span style={errorStyles}> This withdrawal exceeds your Shell balance </span>
 
-  const epsilonRemoved = (amount) => {
-
-    const epsilon = new BigNumber(1).minus(0.000175)
-
-    return amount.multipliedBy(epsilon)
-
-  }
-
   const handleSubmit = (e) => {
     e.preventDefault()
 
