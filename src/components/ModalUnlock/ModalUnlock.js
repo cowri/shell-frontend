@@ -60,8 +60,6 @@ const ModalUnlock = ({
   const [ amount, setAmount ] = useState('')
   const [ unlimited, setUnlimited ] = useState(false)
   
-  console.log("amount", amount.replace('.',''))
-  
   const checkboxClasses = makeStyles({
     root: {
       '& .MuiSvgIcon-root': { 
@@ -84,7 +82,6 @@ const ModalUnlock = ({
   } else {
     current = coin.getIn(['allowance', 'display'])
   }
- 
 
   return (
     <Modal>
@@ -113,7 +110,7 @@ const ModalUnlock = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={ handleCancel }> Cancel </Button>
-        <Button onClick={ () => handleUnlock(unlimited ? amount : amount * (10 ** decimals )) }> Continue </Button>
+        <Button onClick={ () => handleUnlock(unlimited ? amount : new BigNumber(amount).multipliedBy(new BigNumber(10 ** decimals )).toFixed()) }> Continue </Button>
       </ModalActions>
     </Modal>
   )

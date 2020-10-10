@@ -538,7 +538,10 @@ const AmountInput = ({
     <StyledInput>
       <StyledLabelBar>
         <StyledTitle> { title } </StyledTitle>
-        { allowance ? <StyledAvailability onClick={unlock}> Shell's allowance: ${allowance} click to change </StyledAvailability> : null }
+        { allowance ? <StyledAvailability onClick={unlock}> 
+              Shell's allowance: ${allowance + ' '}  
+              <span style={{textDecoration: 'underline', color: '#8a8a8a'}}>click to change </span>
+            </StyledAvailability> : null }
       </StyledLabelBar>
       <TextField fullWidth
         error={error}

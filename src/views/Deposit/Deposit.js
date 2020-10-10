@@ -71,8 +71,6 @@ const Deposit = ({ onDismiss }) => {
 
   const handleUnlock = async (index, amount) => {
     
-    console.log("amount", typeof amount)
-    
     setStep('confirming')
 
     engine.unlock(

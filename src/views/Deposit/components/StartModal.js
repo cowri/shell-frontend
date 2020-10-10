@@ -239,22 +239,13 @@ const StartModal = ({
 
     let available = assetState.getIn(['allowance', 'numeraire'])
     
-    console.log("raw to string", available.toFixed())
-    console.log(new BigNumber('1000000000').toFixed())
-    
     if ( available.isGreaterThan(new BigNumber('100000000'))) {
-      console.log("zing")
       available = '100,000,000+'
     } else if ( available.isGreaterThan(new BigNumber(10000000))) {
-      console.log("ring")
       available = available.toExponential()
     } else {
-      console.log("sing")
       available = assetState.getIn(['allowance', 'display'])
     }
-    
-    console.log(typeof assetState.getIn(['allowance','raw']).toFixed())
-    console.log(assetState.getIn(['allowance','raw']).toExponential())
     
     return (
       <TokenInput
@@ -262,7 +253,7 @@ const StartModal = ({
         icon={asset.icon}
         isError={ localAssetState.get('error') ? true : false }
         helperText={localAssetState.get('error')}
-        onAllowanceClick={() => setLocalState(localState.set('unlocking', ix))}
+        onAllowanceClick={() => setLocalState(localState.set('unlocking', ix)) }
         onChange={e => primeDeposit(e.target.value, ix)}
         styles={inputStyles}
         symbol={asset.symbol}
@@ -321,7 +312,7 @@ const TokenInput = ({
       <span onClick={onAllowanceClick} style={{cursor:'pointer'}} >  
         Shell's allowance:
         <span class="number"> ${available} </span>
-        click to change
+        <span style={{ color: '#8a8a8a', textDecoration: 'underline' }} > click to change </span>
       </span> 
     </StyledLabelBar>
     <TextField fullWidth
