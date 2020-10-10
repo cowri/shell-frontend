@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react'
 
 import ModalConfirm from '../../components/ModalConfirm'
-import DepositingModal from '../../components/ModalAwaitingTx'
-import UnlockingModal from '../../components/ModalAwaitingTx'
+import BroadcastingModal from '../../components/ModalAwaitingTx'
 
 import DashboardContext from '../Dashboard/context'
 
@@ -17,9 +16,7 @@ const MAX_APPROVAL = '1157920892373161954235709850086879078532699846656405640394
 
 const ZERO = new BigNumber(0)
 
-const Deposit = ({
-    onDismiss
-}) => {
+const Deposit = ({ onDismiss }) => {
   const { 
     engine,
     state
@@ -38,7 +35,7 @@ const Deposit = ({
   
   const handleDeposit = async (addresses, amounts) => {
 
-    setStep('confirming-metamask')
+    setStep('confirming')
 
     setLocalState(localState.delete('error'))
     
@@ -70,18 +67,19 @@ const Deposit = ({
         }
       }
     )
-
   }
 
-  const handleUnlock = async (index) => {
+  const handleUnlock = async (index, amount) => {
     
-    setStep('confirming-metamask')
+    console.log("amount", typeof amount)
+    
+    setStep('confirming')
 
     engine.unlock(
       index,
-      MAX_APPROVAL,
+      amount.toString(),
       function onTxHash (hash) {
-        setStep('unlocking')
+        setStep('broadcasting')
         setTxHash(hash)
       },
       function onConfirmation () {
@@ -105,8 +103,7 @@ const Deposit = ({
   return (
     <>
 
-      {step === 'start' && (
-        <StartModal
+      { step === 'start' && <StartModal
           engine={engine}
           localState={localState}
           onDeposit={handleDeposit}
@@ -114,32 +111,30 @@ const Deposit = ({
           onDismiss={onDismiss}
           setLocalState={setLocalState}
           state={state}
-        />
-      )}
+        /> }
 
-      {step === 'unlocking' && (
-        <UnlockingModal txHash={txHash}/>
-      )}
+      { step === 'confirming' && <ModalConfirm wallet={engine.wallet} />}
 
-      {step === 'unlocking-success' && (
-        <ModalSuccess buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'Approval Successful.'} txHash={txHash} />
-      )}
+      { step === 'broadcasting' && <BroadcastingModal txHash={txHash} />}
 
-      {step === 'confirming-metamask' && (
-        <ModalConfirm wallet={engine.wallet} />
-      )}
+      { step === 'unlocking-success' && <ModalSuccess 
+          buttonBlurb={'Finish'} 
+          onDismiss={dismissSubmodal} 
+          title={'Approval Successful.'} 
+          txHash={txHash} /> }
 
-      {step === 'depositing' && (
-        <DepositingModal />
-      )}
+      { step === 'deposit-success' && <ModalSuccess 
+          buttonBlurb={'Finish'} 
+          onDismiss={dismissSubmodal} 
+          title={'Deposit Successful.'} 
+          txHash={txHash} /> }
 
-      {step === 'deposit-success' && (
-        <ModalSuccess buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'Deposit Successful.'} txHash={txHash} />
-      )}
+      { step === 'error' && <ModalError 
+          buttonBlurb={'Finish'}
+          onDismiss={dismissSubmodal}
+          title={'An error occurred.'}
+          txHash={txHash} /> }
 
-      {step === 'error' && (
-        <ModalError buttonBlurb={'Finish'} onDismiss={dismissSubmodal} title={'An error occurred.'} txHash={txHash} />
-      )}
     </>
   )
 }

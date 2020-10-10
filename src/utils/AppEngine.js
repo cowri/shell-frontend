@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../mainnet.config"
+import config from "../kovan.ctokens.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -81,6 +81,8 @@ export default class AppEngine extends SwapEngine {
 
         const ownedLiq = ownedLiqRatio.multipliedBy(shellLiq[0].raw)
         
+        const self = this
+        
         const assets = await Promise.all(this.assets.map(async function (asset, ix) {
 
             const allowance = await asset.allowance(account, shellAddr)
@@ -95,7 +97,10 @@ export default class AppEngine extends SwapEngine {
                 allowance: allowance,
                 balance: balance,
                 balanceInShell: asset.getAllFormatsFromRaw(rawBalInShell),
-                liquidityInShell: asset.getAllFormatsFromRaw(liqInShell)
+                liquidityInShell: asset.getAllFormatsFromRaw(liqInShell),
+                icon: self.assets[ix].icon,
+                symbol: self.assets[ix].symbol,
+                decimals: self.assets[ix].decimals
             }
 
         }))

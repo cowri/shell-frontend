@@ -9,6 +9,7 @@ import ModalConfirm from '../../../components/ModalConfirm'
 import ModalError from '../../../components/ModalError'
 import ModalSuccess from '../../../components/ModalSuccess'
 import ModalTx from '../../../components/ModalAwaitingTx'
+import ModalUnlock from '../../../components/ModalUnlock'
 
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem';
@@ -19,6 +20,8 @@ import { makeStyles, withTheme } from '@material-ui/core/styles'
 import Button from '../../../components/Button'
 
 import TokenIcon from '../../../components/TokenIcon'
+
+const MAX = "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 
 const StyledStartAdornment = styled.div`
   align-items: center;
@@ -55,6 +58,7 @@ const StyledAvailability = withTheme(styled.div`
   margin-left: 8px;
   font-size: 16px;
   margin-bottom: 6.5px;
+  cursor: pointer;
 `)
 
 const StyledInput = styled.div`
@@ -276,7 +280,7 @@ const SwapTab = () => {
 
     e.preventDefault()
 
-    setStep('confirmingMetamask')
+    setStep('confirming')
 
     let tx = swapType === 'origin'
       ? engine.executeOriginSwap(originIx, targetIx, originValue, targetValue)
@@ -292,7 +296,7 @@ const SwapTab = () => {
     function handleTransactionHash (hash) {
       
       setTxHash(hash)
-      setStep('swapping')
+      setStep('broadcasting')
 
     }
 
@@ -314,12 +318,15 @@ const SwapTab = () => {
     }
 
   }
+  
+  const handleUnlock = async (amount) => {
 
-  const handleUnlock = async () => {
+    setStep('confirming')
 
-    setStep('confirmingMetamask')
-
-    const tx = origin.approve(engine.shell.address, "115792089237316195423570985008687907853269984665640564039457584007913129639935")
+    const tx = origin.approve(
+      engine.shell.address,
+      amount.toString()
+    )
 
     tx.send({ from: state.get('account') })
       .once('transactionHash', onTxHash)
@@ -328,7 +335,7 @@ const SwapTab = () => {
 
     function onTxHash (hash) {
       setTxHash(hash)
-      setStep('unlocking')
+      setStep('broadcasting')
     }
 
     function onConfirmation () {
@@ -422,24 +429,60 @@ const SwapTab = () => {
     }
   })()
   
+  let allowance = state.get('assets').get(originIx).get('allowance').get('numeraire')
+  
+  if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
+    allowance = '100,000,000+'
+  } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
+    allowance = allowance.toExponential()
+  } else {
+    allowance = state.getIn(['assets', originIx, 'allowance', 'display'])
+  }
+  
+  const unlockOrigin = () => setStep('unlocking')
+    
   return (
 
     <StyledSwapTab>
-      { step === 'confirmingMetamask' && <ModalConfirm wallet={engine.wallet} /> }
-      { (step === 'swapping' || step === 'unlocking') && <ModalTx txHash={txHash} /> }
-      { step === 'success' && <ModalSuccess buttonBlurb={'Finish'} txHash={txHash} onDismiss={() => setStep('none')} title={'Swap Successful.'}/> }
-      { step === 'unlockSuccess' && <ModalSuccess buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'Unlocking Successful.'}/> }
-      { step === 'error' && <ModalError buttonBlurb={'Finish'} onDismiss={() => setStep('none')} title={'An error occurred.'} />}
+      { step === 'unlocking' && <ModalUnlock 
+          coin={state.getIn(['assets', originIx])} 
+          handleUnlock={handleUnlock} 
+          handleCancel={ () => setStep('none') } 
+        /> }
+
+      { step === 'confirming' && <ModalConfirm wallet={engine.wallet} /> }
+    
+      { step === 'broadcasting' && <ModalTx txHash={txHash} /> }
+
+      { step === 'success' && <ModalSuccess 
+          buttonBlurb={'Finish'} 
+          txHash={txHash} 
+          onDismiss={() => setStep('none')} 
+          title={'Swap Successful.'}
+        /> }
+
+      { step === 'unlockSuccess' && <ModalSuccess 
+        buttonBlurb={'Finish'} 
+        onDismiss={() => setStep('none')} 
+        title={'Unlocking Successful.'}
+        /> }
+
+      { step === 'error' && <ModalError 
+        buttonBlurb={'Finish'} 
+        onDismiss={() => setStep('none')} 
+        title={'An error occurred.'} 
+        /> }
       <StyledRows>
         <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
         <AmountInput 
-          available={state.get('assets').get(originIx).get('balance').get('display')}
+          allowance={allowance}
           icon={origin.icon}
           onChange={e => primeSwap({type:'origin', value: e.target.value}, {})}
           selections={getDropdown(handleOriginSelect, originIx)}
           styles={inputStyles}
           symbol={origin.symbol}
           title={'From'}
+          unlock={unlockOrigin}
           value={originValue}
         />
         <StyledSwapRow>
@@ -468,7 +511,7 @@ const SwapTab = () => {
           Swap
         </Button> 
         <div style={{ width: 12 }} />
-        { (initiallyLocked && !unlocked) ? <Button onClick={handleUnlock}> Unlock { origin.symbol } </Button> : null } 
+        { (initiallyLocked && !unlocked) ? <Button onClick={ () => setStep('unlocking') }> Unlock { origin.symbol } </Button> : null } 
       </StyledActions>
     </StyledSwapTab>
   )
@@ -476,23 +519,26 @@ const SwapTab = () => {
 
 
 const AmountInput = ({
-  available,
+  allowance,
   icon,
   error,
   helperText,
   onChange,
   styles,
-  symbol,
   title,
+  unlock,
   value,
   selections
 }) => {
+  
+  
+ 
 
   return (
     <StyledInput>
       <StyledLabelBar>
         <StyledTitle> { title } </StyledTitle>
-        { available ? <StyledAvailability> Available: {available} {symbol} </StyledAvailability> : null }
+        { allowance ? <StyledAvailability onClick={unlock}> Shell's allowance: ${allowance} click to change </StyledAvailability> : null }
       </StyledLabelBar>
       <TextField fullWidth
         error={error}

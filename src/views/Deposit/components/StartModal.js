@@ -2,12 +2,9 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import CircularProgress from '@material-ui/core/CircularProgress'
-import Snackbar from "@material-ui/core/Snackbar";
-import MuiAlert from '@material-ui/lab/Alert';
 import TextField from '@material-ui/core/TextField'
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 
-import shellIcon from '../../../assets/cowri-logo.svg'
 import tinyShellIcon from '../../../assets/shell_icon_24.svg'
 
 import Button from '../../../components/Button'
@@ -16,6 +13,7 @@ import ModalActions from '../../../components/ModalActions'
 import ModalContent from '../../../components/ModalContent'
 import ModalTitle from '../../../components/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
+import UnlockingModal from '../../../components/ModalUnlock'
 
 import WarningModal from './WarningModal'
 
@@ -239,15 +237,33 @@ const StartModal = ({
     const assetState = state.get('assets').get(ix)
     const localAssetState = localState.get('assets').get(ix)
 
+    let available = assetState.getIn(['allowance', 'numeraire'])
+    
+    console.log("raw to string", available.toFixed())
+    console.log(new BigNumber('1000000000').toFixed())
+    
+    if ( available.isGreaterThan(new BigNumber('100000000'))) {
+      console.log("zing")
+      available = '100,000,000+'
+    } else if ( available.isGreaterThan(new BigNumber(10000000))) {
+      console.log("ring")
+      available = available.toExponential()
+    } else {
+      console.log("sing")
+      available = assetState.getIn(['allowance', 'display'])
+    }
+    
+    console.log(typeof assetState.getIn(['allowance','raw']).toFixed())
+    console.log(assetState.getIn(['allowance','raw']).toExponential())
+    
     return (
       <TokenInput
-        available={assetState.get('balance').get('display')}
+        available={available}
         icon={asset.icon}
         isError={ localAssetState.get('error') ? true : false }
         helperText={localAssetState.get('error')}
-        locked={assetState.get('allowance').get('raw').isZero()}
+        onAllowanceClick={() => setLocalState(localState.set('unlocking', ix))}
         onChange={e => primeDeposit(e.target.value, ix)}
-        onUnlock={e => onUnlock(ix) }
         styles={inputStyles}
         symbol={asset.symbol}
         value={localState.get('assets').get(ix).get('input')}
@@ -262,14 +278,15 @@ const StartModal = ({
 
   return (
     <Modal onDismiss={onDismiss}>
-      {
-        localState.get('prompting') && (
-          <WarningModal 
-            onCancel={() => setLocalState(localState.delete('prompting')) } 
-            onContinue={handleSubmit} 
-          />
-        )
-      }
+      { localState.get('prompting') && <WarningModal 
+          onCancel={() => setLocalState(localState.delete('prompting')) } 
+          onContinue={handleSubmit} /> }
+      { !isNaN(localState.get('unlocking')) && <UnlockingModal
+          coin={state.getIn(['assets', localState.get('unlocking')])}
+          handleCancel={ () => setLocalState(localState.delete('unlocking'))}
+          handleUnlock={ amount => (
+            setLocalState(localState.delete('unlocking')), 
+            onUnlock(localState.get('unlocking'), amount) ) } /> }
       <ModalTitle>Deposit Funds</ModalTitle>
       <ModalContent>
         <StyledForm onSubmit={ () => setLocalState(localState.set('prompting', true))}>
@@ -292,26 +309,23 @@ const TokenInput = ({
   isError,
   icon,
   helperText,
-  locked,
   onChange,
-  onUnlock,
+  onAllowanceClick,
   styles,
   symbol,
-  unlocking,
   value
 }) => {
 
   return ( <>
-    
-    
     <StyledLabelBar>
-      <span>  Shell's allowance:
+      <span onClick={onAllowanceClick} style={{cursor:'pointer'}} >  
+        Shell's allowance:
         <span class="number"> ${available} </span>
+        click to change
       </span> 
     </StyledLabelBar>
     <TextField fullWidth
       defaultColor="red"
-      disabled={locked}
       error={isError}
       FormHelperTextProps={{className: styles.helperText}}
       helperText={helperText}
@@ -323,25 +337,7 @@ const TokenInput = ({
       InputProps={{
         style: isError ? { color: 'red' } : null,
         min: "0",
-        endAdornment: locked ? (
-          <div style={{ marginRight: 6 }}>
-            <Button
-              disabled={unlocking}
-              outlined
-              small
-              onClick={onUnlock}
-            >
-              {unlocking ? (
-                <>
-                  <CircularProgress size={18} />
-                  <span style={{ marginLeft: 6 }}>Unlocking</span>
-                </>
-              ) : 'Unlock'}
-            </Button>
-          </div>
-        ) : (
-          <StyledEndAdornment>{symbol}</StyledEndAdornment>
-        ),
+        endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
         startAdornment: (
           <StyledStartAdornment>
             <TokenIcon size={24}> <img alt="" src={icon} /> </TokenIcon>
