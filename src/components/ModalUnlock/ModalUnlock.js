@@ -10,6 +10,8 @@ import Button from '../Button'
 import Modal from '../Modal'
 import ModalActions from '../ModalActions'
 
+import BigNumber from 'bignumber.js'
+
 const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
 
 const ModalContent = withTheme(styled.div`
@@ -71,17 +73,24 @@ const ModalUnlock = ({
     }
   }, { name: 'MuiCheckbox' })()
   
-  console.log("coin", coin)
-  console.log("decimals", coin.get('decimals'))
-  
-  const current = coin.getIn(['allowance', 'display'])
   const decimals = coin.get('decimals')
+  
+  let current = coin.getIn(['allowance', 'numeraire'])
+  
+  if ( current.isGreaterThan(new BigNumber('100000000'))) {
+    current = '100,000,000+'
+  } else if ( current.isGreaterThan(new BigNumber(10000000))) {
+    current = current.toExponential()
+  } else {
+    current = coin.getIn(['allowance', 'display'])
+  }
+ 
 
   return (
     <Modal>
       <ModalTitle> Unlock { coin.get('symbol') } </ModalTitle>
       <ModalContent>
-        <p> Shell's current allowance is ${ formatBalance(current) } </p>
+        <p> Shell's current allowance is ${ current } </p>
         <NumberFormat
           value={ unlimited ? MAX : amount }
           disabled={ unlimited }
