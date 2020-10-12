@@ -7,17 +7,24 @@ const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534
 export default class SwapEngine {
 
     async viewOriginSwap (originIndex, targetIndex, amount) {
+        
+        console.log("zing", 0)
 
-        let origin = this.assets[originIndex]
-        let target = this.assets[targetIndex]
+        let origin = this.derivatives[originIndex]
+        let target = this.derivatives[targetIndex]
 
         let originAmount = origin.getAllFormatsFromDisplay(amount)
+        
+        console.log("origin", origin)
+        console.log("target", target)
 
         let targetAmount = await this.shell.viewOriginSwap(
             origin.address,
             target.address,
             originAmount.raw
         )
+        
+        console.log("target amount - ", targetAmount)
         
         if (!targetAmount || targetAmount.toString() == REVERTED) {
 
@@ -36,8 +43,8 @@ export default class SwapEngine {
 
     async viewTargetSwap (originIndex, targetIndex, amount) {
 
-        let origin = this.assets[originIndex]
-        let target = this.assets[targetIndex]
+        let origin = this.derivatives[originIndex]
+        let target = this.derivatives[targetIndex]
 
         let targetAmount = target.getAllFormatsFromDisplay(amount)
 
@@ -63,15 +70,19 @@ export default class SwapEngine {
     }
 
     executeOriginSwap (originIndex, targetIndex, originAmount, minTargetAmount) {
+        
+        console.log("~!~!~!~!~ EXECUTE ORIGIN SWAP ~!~!~!~!~")
 
-        let origin = this.assets[originIndex]
-        let target = this.assets[targetIndex]
+        let origin = this.derivatives[originIndex]
+        let target = this.derivatives[targetIndex]
 
         originAmount = origin.getAllFormatsFromDisplay(originAmount)
 
         let minTarget = target.getNumeraireFromDisplay(minTargetAmount).multipliedBy(new BigNumber(.99))
 
         let deadline = Math.floor(Date.now() /1000 + 900)
+        
+        console.log("originAmount", originAmount)
 
         return this.shell.originSwap(
             origin.address,
@@ -85,8 +96,8 @@ export default class SwapEngine {
 
     executeTargetSwap (originIndex, targetIndex, maxOriginAmount, targetAmount) {
 
-        let origin = this.assets[originIndex]
-        let target = this.assets[targetIndex]
+        let origin = this.derivatives[originIndex]
+        let target = this.derivatives[targetIndex]
 
         targetAmount = target.getAllFormatsFromDisplay(targetAmount)
 

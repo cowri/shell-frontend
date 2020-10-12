@@ -124,9 +124,13 @@ const StartModal = ({
 
     const { addresses, amounts } = getAddressesAndAmounts(newLocalState)
     
+    console.log("Addresses", addresses)
+    console.log("amounts", amounts)
+    
     const totalDeposit = amounts.reduce( (a, c, i) => {
 
-      const asset = engine.assets[engine.derivativeIx[addresses[i]]]
+      const asset = engine.assets[engine.assetIx[addresses[i]]]
+      console.log("asset", asset)
 
       return a.plus(asset.getNumeraireFromRaw(c))
 

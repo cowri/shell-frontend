@@ -108,7 +108,7 @@ const SwapTab = () => {
 
   const [step, setStep] = useState('start')
   const [originIx, setOriginIx] = useState(0)
-  const [targetIx, setTargetIx] = useState(1)
+  const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
   const [originValue, setOriginValue] = useState('')
   const [targetValue, setTargetValue] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
@@ -116,14 +116,22 @@ const SwapTab = () => {
   const [priceMessage, setPriceMessage] = useState('Your price for this trade will be...')
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
+  
+  const [coins, setCoins] = useState(engine.assets.reduce( (accu, asset) => {
+    accu.push(asset)
+    return accu.concat(asset.derivatives)
+  }, []))
+  
+  console.log("coins", coins)
+  console.log('derivs', state.get('derivatives'))
 
-  const origin = engine.assets[originIx]
-  const target = engine.assets[targetIx]
+  const origin = coins[originIx]
+  const target = coins[targetIx]
 
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
 
-  const initiallyLocked = state.getIn(['assets', originIx, 'allowance', 'raw']) == 0
+  const initiallyLocked = state.getIn(['derivatives', originIx, 'allowance', 'raw']) == 0
   const [unlocked, setUnlocked] = useState(false)
 
   function setZeroes (value) {
@@ -158,7 +166,7 @@ const SwapTab = () => {
 
     if (index.type === 'origin') {
 
-      const allowance = state.getIn(['assets', index.value, 'allowance', 'raw'])
+      const allowance = state.getIn(['derivatives', index.value, 'allowance', 'raw'])
 
       setUnlocked(allowance != 0)
 
@@ -174,7 +182,7 @@ const SwapTab = () => {
 
     if (index.type === 'switch') {
 
-      const allowance = state.getIn(['assets', targetIx, 'allowance', 'raw'])
+      const allowance = state.getIn(['derivatives', targetIx, 'allowance', 'raw'])
 
       setUnlocked(allowance != 0)
 
@@ -228,6 +236,9 @@ const SwapTab = () => {
         targetAmount
       } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
       
+      console.log("origin amount", originAmount)
+      console.log("target amount", targetAmount)
+      
       setTargetValue(targetAmount.display.replace(',',''))
 
       setPriceIndication(
@@ -260,8 +271,8 @@ const SwapTab = () => {
 
     const tPrice = targetAmount.dividedBy(originAmount).toFixed(4)
 
-    const oSymbol = engine.assets[_originIx].symbol
-    const tSymbol = engine.assets[_targetIx].symbol
+    const oSymbol = coins[_originIx].symbol
+    const tSymbol = coins[_targetIx].symbol
 
     let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
       ? <span> $ <span> 1.00 </span> of { oSymbol } is worth </span>
@@ -390,7 +401,7 @@ const SwapTab = () => {
     root: { 'fontFamily': 'Geomanist', 'fontSize': '17.5px' }
   })()
 
-  const selections = engine.assets.map( (asset, ix) => {
+  const selections = coins.map( (asset, ix) => {
 
       return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
       
@@ -429,23 +440,33 @@ const SwapTab = () => {
     }
   })()
   
-  let allowance = state.get('assets').get(originIx).get('allowance').get('numeraire')
+  let allowance = state.getIn(['derivatives', originIx, 'allowance', 'numeraire'])
+  
+  console.log("what", allowance)
   
   if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
+    console.log("huuuuh")
     allowance = '100,000,000+'
   } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
+    console.log("zuuuh")
     allowance = allowance.toExponential()
   } else {
-    allowance = state.getIn(['assets', originIx, 'allowance', 'display'])
+    console.log("origin ix", originIx)
+    console.log("miiiiit", state.getIn(['derivatives', originIx]))
+    allowance = state.getIn(['derivatives', originIx, 'allowance', 'display'])
+    console.log("the allowance", state.get)
+    console.log("wtf is it", allowance)
   }
+  console.log("Allowance - - - - -", allowance)
   
   const unlockOrigin = () => setStep('unlocking')
     
   return (
 
     <StyledSwapTab>
+
       { step === 'unlocking' && <ModalUnlock 
-          coin={state.getIn(['assets', originIx])} 
+          coin={state.getIn(['derivatives', originIx])} 
           handleUnlock={handleUnlock} 
           handleCancel={ () => setStep('none') } 
         /> }
@@ -472,6 +493,7 @@ const SwapTab = () => {
         onDismiss={() => setStep('none')} 
         title={'An error occurred.'} 
         /> }
+
       <StyledRows>
         <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
         <AmountInput 
@@ -531,8 +553,7 @@ const AmountInput = ({
   selections
 }) => {
   
-  
- 
+  console.log("allowance", allowance)
 
   return (
     <StyledInput>

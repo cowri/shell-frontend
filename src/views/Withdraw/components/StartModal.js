@@ -161,7 +161,18 @@ const StartModal = ({
       </div>
       
       setLocalState(localState
-        .update('assets', as => as.map( (a, ix) => a.set('input', state.getIn([ 'assets', ix, 'balanceInShell', 'display']).replace(',',''))))
+        .update('assets', as => as.map( (a, ix) => {
+          
+          const amt = state.getIn([ 'assets', ix, 'balanceInShell', 'display'])
+          
+          const amtMinusCommas = amt.replace(',','')
+
+          console.log("display amt", amt)
+          console.log("display amt minus commas", amtMinusCommas)
+
+          a.set('input', amtMinusCommas)
+
+        }))
         .set('feeTip', feeMessage)
         .set('proportional', true)
         .delete('zero')

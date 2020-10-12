@@ -9,29 +9,73 @@
       "decimals": 18,
       "icon": "dai.svg",
       "name": "MultiCollateral Dai",
-      "symbol": "DAI"
+      "symbol": "DAI",
+      "type": "ERC20",
+      "derivatives": [ 
+        {
+          "address": "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad",
+          "decimals": 8,
+          "icon": "cdai.svg",
+          "name": "Compound Dai",
+          "symbol": "cDAI",
+          "type": "cERC20"
+        }
+      ]
     },
     { 
       "address": "0xb7a4F3E9097C08dA09517b5aB877F7a917224ede", 
       "decimals": 6,
       "icon": "usdc.svg",
       "name": "USD Coin",
-      "symbol": "USDC"
+      "symbol": "USDC",
+      "type": "ERC20",
+      "derivatives": [
+        {
+          "address": "0x4a92e71227d294f041bd82dd8f78591b75140d63", 
+          "decimals": 8,
+          "icon": "cusdc.svg",
+          "name": "Compound USD Coin",
+          "symbol": "cUSDC",
+          "type": "cERC20"
+        }
+      ]
     },
     { 
       "address": "0x07de306FF27a2B630B1141956844eB1552B956B5", 
       "decimals": 6,
       "icon": "usdt.svg",
       "name": "Tether Stablecoin",
-      "symbol": "USDT"
+      "symbol": "USDT",
+      "type": "ERC20",
+      "derivatives": [
+        {
+          "address": "0x3f0a0ea2f86bae6362cf9799b523ba06647da018",
+          "decimals": 8,
+          "icon": "cusdt.svg",
+          "name": "Compound USDT",
+          "symbol": "cUSDT",
+          "type": "cERC20"
+        }
+      ]
     },
     { 
       "address": "0xD868790F57B39C9B2B51b12de046975f986675f9", 
       "decimals": 6,
       "icon": "susd.svg",
       "name": "Synthetix USD",
-      "symbol": "SUSD"
+      "symbol": "SUSD",
+      "type": "ERC20",
+      "derivatives": [
+        {
+          "address": "0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901",
+          "decimals": 6,
+          "icon": "asusd.svg",
+          "name": "Aave Interest Bearing sUSD",
+          "symbol": "aSUSD",
+          "type": "aERC20"
+        }
+      ]
     }
   ],
-  "shell": "0xdfde66d05a02e37c4813b4f3ab1845b0caafd918"
+  "shell": "0xc80e9a042f186c43d676a267a8be7f7e3e9ce613"
 }

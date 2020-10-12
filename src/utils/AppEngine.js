@@ -1,14 +1,11 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../mainnet.config"
+import config from "../kovan.ctokens.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
+import BigNumber from "bignumber.js"
 
 import shellIcon from "../assets/logo.png"
-
-const assetIcons = config.assets.map(asset => {
-    return require('../assets/' + asset.icon)
-})
 
 export default class AppEngine extends SwapEngine {
 
@@ -31,25 +28,49 @@ export default class AppEngine extends SwapEngine {
             18
         )
 
-        this.assets = [ ]
-        this.derivativeIx = { }
+        this.assets = []
+        this.derivatives = []
+        this.assetIx = {}
+        this.derivativeIx = {}
 
         for (const ix in config.assets) {
-
+            
             const _asset_ = config.assets[ix]
-
-            this.derivativeIx[_asset_.address] = ix
 
             const asset = new Asset(
                 this.web3,
                 _asset_.address,
                 _asset_.name,
                 _asset_.symbol,
-                assetIcons[ix],
+                _asset_.icon,
                 _asset_.decimals
             )
+                
+            this.assetIx[_asset_.address] = ix
+            this.derivativeIx[_asset_.address] = this.derivatives.length
+            
+            asset.derivatives = []
+            
+            for (const _derivative_ of _asset_.derivatives) {
 
+                const derivative = new Asset(
+                    this.web3,
+                    _derivative_.address,
+                    _derivative_.name,
+                    _derivative_.symbol,
+                    _derivative_.icon,
+                    _derivative_.decimals
+                )
+                
+                this.derivativeIx[_derivative_.address] = this.derivatives.length
+                
+                asset.derivatives.push(derivative)
+                
+            }
+            
             this.assets.push(asset)
+            this.derivatives.push(asset)
+            this.derivatives = this.derivatives.concat(asset.derivatives)
 
         }
 
@@ -83,31 +104,52 @@ export default class AppEngine extends SwapEngine {
         
         const self = this
         
+        let derivatives = []
+        
         const assets = await Promise.all(this.assets.map(async function (asset, ix) {
+            
+            const _asset = await queryAsset(asset)
+
+            const liqInShell = shellLiq[1][ix].raw.dividedBy(10 ** (18 - asset.decimals))
+
+            const rawBalInShell = ownedLiqRatio
+                .multipliedBy(shellLiq[1][ix].raw)
+                .div(new BigNumber(10 ** (18 - asset.decimals)))
+
+            _asset.balanceInShell = asset.getAllFormatsFromRaw(rawBalInShell)
+            _asset.liquidityInShell = asset.getAllFormatsFromRaw(liqInShell)
+            
+            _asset.derivatives = await Promise.all(asset.derivatives.map(queryAsset)) 
+            
+            derivatives.push(_asset)
+            derivatives = derivatives.concat(_asset.derivatives)
+            
+            return _asset;
+
+        }))
+        
+        async function queryAsset (asset) {
 
             const allowance = await asset.allowance(account, shellAddr)
 
             const balance = await asset.balanceOf(account)
-
-            const liqInShell = shellLiq[1][ix].raw.dividedBy(10 ** (18 - asset.decimals))
-
-            const rawBalInShell = ownedLiqRatio.multipliedBy(shellLiq[1][ix].raw).div(10 ** (18 - asset.decimals))
+            
+            console.log("asset", asset.name, "allowance", allowance)
 
             return {
                 allowance: allowance,
                 balance: balance,
-                balanceInShell: asset.getAllFormatsFromRaw(rawBalInShell),
-                liquidityInShell: asset.getAllFormatsFromRaw(liqInShell),
-                icon: self.assets[ix].icon,
-                symbol: self.assets[ix].symbol,
-                decimals: self.assets[ix].decimals
+                icon: asset.icon,
+                symbol: asset.symbol,
+                decimals: asset.decimals
             }
 
-        }))
-
+        }
+        
         this.state = fromJS({
             account: account,
             assets: assets,
+            derivatives: derivatives,
             shell: {
                 shells: shells,
                 totalShells: totalShells,
@@ -115,7 +157,6 @@ export default class AppEngine extends SwapEngine {
                 ownedLiq: shell.getAllFormatsFromRaw(ownedLiq)
             },
         })
-
 
         this.setState(this.state)
 
