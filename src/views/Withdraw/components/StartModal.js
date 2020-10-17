@@ -79,6 +79,7 @@ const StyledWithdrawMessage = styled.div`
   font-size: 22px;
 `
 
+const ONE = new BigNumber(1)
 
 const StartModal = ({
   engine, 
@@ -100,11 +101,14 @@ const StartModal = ({
   const EXCEEDS_BALANCE = <span style={errorStyles}> This withdrawal exceeds your Shell balance </span>
 
   const handleSubmit = (e) => {
+    
     e.preventDefault()
 
     if (localState.get('proportional')) {
-
-      onProportionalWithdraw(state.getIn([ 'shell', 'shells', 'raw' ]))
+      
+      const totalShells = state.getIn([ 'shell', 'shellsTotal', 'raw' ])
+      
+      onProportionalWithdraw(totalShells)
 
     } else {
 
@@ -134,7 +138,7 @@ const StartModal = ({
 
         addresses.push(asset.address)
 
-        amounts.push(asset.getRawFromDisplay(amount)) 
+        amounts.push(asset.getAllFormatsFromDisplay(amount)) 
 
       }
 
@@ -147,6 +151,10 @@ const StartModal = ({
   const primeProportionalWithdraw = (yes) => {
 
     if (yes) {
+
+      const fee = engine.shell.getDisplayFromNumeraire(
+        engine.shell.epsilon.multipliedBy(100)
+      )
       
       const feeMessage = <div>
         You will burn
@@ -155,24 +163,22 @@ const StartModal = ({
             src={tinyShellIcon} 
             style={{position:'absolute', top:'1px', left: '0px' }} 
           /> 
-          { ' ' + state.getIn([ 'shell', 'shells', 'display' ]) } 
+          { ' ' + state.getIn([ 'shell', 'shellsTotal', 'display' ]) } 
         </span>
-        <span> and pay a 0.035% fee to liquidity providers for this withdrawal </span>
+        <span> and pay a {fee}% fee to liquidity providers for this withdrawal </span>
       </div>
-      
+
+
       setLocalState(localState
-        .update('assets', as => as.map( (a, ix) => {
-          
-          const amt = state.getIn([ 'assets', ix, 'balanceInShell', 'display'])
-          
-          const amtMinusCommas = amt.replace(',','')
-
-          console.log("display amt", amt)
-          console.log("display amt minus commas", amtMinusCommas)
-
-          a.set('input', amtMinusCommas)
-
-        }))
+        .update('assets', assets => { 
+          return assets.map( (asset, ix) => {
+            let amount = state.getIn(['assets', ix, 'liquidityOwned', 'numeraire'])
+            amount = amount.multipliedBy(ONE.minus(engine.shell.epsilon))
+            amount = engine.shell.getDisplayFromNumeraire(amount)
+            console.log("amount", amount)
+            return asset.set('input', amount)
+          })
+        })
         .set('feeTip', feeMessage)
         .set('proportional', true)
         .delete('zero')
@@ -200,12 +206,16 @@ const StartModal = ({
     let newLocalState = localState.setIn(['assets', ix, 'input'], val)
 
     const { addresses, amounts } = getAddressesAndAmounts(newLocalState)
+    
+    console.log("addresses", addresses)
+    console.log("amounts", amounts)
 
-    const totalWithdraw = amounts.reduce( (a,c,i) => {
+    const totalWithdraw = amounts.reduce( (accu, curr, i) => {
+      console.log("engine.derivative ix",engine.derivativeIx[addresses[i]])
 
-      const asset = engine.assets[engine.derivativeIx[addresses[i]]]
+      const asset = engine.derivatives[engine.derivativeIx[addresses[i]]]
 
-      return a.plus(asset.getNumeraireFromRaw(c))
+      return accu.plus(curr.numeraire)
 
     }, new BigNumber(0))
 
@@ -232,9 +242,7 @@ const StartModal = ({
         .delete('feeTip')
       )
 
-    } else if (shellsToBurn.isGreaterThan(state.getIn(['shell', 'shells', 'numeraire']))) {
-
-      const shellBalance = state.getIn([ 'shell', 'shells', 'display' ])
+    } else if (shellsToBurn.isGreaterThan(state.getIn(['shell', 'shellsTotal', 'numeraire']))) {
 
       return setLocalState(newLocalState
         .set('error', EXCEEDS_BALANCE)
@@ -247,24 +255,39 @@ const StartModal = ({
 
     }
 
-    const liquidityChange = totalWithdraw.dividedBy(state.getIn(['shell', 'totalLiq', 'numeraire']))
+    const liquidityChange = totalWithdraw.dividedBy(state.getIn(['shell', 'liquidityTotal', 'numeraire']))
 
-    const shellsChange = shellsToBurn.dividedBy(state.getIn(['shell', 'totalShells', 'numeraire']))
+    const shellsChange = shellsToBurn.dividedBy(state.getIn(['shell', 'shellsTotal', 'numeraire']))
 
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
-
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
+    
+    const fee = shellsToBurn.multipliedBy(slippage)
+    
     const slippageMessage = slippage.isNegative()
-      ? <span> and pay a { Math.abs(slippage.toFixed(4)) }% fee to liquidity providers </span>
-      : <span> and earn a { slippage.toFixed(4) }% rebalancing subsidy </span>
+      ? ( <span> 
+            and pay a liquidity provider fee of 
+            <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
+              <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
+              { Math.abs(fee.toFixed(4)) } 
+            </span>
+          </span>
+      ) : ( <span > 
+            and earn a rebalancing subsidy of 
+            <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
+              <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
+              { fee.toFixed(4) } 
+            </span>
+          </span> 
+        )
 
     const shells = <div>
       You will burn 
-      <span style={{position: 'relative', paddingLeft: '16.5px'}}> 
+      <span style={{position: 'relative', paddingLeft: '16.5px', paddingRight: '4px' }}> 
         <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '0px' }} /> 
         { ' ' + engine.shell.getDisplayFromNumeraire(shellsToBurn, 2) }
       </span>
       { slippageMessage }
-      for this withdrawal
+       for this withdrawal
     </div>
 
     return setLocalState(newLocalState.set('feeTip', shells))
@@ -287,7 +310,7 @@ const StartModal = ({
   }, { name: 'MuiCheckbox' })()
 
   const tokenInputs = engine.assets.map( (asset, ix) => { 
-    
+
     return (
       <TokenInput
         disabled={localState.get('proportional')}
@@ -308,7 +331,7 @@ const StartModal = ({
           <StyledRows>
             <StyledShells>
                 <StyledShellIcon src={shellIcon}/>
-                <StyledShellBalance> { state.getIn([ 'shell', 'shells', 'display' ]) + ' Shells'} </StyledShellBalance>
+                <StyledShellBalance> { state.getIn([ 'shell', 'shellsTotal', 'display' ]) + ' Shells'} </StyledShellBalance>
             </StyledShells>
             <StyledWithdrawMessage> { localState.get('error') || localState.get('feeTip') } </StyledWithdrawMessage>
             { tokenInputs }

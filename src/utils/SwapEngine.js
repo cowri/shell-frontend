@@ -8,23 +8,16 @@ export default class SwapEngine {
 
     async viewOriginSwap (originIndex, targetIndex, amount) {
         
-        console.log("zing", 0)
-
         let origin = this.derivatives[originIndex]
         let target = this.derivatives[targetIndex]
 
         let originAmount = origin.getAllFormatsFromDisplay(amount)
         
-        console.log("origin", origin)
-        console.log("target", target)
-
         let targetAmount = await this.shell.viewOriginSwap(
             origin.address,
             target.address,
-            originAmount.raw
+            originAmount.raw.toFixed()
         )
-        
-        console.log("target amount - ", targetAmount)
         
         if (!targetAmount || targetAmount.toString() == REVERTED) {
 
@@ -51,7 +44,7 @@ export default class SwapEngine {
         let originAmount = await this.shell.viewTargetSwap(
             origin.address,
             target.address,
-            targetAmount.raw
+            targetAmount.raw.toFixed()
         )
         
         if (!originAmount || originAmount.toString() == REVERTED) {
@@ -87,8 +80,8 @@ export default class SwapEngine {
         return this.shell.originSwap(
             origin.address,
             target.address,
-            originAmount.raw,
-            target.getRawFromNumeraire(minTarget),
+            originAmount.raw.toFixed(),
+            target.getRawFromNumeraire(minTarget).toFixed(),
             deadline
         )
 

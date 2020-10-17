@@ -25,7 +25,16 @@ export default class NumericFormats {
       return numeraire
 
     }
+    
+    getAllFormatsFromNumeraire (numeraire) {
 
+      return {
+        display: this.getDisplayFromNumeraire(numeraire),
+        numeraire: numeraire,
+        raw: this.getRawFromNumeraire(numeraire)
+      }
+
+    }
 
     getAllFormatsFromRaw (raw) {
 
@@ -41,13 +50,13 @@ export default class NumericFormats {
 
     getRawFromNumeraire (numeraire) {
 
-      return numeraire.multipliedBy(10 ** this.decimals).toFixed()
+      return numeraire.multipliedBy(10 ** this.decimals)
 
     }
 
     getRawFromDisplay (display) {
 
-      return new BigNumber(display).multipliedBy(10 ** this.decimals).toFixed()
+      return new BigNumber(display).multipliedBy(10 ** this.decimals)
 
     }
 

@@ -122,9 +122,6 @@ const SwapTab = () => {
     return accu.concat(asset.derivatives)
   }, []))
   
-  console.log("coins", coins)
-  console.log('derivs', state.get('derivatives'))
-
   const origin = coins[originIx]
   const target = coins[targetIx]
 
@@ -442,22 +439,14 @@ const SwapTab = () => {
   
   let allowance = state.getIn(['derivatives', originIx, 'allowance', 'numeraire'])
   
-  console.log("what", allowance)
   
   if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
-    console.log("huuuuh")
     allowance = '100,000,000+'
   } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
-    console.log("zuuuh")
     allowance = allowance.toExponential()
   } else {
-    console.log("origin ix", originIx)
-    console.log("miiiiit", state.getIn(['derivatives', originIx]))
     allowance = state.getIn(['derivatives', originIx, 'allowance', 'display'])
-    console.log("the allowance", state.get)
-    console.log("wtf is it", allowance)
   }
-  console.log("Allowance - - - - -", allowance)
   
   const unlockOrigin = () => setStep('unlocking')
     
@@ -526,7 +515,7 @@ const SwapTab = () => {
       </StyledRows>
       <StyledActions>
         <Button 
-          disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
+          // disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
           onClick={handleSwap}
           outlined={initiallyLocked && !unlocked}
         >
@@ -553,8 +542,6 @@ const AmountInput = ({
   selections
 }) => {
   
-  console.log("allowance", allowance)
-
   return (
     <StyledInput>
       <StyledLabelBar>

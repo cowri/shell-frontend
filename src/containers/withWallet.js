@@ -5,9 +5,9 @@ import { Map } from 'immutable'
 import Web3 from 'web3'
 import Onboard from 'bnc-onboard'
 
-import config from "../kovan.ctokens.config"
+import config from "../kovan.atokens.config"
 
-import AppEngine from '../utils/AppEngine'
+import Engine from '../utils/Engine'
 
 let web3
 let onboard
@@ -73,7 +73,7 @@ const withWallet = (WrappedComponent) => {
 
               } else if (network == config.network) {
 
-                engine = engine ? engine : new AppEngine(web3, setState) 
+                engine = engine ? engine : new Engine(web3, setState) 
 
                 engine.sync(address)
                 
@@ -88,7 +88,7 @@ const withWallet = (WrappedComponent) => {
 
               if (address && _network == config.network) {
 
-                engine = engine ? engine : new AppEngine(web3, setState) 
+                engine = engine ? engine : new Engine(web3, setState) 
                 
                 engine.sync(address)
 
@@ -107,7 +107,7 @@ const withWallet = (WrappedComponent) => {
               
               web3 = new Web3(wallet.provider)
              
-              engine = new AppEngine(web3, setState) 
+              engine = new Engine(web3, setState) 
               
               engine.wallet = wallet.name
 

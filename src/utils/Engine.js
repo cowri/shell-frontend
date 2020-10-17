@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../kovan.ctokens.config"
+import config from "../kovan.atokens.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js"
 
 import shellIcon from "../assets/logo.png"
 
-export default class AppEngine extends SwapEngine {
+export default class Engine extends SwapEngine {
 
     constructor (web3, setState, state) {
 
@@ -28,6 +28,22 @@ export default class AppEngine extends SwapEngine {
             18
         )
 
+        console.log("config.alpha", config.alpha)
+        
+        this.shell.alpha = new BigNumber(config.params.alpha)
+        this.shell.beta = new BigNumber(config.params.beta)
+        this.shell.delta = new BigNumber(config.params.delta)
+        this.shell.epsilon = new BigNumber(config.params.epsilon)
+        this.shell.lambda = new BigNumber(config.params.lambda)
+
+        console.log("shell.alpha", this.shell.alpha.toString())
+        console.log("shell.beta", this.shell.beta.toString())
+        console.log("shell.delta", this.shell.delta.toString())
+        console.log("shell.epsilon", this.shell.epsilon.toString())
+        console.log("shell.lambda", this.shell.lambda.toString())
+        
+        this.shell.weights = []
+        
         this.assets = []
         this.derivatives = []
         this.assetIx = {}
@@ -36,6 +52,8 @@ export default class AppEngine extends SwapEngine {
         for (const ix in config.assets) {
             
             const _asset_ = config.assets[ix]
+            
+            this.shell.weights.push(new BigNumber(_asset_.weight))
 
             const asset = new Asset(
                 this.web3,
@@ -84,58 +102,42 @@ export default class AppEngine extends SwapEngine {
     
     async sync (account) {
         
+        const self = this
+        
         account = account ? account : this.account
         
         this.account = account
 
-        const shellAddr = this.shell.address
-
-        const shell = this.shell
-
-        const shells = await this.shell.balanceOf(this.account)
-
-        const totalShells = await this.shell.totalSupply()
-
-        const ownedLiqRatio = totalShells.raw.isZero() ? totalShells.raw : shells.raw.dividedBy(totalShells.raw) 
-
-        const shellLiq = await this.shell.liquidity()
-
-        const ownedLiq = ownedLiqRatio.multipliedBy(shellLiq[0].raw)
-        
-        const self = this
-        
         let derivatives = []
         
-        const assets = await Promise.all(this.assets.map(async function (asset, ix) {
+        const shell = await this.shell.query(account)
+        
+        const assets = await Promise.all(this.assets.map(async function (_asset_, ix) {
             
-            const _asset = await queryAsset(asset)
-
-            const liqInShell = shellLiq[1][ix].raw.dividedBy(10 ** (18 - asset.decimals))
-
-            const rawBalInShell = ownedLiqRatio
-                .multipliedBy(shellLiq[1][ix].raw)
-                .div(new BigNumber(10 ** (18 - asset.decimals)))
-
-            _asset.balanceInShell = asset.getAllFormatsFromRaw(rawBalInShell)
-            _asset.liquidityInShell = asset.getAllFormatsFromRaw(liqInShell)
+            const asset = await queryAsset(_asset_)
             
-            _asset.derivatives = await Promise.all(asset.derivatives.map(queryAsset)) 
+            asset.utilityTotal = shell.utilitiesTotal[ix]
             
-            derivatives.push(_asset)
-            derivatives = derivatives.concat(_asset.derivatives)
-            
-            return _asset;
+            asset.utilityOwned = shell.utilitiesOwned[ix]
 
-        }))
+            asset.liquidityOwned = shell.liquidityOwned[ix]
+            
+            asset.derivatives = await Promise.all(_asset_.derivatives.map(queryAsset)) 
+            
+            derivatives.push(asset)
+
+            derivatives = derivatives.concat(asset.derivatives)
+            
+            return asset;
+
+        })) 
         
         async function queryAsset (asset) {
 
-            const allowance = await asset.allowance(account, shellAddr)
+            const allowance = await asset.allowance(account, self.shell.address)
 
             const balance = await asset.balanceOf(account)
             
-            console.log("asset", asset.name, "allowance", allowance)
-
             return {
                 allowance: allowance,
                 balance: balance,
@@ -147,15 +149,10 @@ export default class AppEngine extends SwapEngine {
         }
         
         this.state = fromJS({
-            account: account,
-            assets: assets,
-            derivatives: derivatives,
-            shell: {
-                shells: shells,
-                totalShells: totalShells,
-                totalLiq: shellLiq[0],
-                ownedLiq: shell.getAllFormatsFromRaw(ownedLiq)
-            },
+            account,
+            assets,
+            derivatives,
+            shell
         })
 
         this.setState(this.state)
@@ -192,9 +189,14 @@ export default class AppEngine extends SwapEngine {
 
     selectiveWithdraw (addresses, amounts, onHash, onConfirmation, onError) {
 
-        const limit = this.state.getIn([ 'shell', 'shells', 'raw' ])
+        const limit = this.state.getIn([ 'shell', 'shellsOwned', 'raw' ])
 
-        const tx = this.shell.selectiveWithdraw(addresses, amounts, limit.toFixed(), Date.now() + 2000)
+        const tx = this.shell.selectiveWithdraw(
+            addresses, 
+            amounts.map(a => a.raw.toFixed() ),
+            limit.toFixed(),
+            Date.now() + 2000
+        )
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
@@ -213,5 +215,5 @@ export default class AppEngine extends SwapEngine {
             .on('error', onError)
 
     }
-
+    
 }

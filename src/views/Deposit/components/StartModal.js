@@ -165,24 +165,39 @@ const StartModal = ({
 
     }
 
-    const liquidityChange = totalDeposit.dividedBy(state.getIn([ 'shell', 'totalLiq', 'numeraire' ]))
+    const liquidityChange = totalDeposit.dividedBy(state.getIn([ 'shell', 'liquidityTotal', 'numeraire' ]))
 
-    const shellsChange = shellsToMint.dividedBy(state.getIn([ 'shell', 'totalShells', 'numeraire' ]))
+    const shellsChange = shellsToMint.dividedBy(state.getIn([ 'shell', 'shellsTotal', 'numeraire' ]))
 
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange)).multipliedBy(100)
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
+    
+    const fee = shellsToMint.multipliedBy(slippage)
 
     const slippageMessage = slippage.absoluteValue().isGreaterThan(0.0001)
       ? slippage.isNegative()
-        ? <span> and earn a { Math.abs(slippage.toFixed(4)) }% rebalancing subsidy </span> 
-        : <span> and pay a { slippage.toFixed(4) }% fee to liquidity providers </span>
+        ? ( <span> 
+              and earn a rebalance subsidy of 
+              <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
+                <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
+                { Math.abs(slippage.toFixed(4)) } 
+              </span>
+            </span> 
+        ):( <span> 
+              and pay liquidity providers a fee of 
+              <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
+                <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
+                { slippage.toFixed(4) }
+              </span>
+            </span>
+        )
       : ''
     
     const feeMessage = <div>
       You will mint 
-        <span style={{position: 'relative', paddingLeft: '16.5px'}}>
+        <span style={{position: 'relative', paddingLeft: '16.5px', paddingRight: '4px' }}>
           <img alt="" 
             src={tinyShellIcon} 
-            style={{position:'absolute', top:'1px', left: '0px' }} 
+            style={{position:'absolute', top:'1px', left: '1px' }} 
           /> 
           { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint, 2) } 
         </span> 
@@ -209,7 +224,7 @@ const StartModal = ({
 
         addresses.push(asset.address)
 
-        amounts.push(asset.getRawFromDisplay(amount)) 
+        amounts.push(asset.getRawFromDisplay(amount).toFixed()) 
 
       }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../kovan.ctokens.config"
+import config from "../../kovan.atokens.config"
 
 import styled from 'styled-components'
 

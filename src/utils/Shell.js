@@ -4,6 +4,8 @@ import ShellABI from '../abi/Shell.abi.json';
 
 import NumericFormats from "./NumberFormats.js";
 
+const ONE = new BigNumber(1)
+
 export default class Shell extends NumericFormats {
 
     constructor (web3, address, name, symbol, icon, decimals) {
@@ -17,6 +19,119 @@ export default class Shell extends NumericFormats {
         this.icon = icon
         this.decimals = decimals
 
+    }
+    
+    async query (account) {
+        
+        const shellsOwned = await this.balanceOf(account)
+        
+        const shellsTotal = await this.totalSupply()
+        
+        const ownedRatio = shellsTotal.raw.isZero()
+            ? shellsTotal.raw
+            : shellsOwned.raw.dividedBy(shellsTotal.raw)
+        
+        const liquidities = await this.liquidity() 
+        
+        const liquidityTotal = this.getAllFormatsFromRaw(liquidities[0].raw)
+
+        const liquidityOwned = liquidities[1].map(liq => this.getAllFormatsFromRaw(liq.raw.multipliedBy(ownedRatio)))
+        
+        const [ utilityTotal, utilitiesTotal, fees ] = this.calculateUtilities(liquidities)
+        
+        console.log(" utility total", utilityTotal, "utilitiesTotal", utilitiesTotal, "fees", fees)
+        
+        const utilitiesOwned = utilitiesTotal.map(util => this.getAllFormatsFromRaw(util.raw.multipliedBy(ownedRatio)))
+            
+        const utilityOwned = this.getAllFormatsFromNumeraire(utilityTotal.numeraire.multipliedBy(ownedRatio))
+        
+        return {
+            liquidityTotal,
+            liquidityOwned,
+            shellsOwned,
+            shellsTotal,
+            utilityTotal,
+            utilityOwned,
+            utilitiesTotal,
+            utilitiesOwned,
+        }
+
+    }
+    
+    calculateUtilities (liquidity) {
+        
+        let utility = new BigNumber(0) 
+        let utilities = []
+        let fees = []
+
+        let totalLiquidity = liquidity[0]
+        let balances = liquidity[1]
+        
+        for (let i = 0; i < balances.length; i++) {
+            
+            const balance = balances[i].numeraire
+            const ideal = totalLiquidity.numeraire.multipliedBy(this.weights[i])
+            
+            let margin = new BigNumber(0)
+
+            if (balance.isGreaterThan(ideal)) {
+                
+                const threshold = ideal.multipliedBy(ONE.plus(this.beta))
+                
+                if (balance.isGreaterThan(threshold)) {
+
+                    margin = balance.minus(threshold)
+                    
+                }
+
+            } else {
+                
+                const threshold = ideal.multipliedBy(ONE.minus(this.beta))
+                
+                if (threshold.isGreaterThan(balance)) {
+
+                    margin = threshold.minus(balance)
+                    
+                }
+                
+            }
+            
+            if (margin.isZero()) {
+                
+                utility = utility.plus(balance)
+                
+                utilities.push(this.getAllFormatsFromNumeraire(balance))
+                
+                fees.push(this.getAllFormatsFromNumeraire(new BigNumber(0)))
+
+            } else {
+                
+                let fee = margin.dividedBy(ideal).multipliedBy(this.delta)
+
+                if (fee.isGreaterThan(this.max)) fee = this.max
+                
+                fee = fee.plus(fee.multipliedBy(margin))
+                
+                fees.push(this.getAllFormatsFromNumeraire(fee))
+                
+                let discreteUtility = balance.minus(fee)
+                
+                utility = utility.plus(discreteUtility)
+                
+                utilities.push(this.getAllFormatsFromNumeraire(discreteUtility))
+                
+            }
+            
+        }
+        
+        utility = this.getAllFormatsFromNumeraire(utility)
+        
+        return [ utility, utilities, fees ]
+        
+    }
+    
+    async getParams () {
+        return await this.contract.viewShell()
     }
     
     async balanceOf (account) {
@@ -49,9 +164,13 @@ export default class Shell extends NumericFormats {
 
     async viewSelectiveDeposit (addresses, amounts) {
         
+        
         try {
 
-            const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(addresses, amounts).call() )
+            const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(
+                addresses, 
+                amounts
+            ).call() )
 
             return this.getNumeraireFromRaw(shells)
 
@@ -65,15 +184,24 @@ export default class Shell extends NumericFormats {
 
     selectiveDeposit (addresses, amounts, minimum, deadline) {
 
-        return this.contract.methods.selectiveDeposit(addresses, amounts, minimum, deadline)
+        return this.contract.methods.selectiveDeposit(
+            addresses, 
+            amounts, 
+            minimum, 
+            deadline
+        )
 
     }
+    
 
     async viewSelectiveWithdraw (addresses, amounts) {
 
         try {
 
-            const shellsToBurn = new BigNumber( await this.contract.methods.viewSelectiveWithdraw(addresses, amounts).call() )
+            const shellsToBurn = new BigNumber( await this.contract.methods.viewSelectiveWithdraw(
+                addresses, 
+                amounts.map( a => a.raw.toFixed() )
+            ).call() )
 
             return this.getNumeraireFromRaw(shellsToBurn)
 
