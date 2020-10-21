@@ -5,7 +5,7 @@ import { Map } from 'immutable'
 import Web3 from 'web3'
 import Onboard from 'bnc-onboard'
 
-import config from "../kovan.atokens.config"
+import config from "../kovan.btc.one.config"
 
 import Engine from '../utils/Engine'
 

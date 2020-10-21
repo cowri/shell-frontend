@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import CircularProgress from '@material-ui/core/CircularProgress'
@@ -15,7 +15,11 @@ import ModalTitle from '../../../components/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
 import UnlockingModal from '../../../components/ModalUnlock'
 
+import NumberFormat from 'react-number-format'
+
 import WarningModal from './WarningModal'
+
+import { List } from 'immutable'
 
 import BigNumber from 'bignumber.js'
 
@@ -68,11 +72,9 @@ const StyledDepositMessage = styled.div`
 
 const StartModal = ({
   engine,
-  localState,
   onDeposit,
   onDismiss,
   onUnlock,
-  setLocalState,
   state
 }) => {
   
@@ -83,87 +85,74 @@ const StartModal = ({
   }
   
   const SAFETY_CHECK = <span style={errorStyles}> These amounts trigger Shell's Safety Check  </span>
+  const DEFAULT = <span> Your rate on this deposit will be... </span>
 
-  function applyTips (val, ix) {
+  const [ inputs, setInputs ] = useState(new List(new Array(engine.assets.length).fill('')))
+  const [ errors, setErrors ] = useState(new List(new Array(engine.assets.length).fill('')))
+  const [ error, setError ] = useState(null)
+  const [ zero, setZero ] = useState(true)
+  const [ unlocking, setUnlocking ] = useState(null)
+  const [ feeTip, setFeeTip ] = useState(DEFAULT)
+  const [ prompting, setPrompting ] = useState(false)
+  
+  const onInput = (v, i) => {
     
-    let newLocalState = localState.setIn(['assets', ix, 'input'], val)
+    setInputs(inputs.set(i,v))
 
-    setLocalState(newLocalState)
+    v = engine.assets[i].getNumeraireFromDisplay(v)
+    
+    if (v.isGreaterThan(state.getIn([ 'assets', i, 'balance', 'numeraire' ]))) {
 
-    val = engine.assets[ix].getNumeraireFromDisplay(val)
+      setErrors(errors.set(i, 'Amount is greater than your wallet\'s balance'))
 
-    const allowance = state.getIn([ 'assets', ix, 'allowance', 'numeraire' ])
+    } else if (v.isGreaterThan(state.getIn([ 'assets', i, 'allowance', 'numeraire' ]))) {
 
-    const balance = state.getIn([ 'assets', ix, 'balance', 'numeraire' ])
-
-    if (val.isGreaterThan(balance)) {
-
-      newLocalState = newLocalState.setIn(['assets', ix, 'error'], 'Amount is greater than your wallet\'s balance')
-
-    } else if (val.isGreaterThan(allowance)) {
-
-      newLocalState = newLocalState.setIn(['assets', ix, 'error'], 'Amount is greater than Shell\'s allowance')
+      setErrors(errors.set(i, 'Amount is greater than Shell\'s allowance'))
 
     } else {
-
-      newLocalState = newLocalState.setIn(['assets', ix, 'error' ], '')
+      
+      setErrors(errors.set(i, ''))
 
     }
 
-    return newLocalState
-    
   }
+  
+  useEffect( () => {
 
-  const primeDeposit = async (val, ix) => {
-
-    if (isNaN(val)) return
-
-    val = val === '' ? '' : Math.abs(+val)
-
-    let newLocalState = applyTips(val, ix)
-
-    const { addresses, amounts } = getAddressesAndAmounts(newLocalState)
+    const total = inputs.reduce( (a,c) => a + c )
     
-    console.log("Addresses", addresses)
-    console.log("amounts", amounts)
-    
-    const totalDeposit = amounts.reduce( (a, c, i) => {
+    if (total == 0) {
 
-      const asset = engine.assets[engine.assetIx[addresses[i]]]
-      console.log("asset", asset)
-
-      return a.plus(asset.getNumeraireFromRaw(c))
-
-    }, new BigNumber(0))
-
-    if (totalDeposit.isZero()) {
-
-      return setLocalState(newLocalState
-        .set('feeTip', 'Your rate on this deposit will be...')
-        .set('zero', true)
-        .delete('error')
-      )
+      setZero(true)
+      setError(null)
+      setFeeTip(DEFAULT)
 
     } else {
 
-      newLocalState = newLocalState.set('zero', false)
+      setZero(false);
+      (async function () { await primeDeposit() })()
 
     }
 
+  }, [ inputs, zero ])
+
+  const primeDeposit = async () => {
+
+    const { addresses, amounts } = getAddressesAndAmounts()
+    
     const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
     
     if (shellsToMint === false || shellsToMint.toString() === REVERTED) {
 
-      return setLocalState(newLocalState
-        .set('error', SAFETY_CHECK)
-        .delete('feeTip')
-      )
+      setError(SAFETY_CHECK)
+      setFeeTip(null)
+      return 
 
-    } else {
+    } 
 
-      newLocalState = newLocalState.delete('error')
+    setError(null)
 
-    }
+    const totalDeposit = amounts.reduce((a,c) =>  a.plus(c.numeraire), new BigNumber(0))
 
     const liquidityChange = totalDeposit.dividedBy(state.getIn([ 'shell', 'liquidityTotal', 'numeraire' ]))
 
@@ -179,14 +168,14 @@ const StartModal = ({
               and earn a rebalance subsidy of 
               <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
                 <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
-                { Math.abs(slippage.toFixed(4)) } 
+                { Math.abs(fee.toFixed(4)) } 
               </span>
             </span> 
         ):( <span> 
               and pay liquidity providers a fee of 
               <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
                 <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
-                { slippage.toFixed(4) }
+                { fee.toFixed(4) }
               </span>
             </span>
         )
@@ -203,40 +192,32 @@ const StartModal = ({
         </span> 
       { slippageMessage }
     </div>
-
-    setLocalState(newLocalState.set('feeTip', feeMessage))
+      
+    setFeeTip(feeMessage)
 
   }
+  
 
-  const getAddressesAndAmounts = (currentState) => {
+  const getAddressesAndAmounts = () => {
 
     const addresses = []
-
     const amounts = []
 
-    currentState.get('assets').forEach( (asset, ix) => {
-
-      const amount = asset.get('input')
-
-      if (0 < amount) {
-
-        const asset = engine.assets[ix]
-
+    inputs.forEach( (v,i) => {
+      if (0 < v) {
+        const asset = engine.assets[i]
         addresses.push(asset.address)
-
-        amounts.push(asset.getRawFromDisplay(amount).toFixed()) 
-
+        amounts.push(asset.getAllFormatsFromDisplay(v))
       }
-
     })
-
+    
     return { addresses, amounts }
 
   }
 
   const handleSubmit = (e) => {
     
-    const { addresses, amounts } = getAddressesAndAmounts(localState)
+    const { addresses, amounts } = getAddressesAndAmounts()
 
     onDeposit(addresses, amounts)
 
@@ -254,11 +235,10 @@ const StartModal = ({
   const tokenInputs = engine.assets.map( (asset, ix) => {
 
     const assetState = state.get('assets').get(ix)
-    const localAssetState = localState.get('assets').get(ix)
 
     let available = assetState.getIn(['allowance', 'numeraire'])
     
-    if ( available.isGreaterThan(new BigNumber('100000000'))) {
+    if (available.isGreaterThan(new BigNumber(100000000))) {
       available = '100,000,000+'
     } else if ( available.isGreaterThan(new BigNumber(10000000))) {
       available = available.toExponential()
@@ -270,45 +250,45 @@ const StartModal = ({
       <TokenInput
         available={available}
         icon={asset.icon}
-        isError={ localAssetState.get('error') ? true : false }
-        helperText={localAssetState.get('error')}
-        onAllowanceClick={() => setLocalState(localState.set('unlocking', ix)) }
-        onChange={e => primeDeposit(e.target.value, ix)}
+        isError={ errors[ix] ? true : false }
+        helperText={ errors[ix] }
+        onAllowanceClick={ () => setUnlocking(ix) }
+        onChange={payload => onInput(payload.value, ix) }
         styles={inputStyles}
         symbol={asset.symbol}
-        value={localState.get('assets').get(ix).get('input')}
+        value={inputs.get(ix)}
       />
     )
 
   })
 
-  const isInputError = localState.has('error') 
-    ? true 
-    : localState.get('assets').reduce( (x,y) => x ? true : y.get('error') == '' ? false : true, false)
-
+  const isInputError = error || errors.find( c => !!c )
+  
   return (
     <Modal onDismiss={onDismiss}>
-      { localState.get('prompting') && <WarningModal 
-          onCancel={() => setLocalState(localState.delete('prompting')) } 
+      { prompting && <WarningModal 
+          onCancel={ () => setPrompting(false) } 
           onContinue={handleSubmit} /> }
-      { !isNaN(localState.get('unlocking')) && <UnlockingModal
-          coin={state.getIn(['assets', localState.get('unlocking')])}
-          handleCancel={ () => setLocalState(localState.delete('unlocking'))}
-          handleUnlock={ amount => (
-            setLocalState(localState.delete('unlocking')), 
-            onUnlock(localState.get('unlocking'), amount) ) } /> }
-      <ModalTitle>Deposit Funds</ModalTitle>
+      { unlocking != null && <UnlockingModal
+          coin={ state.getIn(['assets', unlocking]) }
+          handleCancel={ () => setUnlocking(null) }
+          handleUnlock={ amount => ( setUnlocking(null), onUnlock(unlocking, amount) ) } /> }
+      <ModalTitle> Deposit Funds </ModalTitle>
       <ModalContent>
-        <StyledForm onSubmit={ () => setLocalState(localState.set('prompting', true))}>
+        <StyledForm>
           <StyledRows>
-            <StyledDepositMessage> { localState.get('error') || localState.get('feeTip') } </StyledDepositMessage>
+            <StyledDepositMessage> { error || feeTip } </StyledDepositMessage>
             { tokenInputs }
           </StyledRows>
         </StyledForm>
       </ModalContent>
       <ModalActions>
-        <Button outlined onClick={onDismiss}>Cancel</Button>
-        <Button disabled={ isInputError || localState.get('zero') } style={{cursor: 'no-drop'}} onClick={() => setLocalState(localState.set('prompting', true))}> Deposit </Button>
+        <Button outlined onClick={onDismiss}> Cancel </Button>
+        <Button disabled={ isInputError || zero } 
+          style={{cursor: 'no-drop'}}
+          onClick={ () => setPrompting(true) } > 
+          Deposit 
+        </Button>
       </ModalActions>
     </Modal>
   )
@@ -334,19 +314,21 @@ const TokenInput = ({
         <span style={{ color: '#8a8a8a', textDecoration: 'underline' }} > click to change </span>
       </span> 
     </StyledLabelBar>
-    <TextField fullWidth
+    <NumberFormat fullWidth
+      customInput={TextField}
       defaultColor="red"
       error={isError}
       FormHelperTextProps={{className: styles.helperText}}
       helperText={helperText}
-      onChange={onChange}
+      inputMode={"numeric"}
+      min="0"
+      onValueChange={ onChange }
       placeholder="0"
-      type="number"
+      thousandSeparator={true}
+      type="text"
       value={value}
-      onKeyDown={e => { if (e.keyCode === 189) e.preventDefault() }}
       InputProps={{
         style: isError ? { color: 'red' } : null,
-        min: "0",
         endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
         startAdornment: (
           <StyledStartAdornment>
@@ -356,7 +338,6 @@ const TokenInput = ({
       }}
     />
   </>)
-
 }
 
 

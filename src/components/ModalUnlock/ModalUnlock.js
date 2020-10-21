@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 import Checkbox from "@material-ui/core/Checkbox"
 import TextField from '@material-ui/core/TextField'
-import NumberFormat from 'react-number-format';
+import NumberFormat from 'react-number-format'
 
 import Button from '../Button'
 import Modal from '../Modal'

@@ -62,7 +62,9 @@ const PoolTab = ({ buttonsDisabled }) => {
 
   const rows = state.has('assets') ? engine.assets.map( (asset, ix) => { 
 
-    const assetState = state.getIn(['assets', ix])
+    const liqTotal = state.getIn(['shell','liquiditiesTotal', ix, 'display'])
+
+    const liqOwned = state.getIn(['shell','liquiditiesOwned', ix, 'display'])
 
     return (
       <Row>
@@ -72,32 +74,32 @@ const PoolTab = ({ buttonsDisabled }) => {
           <LabelledValue label={asset.symbol} value={asset.name} />
         </StyledTokenName>
         <StyledBalance className="number">
-          { '$' + assetState.getIn(['utilityTotal', 'display']) }
+          { liqTotal }
         </StyledBalance>
         <StyledBalance>
-          { '$' + assetState.getIn(['utilityOwned', 'display']) }
+          { liqOwned }
         </StyledBalance>
       </Row>
     )
     
   }) : [] 
 
-  const utilityTotal = state.has('shell') 
+  const liqTotal = state.has('shell') 
     ? state.getIn(['shell', 'utilityTotal', 'display']) 
     : 0
 
-  const utilityOwned = state.has('shell') 
+  const liqOwned = state.has('shell') 
     ? state.getIn(['shell', 'utilityOwned', 'display']) 
     : 0
-  
+    
   return (
     <StyledPoolTab>
       <Overview>
         <OverviewSection>
-          <LabelledValue label="Pool Balance" value={ '$' + utilityTotal } />
+          <LabelledValue label="Pool Balance" value={ liqTotal} />
         </OverviewSection>
         <OverviewSection>
-          <LabelledValue label="Your Balance" value={ '$' + utilityOwned } />
+          <LabelledValue label="Your Balance" value={ liqOwned } />
         </OverviewSection>
       </Overview>
       <StyledRows>

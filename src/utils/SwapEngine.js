@@ -12,7 +12,7 @@ export default class SwapEngine {
         let target = this.derivatives[targetIndex]
 
         let originAmount = origin.getAllFormatsFromDisplay(amount)
-        
+
         let targetAmount = await this.shell.viewOriginSwap(
             origin.address,
             target.address,
@@ -63,8 +63,6 @@ export default class SwapEngine {
     }
 
     executeOriginSwap (originIndex, targetIndex, originAmount, minTargetAmount) {
-        
-        console.log("~!~!~!~!~ EXECUTE ORIGIN SWAP ~!~!~!~!~")
 
         let origin = this.derivatives[originIndex]
         let target = this.derivatives[targetIndex]
@@ -75,8 +73,6 @@ export default class SwapEngine {
 
         let deadline = Math.floor(Date.now() /1000 + 900)
         
-        console.log("originAmount", originAmount)
-
         return this.shell.originSwap(
             origin.address,
             target.address,
@@ -101,8 +97,8 @@ export default class SwapEngine {
         return this.shell.targetSwap(
             origin.address,
             target.address,
-            origin.getRawFromNumeraire(maxOrigin),
-            targetAmount.raw,
+            origin.getRawFromNumeraire(maxOrigin).toFixed(),
+            targetAmount.raw.toFixed(),
             deadline
         )
         

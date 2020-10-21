@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../kovan.atokens.config"
+import config from "../kovan.btc.one.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -28,7 +28,6 @@ export default class Engine extends SwapEngine {
             18
         )
 
-        console.log("config.alpha", config.alpha)
         
         this.shell.alpha = new BigNumber(config.params.alpha)
         this.shell.beta = new BigNumber(config.params.beta)
@@ -36,12 +35,6 @@ export default class Engine extends SwapEngine {
         this.shell.epsilon = new BigNumber(config.params.epsilon)
         this.shell.lambda = new BigNumber(config.params.lambda)
 
-        console.log("shell.alpha", this.shell.alpha.toString())
-        console.log("shell.beta", this.shell.beta.toString())
-        console.log("shell.delta", this.shell.delta.toString())
-        console.log("shell.epsilon", this.shell.epsilon.toString())
-        console.log("shell.lambda", this.shell.lambda.toString())
-        
         this.shell.weights = []
         
         this.assets = []
@@ -97,6 +90,43 @@ export default class Engine extends SwapEngine {
     set network (network) {
 
         this.setState(this.state.set('network', network))
+
+    }
+    
+    getFees (addrs, amts) {
+        
+        let prevLiq = this.state.getIn(['shell', 'liquidityTotal']).toObject()
+        let prevLiqs = this.state.getIn(['shell', 'liquiditiesTotal']).toJS()
+        
+        let nextLiq = prevLiq
+        let nextLiqs = prevLiqs
+        
+        for (let i = 0; i < addrs.length; i++) {
+
+            let di = this.assetIx[addrs[i]]
+            console.log("di", di)
+
+            nextLiqs[di] = this.shell.getAllFormatsFromNumeraire(
+                nextLiqs[di].numeraire.plus(amts[i].numeraire))
+            
+            nextLiq = this.shell.getAllFormatsFromNumeraire(
+                nextLiq.numeraire.plus(amts[i].numeraire))
+            
+        }
+        
+        const [ _nothing, nothing_, prevFees ] = this.shell.calculateUtilities(prevLiq, prevLiqs)
+        const [ _empty, empty_, nextFees ] = this.shell.calculateUtilities(nextLiq, nextLiqs)
+        
+        const fees = []
+        
+        for (let i = 0; i < prevFees.length; i++) {
+            const fee = prevFees[i].numeraire.isGreaterThan(nextFees[i].numeraire)
+                ? prevFees[i].numeraire.minus(nextFees[i].numeraire).negated()
+                : nextFees[i].numeraire.minus(prevFees[i].numeraire)
+            fees.push(this.shell.getAllFormatsFromNumeraire(fee))
+        }
+        
+        return fees
 
     }
     

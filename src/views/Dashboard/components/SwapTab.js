@@ -515,7 +515,7 @@ const SwapTab = () => {
       </StyledRows>
       <StyledActions>
         <Button 
-          // disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
+          disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
           onClick={handleSwap}
           outlined={initiallyLocked && !unlocked}
         >

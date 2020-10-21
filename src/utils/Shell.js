@@ -31,21 +31,25 @@ export default class Shell extends NumericFormats {
             ? shellsTotal.raw
             : shellsOwned.raw.dividedBy(shellsTotal.raw)
         
-        const liquidities = await this.liquidity() 
+        const liq = await this.liquidity() 
         
-        const liquidityTotal = this.getAllFormatsFromRaw(liquidities[0].raw)
+        const liquidityTotal = liq[0]
 
-        const liquidityOwned = liquidities[1].map(liq => this.getAllFormatsFromRaw(liq.raw.multipliedBy(ownedRatio)))
+        const liquidityOwned = this.getAllFormatsFromRaw(liq[0].raw.multipliedBy(ownedRatio))
+
+        const liquiditiesTotal = liq[1]
+
+        const liquiditiesOwned = liq[1].map(l => this.getAllFormatsFromRaw(l.raw.multipliedBy(ownedRatio)))
         
-        const [ utilityTotal, utilitiesTotal, fees ] = this.calculateUtilities(liquidities)
-        
-        console.log(" utility total", utilityTotal, "utilitiesTotal", utilitiesTotal, "fees", fees)
+        const [ utilityTotal, utilitiesTotal, fees ] = this.calculateUtilities(liq[0], liq[1])
         
         const utilitiesOwned = utilitiesTotal.map(util => this.getAllFormatsFromRaw(util.raw.multipliedBy(ownedRatio)))
             
         const utilityOwned = this.getAllFormatsFromNumeraire(utilityTotal.numeraire.multipliedBy(ownedRatio))
         
         return {
+            liquiditiesTotal,
+            liquiditiesOwned,
             liquidityTotal,
             liquidityOwned,
             shellsOwned,
@@ -58,19 +62,16 @@ export default class Shell extends NumericFormats {
 
     }
     
-    calculateUtilities (liquidity) {
+    calculateUtilities (liquidity, liquidities) {
         
         let utility = new BigNumber(0) 
         let utilities = []
         let fees = []
 
-        let totalLiquidity = liquidity[0]
-        let balances = liquidity[1]
-        
-        for (let i = 0; i < balances.length; i++) {
+        for (let i = 0; i < liquidities.length; i++) {
             
-            const balance = balances[i].numeraire
-            const ideal = totalLiquidity.numeraire.multipliedBy(this.weights[i])
+            const balance = liquidities[i].numeraire
+            const ideal = liquidity.numeraire.multipliedBy(this.weights[i])
             
             let margin = new BigNumber(0)
 
@@ -123,7 +124,7 @@ export default class Shell extends NumericFormats {
             }
             
         }
-        
+
         utility = this.getAllFormatsFromNumeraire(utility)
         
         return [ utility, utilities, fees ]
@@ -164,12 +165,11 @@ export default class Shell extends NumericFormats {
 
     async viewSelectiveDeposit (addresses, amounts) {
         
-        
         try {
 
             const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(
                 addresses, 
-                amounts
+                amounts.map(a => a.raw.toFixed())
             ).call() )
 
             return this.getNumeraireFromRaw(shells)
@@ -186,7 +186,7 @@ export default class Shell extends NumericFormats {
 
         return this.contract.methods.selectiveDeposit(
             addresses, 
-            amounts, 
+            amounts.map(a => a.raw.toFixed()), 
             minimum, 
             deadline
         )

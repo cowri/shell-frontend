@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import config from '../../kovan.atokens.config'
+import config from '../../kovan.btc.one.config'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDiscord, faTelegram, faTwitter, } from '@fortawesome/free-brands-svg-icons'

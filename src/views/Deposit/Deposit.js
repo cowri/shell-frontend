@@ -46,7 +46,7 @@ const Deposit = ({ onDismiss }) => {
       amounts,
       function onTxHash (hash) {
         setTxHash(hash)
-        setStep('depositing')
+        setStep('broadcasting')
       },
       function onConfirmation () {
         success = true
