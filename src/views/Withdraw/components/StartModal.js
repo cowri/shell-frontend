@@ -390,7 +390,6 @@ const TokenInput = ({
       InputProps={{
         endAdornment: ( 
           <StyledEndAdornment>
-            <span> hello </span>
             <span> {symbol} </span>
           </StyledEndAdornment>
         ),
