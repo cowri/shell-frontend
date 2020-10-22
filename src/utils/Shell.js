@@ -34,7 +34,7 @@ export default class Shell extends NumericFormats {
         const liq = await this.liquidity() 
         
         const liquidityTotal = liq[0]
-
+        
         const liquidityOwned = this.getAllFormatsFromRaw(liq[0].raw.multipliedBy(ownedRatio))
 
         const liquiditiesTotal = liq[1]
@@ -42,6 +42,9 @@ export default class Shell extends NumericFormats {
         const liquiditiesOwned = liq[1].map(l => this.getAllFormatsFromRaw(l.raw.multipliedBy(ownedRatio)))
         
         const [ utilityTotal, utilitiesTotal, fees ] = this.calculateUtilities(liq[0], liq[1])
+        
+        console.log("utilityTotal", utilityTotal)
+        console.log("utilitiesTotal", utilitiesTotal)
         
         const utilitiesOwned = utilitiesTotal.map(util => this.getAllFormatsFromRaw(util.raw.multipliedBy(ownedRatio)))
             
@@ -72,6 +75,8 @@ export default class Shell extends NumericFormats {
             
             const balance = liquidities[i].numeraire
             const ideal = liquidity.numeraire.multipliedBy(this.weights[i])
+
+            console.log("this weight", this.weights[i].toString())
             
             let margin = new BigNumber(0)
 
@@ -99,6 +104,8 @@ export default class Shell extends NumericFormats {
             
             if (margin.isZero()) {
                 
+                console.log("marge is zero")
+                
                 utility = utility.plus(balance)
                 
                 utilities.push(this.getAllFormatsFromNumeraire(balance))
@@ -106,12 +113,19 @@ export default class Shell extends NumericFormats {
                 fees.push(this.getAllFormatsFromNumeraire(new BigNumber(0)))
 
             } else {
+
+                console.log("marge isnt zero")
                 
                 let fee = margin.dividedBy(ideal).multipliedBy(this.delta)
 
-                if (fee.isGreaterThan(this.max)) fee = this.max
+                if (fee.isGreaterThan(this.max)) {
+                    console.log("greater than max")
+                    fee = this.max
+                }
                 
-                fee = fee.plus(fee.multipliedBy(margin))
+                fee = fee.multipliedBy(margin)
+
+                console.log("fee", fee.toString())
                 
                 fees.push(this.getAllFormatsFromNumeraire(fee))
                 
@@ -122,6 +136,8 @@ export default class Shell extends NumericFormats {
                 utilities.push(this.getAllFormatsFromNumeraire(discreteUtility))
                 
             }
+
+            console.log("utility", utility.toString())
             
         }
 

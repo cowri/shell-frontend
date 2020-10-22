@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import BigNumber from 'bignumber.js'
@@ -10,6 +10,7 @@ import ModalError from '../../../components/ModalError'
 import ModalSuccess from '../../../components/ModalSuccess'
 import ModalTx from '../../../components/ModalAwaitingTx'
 import ModalUnlock from '../../../components/ModalUnlock'
+import NumberFormat from 'react-number-format'
 
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem';
@@ -22,6 +23,7 @@ import Button from '../../../components/Button'
 import TokenIcon from '../../../components/TokenIcon'
 
 const MAX = "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+const DEFAULT_MSG = "Your price for this trade will be..."
 
 const StyledStartAdornment = styled.div`
   align-items: center;
@@ -113,7 +115,7 @@ const SwapTab = () => {
   const [targetValue, setTargetValue] = useState('')
   const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
-  const [priceMessage, setPriceMessage] = useState('Your price for this trade will be...')
+  const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
   
@@ -158,6 +160,44 @@ const SwapTab = () => {
     }
 
   }
+  
+  useEffect(() => {
+
+    if (targetValue == '' && originValue == '') {
+
+      setPriceMessage(DEFAULT_MSG)
+      setHaltMessage('')
+      return
+
+    }
+
+    (async function () { 
+      try {
+
+        const { originAmount, targetAmount } = await engine.viewOriginSwap(
+          originIx, 
+          targetIx, 
+          swapType == 'origin' ? originValue : targetValue
+        )
+        
+        swapType == 'origin' 
+          ? setTargetValue(targetAmount.display)
+          : setOriginValue(originAmount.display)
+          
+        setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
+
+      } catch {
+        
+        swapType == 'origin'
+          ? setTargetValue('')
+          : setOriginValue('')
+        
+        setHaltIndication()
+
+      }
+    })()
+
+  }, [ originValue, targetValue, originIx, targetIx ])
   
   const setIndexes = (index) => {
 
@@ -220,6 +260,7 @@ const SwapTab = () => {
     }
 
   }
+  
 
   const primeOrigin = async (_originIx, _targetIx, amount) => {
 
@@ -232,9 +273,6 @@ const SwapTab = () => {
         originAmount,
         targetAmount
       } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
-      
-      console.log("origin amount", originAmount)
-      console.log("target amount", targetAmount)
       
       setTargetValue(targetAmount.display.replace(',',''))
 
@@ -264,19 +302,19 @@ const SwapTab = () => {
 
   } 
 
-  async function setPriceIndication (_originIx, _targetIx, originAmount, targetAmount) {
+  async function setPriceIndication (originAmount, targetAmount) {
 
     const tPrice = targetAmount.dividedBy(originAmount).toFixed(4)
 
-    const oSymbol = coins[_originIx].symbol
-    const tSymbol = coins[_targetIx].symbol
+    const oSymbol = coins[originIx].symbol
+    const tSymbol = coins[targetIx].symbol
 
     let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
-      ? <span> $ <span> 1.00 </span> of { oSymbol } is worth </span>
+      ? <span> <span> 1.00 </span> of { oSymbol } is worth </span>
       : <span> <span> 1.00 </span> { oSymbol } is worth </span>
 
     let right = (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI')
-      ? <span> $ <span> { tPrice } </span> of { tSymbol } for this trade </span>
+      ? <span> <span> { tPrice } </span> of { tSymbol } for this trade </span>
       : <span> <span> { tPrice } </span> { tSymbol } for this trade </span>
       
     setPriceMessage(<span> {left} {right} </span>)
@@ -357,23 +395,50 @@ const SwapTab = () => {
     }
 
   }
+  
+  const handleOriginInput = e => {
+    
+    setSwapType('origin')
+    setOriginValue(e.target.value.replace(',',''))
+    if (e.target.value == '') setTargetValue('')
+    
+  }
+  
+  const _handleOriginSelect = v => {
+    
+    const allowance = state.getIn(['derivatives', v, 'allowance', 'raw'])
 
-  const handleOriginSelect = e => {
+    setUnlocked(allowance != 0)
 
-    if (e.target.value !== targetIx) {
+    setOriginIx(v)
 
-      const swapPayload = swapType == 'origin'
-        ? { type: 'origin', value: originValue }
-        : { type: 'target', value: targetValue }
-        
-      primeSwap(swapPayload, { type: 'origin', value: e.target.value })
+    if (v == targetIx) {
 
-    } else {
-      
-      primeSwap({type: 'switch'}, {type: 'switch'})
+      setTargetIx(originIx)
 
     }
 
+  }
+  
+  const handleTargetInput = e => {
+
+    setSwapType('target')
+    setTargetValue(e.target.value.replace(',',''))
+    if (e.target.value == '') setOriginValue('')
+    
+  }
+  
+  const _handleTargetSelect = v => {
+    
+    setTargetIx(v)
+    
+  }
+
+  const handleSwitch = () => {
+    
+    setOriginIx(targetIx)
+    setTargetIx(originIx)
+    
   }
 
   const handleTargetSelect = e => {
@@ -409,7 +474,7 @@ const SwapTab = () => {
     return ( <TextField select
       InputProps={{ className: selectionCss.root }}
       children={selections}
-      onChange={e => handler(e)}
+      onChange={e => handler(e.target.value)}
       value={value}
     /> )
 
@@ -438,7 +503,6 @@ const SwapTab = () => {
   })()
   
   let allowance = state.getIn(['derivatives', originIx, 'allowance', 'numeraire'])
-  
   
   if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
     allowance = '100,000,000+'
@@ -488,28 +552,26 @@ const SwapTab = () => {
         <AmountInput 
           allowance={allowance}
           icon={origin.icon}
-          onChange={e => primeSwap({type:'origin', value: e.target.value}, {})}
-          selections={getDropdown(handleOriginSelect, originIx)}
+          onChange={ handleOriginInput }
+          selections={getDropdown(_handleOriginSelect, originIx)}
           styles={inputStyles}
           symbol={origin.symbol}
-          title={'From'}
+          title='From'
           unlock={unlockOrigin}
           value={originValue}
         />
         <StyledSwapRow>
-          <IconButton className={iconClasses.root} 
-            onClick={e=> primeSwap({type:'switch'}, {type:'switch'})}
-          >
+          <IconButton className={iconClasses.root} onClick={handleSwitch} >
             <SwapCallsIcon fontSize={'large'}/>
           </IconButton>
         </StyledSwapRow>
         <AmountInput 
           icon={target.icon}
-          onChange={e => primeSwap({type:'target', value: e.target.value}, {})}
-          selections={getDropdown(handleTargetSelect, targetIx)}
+          onChange={ handleTargetInput }
+          selections={getDropdown(_handleTargetSelect, targetIx)}
           styles={inputStyles}
           symbol={target.symbol}
-          title={'To'}
+          title='To'
           value={targetValue}
         /> 
       </StyledRows>
@@ -547,20 +609,23 @@ const AmountInput = ({
       <StyledLabelBar>
         <StyledTitle> { title } </StyledTitle>
         { allowance ? <StyledAvailability onClick={unlock}> 
-              Shell's allowance: ${allowance + ' '}  
+              Shell's allowance: {allowance + ' '}  
               <span style={{textDecoration: 'underline', color: '#8a8a8a'}}>click to change </span>
             </StyledAvailability> : null }
       </StyledLabelBar>
-      <TextField fullWidth
+      <NumberFormat fullWidth
+        allowNegative={false}
+        customInput={TextField}
         error={error}
         FormHelperTextProps={{className: styles.helperText}}
         helperText={helperText}
+        inputMode="numeric"
         min="0"
         onChange={onChange}
-        onKeyDown={e => { if (e.keyCode === 189) e.preventDefault() }}
         placeholder="0"
+        thousandSeparator={true}
+        type="text"
         value={value}
-        type="number"
         InputProps={{
           className: styles.inputBase,
           endAdornment: ( 

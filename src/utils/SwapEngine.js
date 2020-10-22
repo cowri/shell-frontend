@@ -69,15 +69,23 @@ export default class SwapEngine {
 
         originAmount = origin.getAllFormatsFromDisplay(originAmount)
 
-        let minTarget = target.getNumeraireFromDisplay(minTargetAmount).multipliedBy(new BigNumber(.99))
+        let minTarget = target.getNumeraireFromDisplay(minTargetAmount)
+
+        minTarget = minTarget.multipliedBy(new BigNumber(.99))
 
         let deadline = Math.floor(Date.now() /1000 + 900)
+
+        console.log("minTarget", minTarget.toFixed())
+
+        console.log("target", target.getRawFromNumeraire(minTarget).toFixed())
+        console.log("target fx8", target.getRawFromNumeraire(minTarget).toFixed(8))
+        console.log("target str", target.getRawFromNumeraire(minTarget).toString())
         
         return this.shell.originSwap(
             origin.address,
             target.address,
             originAmount.raw.toFixed(),
-            target.getRawFromNumeraire(minTarget).toFixed(),
+            target.getRawFromNumeraire(minTarget).toFormat(0),
             deadline
         )
 
@@ -97,14 +105,11 @@ export default class SwapEngine {
         return this.shell.targetSwap(
             origin.address,
             target.address,
-            origin.getRawFromNumeraire(maxOrigin).toFixed(),
+            origin.getRawFromNumeraire(maxOrigin).toFormat(0),
             targetAmount.raw.toFixed(),
             deadline
         )
         
     }
-
-    
-
 
 }

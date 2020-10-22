@@ -141,6 +141,8 @@ const StartModal = ({
     const { addresses, amounts } = getAddressesAndAmounts()
     
     const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
+
+    console.log("shells to mint", shellsToMint.toString())
     
     if (shellsToMint === false || shellsToMint.toString() === REVERTED) {
 
@@ -168,14 +170,14 @@ const StartModal = ({
               and earn a rebalance subsidy of 
               <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
                 <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
-                { Math.abs(fee.toFixed(4)) } 
+                { Math.abs(fee.toFixed(8)) } 
               </span>
             </span> 
         ):( <span> 
               and pay liquidity providers a fee of 
               <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
                 <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
-                { fee.toFixed(4) }
+                { fee.toFixed(8) }
               </span>
             </span>
         )
@@ -188,7 +190,7 @@ const StartModal = ({
             src={tinyShellIcon} 
             style={{position:'absolute', top:'1px', left: '1px' }} 
           /> 
-          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint, 2) } 
+          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint, 8) } 
         </span> 
       { slippageMessage }
     </div>
@@ -263,6 +265,9 @@ const StartModal = ({
   })
 
   const isInputError = error || errors.find( c => !!c )
+
+  console.log("is input error", isInputError)
+  console.log("zero", zero)
   
   return (
     <Modal onDismiss={onDismiss}>
@@ -310,11 +315,12 @@ const TokenInput = ({
     <StyledLabelBar>
       <span onClick={onAllowanceClick} style={{cursor:'pointer'}} >  
         Shell's allowance:
-        <span class="number"> ${available} </span>
+        <span class="number"> {available} </span>
         <span style={{ color: '#8a8a8a', textDecoration: 'underline' }} > click to change </span>
       </span> 
     </StyledLabelBar>
     <NumberFormat fullWidth
+      allowNegative={false}
       customInput={TextField}
       defaultColor="red"
       error={isError}

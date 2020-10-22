@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../kovan.btc.one.config"
+import config from "../kovan.two.wbtc.renbtc.sbtc.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -104,7 +104,6 @@ export default class Engine extends SwapEngine {
         for (let i = 0; i < addrs.length; i++) {
 
             let di = this.assetIx[addrs[i]]
-            console.log("di", di)
 
             nextLiqs[di] = this.shell.getAllFormatsFromNumeraire(
                 nextLiqs[di].numeraire.plus(amts[i].numeraire))
