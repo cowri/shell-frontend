@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../kovan.two.wbtc.renbtc.sbtc.config"
+import config from "../mainnet.two.wbtc.renbtc.sbtc.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -27,7 +27,6 @@ export default class Engine extends SwapEngine {
             shellIcon,
             18
         )
-
         
         this.shell.alpha = new BigNumber(config.params.alpha)
         this.shell.beta = new BigNumber(config.params.beta)

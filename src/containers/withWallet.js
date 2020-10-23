@@ -5,7 +5,7 @@ import { Map } from 'immutable'
 import Web3 from 'web3'
 import Onboard from 'bnc-onboard'
 
-import config from "../kovan.two.wbtc.renbtc.sbtc.config"
+import config from "../mainnet.two.wbtc.renbtc.sbtc.config"
 
 import Engine from '../utils/Engine'
 

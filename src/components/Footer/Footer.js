@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import config from '../../kovan.two.wbtc.renbtc.sbtc.config'
+import config from '../../mainnet.two.wbtc.renbtc.sbtc.config'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDiscord, faTelegram, faTwitter, } from '@fortawesome/free-brands-svg-icons'

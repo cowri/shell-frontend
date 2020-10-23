@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../kovan.two.wbtc.renbtc.sbtc.config"
+import config from "../../mainnet.two.wbtc.renbtc.sbtc.config"
 
 import styled from 'styled-components'
 
