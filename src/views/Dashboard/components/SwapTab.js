@@ -133,15 +133,15 @@ const SwapTab = () => {
   const initiallyLocked = state.getIn(['derivatives', originIx, 'allowance', 'raw']) == 0
   const [unlocked, setUnlocked] = useState(false)
 
-  function setZeroes (value) {
-    setOriginValue(value)
-    setTargetValue(value)
-    setPriceMessage('Your price for this trade will be...')
-  }
-
   useEffect(() => {
 
-    if (swapType == 'origin' && originValue == '') {
+    if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
+
+      return 
+
+    }
+
+    if (swapType == 'origin' && ( originValue == '' || originValue.replace('.','') == 0 )) {
 
       setTargetValue('')
       setPriceMessage(DEFAULT_MSG)
@@ -150,7 +150,7 @@ const SwapTab = () => {
 
     }
 
-    if (swapType == 'target' && targetValue == '') {
+    if (swapType == 'target' && ( targetValue == '' || targetValue.replace('.','') == 0 )) {
 
       setOriginValue('')
       setPriceMessage(DEFAULT_MSG)
@@ -252,12 +252,12 @@ const SwapTab = () => {
     function handleConfirmation (conf) {
 
       success = true
-      console.log("conf")
       
       swapType === 'origin' 
         ? setOriginValue('') 
         : setTargetValue('')
-      setPriceMessage('Your price for this trade will be...')
+        
+      setPriceMessage(DEFAULT_MSG)
       setStep('success')
       engine.sync()
 
@@ -304,8 +304,6 @@ const SwapTab = () => {
   
   const handleOriginInput = e => {
 
-    console.log("origin input", e.target.value)
-    
     setSwapType('origin')
     setOriginValue(e.target.value.replace(',',''))
     if (e.target.value == '') setTargetValue('')
@@ -329,8 +327,6 @@ const SwapTab = () => {
   }
   
   const handleTargetInput = e => {
-
-    console.log("target input", e.target.value)
 
     setSwapType('target')
     setTargetValue(e.target.value.replace(',',''))

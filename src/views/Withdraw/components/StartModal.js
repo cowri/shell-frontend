@@ -173,8 +173,6 @@ const StartModal = ({
             .multipliedBy(ONE.minus(engine.shell.epsilon)))
       })
 
-      console.log("updated inputs", updatedInputs)
-
       setInputs(updatedInputs)
       setErrors(errors.map( () => null ))
       setFeeTip(feeMessage)

@@ -142,8 +142,6 @@ const StartModal = ({
     
     const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
 
-    console.log("shells to mint", shellsToMint.toString())
-    
     if (shellsToMint === false || shellsToMint.toString() === REVERTED) {
 
       setError(SAFETY_CHECK)
@@ -266,9 +264,6 @@ const StartModal = ({
 
   const isInputError = error || errors.find( c => !!c )
 
-  console.log("is input error", isInputError)
-  console.log("zero", zero)
-  
   return (
     <Modal onDismiss={onDismiss}>
       { prompting && <WarningModal 
