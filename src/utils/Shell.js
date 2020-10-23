@@ -43,9 +43,6 @@ export default class Shell extends NumericFormats {
         
         const [ utilityTotal, utilitiesTotal, fees ] = this.calculateUtilities(liq[0], liq[1])
         
-        console.log("utilityTotal", utilityTotal)
-        console.log("utilitiesTotal", utilitiesTotal)
-        
         const utilitiesOwned = utilitiesTotal.map(util => this.getAllFormatsFromRaw(util.raw.multipliedBy(ownedRatio)))
             
         const utilityOwned = this.getAllFormatsFromNumeraire(utilityTotal.numeraire.multipliedBy(ownedRatio))
@@ -76,8 +73,6 @@ export default class Shell extends NumericFormats {
             const balance = liquidities[i].numeraire
             const ideal = liquidity.numeraire.multipliedBy(this.weights[i])
 
-            console.log("this weight", this.weights[i].toString())
-            
             let margin = new BigNumber(0)
 
             if (balance.isGreaterThan(ideal)) {
@@ -104,8 +99,6 @@ export default class Shell extends NumericFormats {
             
             if (margin.isZero()) {
                 
-                console.log("marge is zero")
-                
                 utility = utility.plus(balance)
                 
                 utilities.push(this.getAllFormatsFromNumeraire(balance))
@@ -114,19 +107,12 @@ export default class Shell extends NumericFormats {
 
             } else {
 
-                console.log("marge isnt zero")
-                
                 let fee = margin.dividedBy(ideal).multipliedBy(this.delta)
 
-                if (fee.isGreaterThan(this.max)) {
-                    console.log("greater than max")
-                    fee = this.max
-                }
+                if (fee.isGreaterThan(this.max)) fee = this.max
                 
                 fee = fee.multipliedBy(margin)
 
-                console.log("fee", fee.toString())
-                
                 fees.push(this.getAllFormatsFromNumeraire(fee))
                 
                 let discreteUtility = balance.minus(fee)
@@ -136,8 +122,6 @@ export default class Shell extends NumericFormats {
                 utilities.push(this.getAllFormatsFromNumeraire(discreteUtility))
                 
             }
-
-            console.log("utility", utility.toString())
             
         }
 

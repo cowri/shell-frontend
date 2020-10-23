@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js"
-import { Shell } from "./web3Classes"
+
+BigNumber.config({ FORMAT: { groupSeparator: '' }})
 
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
-
 
 export default class SwapEngine {
 
@@ -75,12 +75,6 @@ export default class SwapEngine {
 
         let deadline = Math.floor(Date.now() /1000 + 900)
 
-        console.log("minTarget", minTarget.toFixed())
-
-        console.log("target", target.getRawFromNumeraire(minTarget).toFixed())
-        console.log("target fx8", target.getRawFromNumeraire(minTarget).toFixed(8))
-        console.log("target str", target.getRawFromNumeraire(minTarget).toString())
-        
         return this.shell.originSwap(
             origin.address,
             target.address,

@@ -139,29 +139,25 @@ const SwapTab = () => {
     setPriceMessage('Your price for this trade will be...')
   }
 
-  const primeSwap = async (swap, index) => {
-
-    setIndexes(index)
-
-    if (swap.value == 0) return setZeroes(swap.value)
-    if (swap.type == 'origin') {
-      if (!index.type) primeOrigin(originIx, targetIx, swap.value)
-      if (index.type == 'origin') primeOrigin(index.value, targetIx, swap.value)
-      if (index.type == 'target') primeOrigin(originIx, index.value, swap.value)
-    }
-    if (swap.type == 'target') {
-      if (!index.type) primeTarget(originIx, targetIx, swap.value)
-      if (index.type == 'origin') primeTarget(index.value, targetIx, swap.value)
-      if (index.type == 'target') primeTarget(originIx, index.value, swap.value)
-    }
-    if (swap.type == 'switch') {
-      if (swapType == 'origin') primeOrigin(targetIx, originIx, targetValue)
-      if (swapType == 'target') primeTarget(targetIx, originIx, originValue)
-    }
-
-  }
-  
   useEffect(() => {
+
+    if (swapType == 'origin' && originValue == '') {
+
+      setTargetValue('')
+      setPriceMessage(DEFAULT_MSG)
+      setHaltMessage('')
+      return
+
+    }
+
+    if (swapType == 'target' && targetValue == '') {
+
+      setOriginValue('')
+      setPriceMessage(DEFAULT_MSG)
+      setHaltMessage('')
+      return
+
+    }
 
     if (targetValue == '' && originValue == '') {
 
@@ -171,7 +167,7 @@ const SwapTab = () => {
 
     }
 
-    (async function () { 
+    ;(async function () { 
       try {
 
         const { originAmount, targetAmount } = await engine.viewOriginSwap(
@@ -198,99 +194,6 @@ const SwapTab = () => {
     })()
 
   }, [ originValue, targetValue, originIx, targetIx ])
-  
-  const setIndexes = (index) => {
-
-    if (index.type === 'origin') {
-
-      const allowance = state.getIn(['derivatives', index.value, 'allowance', 'raw'])
-
-      setUnlocked(allowance != 0)
-
-      setOriginIx(index.value)
-      
-    }
-
-    if (index.type === 'target') {
-
-      setTargetIx(index.value)
-
-    }
-
-    if (index.type === 'switch') {
-
-      const allowance = state.getIn(['derivatives', targetIx, 'allowance', 'raw'])
-
-      setUnlocked(allowance != 0)
-
-      setOriginIx(targetIx)
-      setTargetIx(originIx)
-      
-
-    } 
-
-  }
-
-  const primeTarget = async (_originIx, _targetIx, amount) => { 
-    
-    setTargetValue(amount)
-    setSwapType('target')
-    
-    try {
-
-      const {
-        originAmount,
-        targetAmount
-      } = await engine.viewTargetSwap(_originIx, _targetIx, amount)
-      
-      setOriginValue(originAmount.display.replace(',',''))
-
-      setPriceIndication(
-        _originIx, 
-        _targetIx, 
-        originAmount.numeraire, 
-        targetAmount.numeraire
-      )
-      
-    } catch (e) {
-      
-      setOriginValue('')
-      setHaltIndication()
-
-    }
-
-  }
-  
-
-  const primeOrigin = async (_originIx, _targetIx, amount) => {
-
-    setOriginValue(amount)
-    setSwapType('origin')
-
-    try{
-
-      const { 
-        originAmount,
-        targetAmount
-      } = await engine.viewOriginSwap(_originIx, _targetIx, amount)
-      
-      setTargetValue(targetAmount.display.replace(',',''))
-
-      setPriceIndication(
-        _originIx, 
-        _targetIx, 
-        originAmount.numeraire, 
-        targetAmount.numeraire
-      )
-    
-    } catch (e) {
-
-      setTargetValue('')
-      setHaltIndication()
-
-    }
-
-  }
   
   function setHaltIndication () {
     
@@ -347,10 +250,13 @@ const SwapTab = () => {
     }
 
     function handleConfirmation (conf) {
-      
+
       success = true
-      setOriginValue('')
-      setTargetValue('')
+      console.log("conf")
+      
+      swapType === 'origin' 
+        ? setOriginValue('') 
+        : setTargetValue('')
       setPriceMessage('Your price for this trade will be...')
       setStep('success')
       engine.sync()
@@ -397,6 +303,8 @@ const SwapTab = () => {
   }
   
   const handleOriginInput = e => {
+
+    console.log("origin input", e.target.value)
     
     setSwapType('origin')
     setOriginValue(e.target.value.replace(',',''))
@@ -422,6 +330,8 @@ const SwapTab = () => {
   
   const handleTargetInput = e => {
 
+    console.log("target input", e.target.value)
+
     setSwapType('target')
     setTargetValue(e.target.value.replace(',',''))
     if (e.target.value == '') setOriginValue('')
@@ -438,24 +348,6 @@ const SwapTab = () => {
     
     setOriginIx(targetIx)
     setTargetIx(originIx)
-    
-  }
-
-  const handleTargetSelect = e => {
-
-    if (e.target.value !== originIx) {
-
-      const swapPayload = swapType == 'origin'
-        ? { type: 'origin', value: originValue }
-        : { type: 'target', value: targetValue }
-        
-      primeSwap(swapPayload, { type: 'target', value: e.target.value })
-      
-    } else { 
-      
-      primeSwap({type: 'switch' }, {type: 'switch' })
-
-    }
     
   }
 
