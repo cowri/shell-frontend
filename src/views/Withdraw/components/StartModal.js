@@ -151,7 +151,7 @@ const StartModal = ({
 
     if (event.target.checked) {
 
-      const fee = engine.shell.epsilon.multipliedBy(100).toFormat(4)
+      const fee = engine.shell.epsilon.multipliedBy(100).toString()
       
       const feeMessage = (
         <div>
@@ -163,7 +163,7 @@ const StartModal = ({
             /> 
             { ' ' + state.getIn([ 'shell', 'shellsOwned', 'display' ]) } 
           </span>
-          <span> and pay a {'.' + fee}% fee to liquidity providers for this withdrawal </span>
+          <span> and pay a {fee}% fee to liquidity providers for this withdrawal </span>
         </div>
       )
         
