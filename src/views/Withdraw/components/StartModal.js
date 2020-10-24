@@ -163,7 +163,7 @@ const StartModal = ({
             /> 
             { ' ' + state.getIn([ 'shell', 'shellsOwned', 'display' ]) } 
           </span>
-          <span> and pay a {fee}% fee to liquidity providers for this withdrawal </span>
+          <span> and pay a {'.' + fee}% fee to liquidity providers for this withdrawal </span>
         </div>
       )
         
