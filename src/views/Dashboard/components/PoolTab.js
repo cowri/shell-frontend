@@ -88,7 +88,6 @@ const PoolTab = ({ buttonsDisabled }) => {
     ? state.getIn(['shell', 'liquidityTotal', 'display']) 
     : 0
 
-
   const liqOwned = state.has('shell') 
     ? state.getIn(['shell', 'liquidityOwned', 'display']) 
     : 0
