@@ -39,18 +39,6 @@ const UnlimitedCheckbox = styled.div`
   }
 `
 
-
-const formatBalance = (tokenBalance) => {
-  return parseFloat(tokenBalance).toLocaleString('en', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-}
-
-const inputAmount = (inputAmount) => {
-
-}
-
 const ModalUnlock = ({
   coin,
   handleUnlock,
@@ -87,7 +75,7 @@ const ModalUnlock = ({
     <Modal>
       <ModalTitle> Unlock { coin.get('symbol') } </ModalTitle>
       <ModalContent>
-        <p> Shell's current allowance is ${ current } </p>
+        <p> Shell's current allowance is { current } </p>
         <NumberFormat
           value={ unlimited ? MAX : amount }
           disabled={ unlimited }

@@ -1,6 +1,10 @@
 import React from 'react'
 
+<<<<<<< HEAD
 import config from "../../kovan.ctokens.config"
+=======
+import config from "../../kovan.two.wbtc.renbtc.sbtc.config"
+>>>>>>> btc
 
 import styled from 'styled-components'
 

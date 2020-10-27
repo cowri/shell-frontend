@@ -29,6 +29,7 @@ export default class Engine extends SwapEngine {
         )
 
         this.shell.displayDecimals = config.displayDecimals
+        this.shell.swapDecimals = config.swapDecimals
         this.shell.alpha = new BigNumber(config.params.alpha)
         this.shell.beta = new BigNumber(config.params.beta)
         this.shell.delta = new BigNumber(config.params.delta)

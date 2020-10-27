@@ -6,17 +6,15 @@ const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534
 
 export default class SwapEngine {
 
-    async viewOriginSwap (originIndex, targetIndex, amount) {
+    async viewOriginSwap (originIndex, targetIndex, originAmount) {
         
         let origin = this.derivatives[originIndex]
         let target = this.derivatives[targetIndex]
 
-        let originAmount = origin.getAllFormatsFromDisplay(amount)
-
         let targetAmount = await this.shell.viewOriginSwap(
             origin.address,
             target.address,
-            originAmount.raw.toFixed()
+            origin.getRawFromDisplay(originAmount).toFixed()
         )
         
         if (!targetAmount || targetAmount.toString() == REVERTED) {
@@ -26,25 +24,31 @@ export default class SwapEngine {
         } else {
             
             return {
-                originAmount: originAmount,
-                targetAmount: target.getAllFormatsFromRaw(targetAmount)
+                originAmount: {
+                    numeraire: origin.getNumeraireFromDisplay(originAmount),
+                    display: originAmount,
+                    raw: origin.getRawFromDisplay(originAmount)
+                },
+                targetAmount: {
+                    numeraire: target.getNumeraireFromRaw(targetAmount),
+                    display: target.getDisplayFromRaw(targetAmount, this.shell.swapDecimals),
+                    raw: targetAmount
+                }
             }
 
         }
 
     }
 
-    async viewTargetSwap (originIndex, targetIndex, amount) {
+    async viewTargetSwap (originIndex, targetIndex, targetAmount) {
 
         let origin = this.derivatives[originIndex]
         let target = this.derivatives[targetIndex]
 
-        let targetAmount = target.getAllFormatsFromDisplay(amount)
-
         let originAmount = await this.shell.viewTargetSwap(
             origin.address,
             target.address,
-            targetAmount.raw.toFixed()
+            target.getRawFromDisplay(targetAmount).toFixed()
         )
         
         if (!originAmount || originAmount.toString() == REVERTED) {
@@ -54,8 +58,16 @@ export default class SwapEngine {
         } else {
 
             return {
-                originAmount: origin.getAllFormatsFromRaw(originAmount),
-                targetAmount: targetAmount,
+                originAmount: {
+                    display: origin.getDisplayFromRaw(originAmount, this.shell.swapDecimals),
+                    numeraire: origin.getNumeraireFromRaw(originAmount),
+                    raw: originAmount
+                },
+                targetAmount: {
+                    numeraire: target.getNumeraireFromDisplay(targetAmount),
+                    raw: target.getRawFromDisplay(targetAmount),
+                    display: targetAmount
+                }
             }
 
         }

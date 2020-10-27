@@ -151,7 +151,7 @@ const StartModal = ({
 
     if (event.target.checked) {
 
-      const fee = engine.shell.epsilon.multipliedBy(100).toFormat(4)
+      const fee = engine.shell.epsilon.multipliedBy(100).toString()
       
       const feeMessage = (
         <div>
@@ -267,7 +267,7 @@ const StartModal = ({
         You will burn 
         <span style={{position: 'relative', paddingLeft: '16.5px', paddingRight: '4px' }}> 
           <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '0px' }} /> 
-          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToBurn, 8) }
+          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToBurn) }
         </span>
         { slippageMessage }
       </div>

@@ -188,7 +188,7 @@ const StartModal = ({
             src={tinyShellIcon} 
             style={{position:'absolute', top:'1px', left: '1px' }} 
           /> 
-          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint, 8) } 
+          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint) } 
         </span> 
       { slippageMessage }
     </div>
