@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../mainnet.one.dai.usdc.usdt.susd.config"
+import config from "../../kovan.ctokens.config"
 
 import styled from 'styled-components'
 

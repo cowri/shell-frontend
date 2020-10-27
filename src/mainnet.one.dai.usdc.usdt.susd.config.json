@@ -4,6 +4,7 @@
   "blocknative": "9bb42eeb-6448-414d-94ee-6f91b875fd2d",
   "network": 1,
   "displayDecimals": 2,
+  "swapDecimals": 2,
   "assets": [
     { 
       "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F", 

@@ -3,6 +3,8 @@
   "infuraKey": "23656e31a1a34049bc03807c64bcd017",
   "blocknative": "9bb42eeb-6448-414d-94ee-6f91b875fd2d",
   "network": 1,
+  "displayDecimals": 4,
+  "swapDecimals": 8,
   "assets": [
     { 
       "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", 
