@@ -63,14 +63,14 @@ export default class NumericFormats {
     getDisplayFromRaw (raw) {
 
       return Number(
-        new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(8)
-      ).toFixed(8)
+        new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(this.displayDecimals)
+      ).toLocaleString()
       
     }
 
     getDisplayFromNumeraire (numeraire, decimals) {
 
-      return Number(numeraire.toFixed(decimals)).toFixed(8)
+      return Number(numeraire.toFixed(this.displayDecimals)).toLocaleString()
 
     }
 }

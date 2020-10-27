@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../mainnet.two.wbtc.renbtc.sbtc.config"
+import config from "../mainnet.one.dai.usdc.usdt.susd.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -27,7 +27,8 @@ export default class Engine extends SwapEngine {
             shellIcon,
             18
         )
-        
+
+        this.shell.displayDecimals = config.displayDecimals
         this.shell.alpha = new BigNumber(config.params.alpha)
         this.shell.beta = new BigNumber(config.params.beta)
         this.shell.delta = new BigNumber(config.params.delta)
@@ -55,6 +56,8 @@ export default class Engine extends SwapEngine {
                 _asset_.icon,
                 _asset_.decimals
             )
+
+            asset.displayDecimals = config.displayDecimals
                 
             this.assetIx[_asset_.address] = ix
             this.derivativeIx[_asset_.address] = this.derivatives.length
@@ -71,6 +74,8 @@ export default class Engine extends SwapEngine {
                     _derivative_.icon,
                     _derivative_.decimals
                 )
+
+                derivative.displayDecimals = config.displayDecimals
                 
                 this.derivativeIx[_derivative_.address] = this.derivatives.length
                 
