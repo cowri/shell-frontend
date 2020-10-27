@@ -60,17 +60,22 @@ export default class NumericFormats {
 
     }
 
-    getDisplayFromRaw (raw) {
+    getDisplayFromRaw (raw, decimals) {
+
+      decimals = decimals ? decimals : this.displayDecimals
 
       return Number(
-        new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(this.displayDecimals)
-      ).toLocaleString()
+        new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(decimals)
+      ).toLocaleString(undefined, { minimumFractionDigits: decimals })
       
     }
 
     getDisplayFromNumeraire (numeraire, decimals) {
 
-      return Number(numeraire.toFixed(this.displayDecimals)).toLocaleString()
+      decimals = decimals ? decimals : this.displayDecimals
+
+      return Number(numeraire.toFixed(decimals))
+        .toLocaleString(undefined, { minimumFractionDigits: decimals })
 
     }
 }

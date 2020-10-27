@@ -267,7 +267,7 @@ const StartModal = ({
         You will burn 
         <span style={{position: 'relative', paddingLeft: '16.5px', paddingRight: '4px' }}> 
           <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '0px' }} /> 
-          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToBurn, 8) }
+          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToBurn) }
         </span>
         { slippageMessage }
       </div>

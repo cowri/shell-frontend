@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../mainnet.one.dai.usdc.usdt.susd.config"
+import config from "../../kovan.two.wbtc.renbtc.sbtc.config"
 
 import styled from 'styled-components'
 

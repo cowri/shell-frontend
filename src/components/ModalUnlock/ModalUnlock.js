@@ -39,18 +39,6 @@ const UnlimitedCheckbox = styled.div`
   }
 `
 
-
-const formatBalance = (tokenBalance) => {
-  return parseFloat(tokenBalance).toLocaleString('en', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-}
-
-const inputAmount = (inputAmount) => {
-
-}
-
 const ModalUnlock = ({
   coin,
   handleUnlock,
