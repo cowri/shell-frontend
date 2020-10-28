@@ -72,7 +72,7 @@ export default class NumericFormats {
 
       return Number(
         new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(decimals)
-      ).toLocaleString(undefined, { minimumFractionDigits: decimals })
+      ).toLocaleString('en-US', { minimumFractionDigits: decimals })
       
     }
 
@@ -81,7 +81,7 @@ export default class NumericFormats {
       decimals = decimals ? decimals : this.displayDecimals
 
       return Number(numeraire.toFixed(decimals))
-        .toLocaleString(undefined, { minimumFractionDigits: decimals })
+        .toLocaleString('en-US', { minimumFractionDigits: decimals })
 
     }
 }
