@@ -4,11 +4,15 @@ export default class NumericFormats {
     
     getNumeraireFromDisplay (display) { 
 
+      display = display.replace(',','')
+
       return new BigNumber(display === '' ? 0 : display);
 
     }
 
     getAllFormatsFromDisplay (display) {
+
+      display = display.replace(',','')
 
       return {
         display: display,
@@ -55,6 +59,8 @@ export default class NumericFormats {
     }
 
     getRawFromDisplay (display) {
+
+      display = display.replace(',','')
 
       return new BigNumber(display).multipliedBy(10 ** this.decimals)
 
