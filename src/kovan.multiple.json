@@ -1,0 +1,144 @@
+{
+  "defaultWeb3Provider": "kovan.infura.io/v3/23656e31a1a34049bc03807c64bcd017",
+  "infuraKey": "23656e31a1a34049bc03807c64bcd017",
+  "blocknative": "9bb42eeb-6448-414d-94ee-6f91b875fd2d",
+  "network": 42,
+  "shells": [ 
+    {
+      "shell": "0xf1d6e35501a27618d3ac0174db7e310e211d50e6",
+      "name": "50% wBTC 40% renBTC 10% sBTC",
+      "displayDecimals": 4,
+      "swapDecimals": 8,
+      "assets": [
+        { 
+          "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
+          "decimals": 8,
+          "icon": "wbtc.svg",
+          "name": "Wrapped BTC",
+          "symbol": "WBTC",
+          "type": "ERC20",
+          "weight": ".5",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xba9d8223398C61cef238b94102507501EFBF2d3E", 
+          "decimals": 8,
+          "icon": "renbtc.svg",
+          "name": "renBTC",
+          "symbol": "renBTC",
+          "type": "ERC20",
+          "weight": ".4",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xCE18d20A5EAE16573AD8bed2a07e2E76Fee5a3dA", 
+          "decimals": 18,
+          "icon": "sbtc.svg",
+          "name": "Synth sBTC",
+          "symbol": "sBTC",
+          "type": "ERC20",
+          "weight": ".1",
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".9",
+        "beta": ".6",
+        "delta": ".1",
+        "epsilon": ".00035",
+        "lambda": "1"
+      }
+    }, {
+      "shell": "0x6ed9874c64cf39c7f070296c80959947b016b3af",
+      "name": "30% Dai 30% USDt 30% USDc 10% sUSD",
+      "displayDecimals": 2,
+      "swapDecimals": 2,
+      "assets": [
+        { 
+          "address": "0xFf795577d9AC8bD7D90Ee22b6C1703490b6512FD", 
+          "decimals": 18,
+          "icon": "dai.svg",
+          "name": "MultiCollateral Dai",
+          "symbol": "DAI",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [ 
+            {
+              "address": "0x58AD4cB396411B691A9AAb6F74545b2C5217FE6a",
+              "decimals": 18,
+              "icon": "adai.svg",
+              "name": "Aave Interest Bearing Dai",
+              "symbol": "aDAI",
+              "type": "aERC20"
+            }
+          ]
+        },
+        { 
+          "address": "0xe22da380ee6B445bb8273C81944ADEB6E8450422", 
+          "decimals": 6,
+          "icon": "usdc.svg",
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [
+            {
+              "address": "0x02F626c6ccb6D2ebC071c068DC1f02Bf5693416a", 
+              "decimals": 6,
+              "icon": "ausdc.svg",
+              "name": "Aave Interest Bearing USDC",
+              "symbol": "aUSDC",
+              "type": "aERC20"
+            }
+          ]
+        },
+        { 
+          "address": "0x13512979ADE267AB5100878E2e0f485B568328a4", 
+          "decimals": 6,
+          "icon": "usdt.svg",
+          "name": "Tether Stablecoin",
+          "symbol": "USDT",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [
+            {
+              "address": "0xA01bA9fB493b851F4Ac5093A324CB081A909C34B",
+              "decimals": 6,
+              "icon": "ausdt.svg",
+              "name": "Aave Interest Bearing USDT",
+              "symbol": "aUSDT",
+              "type": "aERC20"
+            }
+          ]
+        },
+        { 
+          "address": "0xD868790F57B39C9B2B51b12de046975f986675f9", 
+          "decimals": 6,
+          "icon": "susd.svg",
+          "name": "Synthetix USD",
+          "symbol": "SUSD",
+          "type": "ERC20",
+          "weight": ".1",
+          "derivatives": [
+            {
+              "address": "0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901",
+              "decimals": 6,
+              "icon": "asusd.svg",
+              "name": "Aave Interest Bearing sUSD",
+              "symbol": "aSUSD",
+              "type": "aERC20"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "alpha": ".9",
+        "beta": ".75",
+        "delta": ".5",
+        "epsilon": ".00035",
+        "lambda": ".9"
+      }
+
+    }
+  ]
+}

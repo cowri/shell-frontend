@@ -48,16 +48,16 @@ export default class Shell extends NumericFormats {
         const utilityOwned = this.getAllFormatsFromNumeraire(utilityTotal.numeraire.multipliedBy(ownedRatio))
         
         return {
-            liquiditiesTotal,
             liquiditiesOwned,
-            liquidityTotal,
+            liquiditiesTotal,
             liquidityOwned,
+            liquidityTotal,
             shellsOwned,
             shellsTotal,
-            utilityTotal,
-            utilityOwned,
-            utilitiesTotal,
             utilitiesOwned,
+            utilitiesTotal,
+            utilityOwned,
+            utilityTotal
         }
 
     }

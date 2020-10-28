@@ -19,74 +19,81 @@ export default class Engine extends SwapEngine {
 
         this.setState = setState
 
-        this.shell = new Shell(
-            this.web3,
-            config.shell,
-            "Shell Protocol",
-            "SHL",
-            shellIcon,
-            18
-        )
+        const shells = []
 
-        this.shell.displayDecimals = config.displayDecimals
-        this.shell.swapDecimals = config.swapDecimals
-        this.shell.alpha = new BigNumber(config.params.alpha)
-        this.shell.beta = new BigNumber(config.params.beta)
-        this.shell.delta = new BigNumber(config.params.delta)
-        this.shell.epsilon = new BigNumber(config.params.epsilon)
-        this.shell.lambda = new BigNumber(config.params.lambda)
+        for (const _shell_ of config.shells) {
 
-        this.shell.weights = []
-        
-        this.assets = []
-        this.derivatives = []
-        this.assetIx = {}
-        this.derivativeIx = {}
-
-        for (const ix in config.assets) {
-            
-            const _asset_ = config.assets[ix]
-            
-            this.shell.weights.push(new BigNumber(_asset_.weight))
-
-            const asset = new Asset(
+            const shell = new Shell(
                 this.web3,
-                _asset_.address,
-                _asset_.name,
-                _asset_.symbol,
-                _asset_.icon,
-                _asset_.decimals
+                _shell_.shell,
+                "Shell Protocol",
+                "SHL",
+                shellIcon,
+                18
             )
 
-            asset.displayDecimals = config.displayDecimals
-                
-            this.assetIx[_asset_.address] = ix
-            this.derivativeIx[_asset_.address] = this.derivatives.length
-            
-            asset.derivatives = []
-            
-            for (const _derivative_ of _asset_.derivatives) {
+            shell.displayDecimals = _shell_.displayDecimals
+            shell.swapDecimals = _shell_.swapDecimals
+            shell.alpha = new BigNumber(_shell_.alpha)
+            shell.beta = new BigNumber(_shell_.beta)
+            shell.delta = new BigNumber(_shell_.delta)
+            shell.epsilon = new BigNumber(_shell_.epsilon)
+            shell.lambda = new BigNumber(_shell_.lambda)
 
-                const derivative = new Asset(
+            shell.weights = []
+            shell.assets = []
+            shell.derivatives = []
+            shell.assetIx = {}
+            shell.derivativeIx = {}
+
+            for (const ix in _shell_.assets) {
+                
+                const _asset_ = _shell_.assets[ix]
+                
+                shell.weights.push(new BigNumber(_asset_.weight))
+
+                const asset = new Asset(
                     this.web3,
-                    _derivative_.address,
-                    _derivative_.name,
-                    _derivative_.symbol,
-                    _derivative_.icon,
-                    _derivative_.decimals
+                    _asset_.address,
+                    _asset_.name,
+                    _asset_.symbol,
+                    _asset_.icon,
+                    _asset_.decimals
                 )
 
-                derivative.displayDecimals = config.displayDecimals
+                asset.displayDecimals = _shell_.displayDecimals
+                    
+                shell.assetIx[_asset_.address] = ix
+                shell.derivativeIx[_asset_.address] = shell.derivatives.length
                 
-                this.derivativeIx[_derivative_.address] = this.derivatives.length
+                asset.derivatives = []
                 
-                asset.derivatives.push(derivative)
+                for (const _derivative_ of _asset_.derivatives) {
+
+                    const derivative = new Asset(
+                        this.web3,
+                        _derivative_.address,
+                        _derivative_.name,
+                        _derivative_.symbol,
+                        _derivative_.icon,
+                        _derivative_.decimals
+                    )
+
+                    derivative.displayDecimals = config.displayDecimals
+                    
+                    asset.derivatives.push(derivative)
+
+                    shell.derivativeIx[_derivative_.address] = shell.derivatives.length
+                    
+                }
                 
+                shell.assets.push(asset)
+                shell.derivatives.push(asset)
+                shell.derivatives = shell.derivatives.concat(asset.derivatives)
+
             }
-            
-            this.assets.push(asset)
-            this.derivatives.push(asset)
-            this.derivatives = this.derivatives.concat(asset.derivatives)
+
+            shells.push(shell)
 
         }
 
@@ -133,20 +140,27 @@ export default class Engine extends SwapEngine {
         return fees
 
     }
-    
-    async sync (account) {
-        
+
+    async syncShells (account) {
+
         const self = this
-        
+
         account = account ? account : this.account
-        
+
         this.account = account
+
+        let shells = []
+
+
+    }
+
+    async readShell (_shell_) {
 
         let derivatives = []
         
-        const shell = await this.shell.query(account)
+        const shell = await _shell_.query(this.account)
         
-        const assets = await Promise.all(this.assets.map(async function (_asset_, ix) {
+        const assets = await Promise.all(_shell_.assets.map(async function (_asset_, ix) {
             
             const asset = await queryAsset(_asset_)
             
@@ -168,9 +182,9 @@ export default class Engine extends SwapEngine {
         
         async function queryAsset (asset) {
 
-            const allowance = await asset.allowance(account, self.shell.address)
+            const allowance = await asset.allowance(this.account, _shell_.address)
 
-            const balance = await asset.balanceOf(account)
+            const balance = await asset.balanceOf(this.account)
             
             return {
                 allowance: allowance,
@@ -182,12 +196,43 @@ export default class Engine extends SwapEngine {
 
         }
         
-        this.state = fromJS({
-            account,
+        return {
             assets,
             derivatives,
             shell
+        }
+
+    }
+
+    async sync (account) {
+        
+        account = account ? account : this.account
+        
+        this.account = account
+
+        const shells = []
+
+        for (const _shell_ of this.shells) {
+
+            shells.push(await this.readShell(_shell_))
+
+        }
+
+        this.state = fromJS({
+            account,
+            shells
         })
+
+        this.setState(this.state)
+
+    }
+
+    async syncShell (ix) {
+
+        this.state = this.state.setIn(
+            ['shells', ix],
+            await this.readShell(this.shells[ix])
+        )
 
         this.setState(this.state)
 
