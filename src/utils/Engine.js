@@ -1,5 +1,5 @@
 import { fromJS, List, Map  } from "immutable"
-import config from "../mainnet.one.dai.usdc.usdt.susd.config"
+import config from "../kovan.multiple.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -19,7 +19,7 @@ export default class Engine extends SwapEngine {
 
         this.setState = setState
 
-        const shells = []
+        this.shells = []
 
         for (const _shell_ of config.shells) {
 
@@ -49,8 +49,6 @@ export default class Engine extends SwapEngine {
             for (const ix in _shell_.assets) {
                 
                 const _asset_ = _shell_.assets[ix]
-                
-                shell.weights.push(new BigNumber(_asset_.weight))
 
                 const asset = new Asset(
                     this.web3,
@@ -62,6 +60,7 @@ export default class Engine extends SwapEngine {
                 )
 
                 asset.displayDecimals = _shell_.displayDecimals
+                asset.weight = new BigNumber(_asset_.weight)
                     
                 shell.assetIx[_asset_.address] = ix
                 shell.derivativeIx[_asset_.address] = shell.derivatives.length
@@ -86,14 +85,15 @@ export default class Engine extends SwapEngine {
                     shell.derivativeIx[_derivative_.address] = shell.derivatives.length
                     
                 }
-                
+
+                shell.weights.push(asset.weight) 
                 shell.assets.push(asset)
                 shell.derivatives.push(asset)
                 shell.derivatives = shell.derivatives.concat(asset.derivatives)
 
             }
 
-            shells.push(shell)
+            this.shells.push(shell)
 
         }
 
@@ -151,10 +151,11 @@ export default class Engine extends SwapEngine {
 
         let shells = []
 
-
     }
 
     async readShell (_shell_) {
+
+        const self = this
 
         let derivatives = []
         
@@ -182,9 +183,9 @@ export default class Engine extends SwapEngine {
         
         async function queryAsset (asset) {
 
-            const allowance = await asset.allowance(this.account, _shell_.address)
+            const allowance = await asset.allowance(self.account, _shell_.address)
 
-            const balance = await asset.balanceOf(this.account)
+            const balance = await asset.balanceOf(self.account)
             
             return {
                 allowance: allowance,

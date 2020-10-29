@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import config from '../../mainnet.one.dai.usdc.usdt.susd.config'
+import config from '../../kovan.multiple.config'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDiscord, faTelegram, faTwitter, } from '@fortawesome/free-brands-svg-icons'

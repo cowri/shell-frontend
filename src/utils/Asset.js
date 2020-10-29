@@ -1,5 +1,3 @@
-import BigNumber from 'bignumber.js';
-
 import ERC20ABI from '../abi/ERC20.abi.json';
 
 import NumberFormats from "./NumberFormats.js";

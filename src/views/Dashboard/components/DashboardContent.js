@@ -6,6 +6,7 @@ import Tab from '../../../components/Tab'
 import Tabs from '../../../components/Tabs'
 
 import PoolTab from './PoolTab'
+import PoolsTab from './PoolsTab'
 import SwapTab from './SwapTab'
 
 import DashboardContext from '../context'
@@ -14,28 +15,29 @@ const DashboardContent = ({ }) => {
 
   const { state } = useContext(DashboardContext)
 
-  const [activeTab, setActiveTab] = useState('pool')
+  const [activeTab, setActiveTab] = useState('pools')
 
   return (
     <Container>
       <Surface>
         <Tabs>
           <Tab 
-            active={activeTab === 'pool'} 
-            disabled={!state.has('assets')}
-            onClick={() => setActiveTab('pool')}
+            active={activeTab === 'pool' || activeTab == 'pools'} 
+            disabled={!state.has('shells')}
+            onClick={() => { if (activeTab == 'pool') setActiveTab('pools') }}
           >
-            Pool
+            { activeTab != 'pool' ? 'Pools' : <a> Back To Pools </a> }
           </Tab>
           <Tab 
             active={activeTab === 'swap'}
-            disabled={!state.has('assets')}
+            disabled={!state.has('shells')}
             onClick={() => setActiveTab('swap')}
           >
             Swap
           </Tab>
         </Tabs>
 
+        { activeTab === 'pools' && <PoolsTab /> }
         { activeTab === 'pool' && <PoolTab /> }
         { activeTab === 'swap' && <SwapTab /> }
 

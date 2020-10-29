@@ -47,20 +47,6 @@ const Dashboard = ({
   const [depositModal, setDepositModal] = useState(false)
   const [withdrawModal, setWithdrawModal] = useState(false)
 
-  const renderContent = () => {
-
-    if (!loggedIn) {
-
-    } else if (!web3) {
-
-    } else {
-
-      return <DashboardContent />
-
-    }
-
-  }
-
   return (
     <>
       <DashboardContext.Provider value={{
@@ -73,7 +59,7 @@ const Dashboard = ({
           {/* <Intercom appID='zr42wlxq' user_id={userId} /> */}
           <StyledDashboard>
             <Header />
-            { renderContent() }
+            { loggedIn && web3 && <DashboardContent/> }
             <Footer />
           </StyledDashboard>
           {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}

@@ -15,7 +15,7 @@
           "decimals": 8,
           "icon": "wbtc.svg",
           "name": "Wrapped BTC",
-          "symbol": "WBTC",
+          "symbol": "wBTC",
           "type": "ERC20",
           "weight": ".5",
           "derivatives": [ ]
