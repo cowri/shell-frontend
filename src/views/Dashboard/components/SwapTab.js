@@ -169,8 +169,10 @@ const SwapTab = () => {
 
     ;(async function () { 
       try {
-
-        const { originAmount, targetAmount } = await engine.viewOriginSwap(
+        
+        const method = swapType == 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
+        
+        const { originAmount, targetAmount } = await engine[method](
           originIx, 
           targetIx, 
           swapType == 'origin' ? originValue : targetValue
