@@ -17,8 +17,9 @@ const StyledRow = withTheme(styled.div`
   }
 `)
 
-const Row = ({ children, onMouseOver, onMouseOut, head, hideBorder, ref, style }) => (
+const Row = ({ children, onClick, onMouseOver, onMouseOut, head, hideBorder, ref, style }) => (
   <StyledRow 
+    onClick={onClick}
     onMouseOver={onMouseOver} 
     onMouseOut={onMouseOut} 
     style={style} 

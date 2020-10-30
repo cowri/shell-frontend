@@ -9,9 +9,6 @@ import Header from '../../components/Header'
 
 import withWallet from '../../containers/withWallet'
 
-import Deposit from '../Deposit'
-import Withdraw from '../Withdraw'
-
 import DashboardContent from './components/DashboardContent'
 
 import DashboardContext from './context'
@@ -44,14 +41,9 @@ const Dashboard = ({
 
   } 
 
-  const [depositModal, setDepositModal] = useState(false)
-  const [withdrawModal, setWithdrawModal] = useState(false)
-
   return (
     <>
       <DashboardContext.Provider value={{
-        presentDeposit: () => setDepositModal(true),
-        presentWithdraw: () => setWithdrawModal(true),
         web3,
         engine,
         state,
@@ -62,8 +54,6 @@ const Dashboard = ({
             { loggedIn && web3 && <DashboardContent/> }
             <Footer />
           </StyledDashboard>
-          {depositModal && <Deposit onDismiss={() => setDepositModal(false)} />}
-          {withdrawModal && <Withdraw onDismiss={() => setWithdrawModal(false)} />}
       </DashboardContext.Provider>
     </>
   )

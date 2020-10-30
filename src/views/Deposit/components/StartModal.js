@@ -75,6 +75,7 @@ const StartModal = ({
   onDeposit,
   onDismiss,
   onUnlock,
+  shellIx,
   state
 }) => {
   
@@ -87,8 +88,8 @@ const StartModal = ({
   const SAFETY_CHECK = <span style={errorStyles}> These amounts trigger Shell's Safety Check  </span>
   const DEFAULT = <span> Your rate on this deposit will be... </span>
 
-  const [ inputs, setInputs ] = useState(new List(new Array(engine.assets.length).fill('')))
-  const [ errors, setErrors ] = useState(new List(new Array(engine.assets.length).fill('')))
+  const [ inputs, setInputs ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
+  const [ errors, setErrors ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
   const [ error, setError ] = useState(null)
   const [ zero, setZero ] = useState(true)
   const [ unlocking, setUnlocking ] = useState(null)
@@ -99,13 +100,13 @@ const StartModal = ({
     
     setInputs(inputs.set(i,v))
 
-    v = engine.assets[i].getNumeraireFromDisplay(v)
+    v = engine.shells[shellIx].assets[i].getNumeraireFromDisplay(v)
     
-    if (v.isGreaterThan(state.getIn([ 'assets', i, 'balance', 'numeraire' ]))) {
+    if (v.isGreaterThan(state.getIn([ 'shells', shellIx, 'assets', i, 'balance', 'numeraire' ]))) {
 
       setErrors(errors.set(i, 'Amount is greater than your wallet\'s balance'))
 
-    } else if (v.isGreaterThan(state.getIn([ 'assets', i, 'allowance', 'numeraire' ]))) {
+    } else if (v.isGreaterThan(state.getIn([ 'shells', shellIx, 'assets', i, 'allowance', 'numeraire' ]))) {
 
       setErrors(errors.set(i, 'Amount is greater than Shell\'s allowance'))
 
@@ -140,7 +141,7 @@ const StartModal = ({
 
     const { addresses, amounts } = getAddressesAndAmounts()
     
-    const shellsToMint = await engine.shell.viewSelectiveDeposit(addresses, amounts)
+    const shellsToMint = await engine.shells[shellIx].viewSelectiveDeposit(addresses, amounts)
 
     if (shellsToMint === false || shellsToMint.toString() === REVERTED) {
 
@@ -188,7 +189,7 @@ const StartModal = ({
             src={tinyShellIcon} 
             style={{position:'absolute', top:'1px', left: '1px' }} 
           /> 
-          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToMint) } 
+          { ' ' + engine.shells[shellIx].getDisplayFromNumeraire(shellsToMint) } 
         </span> 
       { slippageMessage }
     </div>
@@ -205,7 +206,7 @@ const StartModal = ({
 
     inputs.forEach( (v,i) => {
       if (0 < v) {
-        const asset = engine.assets[i]
+        const asset = engine.shells[shellIx].assets[i]
         addresses.push(asset.address)
         amounts.push(asset.getAllFormatsFromDisplay(v))
       }
@@ -232,11 +233,11 @@ const StartModal = ({
     }
   })()
 
-  const tokenInputs = engine.assets.map( (asset, ix) => {
+  const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => {
 
-    const assetState = state.get('assets').get(ix)
+    const assetState = state.getIn([ 'shells', shellIx, 'assets', ix ])
 
-    let available = assetState.getIn(['allowance', 'numeraire'])
+    let available = assetState.getIn([ 'allowance', 'numeraire' ])
     
     if (available.isGreaterThan(new BigNumber(100000000))) {
       available = '100,000,000+'
@@ -270,7 +271,7 @@ const StartModal = ({
           onCancel={ () => setPrompting(false) } 
           onContinue={handleSubmit} /> }
       { unlocking != null && <UnlockingModal
-          coin={ state.getIn(['assets', unlocking]) }
+          coin={ state.getIn(['shells', shellIx, 'assets', unlocking]) }
           handleCancel={ () => setUnlocking(null) }
           handleUnlock={ amount => ( setUnlocking(null), onUnlock(unlocking, amount) ) } /> }
       <ModalTitle> Deposit Funds </ModalTitle>

@@ -113,16 +113,13 @@ const SwapTab = () => {
   const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
   const [originValue, setOriginValue] = useState('')
   const [targetValue, setTargetValue] = useState('')
-  const [targetHelperText, setTargetHelperText] = useState('')
   const [swapType, setSwapType] = useState('origin')
   const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
   
-  const [coins, setCoins] = useState(engine.assets.reduce( (accu, asset) => {
-    accu.push(asset)
-    return accu.concat(asset.derivatives)
-  }, []))
+  const iterator = shell => shell.assets.flatMap( asset => [ asset ].concat(asset.derivatives) )
+  const [coins, setCoins] = useState(engine.shells.flatMap(iterator))
   
   const origin = coins[originIx]
   const target = coins[targetIx]
@@ -171,8 +168,8 @@ const SwapTab = () => {
       try {
 
         const { originAmount, targetAmount } = await engine.viewOriginSwap(
-          originIx, 
-          targetIx, 
+          origin.address, 
+          target.address, 
           swapType == 'origin' ? originValue : targetValue
         )
         

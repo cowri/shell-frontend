@@ -20,6 +20,9 @@ export default class Engine extends SwapEngine {
         this.setState = setState
 
         this.shells = []
+        this.assets = []
+        this.derivatives = []
+        this.pairs = {}
 
         for (const _shell_ of config.shells) {
 
@@ -47,6 +50,17 @@ export default class Engine extends SwapEngine {
             shell.derivativeIx = {}
 
             for (const ix in _shell_.assets) {
+                
+                for (let xi = ix + 1; xi < _shell_.assets.length; xi++) {
+                    const _ix = _shell_.assets[ix]
+                    const xi_ = _shell_.assets[xi]
+                    const ixxi = this.pairs[_ix] ? this.pairs[_ix] : {}
+                    const xiix = this.pairs[xi_] ? this.pairs[xi_] : {}
+                    if (!ixxi[xi_]) ixxi[xi_] = []
+                    if (!xiix[_ix]) xiix[_ix] = []
+                    xiix[_ix].push(_shell_.shell)
+                    ixxi[xi_].push(_shell_.shell)
+                }
                 
                 const _asset_ = _shell_.assets[ix]
 
@@ -104,29 +118,29 @@ export default class Engine extends SwapEngine {
         this.setState(this.state.set('network', network))
 
     }
-    
-    getFees (addrs, amts) {
+
+    getFees (shellIx, addrs, amts) {
         
-        let prevLiq = this.state.getIn(['shell', 'liquidityTotal']).toObject()
-        let prevLiqs = this.state.getIn(['shell', 'liquiditiesTotal']).toJS()
+        let prevLiq = this.state.getIn(['shells', shellIx, 'shell', 'liquidityTotal']).toObject()
+        let prevLiqs = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal']).toJS()
         
         let nextLiq = prevLiq
         let nextLiqs = prevLiqs
         
         for (let i = 0; i < addrs.length; i++) {
 
-            let di = this.assetIx[addrs[i]]
+            let di = this.shells[shellIx].assetIx[addrs[i]]
 
-            nextLiqs[di] = this.shell.getAllFormatsFromNumeraire(
+            nextLiqs[di] = this.shells[shellIx].getAllFormatsFromNumeraire(
                 nextLiqs[di].numeraire.plus(amts[i].numeraire))
             
-            nextLiq = this.shell.getAllFormatsFromNumeraire(
+            nextLiq = this.shells[shellIx].getAllFormatsFromNumeraire(
                 nextLiq.numeraire.plus(amts[i].numeraire))
             
         }
         
-        const [ _nothing, nothing_, prevFees ] = this.shell.calculateUtilities(prevLiq, prevLiqs)
-        const [ _empty, empty_, nextFees ] = this.shell.calculateUtilities(nextLiq, nextLiqs)
+        const [ _nothing, nothing_, prevFees ] = this.shells[shellIx].calculateUtilities(prevLiq, prevLiqs)
+        const [ _empty, empty_, nextFees ] = this.shells[shellIx].calculateUtilities(nextLiq, nextLiqs)
         
         const fees = []
         
@@ -134,7 +148,7 @@ export default class Engine extends SwapEngine {
             const fee = prevFees[i].numeraire.isGreaterThan(nextFees[i].numeraire)
                 ? prevFees[i].numeraire.minus(nextFees[i].numeraire).negated()
                 : nextFees[i].numeraire.minus(prevFees[i].numeraire)
-            fees.push(this.shell.getAllFormatsFromNumeraire(fee))
+            fees.push(this.shells[shellIx].getAllFormatsFromNumeraire(fee))
         }
         
         return fees
@@ -239,9 +253,10 @@ export default class Engine extends SwapEngine {
 
     }
 
-    unlock (index, amount, onHash, onConfirmation, onError) {
+    unlock (shellIx, assetIx, amount, onHash, onConfirmation, onError) {
 
-        const tx = this.assets[index].approve(this.shell.address, amount)
+        const tx = this.shells[shellIx].assets[assetIx]
+            .approve(this.shells[shellIx].address, amount)
 
         tx.send({ from: this.account })
             .once('transactionHash', onHash)
@@ -253,9 +268,10 @@ export default class Engine extends SwapEngine {
 
     }
 
-    selectiveDeposit (addresses, amounts, onHash, onConfirmation, onError) {
+    selectiveDeposit (shellIx, addresses, amounts, onHash, onConfirmation, onError) {
 
-        const tx = this.shell.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+        const tx = this.shells[shellIx]
+            .selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
@@ -267,11 +283,11 @@ export default class Engine extends SwapEngine {
 
     }
 
-    selectiveWithdraw (addresses, amounts, onHash, onConfirmation, onError) {
+    selectiveWithdraw (shellIx, addresses, amounts, onHash, onConfirmation, onError) {
 
-        const limit = this.state.getIn([ 'shell', 'shellsOwned', 'raw' ])
+        const limit = this.state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'raw' ])
 
-        const tx = this.shell.selectiveWithdraw(
+        const tx = this.shells[shellIx].selectiveWithdraw(
             addresses, 
             amounts.map(a => a.raw.toFixed() ),
             limit.toFixed(),

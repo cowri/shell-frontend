@@ -14,7 +14,7 @@ import BigNumber from 'bignumber.js';
 
 import DashboardContext from '../context'
 
-const StyledPoolTab = styled.div`
+const StyledShellsTab = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -49,12 +49,12 @@ const StyledRows = styled.div`
   margin-bottom: 12px;
 `
 
-const PoolName = styled.span`
+const ShellName = styled.span`
   align-items: center;
   display: flex;
   flex: 1.5;
 `
-const PoolNamePart = styled.span`
+const ShellNamePart = styled.span`
   margin: 4px;
   padding-right: 8px;
   position: relative;
@@ -69,7 +69,7 @@ const PoolNamePart = styled.span`
   }
 `
 
-const PoolNamePartLast = styled.span`
+const ShellNamePartLast = styled.span`
   margin: 4px;
   position: relative;
 `
@@ -118,10 +118,10 @@ function useHover() {
   return [ref, value];
 }
 
-const PoolsTab = () => {
+const ShellsTab = ({showShell}) => {
   
   const {
-    presentPool,
+    presentShell,
     engine,
     state
   } = useContext(DashboardContext)
@@ -132,29 +132,33 @@ const PoolsTab = () => {
   if (state.has('shells')) {
     for (let i = 0; i < engine.shells.length; i++) {
       let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
-      rows.push(<PoolRow assets={engine.shells[i].assets} liqTotal={liqTotal}/>)
+
+      rows.push(
+        <ShellRow 
+          showShell={() => showShell(i)} 
+          assets={engine.shells[i].assets} 
+          liqTotal={liqTotal}
+        />
+      )
+
     }
   }
 
   return (
-    <StyledPoolTab>
-      {/* <Overview>
-      </Overview> */}
+    <StyledShellsTab>
       <StyledRows>
         <Row head>
-          <span style={{ flex: 1.5 }}> Pools </span>
+          <span style={{ flex: 1.5 }}> Shells </span>
           <span style={{ flex: 1, textAlign: 'right' }}> Size </span>
           <span style={{ flex: 1, textAlign: 'right' }}> APY </span>
         </Row>
         { rows }
       </StyledRows>
-    </StyledPoolTab>
+    </StyledShellsTab>
   )
 }
 
-const PoolRow = ({liqTotal, assets}) => {
-  console.log("liq total", liqTotal)
-  console.log("assets", assets)
+const ShellRow = ({showShell, liqTotal, assets}) => {
 
   const useHover = () => {
     const [hovered, setHovered] = useState()
@@ -166,7 +170,7 @@ const PoolRow = ({liqTotal, assets}) => {
   }
 
   const [ hovered, handlers ] = useHover()
-  
+
   const name = getName(assets)
 
   function getName (assets) {
@@ -176,27 +180,27 @@ const PoolRow = ({liqTotal, assets}) => {
       if (i == assets.length - 1) {
         
         return (
-          <PoolNamePartLast>
+          <ShellNamePartLast>
             <Symbol moused={hovered}>
               { a.symbol }
             </Symbol>
             <Weight moused={hovered}>
               { a.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
             </Weight>
-          </PoolNamePartLast>
+          </ShellNamePartLast>
         )
 
       } else {
 
         return (
-          <PoolNamePart>
+          <ShellNamePart>
             <Symbol moused={hovered}>
               { a.symbol }
             </Symbol>
             <Weight moused={hovered}>
               { a.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
             </Weight>
-          </PoolNamePart>
+          </ShellNamePart>
         )
 
       }
@@ -204,15 +208,15 @@ const PoolRow = ({liqTotal, assets}) => {
     })
 
     return (
-      <PoolName>
+      <ShellName>
         {parts}
-      </PoolName>
+      </ShellName>
     )
 
   }
 
   return (
-    <Row {...handlers} style={{cursor:'pointer'}}>
+    <Row onClick={showShell} {...handlers} style={{cursor:'pointer'}}>
       {name}
       <StyledBalance className="number" moused={hovered}> { liqTotal } </StyledBalance>
       <StyledBalance className="number" moused={hovered}> 100% </StyledBalance>
@@ -221,4 +225,4 @@ const PoolRow = ({liqTotal, assets}) => {
 
 }
 
-export default PoolsTab
+export default ShellsTab

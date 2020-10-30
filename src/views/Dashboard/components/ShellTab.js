@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
 
@@ -10,9 +10,12 @@ import OverviewSection from '../../../components/OverviewSection'
 import Row from '../../../components/Row'
 import TokenIcon from '../../../components/TokenIcon'
 
+import Deposit from '../../Deposit'
+import Withdraw from '../../Withdraw'
+
 import DashboardContext from '../context'
 
-const StyledPoolTab = styled.div`
+const StyledShellTab = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -51,20 +54,20 @@ const StyledRows = styled.div`
   margin-bottom: 12px;
 `
 
-const PoolTab = ({ buttonsDisabled }) => {
+const ShellTab = ({ shellIx }) => {
   
   const {
-    presentDeposit,
-    presentWithdraw,
     engine,
     state
   } = useContext(DashboardContext)
 
-  const rows = state.has('assets') ? engine.assets.map( (asset, ix) => { 
+  const [ presentDeposit, setPresentDeposit ] = useState(false)
+  const [ presentWithdraw, setPresentWithdraw ] = useState(false)
 
-    const liqTotal = state.getIn(['shell','liquiditiesTotal', ix, 'display'])
+  const rows = engine.shells[shellIx].assets.map( (asset, ix) => { 
 
-    const liqOwned = state.getIn(['shell','liquiditiesOwned', ix, 'display'])
+    const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesTotal', ix, 'display' ])
+    const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesOwned', ix, 'display' ])
 
     return (
       <Row>
@@ -82,21 +85,18 @@ const PoolTab = ({ buttonsDisabled }) => {
       </Row>
     )
     
-  }) : [] 
+  })
 
-  const liqTotal = state.has('shell') 
-    ? state.getIn(['shell', 'liquidityTotal', 'display']) 
-    : 0
+  const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ]) 
+  const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ]) 
 
-  const liqOwned = state.has('shell') 
-    ? state.getIn(['shell', 'liquidityOwned', 'display']) 
-    : 0
-
-  return (
-    <StyledPoolTab>
+  return ( <>
+    { presentDeposit && <Deposit shellIx={shellIx} onDismiss={() => setPresentDeposit(false)} />}
+    { presentWithdraw && <Withdraw shellIx={shellIx} onDismiss={() => setPresentWithdraw(false)} />} 
+    <StyledShellTab>
       <Overview>
         <OverviewSection>
-          <LabelledValue label="Pool Balance" value={ liqTotal} />
+          <LabelledValue label="Shell Reserves" value={ liqTotal} />
         </OverviewSection>
         <OverviewSection>
           <LabelledValue label="Your Balance" value={ liqOwned } />
@@ -105,18 +105,18 @@ const PoolTab = ({ buttonsDisabled }) => {
       <StyledRows>
         <Row head>
           <span style={{ flex: 1.5 }}> Token </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> Pool Balance </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> My Balance </span>
+          <span style={{ flex: 1, textAlign: 'right' }}> Shell Reserves </span>
+          <span style={{ flex: 1, textAlign: 'right' }}> My Balances </span>
         </Row>
         { rows }
       </StyledRows>
       <StyledActions>
-        <Button disabled={!state.has('assets')} onClick={presentDeposit}>Deposit</Button>
+        <Button onClick={setPresentDeposit}>Deposit</Button>
         <div style={{ width: 12 }} />
-        <Button disabled={!state.has('assets')} outlined onClick={presentWithdraw}>Withdraw</Button>
+        <Button outlined onClick={setPresentWithdraw}>Withdraw</Button>
       </StyledActions>
-    </StyledPoolTab>
-  )
+    </StyledShellTab>
+  </> )
 }
 
-export default PoolTab
+export default ShellTab

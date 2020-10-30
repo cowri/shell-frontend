@@ -96,6 +96,7 @@ const StartModal = ({
   onProportionalWithdraw,
   onWithdraw,
   onDismiss,
+  shellIx,
   state
 }) => {
 
@@ -103,9 +104,9 @@ const StartModal = ({
   const EXCEEDS_BALANCE = <span style={errorStyles}> This withdrawal exceeds your Shell balance </span>
   const DEFAULT = <span> Your rate for this withdrawal will be... </span>
   
-  const [ inputs, setInputs ] = useState(new List(new Array(engine.assets.length).fill('')))
-  const [ errors, setErrors ] = useState(new List(new Array(engine.assets.length).fill('')))
-  const [ fees, setFees ] = useState(new Array(engine.assets.length).fill(null))
+  const [ inputs, setInputs ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
+  const [ errors, setErrors ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
+  const [ fees, setFees ] = useState(new Array(engine.shells[shellIx].assets.length).fill(null))
   const [ feeTip, setFeeTip ] = useState(DEFAULT)
   const [ proportional, setProportional ] = useState(false)
   const [ zero, setZero ] = useState(true)
@@ -117,7 +118,7 @@ const StartModal = ({
 
     if (proportional) {
       
-      const totalShells = state.getIn([ 'shell', 'shellsOwned', 'raw' ])
+      const totalShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'raw' ])
 
       onProportionalWithdraw(totalShells)
 
@@ -137,7 +138,7 @@ const StartModal = ({
 
     inputs.forEach( (v,i) => {
       if (0 < v) {
-        const asset = engine.assets[i]
+        const asset = engine.shells[shellIx].assets[i]
         addresses.push(asset.address)
         amounts.push(asset.getAllFormatsFromDisplay(v))
       }
@@ -151,7 +152,7 @@ const StartModal = ({
 
     if (event.target.checked) {
 
-      const fee = engine.shell.epsilon.multipliedBy(100).toString()
+      const fee = engine.shells[shellIx].epsilon.multipliedBy(100).toString()
       
       const feeMessage = (
         <div>
@@ -161,16 +162,16 @@ const StartModal = ({
               src={tinyShellIcon} 
               style={{position:'absolute', top:'1px', left: '0px' }} 
             /> 
-            { ' ' + state.getIn([ 'shell', 'shellsOwned', 'display' ]) } 
+            { ' ' + state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) } 
           </span>
           <span> and pay a {fee}% fee to liquidity providers for this withdrawal </span>
         </div>
       )
         
       const updatedInputs = inputs.map( (v, i) => {
-        return engine.shell.getDisplayFromNumeraire(
-          state.getIn(['shell', 'liquiditiesOwned', i, 'numeraire'])
-            .multipliedBy(ONE.minus(engine.shell.epsilon)))
+        return engine.shells[shellIx].getDisplayFromNumeraire(
+          state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesOwned', i, 'numeraire'])
+            .multipliedBy(ONE.minus(engine.shells[shellIx].epsilon)))
       })
 
       setInputs(updatedInputs)
@@ -217,11 +218,11 @@ const StartModal = ({
     
     const totalWithdraw = amounts.reduce( (a, c) => a.plus(c.numeraire), new BigNumber(0) )
     
-    const fees = engine.getFees(addresses, amounts.map( a => {
-      return engine.shell.getAllFormatsFromNumeraire(a.numeraire.negated())
+    const fees = engine.getFees(shellIx, addresses, amounts.map( a => {
+      return engine.shells[shellIx].getAllFormatsFromNumeraire(a.numeraire.negated())
     }))
     
-    const shellsToBurn = await engine.shell.viewSelectiveWithdraw(addresses, amounts)
+    const shellsToBurn = await engine.shells[shellIx].viewSelectiveWithdraw(addresses, amounts)
     
     if (shellsToBurn === false || shellsToBurn.toString() == REVERTED) {
       
@@ -229,7 +230,7 @@ const StartModal = ({
       setFeeTip(null)
       return
 
-    } else if (shellsToBurn.isGreaterThan(state.getIn(['shell', 'shellsOwned', 'numeraire']))) {
+    } else if (shellsToBurn.isGreaterThan(state.getIn(['shells', shellIx, 'shell', 'shellsOwned', 'numeraire']))) {
       
       setError(EXCEEDS_BALANCE)
       setFeeTip(null)
@@ -237,9 +238,9 @@ const StartModal = ({
 
     } 
 
-    const liquidityChange = totalWithdraw.dividedBy(state.getIn(['shell', 'liquidityTotal', 'numeraire']))
+    const liquidityChange = totalWithdraw.dividedBy(state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire']))
 
-    const shellsChange = shellsToBurn.dividedBy(state.getIn(['shell', 'shellsTotal', 'numeraire']))
+    const shellsChange = shellsToBurn.dividedBy(state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire']))
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
     
@@ -267,7 +268,7 @@ const StartModal = ({
         You will burn 
         <span style={{position: 'relative', paddingLeft: '16.5px', paddingRight: '4px' }}> 
           <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '0px' }} /> 
-          { ' ' + engine.shell.getDisplayFromNumeraire(shellsToBurn) }
+          { ' ' + engine.shells[shellIx].getDisplayFromNumeraire(shellsToBurn) }
         </span>
         { slippageMessage }
       </div>
@@ -313,7 +314,7 @@ const StartModal = ({
     }
   }, { name: 'MuiCheckbox' })()
 
-  const tokenInputs = engine.assets.map( (asset, ix) => { 
+  const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => { 
 
     return (
       <TokenInput
@@ -335,10 +336,10 @@ const StartModal = ({
           <StyledRows>
             <StyledShells>
                 <StyledShellIcon src={shellIcon}/>
-                <StyledShellBalance> { state.getIn([ 'shell', 'shellsOwned', 'display' ]) + ' Shells'} </StyledShellBalance>
+                <StyledShellBalance> { state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) + ' Shells'} </StyledShellBalance>
             </StyledShells>
             <StyledWithdrawMessage> { error || feeTip } </StyledWithdrawMessage>
-            { tokenInputs }
+              { tokenInputs }
             <StyledWithdrawEverything>
               <Checkbox 
                 checked={ proportional }
