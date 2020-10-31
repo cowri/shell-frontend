@@ -12,16 +12,19 @@ export default class Engine extends SwapEngine {
     constructor (web3, setState, state) {
 
         super()
+        
+        const self = this
 
         this.state = state
 
         this.web3 = web3
 
         this.setState = setState
-
+        
         this.shells = []
         this.assets = []
         this.derivatives = []
+        this.overlaps = []
         this.pairs = {}
 
         for (const _shell_ of config.shells) {
@@ -49,21 +52,10 @@ export default class Engine extends SwapEngine {
             shell.assetIx = {}
             shell.derivativeIx = {}
 
-            for (const ix in _shell_.assets) {
-                
-                for (let xi = ix + 1; xi < _shell_.assets.length; xi++) {
-                    const _ix = _shell_.assets[ix]
-                    const xi_ = _shell_.assets[xi]
-                    const ixxi = this.pairs[_ix] ? this.pairs[_ix] : {}
-                    const xiix = this.pairs[xi_] ? this.pairs[xi_] : {}
-                    if (!ixxi[xi_]) ixxi[xi_] = []
-                    if (!xiix[_ix]) xiix[_ix] = []
-                    xiix[_ix].push(_shell_.shell)
-                    ixxi[xi_].push(_shell_.shell)
-                }
+            for (let ix = 0; ix < _shell_.assets.length; ix++) {
                 
                 const _asset_ = _shell_.assets[ix]
-
+                
                 const asset = new Asset(
                     this.web3,
                     _asset_.address,
@@ -74,6 +66,7 @@ export default class Engine extends SwapEngine {
                 )
 
                 asset.displayDecimals = _shell_.displayDecimals
+                asset.swapDecimals = _shell_.swapDecimals
                 asset.weight = new BigNumber(_asset_.weight)
                     
                 shell.assetIx[_asset_.address] = ix
@@ -81,22 +74,26 @@ export default class Engine extends SwapEngine {
                 
                 asset.derivatives = []
                 
-                for (const _derivative_ of _asset_.derivatives) {
-
+                for (let dix = 0; dix < _asset_.derivatives.length; dix++) {
+                    
+                    const _derivative_ = _asset_.derivatives[dix]
+                    
                     const derivative = new Asset(
                         this.web3,
-                        _derivative_.address,
-                        _derivative_.name,
-                        _derivative_.symbol,
-                        _derivative_.icon,
-                        _derivative_.decimals
+                        _asset_.derivatives[dix].address,
+                        _asset_.derivatives[dix].name,
+                        _asset_.derivatives[dix].symbol,
+                        _asset_.derivatives[dix].icon,
+                        _asset_.derivatives[dix].decimals
                     )
 
-                    derivative.displayDecimals = config.displayDecimals
+                    derivative.displayDecimals = _shell_.displayDecimals
+                    derivative.swapDecimals = _shell_.swapDecimals
+
                     
                     asset.derivatives.push(derivative)
 
-                    shell.derivativeIx[_derivative_.address] = shell.derivatives.length
+                    shell.derivativeIx[asset.derivatives[dix].address] = shell.derivatives.length
                     
                 }
 
@@ -104,11 +101,58 @@ export default class Engine extends SwapEngine {
                 shell.assets.push(asset)
                 shell.derivatives.push(asset)
                 shell.derivatives = shell.derivatives.concat(asset.derivatives)
+                this.assets.push(asset)
+                this.derivatives.push(asset)
+                this.derivatives = this.derivatives.concat(asset.derivatives)
 
+
+            }
+            
+            this.overlaps[this.shells.length] = []
+
+            for (let ix = 0; ix < _shell_.assets.length; ix++) {
+                this.overlaps[this.shells.length].push(_shell_.assets[ix].symbol)
+                for (let xi = ix + 1; xi < _shell_.assets.length; xi++) {
+                    setPair(
+                        this.shells.length, 
+                        _shell_.assets[ix].address,
+                        _shell_.assets[xi].address
+                    )
+                    for (let dix = 0; dix < _shell_.assets[ix].derivatives.length; dix++) {
+                        this.overlaps[this.shells.length].push(_shell_.assets[ix].derivatives[dix].symbol)
+                        for (let xid = 0; xid < _shell_.assets[xi].derivatives.length; xid++) {
+                            setPair(
+                                this.shells.length, 
+                                _shell_.assets[ix].address, 
+                                _shell_.assets[xi].derivatives[xid].address
+                            )
+                            setPair(
+                                this.shells.length, 
+                                _shell_.assets[ix].derivatives[dix].address,
+                                _shell_.assets[xi].derivatives[xid].address
+                            )
+                        }
+                    }
+                }
             }
 
             this.shells.push(shell)
 
+        }
+
+        function filter (x) { if (!this.has(x.symbol)) { this.add(x.symbol); return true } else return false }
+        this.assets = this.assets.filter(filter, new Set())
+        this.derivatives = this.derivatives.filter(filter, new Set())
+        
+        function setPair (s, _x, y_) {
+            const x = self.pairs[_x] ? self.pairs[_x] : {}
+            const y = self.pairs[y_] ? self.pairs[y_] : {}
+            if (!x[y_]) x[y_] = []
+            if (!y[_x]) y[_x] = []
+            x[y_].push(s)
+            y[_x].push(s)
+            self.pairs[_x] = x
+            self.pairs[y_] = y
         }
 
     }
@@ -226,16 +270,35 @@ export default class Engine extends SwapEngine {
         this.account = account
 
         const shells = []
+        let assets = []
+        let assetsPlusDerivatives = []
 
         for (const _shell_ of this.shells) {
+            
+            const shell = await this.readShell(_shell_)
+            
+            assets = assets.concat(shell.assets)
+            assetsPlusDerivatives = assetsPlusDerivatives.concat(shell.assets.flatMap( asset => [ asset ].concat(asset.derivatives) ) )
 
-            shells.push(await this.readShell(_shell_))
+            shells.push(shell)
 
         }
-
+        
+        function filter (asset) {
+            if (!this.has(asset.icon)) {
+                this.add(asset.icon)
+                return true
+            } else return false
+        }
+        
+        assets = assets.filter(filter, new Set())
+        assetsPlusDerivatives = assetsPlusDerivatives.filter(filter, new Set())
+        
         this.state = fromJS({
             account,
-            shells
+            shells,
+            assets,
+            assetsPlusDerivatives
         })
 
         this.setState(this.state)

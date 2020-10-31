@@ -110,30 +110,31 @@ const SwapTab = () => {
 
   const [step, setStep] = useState('start')
   const [originIx, setOriginIx] = useState(0)
-  const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
+  const [targetIx, setTargetIx] = useState(1)
   const [originValue, setOriginValue] = useState('')
   const [targetValue, setTargetValue] = useState('')
+  const [shellIx, setShellIx] = useState(null)
+  const [shellDerivativeIx, setShellDerivativeIx] = useState(null)
   const [swapType, setSwapType] = useState('origin')
   const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
   
-  const iterator = shell => shell.assets.flatMap( asset => [ asset ].concat(asset.derivatives) )
-  const [coins, setCoins] = useState(engine.shells.flatMap(iterator))
-  
-  const origin = coins[originIx]
-  const target = coins[targetIx]
+  const origin = engine.assets[originIx]
+  const target = engine.assets[targetIx]
 
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
 
-  const initiallyLocked = state.getIn(['derivatives', originIx, 'allowance', 'raw']) == 0
+  const initiallyLocked = state.getIn(['assets', originIx, 'allowance', 'raw']) == 0
   const [unlocked, setUnlocked] = useState(false)
 
   useEffect(() => {
 
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
-
+      
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return 
 
     }
@@ -143,6 +144,8 @@ const SwapTab = () => {
       setTargetValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return
 
     }
@@ -152,6 +155,8 @@ const SwapTab = () => {
       setOriginValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return
 
     }
@@ -160,16 +165,25 @@ const SwapTab = () => {
 
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return
 
     }
 
     ;(async function () { 
       try {
+        
+        const method = swapType == 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
 
-        const { originAmount, targetAmount } = await engine.viewOriginSwap(
-          origin.address, 
-          target.address, 
+        const { 
+          originAmount,
+          targetAmount,
+          shellIx,
+          shellDerivativeIx
+        } = await engine[method](
+          origin, 
+          target, 
           swapType == 'origin' ? originValue : targetValue
         )
         
@@ -178,14 +192,18 @@ const SwapTab = () => {
           : setOriginValue(originAmount.display)
           
         setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
+        setShellIx(shellIx)
+        setShellDerivativeIx(shellDerivativeIx)
 
-      } catch {
+      } catch (e) {
         
         swapType == 'origin'
           ? setTargetValue('')
           : setOriginValue('')
         
         setHaltIndication()
+        setShellIx(null)
+        setShellDerivativeIx(null)
 
       }
     })()
@@ -206,8 +224,8 @@ const SwapTab = () => {
 
     const tPrice = targetAmount.dividedBy(originAmount).toFixed(4)
 
-    const oSymbol = coins[originIx].symbol
-    const tSymbol = coins[targetIx].symbol
+    const oSymbol = engine.assets[originIx].symbol
+    const tSymbol = engine.assets[targetIx].symbol
 
     let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
       ? <span> <span> 1.00 </span> of { oSymbol } is worth </span>
@@ -227,10 +245,10 @@ const SwapTab = () => {
     e.preventDefault()
 
     setStep('confirming')
+    
+    let method = swapType === 'origin' ? 'executeOriginSwap' : 'executeTargetSwap'
 
-    let tx = swapType === 'origin'
-      ? engine.executeOriginSwap(originIx, targetIx, originValue, targetValue)
-      : engine.executeTargetSwap(originIx, targetIx, originValue, targetValue)
+    let tx = engine[method](shellIx, origin, target, originValue, targetValue)
 
     tx.send({ from: state.get('account') })
       .once('transactionHash', handleTransactionHash)
@@ -253,16 +271,20 @@ const SwapTab = () => {
       swapType === 'origin' 
         ? setOriginValue('') 
         : setTargetValue('')
-        
+
       setPriceMessage(DEFAULT_MSG)
       setStep('success')
+      setShellIx(null)
       engine.sync()
 
     }
 
     function handleError (e) {
       
-      if (!success) setStep('error')
+      if (!success) {
+        setStep('error')
+        setShellIx(null)
+      }
 
     }
 
@@ -273,7 +295,7 @@ const SwapTab = () => {
     setStep('confirming')
 
     const tx = origin.approve(
-      engine.shell.address,
+      engine.shells[shellIx].address,
       amount.toString()
     )
 
@@ -309,7 +331,7 @@ const SwapTab = () => {
   
   const _handleOriginSelect = v => {
     
-    const allowance = state.getIn(['derivatives', v, 'allowance', 'raw'])
+    const allowance = state.getIn(['assets', v, 'allowance', 'raw'])
 
     setUnlocked(allowance != 0)
 
@@ -348,7 +370,7 @@ const SwapTab = () => {
     root: { 'fontFamily': 'Geomanist', 'fontSize': '17.5px' }
   })()
 
-  const selections = coins.map( (asset, ix) => {
+  const selections = engine.assets.map( (asset, ix) => {
 
       return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
       
@@ -387,15 +409,39 @@ const SwapTab = () => {
     }
   })()
   
-  let allowance = state.getIn(['derivatives', originIx, 'allowance', 'numeraire'])
+  let allowance
   
-  if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
-    allowance = '100,000,000+'
-  } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
-    allowance = allowance.toExponential()
-  } else {
-    allowance = state.getIn(['derivatives', originIx, 'allowance', 'display'])
+  if (shellIx != null && shellDerivativeIx != null) {
+
+    allowance = state.getIn([
+      'shells', 
+      shellIx,
+      'derivatives',
+      shellDerivativeIx, 
+      'allowance', 
+      'numeraire'
+    ])
+    
+    console.log("ALLOWANCE", allowance, allowance.toString())
+    
+    if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
+      allowance = '100,000,000+'
+    } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
+      allowance = allowance.toExponential()
+    } else {
+      allowance = state.getIn([
+        'shells', 
+        shellIx, 
+        'derivatives',
+        shellDerivativeIx,
+        'allowance', 
+        'display'
+      ])
+    }
+
   }
+    
+  
   
   const unlockOrigin = () => setStep('unlocking')
     
@@ -404,7 +450,7 @@ const SwapTab = () => {
     <StyledSwapTab>
 
       { step === 'unlocking' && <ModalUnlock 
-          coin={state.getIn(['derivatives', originIx])} 
+          coin={state.getIn(['assets', originIx])} 
           handleUnlock={handleUnlock} 
           handleCancel={ () => setStep('none') } 
         /> }
