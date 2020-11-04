@@ -92,7 +92,7 @@ const Weight = styled.span`
 `
 
 const ShellsTab = ({showShell}) => {
-  
+
   const {
     presentShell,
     engine,
@@ -107,10 +107,11 @@ const ShellsTab = ({showShell}) => {
       let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
 
       rows.push(
-        <ShellRow 
-          showShell={() => showShell(i)} 
-          assets={engine.shells[i].assets} 
+        <ShellRow
+          showShell={() => showShell(i)}
+          assets={engine.shells[i].assets}
           liqTotal={liqTotal}
+          apy={engine.shells[i].apy}
         />
       )
 
@@ -131,7 +132,7 @@ const ShellsTab = ({showShell}) => {
   )
 }
 
-const ShellRow = ({showShell, liqTotal, assets}) => {
+const ShellRow = ({showShell, liqTotal, assets, apy}) => {
 
   const useHover = () => {
     const [hovered, setHovered] = useState()
@@ -151,7 +152,7 @@ const ShellRow = ({showShell, liqTotal, assets}) => {
     const parts = assets.map( (a,i) => {
 
       if (i == assets.length - 1) {
-        
+
         return (
           <ShellNamePartLast>
             <Symbol moused={hovered}>
@@ -192,7 +193,7 @@ const ShellRow = ({showShell, liqTotal, assets}) => {
     <Row onClick={showShell} {...handlers} style={{cursor:'pointer'}}>
       {name}
       <StyledBalance className="number" moused={hovered}> { liqTotal } </StyledBalance>
-      <StyledBalance className="number" moused={hovered}> 100% </StyledBalance>
+      <StyledBalance className="number" moused={hovered}> {apy} </StyledBalance>
     </Row>
   )
 
