@@ -16,7 +16,7 @@ const MAX_APPROVAL = '1157920892373161954235709850086879078532699846656405640394
 
 const ZERO = new BigNumber(0)
 
-const Deposit = ({ onDismiss }) => {
+const Deposit = ({ shellIx, onDismiss }) => {
   const { 
     engine,
     state
@@ -25,7 +25,7 @@ const Deposit = ({ onDismiss }) => {
   const [txHash, setTxHash] = useState('')
   const [step, setStep] = useState('start')
   const [localState, setLocalState] = useState(fromJS({
-    assets: new Array(engine.assets.length).fill({
+    assets: new Array(engine.shells[shellIx].assets.length).fill({
       error: '',
       input: ''
     }),
@@ -42,6 +42,7 @@ const Deposit = ({ onDismiss }) => {
     let success = false
 
     engine.selectiveDeposit(
+      shellIx,
       addresses,
       amounts,
       function onTxHash (hash) {
@@ -74,6 +75,7 @@ const Deposit = ({ onDismiss }) => {
     setStep('confirming')
 
     engine.unlock(
+      shellIx,
       index,
       amount.toString(),
       function onTxHash (hash) {
@@ -108,6 +110,7 @@ const Deposit = ({ onDismiss }) => {
           onUnlock={handleUnlock}
           onDismiss={onDismiss}
           setLocalState={setLocalState}
+          shellIx={shellIx}
           state={state}
         /> }
 

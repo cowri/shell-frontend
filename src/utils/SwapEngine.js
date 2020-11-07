@@ -6,113 +6,132 @@ const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534
 
 export default class SwapEngine {
 
-    async viewOriginSwap (originIndex, targetIndex, originAmount) {
+    async viewOriginSwap (origin, target, originAmount) {
         
-        let origin = this.derivatives[originIndex]
-        let target = this.derivatives[targetIndex]
-
-        let targetAmount = await this.shell.viewOriginSwap(
-            origin.address,
-            target.address,
-            origin.getRawFromDisplay(originAmount).toFixed()
-        )
+        let shells = this.pairsToShells[origin.address][target.address]
         
-        if (!targetAmount || targetAmount.toString() == REVERTED) {
-
-            throw(new Error("Reverted"))
-
-        } else {
-            
-            return {
-                originAmount: {
-                    numeraire: origin.getNumeraireFromDisplay(originAmount),
-                    display: originAmount,
-                    raw: origin.getRawFromDisplay(originAmount)
-                },
-                targetAmount: {
-                    numeraire: target.getNumeraireFromRaw(targetAmount),
-                    display: target.getDisplayFromRaw(targetAmount, this.shell.swapDecimals),
-                    raw: targetAmount
-                }
+        let quotes = await Promise.all(shells.map( async (ix) => {
+            return await this.shells[ix].viewOriginSwap(
+                origin.address,
+                target.address,
+                origin.getRawFromDisplay(originAmount).integerValue().toFixed()
+            )
+        }))
+        
+        let shellIx
+        let shellDerivativeIx
+        let max = new BigNumber(0)
+        
+        for (let i = 0; i < shells.length; i++) {
+            if (!quotes[i] || quotes[i].toString() == REVERTED) continue
+            if (quotes[i].isGreaterThan(max)){
+                max = quotes[i]
+                shellIx = shells[i]
             }
+        }
+        
+        if (shellIx == undefined) { throw( new Error("reverted")) }
+        
+        for (let i = 0; i < this.shells[shellIx].derivatives.length; i++) {
+            if (this.shells[shellIx].derivatives[i].address == origin.address) {
+                shellDerivativeIx = i
+                break
+            }
+        }
+        
+        return {
+            originAmount: {
+                numeraire: origin.getNumeraireFromDisplay(originAmount),
+                display: originAmount,
+                raw: origin.getRawFromDisplay(originAmount)
+            },
+            targetAmount: {
+                numeraire: target.getNumeraireFromRaw(max),
+                display: target.getDisplayFromRaw(max, target.swapDecimals),
+                raw: max
+            },
+            shellIx: shellIx,
+            shellDerivativeIx: shellDerivativeIx
+        }
+        
+    }
 
+    async viewTargetSwap (origin, target, targetAmount) {
+        
+        let shells = this.pairsToShells[origin.address][target.address]
+        
+        let quotes = await Promise.all(shells.map( async (ix) => {
+            return await this.shells[ix].viewTargetSwap(
+                origin.address,
+                target.address,
+                target.getRawFromDisplay(targetAmount).integerValue().toFixed()
+            )
+        }))
+
+        let shell
+        let min = new BigNumber(1e80)
+        
+        for (let i = 0; i < shells.length; i++) {
+            if (!quotes[i] || quotes[i].toString() == REVERTED) continue
+            if (quotes[i].isLessThan(min)){
+                min = quotes[i]
+                shell = shells[i]
+            }
+        }
+
+        if (shell == undefined) throw( new Error("reverted"))
+        
+        return {
+            originAmount: {
+                display: origin.getDisplayFromRaw(min, origin.swapDecimals),
+                numeraire: origin.getNumeraireFromRaw(min),
+                raw: min
+            },
+            targetAmount: {
+                numeraire: target.getNumeraireFromDisplay(targetAmount),
+                raw: target.getRawFromDisplay(targetAmount),
+                display: targetAmount
+            },
+            shellIx: shell
         }
 
     }
 
-    async viewTargetSwap (originIndex, targetIndex, targetAmount) {
-
-        let origin = this.derivatives[originIndex]
-        let target = this.derivatives[targetIndex]
-
-        let originAmount = await this.shell.viewTargetSwap(
-            origin.address,
-            target.address,
-            target.getRawFromDisplay(targetAmount).toFixed()
-        )
+    executeOriginSwap (shellIx, origin, target, originAmount, minTargetAmount) {
         
-        if (!originAmount || originAmount.toString() == REVERTED) {
-            
-            throw(new Error("Reverted"))
+        originAmount = origin.getRawFromDisplay(originAmount)
 
-        } else {
-
-            return {
-                originAmount: {
-                    display: origin.getDisplayFromRaw(originAmount, this.shell.swapDecimals),
-                    numeraire: origin.getNumeraireFromRaw(originAmount),
-                    raw: originAmount
-                },
-                targetAmount: {
-                    numeraire: target.getNumeraireFromDisplay(targetAmount),
-                    raw: target.getRawFromDisplay(targetAmount),
-                    display: targetAmount
-                }
-            }
-
-        }
-
-    }
-
-    executeOriginSwap (originIndex, targetIndex, originAmount, minTargetAmount) {
-
-        let origin = this.derivatives[originIndex]
-        let target = this.derivatives[targetIndex]
-
-        originAmount = origin.getAllFormatsFromDisplay(originAmount)
-
-        let minTarget = target.getNumeraireFromDisplay(minTargetAmount)
-
+        let minTarget = target.getRawFromDisplay(minTargetAmount)
+        
         minTarget = minTarget.multipliedBy(new BigNumber(.99))
 
         let deadline = Math.floor(Date.now() /1000 + 900)
 
-        return this.shell.originSwap(
+        return this.shells[shellIx].originSwap(
             origin.address,
             target.address,
-            originAmount.raw.toFixed(),
-            target.getRawFromNumeraire(minTarget).toFormat(0),
+            originAmount.integerValue().toFixed(),
+            minTarget.integerValue().toFixed(),
             deadline
         )
 
     }
 
-    executeTargetSwap (originIndex, targetIndex, maxOriginAmount, targetAmount) {
+    executeTargetSwap (shellIx, origin, target, maxOriginAmount, targetAmount) {
 
-        let origin = this.derivatives[originIndex]
-        let target = this.derivatives[targetIndex]
+        targetAmount = target.getRawFromDisplay(targetAmount)
 
-        targetAmount = target.getAllFormatsFromDisplay(targetAmount)
+        let maxOrigin =  origin.getRawFromDisplay(maxOriginAmount)
 
-        let maxOrigin =  origin.getNumeraireFromDisplay(maxOriginAmount).multipliedBy(new BigNumber(1.01))
+        maxOrigin = maxOrigin.multipliedBy(new BigNumber(1.01))
 
         let deadline = Math.floor(Date.now() / 1000 + 900)
 
-        return this.shell.targetSwap(
+        return this.shells[shellIx].targetSwap(
             origin.address,
             target.address,
-            origin.getRawFromNumeraire(maxOrigin).toFormat(0),
-            targetAmount.raw.toFixed(),
+            maxOrigin.integerValue().toFixed(),
+            targetAmount.integerValue().toFixed(),
             deadline
         )
         

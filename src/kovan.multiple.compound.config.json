@@ -1,0 +1,179 @@
+{
+  "defaultWeb3Provider": "kovan.infura.io/v3/23656e31a1a34049bc03807c64bcd017",
+  "infuraKey": "23656e31a1a34049bc03807c64bcd017",
+  "blocknative": "9bb42eeb-6448-414d-94ee-6f91b875fd2d",
+  "network": 42,
+  "shells": [ 
+    {
+      "shell": "0x570486348ac0d48995464c28e4c4d756288ccdd5",
+      "name": "30% Dai 30% USDt 30% USDc 10% sUSD",
+      "displayDecimals": 2,
+      "swapDecimals": 2,
+      "assets": [
+        { 
+          "address": "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", 
+          "decimals": 18,
+          "icon": "dai.svg",
+          "name": "MultiCollateral Dai",
+          "symbol": "DAI",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [ 
+            {
+              "address": "0xf0d0eb522cfa50b716b3b1604c4f0fa6f04376ad",
+              "decimals": 8,
+              "icon": "cdai.svg",
+              "name": "Compound Dai",
+              "symbol": "cDAI",
+              "type": "cERC20"
+            }
+          ]
+        },
+        { 
+          "address": "0xb7a4F3E9097C08dA09517b5aB877F7a917224ede", 
+          "decimals": 6,
+          "icon": "usdc.svg",
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [
+            {
+              "address": "0x4a92e71227d294f041bd82dd8f78591b75140d63", 
+              "decimals": 8,
+              "icon": "cusdc.svg",
+              "name": "Compound USD Coin",
+              "symbol": "cUSDC",
+              "type": "cERC20"
+            }
+          ]
+        },
+        { 
+          "address": "0x07de306FF27a2B630B1141956844eB1552B956B5", 
+          "decimals": 6,
+          "icon": "usdt.svg",
+          "name": "Tether Stablecoin",
+          "symbol": "USDT",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [
+            {
+              "address": "0x3f0a0ea2f86bae6362cf9799b523ba06647da018",
+              "decimals": 8,
+              "icon": "cusdt.svg",
+              "name": "Compound USDT",
+              "symbol": "cUSDT",
+              "type": "cERC20"
+            }
+          ]
+        },
+        { 
+          "address": "0xD868790F57B39C9B2B51b12de046975f986675f9", 
+          "decimals": 6,
+          "icon": "susd.svg",
+          "name": "Synthetix USD",
+          "symbol": "SUSD",
+          "type": "ERC20",
+          "weight": ".1",
+          "derivatives": [
+            {
+              "address": "0xb9c1434aB6d5811D1D0E92E8266A37Ae8328e901",
+              "decimals": 6,
+              "icon": "asusd.svg",
+              "name": "Aave Interest Bearing sUSD",
+              "symbol": "aSUSD",
+              "type": "aERC20"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "alpha": ".9",
+        "beta": ".75",
+        "delta": ".5",
+        "epsilon": ".00035",
+        "lambda": ".9"
+      }
+    },
+    {
+      "shell": "0xd23843013EEE74f80e38aC508bac697700a274A5",
+      "name": "70% wBTC 30% renBTC",
+      "displayDecimals": 4,
+      "swapDecimals": 8,
+      "assets": [
+        { 
+          "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
+          "decimals": 8,
+          "icon": "wbtc.svg",
+          "name": "Wrapped BTC",
+          "symbol": "wBTC",
+          "type": "ERC20",
+          "weight": ".7",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xba9d8223398C61cef238b94102507501EFBF2d3E", 
+          "decimals": 8,
+          "icon": "renbtc.svg",
+          "name": "renBTC",
+          "symbol": "renBTC",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".9",
+        "beta": ".6",
+        "delta": ".1",
+        "epsilon": ".00035",
+        "lambda": "1"
+      }
+    },
+    {
+      "shell": "0xf1d6e35501a27618d3ac0174db7e310e211d50e6",
+      "name": "50% wBTC 40% renBTC 10% sBTC",
+      "displayDecimals": 4,
+      "swapDecimals": 8,
+      "assets": [
+        { 
+          "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
+          "decimals": 8,
+          "icon": "wbtc.svg",
+          "name": "Wrapped BTC",
+          "symbol": "wBTC",
+          "type": "ERC20",
+          "weight": ".5",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xba9d8223398C61cef238b94102507501EFBF2d3E", 
+          "decimals": 8,
+          "icon": "renbtc.svg",
+          "name": "renBTC",
+          "symbol": "renBTC",
+          "type": "ERC20",
+          "weight": ".4",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xCE18d20A5EAE16573AD8bed2a07e2E76Fee5a3dA", 
+          "decimals": 18,
+          "icon": "sbtc.svg",
+          "name": "Synth sBTC",
+          "symbol": "sBTC",
+          "type": "ERC20",
+          "weight": ".1",
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".9",
+        "beta": ".6",
+        "delta": ".1",
+        "epsilon": ".00035",
+        "lambda": "1"
+      }
+    } 
+  ]
+}

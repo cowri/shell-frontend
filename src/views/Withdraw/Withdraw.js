@@ -11,9 +11,7 @@ import ModalError from '../../components/ModalError'
 import StartModal from './components/StartModal'
 import ModalSuccess from '../../components/ModalSuccess'
 
-const Withdraw = ({
-  onDismiss
-}) => {
+const Withdraw = ({ shellIx, onDismiss }) => {
   const { 
     engine,
     state
@@ -22,7 +20,7 @@ const Withdraw = ({
   const [txHash, setTxHash] = useState('')
   const [step, setStep] = useState('start')
   const [localState, setLocalState] = useState(fromJS({
-    assets: new Array(engine.assets.length).fill({
+    assets: new Array(engine.shells[shellIx].assets.length).fill({
       error: '',
       input: ''
     }),
@@ -45,6 +43,7 @@ const Withdraw = ({
     setStep('confirmingMetamask')
 
     engine.proportionalWithdraw(
+      shellIx,
       amount,
       handleTxHash,
       handleConfirmation,
@@ -58,6 +57,7 @@ const Withdraw = ({
     setStep('confirmingMetamask')
 
     engine.selectiveWithdraw(
+      shellIx,
       addresses,
       amounts,
       handleTxHash,
@@ -66,7 +66,7 @@ const Withdraw = ({
     )
 
   }
-
+  
   return (
     <>
       {step === 'start' && (
@@ -77,6 +77,7 @@ const Withdraw = ({
           onProportionalWithdraw={handleProportionalWithdraw}
           onWithdraw={handleWithdraw}
           setLocalState={setLocalState}
+          shellIx={shellIx}
           state={state}
         />
       )}
@@ -86,15 +87,25 @@ const Withdraw = ({
       )}
 
       {step === 'withdrawing' && (
-        <WithdrawingModal />
+        <WithdrawingModal txHash={txHash} />
       )}
 
       {step === 'success' && (
-        <ModalSuccess buttonBlurb={'Finish'} onDismiss={onDismiss} title={'Withdrawal Successful.'} />
+        <ModalSuccess 
+          buttonBlurb={'Finish'} 
+          onDismiss={onDismiss} 
+          title={'Withdrawal Successful.'} 
+          txHash={txHash}
+        />
       )}
 
       {step === 'error' && (
-        <ModalError buttonBlurb={'Finish'} onDismiss={onDismiss} title={'An error occurred.'} />
+        <ModalError 
+          buttonBlurb={'Finish'} 
+          onDismiss={onDismiss} 
+          title={'An error occurred.'} 
+          txHash={txHash}
+        />
       )}
 
     </>

@@ -82,7 +82,6 @@ const ModalUnlock = ({
           inputMode={ "numeric" }
           inputProps={{style: { fontSize: '22px', textAlign: 'center' } } }
           customInput={TextField}
-          prefix={'$'}
           type="text"
           thousandSeparator={true}
           onValueChange={ payload => setAmount(payload.value) }

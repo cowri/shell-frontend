@@ -1,9 +1,11 @@
+import React from 'react'
 import { fromJS, List, Map  } from "immutable"
-import config from "../mainnet.one.dai.usdc.usdt.susd.config"
+import config from "../mainnet.multiple.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
 import BigNumber from "bignumber.js"
+import { CircularProgress } from '@material-ui/core'
 
 import shellIcon from "../assets/logo.png"
 
@@ -13,81 +15,196 @@ export default class Engine extends SwapEngine {
 
         super()
 
+        const self = this
+
         this.state = state
 
         this.web3 = web3
 
         this.setState = setState
 
-        this.shell = new Shell(
-            this.web3,
-            config.shell,
-            "Shell Protocol",
-            "SHL",
-            shellIcon,
-            18
-        )
-
-        this.shell.displayDecimals = config.displayDecimals
-        this.shell.swapDecimals = config.swapDecimals
-        this.shell.alpha = new BigNumber(config.params.alpha)
-        this.shell.beta = new BigNumber(config.params.beta)
-        this.shell.delta = new BigNumber(config.params.delta)
-        this.shell.epsilon = new BigNumber(config.params.epsilon)
-        this.shell.lambda = new BigNumber(config.params.lambda)
-
-        this.shell.weights = []
-        
+        this.shells = []
         this.assets = []
         this.derivatives = []
-        this.assetIx = {}
-        this.derivativeIx = {}
+        this.overlaps = {}
+        this.pairsToShells = {}
 
-        for (const ix in config.assets) {
-            
-            const _asset_ = config.assets[ix]
-            
-            this.shell.weights.push(new BigNumber(_asset_.weight))
+        for (const _shell_ of config.shells) {
 
-            const asset = new Asset(
+            const shell = new Shell(
                 this.web3,
-                _asset_.address,
-                _asset_.name,
-                _asset_.symbol,
-                _asset_.icon,
-                _asset_.decimals
+                _shell_.shell,
+                "Shell Protocol",
+                "SHL",
+                shellIcon,
+                18
             )
 
-            asset.displayDecimals = config.displayDecimals
-                
-            this.assetIx[_asset_.address] = ix
-            this.derivativeIx[_asset_.address] = this.derivatives.length
-            
-            asset.derivatives = []
-            
-            for (const _derivative_ of _asset_.derivatives) {
+            shell.displayDecimals = _shell_.displayDecimals
+            shell.swapDecimals = _shell_.swapDecimals
+            shell.alpha = new BigNumber(_shell_.alpha)
+            shell.beta = new BigNumber(_shell_.beta)
+            shell.delta = new BigNumber(_shell_.delta)
+            shell.epsilon = new BigNumber(_shell_.epsilon)
+            shell.lambda = new BigNumber(_shell_.lambda)
 
-                const derivative = new Asset(
+            shell.weights = []
+            shell.assets = []
+            shell.derivatives = []
+            shell.assetIx = {}
+            shell.derivativeIx = {}
+
+            for (let ix = 0; ix < _shell_.assets.length; ix++) {
+
+                const _asset_ = _shell_.assets[ix]
+
+                const asset = new Asset(
                     this.web3,
-                    _derivative_.address,
-                    _derivative_.name,
-                    _derivative_.symbol,
-                    _derivative_.icon,
-                    _derivative_.decimals
+                    _asset_.address,
+                    _asset_.name,
+                    _asset_.symbol,
+                    _asset_.icon,
+                    _asset_.decimals
                 )
 
-                derivative.displayDecimals = config.displayDecimals
-                
-                this.derivativeIx[_derivative_.address] = this.derivatives.length
-                
-                asset.derivatives.push(derivative)
-                
-            }
-            
-            this.assets.push(asset)
-            this.derivatives.push(asset)
-            this.derivatives = this.derivatives.concat(asset.derivatives)
+                asset.displayDecimals = _shell_.displayDecimals
+                asset.swapDecimals = _shell_.swapDecimals
+                asset.weight = new BigNumber(_asset_.weight)
 
+                shell.assetIx[_asset_.address] = ix
+                shell.derivativeIx[_asset_.address] = shell.derivatives.length
+
+                asset.derivatives = []
+
+                for (let dix = 0; dix < _asset_.derivatives.length; dix++) {
+
+                    const derivative = new Asset(
+                        this.web3,
+                        _asset_.derivatives[dix].address,
+                        _asset_.derivatives[dix].name,
+                        _asset_.derivatives[dix].symbol,
+                        _asset_.derivatives[dix].icon,
+                        _asset_.derivatives[dix].decimals
+                    )
+
+                    derivative.displayDecimals = _shell_.displayDecimals
+                    derivative.swapDecimals = _shell_.swapDecimals
+
+                    asset.derivatives.push(derivative)
+
+                    shell.derivativeIx[asset.derivatives[dix].address] = shell.derivatives.length
+
+                }
+
+                shell.weights.push(asset.weight)
+                shell.assets.push(asset)
+                shell.derivatives.push(asset)
+                shell.derivatives = shell.derivatives.concat(asset.derivatives)
+                this.assets.push(asset)
+                this.derivatives.push(asset)
+                this.derivatives = this.derivatives.concat(asset.derivatives)
+
+
+            }
+
+            for (let ix = 0; ix < _shell_.assets.length; ix++) {
+                const _symbol = _shell_.assets[ix].symbol
+                for (let xi = ix + 1; xi < _shell_.assets.length; xi++) {
+                    setOverlap(
+                        _shell_.assets[ix].symbol,
+                        _shell_.assets[xi].symbol,
+                    )
+                    setPair(
+                        this.shells.length,
+                        _shell_.assets[ix].address,
+                        _shell_.assets[xi].address
+                    )
+                    for (let dix = 0; dix < _shell_.assets[ix].derivatives.length; dix++) {
+                        setOverlap(
+                            _shell_.assets[ix].symbol, 
+                            _shell_.assets[ix].derivatives[dix].symbol
+                        )
+                        setPair(
+                            this.shells.length,
+                            _shell_.assets[ix].address, 
+                            _shell_.assets[ix].derivatives[dix].address
+                        )
+                        for (let dixid = dix + 1; dixid < _shell_.assets[ix].derivatives.length; dixid++){
+                            setOverlap(
+                                _shell_.assets[ix].derivatives[dix].symbol, 
+                                _shell_.assets[ix].derivatives[dixid].symbol
+                            )
+                            setPair(
+                                this.shells.length,
+                                _shell_.assets[ix].derivatives[dix].address, 
+                                _shell_.assets[ix].derivatives[dixid].address
+                            )
+                        }
+                        for (let xid = 0; xid < _shell_.assets[xi].derivatives.length; xid++) {
+                            setOverlap(
+                                _shell_.assets[ix].symbol,
+                                _shell_.assets[xi].derivatives[xid].symbol
+                            )
+                            setOverlap(
+                                _shell_.assets[ix].derivatives[dix].symbol,
+                                _shell_.assets[xi].derivatives[xid].symbol
+                            )
+                            setOverlap(
+                                _shell_.assets[xi].symbol, 
+                                _shell_.assets[ix].derivatives[dix].symbol
+                            )
+                            setPair(
+                                this.shells.length,
+                                _shell_.assets[xi].address,
+                                _shell_.assets[ix].derivatives[dix].address
+                            )
+                            setPair(
+                                this.shells.length,
+                                _shell_.assets[ix].address,
+                                _shell_.assets[xi].derivatives[xid].address
+                            )
+                            setPair(
+                                this.shells.length,
+                                _shell_.assets[ix].derivatives[dix].address,
+                                _shell_.assets[xi].derivatives[xid].address
+                            )
+                        }
+                    }
+                }
+            }
+
+            shell.apy = <CircularProgress />
+
+            this.getAPY(_shell_.shell).then(result => {
+                shell.apy = result
+            })
+
+            this.shells.push(shell)
+
+        }
+
+        function filter (x) { if (!this.has(x.symbol)) { this.add(x.symbol); return true } else return false }
+        this.assets = this.assets.filter(filter, new Set())
+        this.derivatives = this.derivatives.filter(filter, new Set())
+
+        function setOverlap (left, right) {
+            const ltr = self.overlaps[left] ? self.overlaps[left] : [ ]
+            const rtl = self.overlaps[right] ? self.overlaps[right] : [ ]
+            if (ltr.indexOf(right) == -1) ltr.push(right)
+            if (rtl.indexOf(left) == -1) rtl.push(left)
+            self.overlaps[left] = ltr
+            self.overlaps[right] = rtl
+        }
+
+        function setPair (s, _x, y_) {
+            const x = self.pairsToShells[_x] ? self.pairsToShells[_x] : {}
+            const y = self.pairsToShells[y_] ? self.pairsToShells[y_] : {}
+            if (!x[y_]) x[y_] = []
+            if (!y[_x]) y[_x] = []
+            x[y_].push(s)
+            y[_x].push(s)
+            self.pairsToShells[_x] = x
+            self.pairsToShells[y_] = y
         }
 
     }
@@ -97,81 +214,89 @@ export default class Engine extends SwapEngine {
         this.setState(this.state.set('network', network))
 
     }
-    
-    getFees (addrs, amts) {
-        
-        let prevLiq = this.state.getIn(['shell', 'liquidityTotal']).toObject()
-        let prevLiqs = this.state.getIn(['shell', 'liquiditiesTotal']).toJS()
-        
+
+    getFees (shellIx, addrs, amts) {
+
+        let prevLiq = this.state.getIn(['shells', shellIx, 'shell', 'liquidityTotal']).toObject()
+        let prevLiqs = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal']).toJS()
+
         let nextLiq = prevLiq
         let nextLiqs = prevLiqs
-        
+
         for (let i = 0; i < addrs.length; i++) {
 
-            let di = this.assetIx[addrs[i]]
+            let di = this.shells[shellIx].assetIx[addrs[i]]
 
-            nextLiqs[di] = this.shell.getAllFormatsFromNumeraire(
+            nextLiqs[di] = this.shells[shellIx].getAllFormatsFromNumeraire(
                 nextLiqs[di].numeraire.plus(amts[i].numeraire))
-            
-            nextLiq = this.shell.getAllFormatsFromNumeraire(
+
+            nextLiq = this.shells[shellIx].getAllFormatsFromNumeraire(
                 nextLiq.numeraire.plus(amts[i].numeraire))
-            
+
         }
-        
-        const [ _nothing, nothing_, prevFees ] = this.shell.calculateUtilities(prevLiq, prevLiqs)
-        const [ _empty, empty_, nextFees ] = this.shell.calculateUtilities(nextLiq, nextLiqs)
-        
+
+        const [ _nothing, nothing_, prevFees ] = this.shells[shellIx].calculateUtilities(prevLiq, prevLiqs)
+        const [ _empty, empty_, nextFees ] = this.shells[shellIx].calculateUtilities(nextLiq, nextLiqs)
+
         const fees = []
-        
+
         for (let i = 0; i < prevFees.length; i++) {
             const fee = prevFees[i].numeraire.isGreaterThan(nextFees[i].numeraire)
                 ? prevFees[i].numeraire.minus(nextFees[i].numeraire).negated()
                 : nextFees[i].numeraire.minus(prevFees[i].numeraire)
-            fees.push(this.shell.getAllFormatsFromNumeraire(fee))
+            fees.push(this.shells[shellIx].getAllFormatsFromNumeraire(fee))
         }
-        
+
         return fees
 
     }
-    
-    async sync (account) {
-        
+
+    async syncShells (account) {
+
         const self = this
-        
+
         account = account ? account : this.account
-        
+
         this.account = account
 
+        let shells = []
+
+    }
+
+    async readShell (_shell_) {
+
+        const self = this
+
         let derivatives = []
-        
-        const shell = await this.shell.query(account)
-        
-        const assets = await Promise.all(this.assets.map(async function (_asset_, ix) {
-            
+
+        const shell = await _shell_.query(this.account)
+
+        const assets = await Promise.all(_shell_.assets.map(async function (_asset_, ix) {
+
             const asset = await queryAsset(_asset_)
-            
+
             asset.utilityTotal = shell.utilitiesTotal[ix]
-            
+
             asset.utilityOwned = shell.utilitiesOwned[ix]
 
             asset.liquidityOwned = shell.liquidityOwned[ix]
-            
-            asset.derivatives = await Promise.all(_asset_.derivatives.map(queryAsset)) 
-            
+
+            asset.derivatives = await Promise.all(_asset_.derivatives.map(queryAsset))
+
             derivatives.push(asset)
 
             derivatives = derivatives.concat(asset.derivatives)
-            
+
             return asset;
 
-        })) 
-        
+        }))
+
         async function queryAsset (asset) {
 
-            const allowance = await asset.allowance(account, self.shell.address)
+            const allowance = await asset.allowance(self.account, _shell_.address)
 
-            const balance = await asset.balanceOf(account)
-            
+            const balance = await asset.balanceOf(self.account)
+
             return {
                 allowance: allowance,
                 balance: balance,
@@ -181,21 +306,72 @@ export default class Engine extends SwapEngine {
             }
 
         }
-        
-        this.state = fromJS({
-            account,
+
+        return {
             assets,
             derivatives,
             shell
+        }
+
+    }
+
+    async sync (account) {
+
+        account = account ? account : this.account
+
+        this.account = account
+
+        const shells = []
+        let assets = []
+        let derivatives = []
+
+        for (const _shell_ of this.shells) {
+
+            const shell = await this.readShell(_shell_)
+
+            assets = assets.concat(shell.assets)
+            derivatives = derivatives.concat(shell.assets.flatMap( asset => [ asset ].concat(asset.derivatives) ) )
+
+            shells.push(shell)
+
+        }
+
+        function filter (asset) {
+            if (!this.has(asset.icon)) {
+                this.add(asset.icon)
+                return true
+            } else return false
+        }
+
+        assets = assets.filter(filter, new Set())
+        derivatives = derivatives.filter(filter, new Set())
+
+        this.state = fromJS({
+            account,
+            shells,
+            assets,
+            derivatives
         })
 
         this.setState(this.state)
 
     }
 
-    unlock (index, amount, onHash, onConfirmation, onError) {
+    async syncShell (ix) {
 
-        const tx = this.assets[index].approve(this.shell.address, amount)
+        this.state = this.state.setIn(
+            ['shells', ix],
+            await this.readShell(this.shells[ix])
+        )
+
+        this.setState(this.state)
+
+    }
+
+    unlock (shellIx, assetIx, amount, onHash, onConfirmation, onError) {
+
+        const tx = this.shells[shellIx].assets[assetIx]
+            .approve(this.shells[shellIx].address, amount)
 
         tx.send({ from: this.account })
             .once('transactionHash', onHash)
@@ -207,9 +383,15 @@ export default class Engine extends SwapEngine {
 
     }
 
-    selectiveDeposit (addresses, amounts, onHash, onConfirmation, onError) {
+    selectiveDeposit (shellIx, addresses, amounts, onHash, onConfirmation, onError) {
 
-        const tx = this.shell.selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+        const tx = this.shells[shellIx]
+            .selectiveDeposit(
+                addresses, 
+                amounts, 
+                0, 
+                Date.now() + 2000
+            )
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
@@ -221,16 +403,17 @@ export default class Engine extends SwapEngine {
 
     }
 
-    selectiveWithdraw (addresses, amounts, onHash, onConfirmation, onError) {
+    selectiveWithdraw (shellIx, addresses, amounts, onHash, onConfirmation, onError) {
 
-        const limit = this.state.getIn([ 'shell', 'shellsOwned', 'raw' ])
+        const limit = this.state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'raw' ])
 
-        const tx = this.shell.selectiveWithdraw(
-            addresses, 
-            amounts.map(a => a.raw.toFixed() ),
-            limit.toFixed(),
-            Date.now() + 2000
-        )
+        const tx = this.shells[shellIx]
+            .selectiveWithdraw(
+                addresses,
+                amounts.map(a => a.raw.integerValue().toFixed() ),
+                limit.toFixed(),
+                Date.now() + 2000
+            )
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
@@ -249,5 +432,20 @@ export default class Engine extends SwapEngine {
             .on('error', onError)
 
     }
-    
+
+    async getAPY (addr) {
+        
+        let url = 'https://dashboard.shells.exchange/getAPY/' + addr
+
+        let percentage = 0
+
+        await fetch(url).then(response => response.text()).then(contents => {
+            let data = JSON.parse(contents).data
+            percentage = data[data.length - 1].percentage
+        })
+
+        return percentage
+
+    }
+
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../mainnet.one.dai.usdc.usdt.susd.config"
+import config from "../../mainnet.multiple.config"
 
 import styled from 'styled-components'
 

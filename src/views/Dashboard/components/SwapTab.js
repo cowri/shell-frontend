@@ -113,30 +113,38 @@ const SwapTab = () => {
   const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
   const [originValue, setOriginValue] = useState('')
   const [targetValue, setTargetValue] = useState('')
-  const [targetHelperText, setTargetHelperText] = useState('')
+  const [shellIx, setShellIx] = useState(null)
+  const [shellDerivativeIx, setShellDerivativeIx] = useState(null)
   const [swapType, setSwapType] = useState('origin')
   const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
   
-  const [coins, setCoins] = useState(engine.assets.reduce( (accu, asset) => {
-    accu.push(asset)
-    return accu.concat(asset.derivatives)
-  }, []))
-  
-  const origin = coins[originIx]
-  const target = coins[targetIx]
+  const origin = engine.derivatives[originIx]
+  const target = engine.derivatives[targetIx]
 
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
 
-  const initiallyLocked = state.getIn(['derivatives', originIx, 'allowance', 'raw']) == 0
+  const initiallyLocked = state.getIn(['assets', originIx, 'allowance', 'raw']) == 0
   const [unlocked, setUnlocked] = useState(false)
 
+  const sanitizeNumber = (number, decimals) => {
+    number = number.replace(/,/g,'')
+    if (number.indexOf('.') != -1 && number.split('.')[1].length > decimals) {
+      number = number.split('.')
+      number[1] = number[1].substring(0, decimals)
+      number = number.join('.')
+    }
+    return number
+  }
+  
   useEffect(() => {
 
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
-
+      
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return 
 
     }
@@ -146,6 +154,8 @@ const SwapTab = () => {
       setTargetValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return
 
     }
@@ -155,6 +165,8 @@ const SwapTab = () => {
       setOriginValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return
 
     }
@@ -163,6 +175,8 @@ const SwapTab = () => {
 
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
+      setShellIx(null)
+      setShellDerivativeIx(null)
       return
 
     }
@@ -171,21 +185,28 @@ const SwapTab = () => {
       try {
         
         const method = swapType == 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
-        
-        const { originAmount, targetAmount } = await engine[method](
-          originIx, 
-          targetIx, 
+
+        const { 
+          originAmount,
+          targetAmount,
+          shellIx,
+          shellDerivativeIx
+        } = await engine[method](
+          origin, 
+          target, 
           swapType == 'origin' ? originValue : targetValue
         )
-        
+
         swapType == 'origin' 
           ? setTargetValue(targetAmount.display)
           : setOriginValue(originAmount.display)
           
         setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
+        setShellIx(shellIx)
+        setShellDerivativeIx(shellDerivativeIx)
 
-      } catch {
-        
+      } catch (e) {
+
         swapType == 'origin'
           ? setTargetValue('')
           : setOriginValue('')
@@ -211,8 +232,8 @@ const SwapTab = () => {
 
     const tPrice = targetAmount.dividedBy(originAmount).toFixed(4)
 
-    const oSymbol = coins[originIx].symbol
-    const tSymbol = coins[targetIx].symbol
+    const oSymbol = engine.derivatives[originIx].symbol
+    const tSymbol = engine.derivatives[targetIx].symbol
 
     let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
       ? <span> <span> 1.00 </span> of { oSymbol } is worth </span>
@@ -232,10 +253,16 @@ const SwapTab = () => {
     e.preventDefault()
 
     setStep('confirming')
-
-    let tx = swapType === 'origin'
-      ? engine.executeOriginSwap(originIx, targetIx, originValue, targetValue)
-      : engine.executeTargetSwap(originIx, targetIx, originValue, targetValue)
+    
+    let method = swapType === 'origin' ? 'executeOriginSwap' : 'executeTargetSwap'
+    
+    let tx = engine[method](
+      shellIx, 
+      origin, 
+      target, 
+      sanitizeNumber(originValue, origin.decimals), 
+      sanitizeNumber(targetValue, target.decimals)
+    )
 
     tx.send({ from: state.get('account') })
       .once('transactionHash', handleTransactionHash)
@@ -258,7 +285,7 @@ const SwapTab = () => {
       swapType === 'origin' 
         ? setOriginValue('') 
         : setTargetValue('')
-        
+
       setPriceMessage(DEFAULT_MSG)
       setStep('success')
       engine.sync()
@@ -278,7 +305,7 @@ const SwapTab = () => {
     setStep('confirming')
 
     const tx = origin.approve(
-      engine.shell.address,
+      engine.shells[shellIx].address,
       amount.toString()
     )
 
@@ -307,14 +334,14 @@ const SwapTab = () => {
   const handleOriginInput = e => {
 
     setSwapType('origin')
-    setOriginValue(e.target.value.replace(',',''))
+    setOriginValue(sanitizeNumber(e.target.value, origin.decimals))
     if (e.target.value == '') setTargetValue('')
     
   }
   
   const _handleOriginSelect = v => {
     
-    const allowance = state.getIn(['derivatives', v, 'allowance', 'raw'])
+    const allowance = state.getIn(['assets', v, 'allowance', 'raw'])
 
     setUnlocked(allowance != 0)
 
@@ -326,12 +353,21 @@ const SwapTab = () => {
 
     }
 
+    const overlaps = engine.overlaps[engine.derivatives[v].symbol]
+
+    if (overlaps.indexOf(target.symbol) == -1) {
+
+      const find = asset => asset.symbol == overlaps[0]
+      setTargetIx(engine.derivatives.findIndex(find))
+
+    }
+
   }
   
   const handleTargetInput = e => {
 
     setSwapType('target')
-    setTargetValue(e.target.value.replace(',',''))
+    setTargetValue(sanitizeNumber(e.target.value, target.decimals))
     if (e.target.value == '') setOriginValue('')
     
   }
@@ -353,13 +389,27 @@ const SwapTab = () => {
     root: { 'fontFamily': 'Geomanist', 'fontSize': '17.5px' }
   })()
 
-  const selections = coins.map( (asset, ix) => {
+  const selections = engine.derivatives.map( (asset, ix) => {
 
       return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
       
   })
 
-  const getDropdown = (handler, value) => {
+  const targetSelections = engine.derivatives.reduce( (a, c, i) => {
+
+    if (engine.overlaps[c.symbol].indexOf(origin.symbol) != -1) {
+      a.push( 
+        <MenuItem className={selectionCss.root} key={i} value={i} > 
+          { c.symbol } 
+        </MenuItem>
+      )
+    }
+
+    return a
+
+  }, [])
+
+  const getDropdown = (handler, selections,value) => {
 
     return ( <TextField select
       InputProps={{ className: selectionCss.root }}
@@ -392,15 +442,37 @@ const SwapTab = () => {
     }
   })()
   
-  let allowance = state.getIn(['derivatives', originIx, 'allowance', 'numeraire'])
+  let allowance
   
-  if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
-    allowance = '100,000,000+'
-  } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
-    allowance = allowance.toExponential()
-  } else {
-    allowance = state.getIn(['derivatives', originIx, 'allowance', 'display'])
+  if (shellIx != null && shellDerivativeIx != null) {
+
+    allowance = state.getIn([
+      'shells', 
+      shellIx,
+      'derivatives',
+      shellDerivativeIx, 
+      'allowance', 
+      'numeraire'
+    ])
+    
+    if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
+      allowance = '100,000,000+'
+    } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
+      allowance = allowance.toExponential()
+    } else {
+      allowance = state.getIn([
+        'shells', 
+        shellIx, 
+        'derivatives',
+        shellDerivativeIx,
+        'allowance', 
+        'display'
+      ])
+    }
+
   }
+    
+  
   
   const unlockOrigin = () => setStep('unlocking')
     
@@ -443,7 +515,7 @@ const SwapTab = () => {
           allowance={allowance}
           icon={origin.icon}
           onChange={ handleOriginInput }
-          selections={getDropdown(_handleOriginSelect, originIx)}
+          selections={getDropdown(_handleOriginSelect, selections, originIx)}
           styles={inputStyles}
           symbol={origin.symbol}
           title='From'
@@ -458,7 +530,7 @@ const SwapTab = () => {
         <AmountInput 
           icon={target.icon}
           onChange={ handleTargetInput }
-          selections={getDropdown(_handleTargetSelect, targetIx)}
+          selections={getDropdown(_handleTargetSelect, targetSelections, targetIx)}
           styles={inputStyles}
           symbol={target.symbol}
           title='To'
