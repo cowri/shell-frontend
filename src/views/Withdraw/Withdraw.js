@@ -66,7 +66,7 @@ const Withdraw = ({ shellIx, onDismiss }) => {
     )
 
   }
-
+  
   return (
     <>
       {step === 'start' && (
@@ -87,7 +87,7 @@ const Withdraw = ({ shellIx, onDismiss }) => {
       )}
 
       {step === 'withdrawing' && (
-        <WithdrawingModal />
+        <WithdrawingModal txHash={txHash} />
       )}
 
       {step === 'success' && (
@@ -95,6 +95,7 @@ const Withdraw = ({ shellIx, onDismiss }) => {
           buttonBlurb={'Finish'} 
           onDismiss={onDismiss} 
           title={'Withdrawal Successful.'} 
+          txHash={txHash}
         />
       )}
 
@@ -103,6 +104,7 @@ const Withdraw = ({ shellIx, onDismiss }) => {
           buttonBlurb={'Finish'} 
           onDismiss={onDismiss} 
           title={'An error occurred.'} 
+          txHash={txHash}
         />
       )}
 

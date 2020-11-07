@@ -1,11 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import config from '../../kovan.multiple.config'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDiscord, faTelegram, faTwitter, } from '@fortawesome/free-brands-svg-icons'
-
-import etherscan from "../../assets/etherscan-logo-light-circle.svg"
+import { faDiscord, faTelegram, faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons'
 
 import Container from '../Container'
 
@@ -41,11 +37,11 @@ const Footer = () => (
       <StyledSocialIcon target="_blank" href="https://t.me/joinchat/IXE6vxd2VqQT1-VyAxAqig">
         <FontAwesomeIcon icon={faTelegram} size="lg" />
       </StyledSocialIcon>
-      <StyledSocialIcon target="_blank" href={"https://etherscan.io/address/" + config.shell} >
-        <img src={etherscan} style={{width:'1.33em'}} alt="" />
-      </StyledSocialIcon>
       <StyledSocialIcon target="_blank" href="https://discord.gg/ZqMJPr4">
         <FontAwesomeIcon icon={faDiscord} size="lg" />
+      </StyledSocialIcon>
+      <StyledSocialIcon target="_blank" href="https://github.com/cowri/shell-solidity-v1">
+        <FontAwesomeIcon icon={faGithub} size="lg" />
       </StyledSocialIcon>
     </StyledFooter>
   </Container>

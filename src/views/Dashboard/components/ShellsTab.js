@@ -123,7 +123,7 @@ const ShellsTab = ({showShell}) => {
       <StyledRows>
         <Row head>
           <span style={{ flex: 1.5 }}> Shells </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> Size </span>
+          <span style={{ flex: 1, textAlign: 'right' }}> Liquidity </span>
           <span style={{ flex: 1, textAlign: 'right' }}> APY </span>
         </Row>
         { rows }

@@ -8,13 +8,13 @@ export default class SwapEngine {
 
     async viewOriginSwap (origin, target, originAmount) {
         
-        let shells = this.pairs[origin.address][target.address]
+        let shells = this.pairsToShells[origin.address][target.address]
         
         let quotes = await Promise.all(shells.map( async (ix) => {
             return await this.shells[ix].viewOriginSwap(
                 origin.address,
                 target.address,
-                origin.getRawFromDisplay(originAmount).toFixed()
+                origin.getRawFromDisplay(originAmount).integerValue().toFixed()
             )
         }))
         
@@ -23,11 +23,10 @@ export default class SwapEngine {
         let max = new BigNumber(0)
         
         for (let i = 0; i < shells.length; i++) {
-            console.log("quote", quotes[i].toString())
             if (!quotes[i] || quotes[i].toString() == REVERTED) continue
             if (quotes[i].isGreaterThan(max)){
                 max = quotes[i]
-                shellIx = i
+                shellIx = shells[i]
             }
         }
         
@@ -59,32 +58,32 @@ export default class SwapEngine {
 
     async viewTargetSwap (origin, target, targetAmount) {
         
-        let shells = this.pairs[origin.address][target.address]
+        let shells = this.pairsToShells[origin.address][target.address]
         
         let quotes = await Promise.all(shells.map( async (ix) => {
-            return await this.shells[ix].viewOriginSwap(
+            return await this.shells[ix].viewTargetSwap(
                 origin.address,
                 target.address,
-                target.getRawFromDisplay(targetAmount).toFixed()
+                target.getRawFromDisplay(targetAmount).integerValue().toFixed()
             )
         }))
-        
+
         let shell
-        let min = new BigNumber(0)
+        let min = new BigNumber(1e80)
         
         for (let i = 0; i < shells.length; i++) {
             if (!quotes[i] || quotes[i].toString() == REVERTED) continue
             if (quotes[i].isLessThan(min)){
                 min = quotes[i]
-                shell = i
+                shell = shells[i]
             }
         }
-        
-        if (!shell) throw( new Error("reverted"))
+
+        if (shell == undefined) throw( new Error("reverted"))
         
         return {
             originAmount: {
-                display: origin.getDisplayFromRaw(min, this.shell.swapDecimals),
+                display: origin.getDisplayFromRaw(min, origin.swapDecimals),
                 numeraire: origin.getNumeraireFromRaw(min),
                 raw: min
             },
@@ -99,11 +98,13 @@ export default class SwapEngine {
     }
 
     executeOriginSwap (shellIx, origin, target, originAmount, minTargetAmount) {
+        
+        console.log("shellix", shellIx)
+        
+        originAmount = origin.getRawFromDisplay(originAmount)
 
-        originAmount = origin.getAllFormatsFromDisplay(originAmount)
-
-        let minTarget = target.getNumeraireFromDisplay(minTargetAmount)
-
+        let minTarget = target.getRawFromDisplay(minTargetAmount)
+        
         minTarget = minTarget.multipliedBy(new BigNumber(.99))
 
         let deadline = Math.floor(Date.now() /1000 + 900)
@@ -111,8 +112,8 @@ export default class SwapEngine {
         return this.shells[shellIx].originSwap(
             origin.address,
             target.address,
-            originAmount.raw.toFixed(),
-            target.getRawFromNumeraire(minTarget).toFormat(0),
+            originAmount.integerValue().toFixed(),
+            minTarget.integerValue().toFixed(),
             deadline
         )
 
@@ -120,17 +121,19 @@ export default class SwapEngine {
 
     executeTargetSwap (shellIx, origin, target, maxOriginAmount, targetAmount) {
 
-        targetAmount = target.getAllFormatsFromDisplay(targetAmount)
+        targetAmount = target.getRawFromDisplay(targetAmount)
 
-        let maxOrigin =  origin.getNumeraireFromDisplay(maxOriginAmount).multipliedBy(new BigNumber(1.01))
+        let maxOrigin =  origin.getRawFromDisplay(maxOriginAmount)
+
+        maxOrigin = maxOrigin.multipliedBy(new BigNumber(1.01))
 
         let deadline = Math.floor(Date.now() / 1000 + 900)
 
         return this.shells[shellIx].targetSwap(
             origin.address,
             target.address,
-            origin.getRawFromNumeraire(maxOrigin).toFormat(0),
-            targetAmount.raw.toFixed(),
+            maxOrigin.integerValue().toFixed(),
+            targetAmount.integerValue().toFixed(),
             deadline
         )
         

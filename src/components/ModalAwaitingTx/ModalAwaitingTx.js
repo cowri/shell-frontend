@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../kovan.multiple.config"
+import config from "../../kovan.multiple.compound.config"
 
 import styled from 'styled-components'
 

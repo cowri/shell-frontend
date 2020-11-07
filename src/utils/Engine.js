@@ -1,6 +1,6 @@
 import React from 'react'
 import { fromJS, List, Map  } from "immutable"
-import config from "../mainnet.multiple.config"
+import config from "../kovan.multiple.compound.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -26,8 +26,8 @@ export default class Engine extends SwapEngine {
         this.shells = []
         this.assets = []
         this.derivatives = []
-        this.overlaps = []
-        this.pairs = {}
+        this.overlaps = {}
+        this.pairsToShells = {}
 
         for (const _shell_ of config.shells) {
 
@@ -78,8 +78,6 @@ export default class Engine extends SwapEngine {
 
                 for (let dix = 0; dix < _asset_.derivatives.length; dix++) {
 
-                    const _derivative_ = _asset_.derivatives[dix]
-
                     const derivative = new Asset(
                         this.web3,
                         _asset_.derivatives[dix].address,
@@ -91,7 +89,6 @@ export default class Engine extends SwapEngine {
 
                     derivative.displayDecimals = _shell_.displayDecimals
                     derivative.swapDecimals = _shell_.swapDecimals
-
 
                     asset.derivatives.push(derivative)
 
@@ -110,19 +107,57 @@ export default class Engine extends SwapEngine {
 
             }
 
-            this.overlaps[this.shells.length] = []
-
             for (let ix = 0; ix < _shell_.assets.length; ix++) {
-                this.overlaps[this.shells.length].push(_shell_.assets[ix].symbol)
+                const _symbol = _shell_.assets[ix].symbol
                 for (let xi = ix + 1; xi < _shell_.assets.length; xi++) {
+                    setOverlap(
+                        _shell_.assets[ix].symbol,
+                        _shell_.assets[xi].symbol,
+                    )
                     setPair(
                         this.shells.length,
                         _shell_.assets[ix].address,
                         _shell_.assets[xi].address
                     )
                     for (let dix = 0; dix < _shell_.assets[ix].derivatives.length; dix++) {
-                        this.overlaps[this.shells.length].push(_shell_.assets[ix].derivatives[dix].symbol)
+                        setOverlap(
+                            _shell_.assets[ix].symbol, 
+                            _shell_.assets[ix].derivatives[dix].symbol
+                        )
+                        setPair(
+                            this.shells.length,
+                            _shell_.assets[ix].address, 
+                            _shell_.assets[ix].derivatives[dix].address
+                        )
+                        for (let dixid = dix + 1; dixid < _shell_.assets[ix].derivatives.length; dixid++){
+                            setOverlap(
+                                _shell_.assets[ix].derivatives[dix].symbol, 
+                                _shell_.assets[ix].derivatives[dixid].symbol
+                            )
+                            setPair(
+                                this.shells.length,
+                                _shell_.assets[ix].derivatives[dix].address, 
+                                _shell_.assets[ix].derivatives[dixid].address
+                            )
+                        }
                         for (let xid = 0; xid < _shell_.assets[xi].derivatives.length; xid++) {
+                            setOverlap(
+                                _shell_.assets[ix].symbol,
+                                _shell_.assets[xi].derivatives[xid].symbol
+                            )
+                            setOverlap(
+                                _shell_.assets[ix].derivatives[dix].symbol,
+                                _shell_.assets[xi].derivatives[xid].symbol
+                            )
+                            setOverlap(
+                                _shell_.assets[xi].symbol, 
+                                _shell_.assets[ix].derivatives[dix].symbol
+                            )
+                            setPair(
+                                this.shells.length,
+                                _shell_.assets[xi].address,
+                                _shell_.assets[ix].derivatives[dix].address
+                            )
                             setPair(
                                 this.shells.length,
                                 _shell_.assets[ix].address,
@@ -140,7 +175,7 @@ export default class Engine extends SwapEngine {
 
             shell.apy = <CircularProgress />
 
-            this.getAPY(shell.assets).then(result => {
+            this.getAPY(_shell_.shell).then(result => {
                 shell.apy = result
             })
 
@@ -152,15 +187,24 @@ export default class Engine extends SwapEngine {
         this.assets = this.assets.filter(filter, new Set())
         this.derivatives = this.derivatives.filter(filter, new Set())
 
+        function setOverlap (left, right) {
+            const ltr = self.overlaps[left] ? self.overlaps[left] : [ ]
+            const rtl = self.overlaps[right] ? self.overlaps[right] : [ ]
+            if (ltr.indexOf(right) == -1) ltr.push(right)
+            if (rtl.indexOf(left) == -1) rtl.push(left)
+            self.overlaps[left] = ltr
+            self.overlaps[right] = rtl
+        }
+
         function setPair (s, _x, y_) {
-            const x = self.pairs[_x] ? self.pairs[_x] : {}
-            const y = self.pairs[y_] ? self.pairs[y_] : {}
+            const x = self.pairsToShells[_x] ? self.pairsToShells[_x] : {}
+            const y = self.pairsToShells[y_] ? self.pairsToShells[y_] : {}
             if (!x[y_]) x[y_] = []
             if (!y[_x]) y[_x] = []
             x[y_].push(s)
             y[_x].push(s)
-            self.pairs[_x] = x
-            self.pairs[y_] = y
+            self.pairsToShells[_x] = x
+            self.pairsToShells[y_] = y
         }
 
     }
@@ -342,7 +386,12 @@ export default class Engine extends SwapEngine {
     selectiveDeposit (shellIx, addresses, amounts, onHash, onConfirmation, onError) {
 
         const tx = this.shells[shellIx]
-            .selectiveDeposit(addresses, amounts, 0, Date.now() + 2000)
+            .selectiveDeposit(
+                addresses, 
+                amounts, 
+                0, 
+                Date.now() + 2000
+            )
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
@@ -358,12 +407,13 @@ export default class Engine extends SwapEngine {
 
         const limit = this.state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'raw' ])
 
-        const tx = this.shells[shellIx].selectiveWithdraw(
-            addresses,
-            amounts.map(a => a.raw.toFixed() ),
-            limit.toFixed(),
-            Date.now() + 2000
-        )
+        const tx = this.shells[shellIx]
+            .selectiveWithdraw(
+                addresses,
+                amounts.map(a => a.raw.integerValue().toFixed() ),
+                limit.toFixed(),
+                Date.now() + 2000
+            )
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
@@ -383,25 +433,19 @@ export default class Engine extends SwapEngine {
 
     }
 
-    async getAPY (assets) {
-        let assetString = ''
-        assets.forEach((asset, i) => {
-            assetString += (asset.symbol + ' ')
-        });
-
-
-        let url = 'https://dashboard.shells.exchange/getAPY'
-        let apyData = null
-        if(assetString.includes('BTC')){
-            url += 'btc'
-        }
+    async getAPY (addr) {
+        
+        let url = 'https://dashboard.shells.exchange/getAPY/' + addr
 
         let percentage = 0
+
         await fetch(url).then(response => response.text()).then(contents => {
             let data = JSON.parse(contents).data
             percentage = data[data.length - 1].percentage
         })
+
         return percentage
+
     }
 
 }

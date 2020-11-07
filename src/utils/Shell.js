@@ -169,7 +169,7 @@ export default class Shell extends NumericFormats {
 
             const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(
                 addresses, 
-                amounts.map(a => a.raw.toFixed())
+                amounts.map(a => a.raw.integerValue().toFixed())
             ).call() )
 
             return this.getNumeraireFromRaw(shells)
@@ -186,7 +186,7 @@ export default class Shell extends NumericFormats {
 
         return this.contract.methods.selectiveDeposit(
             addresses, 
-            amounts.map(a => a.raw.toFixed()), 
+            amounts.map(a => a.raw.integerValue().toFixed()), 
             minimum, 
             deadline
         )
@@ -200,7 +200,7 @@ export default class Shell extends NumericFormats {
 
             const shellsToBurn = new BigNumber( await this.contract.methods.viewSelectiveWithdraw(
                 addresses, 
-                amounts.map( a => a.raw.toFixed() )
+                amounts.map( a => a.raw.integerValue().toFixed() )
             ).call() )
 
             return this.getNumeraireFromRaw(shellsToBurn)

@@ -5,7 +5,7 @@ import { Map } from 'immutable'
 import Web3 from 'web3'
 import Onboard from 'bnc-onboard'
 
-import config from "../mainnet.multiple.config"
+import config from "../kovan.multiple.compound.config"
 
 import Engine from '../utils/Engine'
 

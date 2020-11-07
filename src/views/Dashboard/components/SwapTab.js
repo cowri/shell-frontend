@@ -110,7 +110,7 @@ const SwapTab = () => {
 
   const [step, setStep] = useState('start')
   const [originIx, setOriginIx] = useState(0)
-  const [targetIx, setTargetIx] = useState(1)
+  const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
   const [originValue, setOriginValue] = useState('')
   const [targetValue, setTargetValue] = useState('')
   const [shellIx, setShellIx] = useState(null)
@@ -120,8 +120,8 @@ const SwapTab = () => {
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
   
-  const origin = engine.assets[originIx]
-  const target = engine.assets[targetIx]
+  const origin = engine.derivatives[originIx]
+  const target = engine.derivatives[targetIx]
 
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
@@ -129,6 +129,16 @@ const SwapTab = () => {
   const initiallyLocked = state.getIn(['assets', originIx, 'allowance', 'raw']) == 0
   const [unlocked, setUnlocked] = useState(false)
 
+  const sanitizeNumber = (number, decimals) => {
+    number = number.replace(/,/g,'')
+    if (number.indexOf('.') != -1 && number.split('.')[1].length > decimals) {
+      number = number.split('.')
+      number[1] = number[1].substring(0, decimals)
+      number = number.join('.')
+    }
+    return number
+  }
+  
   useEffect(() => {
 
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
@@ -186,7 +196,7 @@ const SwapTab = () => {
           target, 
           swapType == 'origin' ? originValue : targetValue
         )
-        
+
         swapType == 'origin' 
           ? setTargetValue(targetAmount.display)
           : setOriginValue(originAmount.display)
@@ -196,14 +206,12 @@ const SwapTab = () => {
         setShellDerivativeIx(shellDerivativeIx)
 
       } catch (e) {
-        
+
         swapType == 'origin'
           ? setTargetValue('')
           : setOriginValue('')
         
         setHaltIndication()
-        setShellIx(null)
-        setShellDerivativeIx(null)
 
       }
     })()
@@ -224,8 +232,8 @@ const SwapTab = () => {
 
     const tPrice = targetAmount.dividedBy(originAmount).toFixed(4)
 
-    const oSymbol = engine.assets[originIx].symbol
-    const tSymbol = engine.assets[targetIx].symbol
+    const oSymbol = engine.derivatives[originIx].symbol
+    const tSymbol = engine.derivatives[targetIx].symbol
 
     let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
       ? <span> <span> 1.00 </span> of { oSymbol } is worth </span>
@@ -247,8 +255,14 @@ const SwapTab = () => {
     setStep('confirming')
     
     let method = swapType === 'origin' ? 'executeOriginSwap' : 'executeTargetSwap'
-
-    let tx = engine[method](shellIx, origin, target, originValue, targetValue)
+    
+    let tx = engine[method](
+      shellIx, 
+      origin, 
+      target, 
+      sanitizeNumber(originValue, origin.decimals), 
+      sanitizeNumber(targetValue, target.decimals)
+    )
 
     tx.send({ from: state.get('account') })
       .once('transactionHash', handleTransactionHash)
@@ -274,17 +288,13 @@ const SwapTab = () => {
 
       setPriceMessage(DEFAULT_MSG)
       setStep('success')
-      setShellIx(null)
       engine.sync()
 
     }
 
     function handleError (e) {
       
-      if (!success) {
-        setStep('error')
-        setShellIx(null)
-      }
+      if (!success) setStep('error')
 
     }
 
@@ -324,7 +334,7 @@ const SwapTab = () => {
   const handleOriginInput = e => {
 
     setSwapType('origin')
-    setOriginValue(e.target.value.replace(',',''))
+    setOriginValue(sanitizeNumber(e.target.value, origin.decimals))
     if (e.target.value == '') setTargetValue('')
     
   }
@@ -343,12 +353,21 @@ const SwapTab = () => {
 
     }
 
+    const overlaps = engine.overlaps[engine.derivatives[v].symbol]
+
+    if (overlaps.indexOf(target.symbol) == -1) {
+
+      const find = asset => asset.symbol == overlaps[0]
+      setTargetIx(engine.derivatives.findIndex(find))
+
+    }
+
   }
   
   const handleTargetInput = e => {
 
     setSwapType('target')
-    setTargetValue(e.target.value.replace(',',''))
+    setTargetValue(sanitizeNumber(e.target.value, target.decimals))
     if (e.target.value == '') setOriginValue('')
     
   }
@@ -370,13 +389,27 @@ const SwapTab = () => {
     root: { 'fontFamily': 'Geomanist', 'fontSize': '17.5px' }
   })()
 
-  const selections = engine.assets.map( (asset, ix) => {
+  const selections = engine.derivatives.map( (asset, ix) => {
 
       return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
       
   })
 
-  const getDropdown = (handler, value) => {
+  const targetSelections = engine.derivatives.reduce( (a, c, i) => {
+
+    if (engine.overlaps[c.symbol].indexOf(origin.symbol) != -1) {
+      a.push( 
+        <MenuItem className={selectionCss.root} key={i} value={i} > 
+          { c.symbol } 
+        </MenuItem>
+      )
+    }
+
+    return a
+
+  }, [])
+
+  const getDropdown = (handler, selections,value) => {
 
     return ( <TextField select
       InputProps={{ className: selectionCss.root }}
@@ -421,8 +454,6 @@ const SwapTab = () => {
       'allowance', 
       'numeraire'
     ])
-    
-    console.log("ALLOWANCE", allowance, allowance.toString())
     
     if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
       allowance = '100,000,000+'
@@ -484,7 +515,7 @@ const SwapTab = () => {
           allowance={allowance}
           icon={origin.icon}
           onChange={ handleOriginInput }
-          selections={getDropdown(_handleOriginSelect, originIx)}
+          selections={getDropdown(_handleOriginSelect, selections, originIx)}
           styles={inputStyles}
           symbol={origin.symbol}
           title='From'
@@ -499,7 +530,7 @@ const SwapTab = () => {
         <AmountInput 
           icon={target.icon}
           onChange={ handleTargetInput }
-          selections={getDropdown(_handleTargetSelect, targetIx)}
+          selections={getDropdown(_handleTargetSelect, targetSelections, targetIx)}
           styles={inputStyles}
           symbol={target.symbol}
           title='To'

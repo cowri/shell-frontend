@@ -16,18 +16,21 @@ const DashboardContent = ({ }) => {
   const { state } = useContext(DashboardContext)
 
   const [activeTab, setActiveTab] = useState('shells')
+  const [shellsTab, setShellsTab] = useState('shells')
   const [shellIx, setShellIx] = useState(null)
 
   const showShell = (ix) => {
-    console.log("show shell", ix)
     setActiveTab('shell')
+    setShellsTab('shell')
     setShellIx(ix)
   }
 
   const shellTabClick = () => {
     if (activeTab == 'shell') {
+      setShellsTab('shells')
       setActiveTab('shells')
-      setShellIx(null)
+    } else if (activeTab == 'swap') {
+      setActiveTab(shellsTab)
     }
   }
 
@@ -36,11 +39,11 @@ const DashboardContent = ({ }) => {
       <Surface>
         <Tabs>
           <Tab 
-            active={activeTab === 'shell' || activeTab == 'shells'} 
+            active={activeTab === 'shell' || activeTab == 'shells'}
             disabled={!state.has('shells')}
             onClick={shellTabClick}
           >
-            { activeTab != 'shell' ? 'Shells' : <a> ← Back To Shells </a> }
+            { activeTab != 'shell' ? 'Shells' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Shells </a> }
           </Tab>
           <Tab 
             active={activeTab === 'swap'}

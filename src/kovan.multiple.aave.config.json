@@ -5,85 +5,6 @@
   "network": 42,
   "shells": [ 
     {
-      "shell": "0xd23843013EEE74f80e38aC508bac697700a274A5",
-      "name": "70% wBTC 30% renBTC",
-      "displayDecimals": 4,
-      "swapDecimals": 8,
-      "assets": [
-        { 
-          "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
-          "decimals": 8,
-          "icon": "wbtc.svg",
-          "name": "Wrapped BTC",
-          "symbol": "wBTC",
-          "type": "ERC20",
-          "weight": ".7",
-          "derivatives": [ ]
-        },
-        { 
-          "address": "0xba9d8223398C61cef238b94102507501EFBF2d3E", 
-          "decimals": 8,
-          "icon": "renbtc.svg",
-          "name": "renBTC",
-          "symbol": "renBTC",
-          "type": "ERC20",
-          "weight": ".3",
-          "derivatives": [ ]
-        }
-      ],
-      "params": {
-        "alpha": ".9",
-        "beta": ".6",
-        "delta": ".1",
-        "epsilon": ".00035",
-        "lambda": "1"
-      }
-    },
-    {
-      "shell": "0xf1d6e35501a27618d3ac0174db7e310e211d50e6",
-      "name": "50% wBTC 40% renBTC 10% sBTC",
-      "displayDecimals": 4,
-      "swapDecimals": 8,
-      "assets": [
-        { 
-          "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
-          "decimals": 8,
-          "icon": "wbtc.svg",
-          "name": "Wrapped BTC",
-          "symbol": "wBTC",
-          "type": "ERC20",
-          "weight": ".5",
-          "derivatives": [ ]
-        },
-        { 
-          "address": "0xba9d8223398C61cef238b94102507501EFBF2d3E", 
-          "decimals": 8,
-          "icon": "renbtc.svg",
-          "name": "renBTC",
-          "symbol": "renBTC",
-          "type": "ERC20",
-          "weight": ".4",
-          "derivatives": [ ]
-        },
-        { 
-          "address": "0xCE18d20A5EAE16573AD8bed2a07e2E76Fee5a3dA", 
-          "decimals": 18,
-          "icon": "sbtc.svg",
-          "name": "Synth sBTC",
-          "symbol": "sBTC",
-          "type": "ERC20",
-          "weight": ".1",
-          "derivatives": [ ]
-        }
-      ],
-      "params": {
-        "alpha": ".9",
-        "beta": ".6",
-        "delta": ".1",
-        "epsilon": ".00035",
-        "lambda": "1"
-      }
-    }, {
       "shell": "0x6ed9874c64cf39c7f070296c80959947b016b3af",
       "name": "30% Dai 30% USDt 30% USDc 10% sUSD",
       "displayDecimals": 2,
@@ -173,7 +94,86 @@
         "epsilon": ".00035",
         "lambda": ".9"
       }
-
-    }
+    },
+    {
+      "shell": "0xd23843013EEE74f80e38aC508bac697700a274A5",
+      "name": "70% wBTC 30% renBTC",
+      "displayDecimals": 4,
+      "swapDecimals": 8,
+      "assets": [
+        { 
+          "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
+          "decimals": 8,
+          "icon": "wbtc.svg",
+          "name": "Wrapped BTC",
+          "symbol": "wBTC",
+          "type": "ERC20",
+          "weight": ".7",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xba9d8223398C61cef238b94102507501EFBF2d3E", 
+          "decimals": 8,
+          "icon": "renbtc.svg",
+          "name": "renBTC",
+          "symbol": "renBTC",
+          "type": "ERC20",
+          "weight": ".3",
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".9",
+        "beta": ".6",
+        "delta": ".1",
+        "epsilon": ".00035",
+        "lambda": "1"
+      }
+    },
+    {
+      "shell": "0xf1d6e35501a27618d3ac0174db7e310e211d50e6",
+      "name": "50% wBTC 40% renBTC 10% sBTC",
+      "displayDecimals": 4,
+      "swapDecimals": 8,
+      "assets": [
+        { 
+          "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
+          "decimals": 8,
+          "icon": "wbtc.svg",
+          "name": "Wrapped BTC",
+          "symbol": "wBTC",
+          "type": "ERC20",
+          "weight": ".5",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xba9d8223398C61cef238b94102507501EFBF2d3E", 
+          "decimals": 8,
+          "icon": "renbtc.svg",
+          "name": "renBTC",
+          "symbol": "renBTC",
+          "type": "ERC20",
+          "weight": ".4",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0xCE18d20A5EAE16573AD8bed2a07e2E76Fee5a3dA", 
+          "decimals": 18,
+          "icon": "sbtc.svg",
+          "name": "Synth sBTC",
+          "symbol": "sBTC",
+          "type": "ERC20",
+          "weight": ".1",
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".9",
+        "beta": ".6",
+        "delta": ".1",
+        "epsilon": ".00035",
+        "lambda": "1"
+      }
+    } 
   ]
 }

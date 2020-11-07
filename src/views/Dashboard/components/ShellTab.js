@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
+import config from '../../../kovan.multiple.compound.config'
 
 import Button from '../../../components/Button'
 import LabelledValue from '../../../components/LabelledValue'
@@ -24,7 +25,18 @@ const StyledShellTab = styled.div`
 const StyledTokenName = styled.span`
   align-items: center;
   display: flex;
-  flex: 1.5;
+  flex: 1.5;j
+`
+
+const StyledSocialIcon = styled.a`
+  align-items: center;
+  color: #FFF;
+  display: flex;
+  height: 44px;
+  justify-content: center;
+  margin: 10px;
+  width: 44px;
+  margin-left: auto;
 `
 
 const StyledBalance = styled.div`
@@ -89,6 +101,11 @@ const ShellTab = ({ shellIx }) => {
 
   const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ]) 
   const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ]) 
+  
+  let etherscan = config.network == 1 ? 'https://etherscan.io/address/' + config.shells[shellIx].shell
+    : config.network == 41 ? 'https://kovan.etherscan.io/address/' + config.shells[shellIx].shell
+    : ''
+
 
   return ( <>
     { presentDeposit && <Deposit shellIx={shellIx} onDismiss={() => setPresentDeposit(false)} />}
@@ -114,6 +131,9 @@ const ShellTab = ({ shellIx }) => {
         <Button onClick={setPresentDeposit}>Deposit</Button>
         <div style={{ width: 12 }} />
         <Button outlined onClick={setPresentWithdraw}>Withdraw</Button>
+        <StyledSocialIcon target="_blank" href={etherscan} >
+          <img src="./etherscan-logo-circle.svg" style={{width:'2em'}} alt="" />
+        </StyledSocialIcon>
       </StyledActions>
     </StyledShellTab>
   </> )
