@@ -1,6 +1,6 @@
 import React from 'react'
 import { fromJS, List, Map  } from "immutable"
-import config from "../kovan.multiple.compound.config"
+import config from "../mainnet.multiple.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
@@ -323,14 +323,14 @@ export default class Engine extends SwapEngine {
 
         const shells = []
         let assets = []
-        let assetsPlusDerivatives = []
+        let derivatives = []
 
         for (const _shell_ of this.shells) {
 
             const shell = await this.readShell(_shell_)
 
             assets = assets.concat(shell.assets)
-            assetsPlusDerivatives = assetsPlusDerivatives.concat(shell.assets.flatMap( asset => [ asset ].concat(asset.derivatives) ) )
+            derivatives = derivatives.concat(shell.assets.flatMap( asset => [ asset ].concat(asset.derivatives) ) )
 
             shells.push(shell)
 
@@ -344,13 +344,13 @@ export default class Engine extends SwapEngine {
         }
 
         assets = assets.filter(filter, new Set())
-        assetsPlusDerivatives = assetsPlusDerivatives.filter(filter, new Set())
+        derivatives = derivatives.filter(filter, new Set())
 
         this.state = fromJS({
             account,
             shells,
             assets,
-            assetsPlusDerivatives
+            derivatives
         })
 
         this.setState(this.state)

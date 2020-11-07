@@ -264,7 +264,7 @@ const StartModal = ({
   })
 
   const isInputError = error || errors.find( c => !!c )
-
+  
   return (
     <Modal onDismiss={onDismiss}>
       { prompting && <WarningModal 

@@ -99,8 +99,6 @@ export default class SwapEngine {
 
     executeOriginSwap (shellIx, origin, target, originAmount, minTargetAmount) {
         
-        console.log("shellix", shellIx)
-        
         originAmount = origin.getRawFromDisplay(originAmount)
 
         let minTarget = target.getRawFromDisplay(minTargetAmount)

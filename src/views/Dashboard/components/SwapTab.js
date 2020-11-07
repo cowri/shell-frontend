@@ -481,7 +481,7 @@ const SwapTab = () => {
     <StyledSwapTab>
 
       { step === 'unlocking' && <ModalUnlock 
-          coin={state.getIn(['assets', originIx])} 
+          coin={state.getIn(['derivatives', originIx])} 
           handleUnlock={handleUnlock} 
           handleCancel={ () => setStep('none') } 
         /> }
