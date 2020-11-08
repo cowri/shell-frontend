@@ -42,11 +42,11 @@ export default class Engine extends SwapEngine {
 
             shell.displayDecimals = _shell_.displayDecimals
             shell.swapDecimals = _shell_.swapDecimals
-            shell.alpha = new BigNumber(_shell_.alpha)
-            shell.beta = new BigNumber(_shell_.beta)
-            shell.delta = new BigNumber(_shell_.delta)
-            shell.epsilon = new BigNumber(_shell_.epsilon)
-            shell.lambda = new BigNumber(_shell_.lambda)
+            shell.alpha = new BigNumber(_shell_.params.alpha)
+            shell.beta = new BigNumber(_shell_.params.beta)
+            shell.delta = new BigNumber(_shell_.params.delta)
+            shell.epsilon = new BigNumber(_shell_.params.epsilon)
+            shell.lambda = new BigNumber(_shell_.params.lambda)
 
             shell.weights = []
             shell.assets = []
@@ -422,9 +422,9 @@ export default class Engine extends SwapEngine {
 
     }
 
-    proportionalWithdraw (amount, onHash, onConfirmation, onError) {
+    proportionalWithdraw (shellIx, amount, onHash, onConfirmation, onError) {
 
-        const tx = this.shell.proportionalWithdraw(amount.toFixed(), Date.now() + 2000)
+        const tx = this.shells[shellIx].proportionalWithdraw(amount.toFixed(), Date.now() + 2000)
 
         tx.send({ from: this.account })
             .on('transactionHash', onHash)
