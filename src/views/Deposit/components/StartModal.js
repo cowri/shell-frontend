@@ -155,9 +155,11 @@ const StartModal = ({
 
     const totalDeposit = amounts.reduce((a,c) =>  a.plus(c.numeraire), new BigNumber(0))
 
-    const liquidityChange = totalDeposit.dividedBy(state.getIn([ 'shell', 'liquidityTotal', 'numeraire' ]))
+    const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'numeraire' ])
+    const liquidityChange = totalDeposit.dividedBy(liqTotal)
 
-    const shellsChange = shellsToMint.dividedBy(state.getIn([ 'shell', 'shellsTotal', 'numeraire' ]))
+    const shellsTotal = state.getIn([ 'shells', shellIx, 'shell', 'shellsTotal', 'numeraire' ])
+    const shellsChange = shellsToMint.dividedBy(shellsTotal)
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
     

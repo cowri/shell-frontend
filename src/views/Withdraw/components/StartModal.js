@@ -238,9 +238,11 @@ const StartModal = ({
 
     } 
 
-    const liquidityChange = totalWithdraw.dividedBy(state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire']))
+    const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
+    const liquidityChange = totalWithdraw.dividedBy(liqTotal)
 
-    const shellsChange = shellsToBurn.dividedBy(state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire']))
+    const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
+    const shellsChange = shellsToBurn.dividedBy(liqTotal)
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
     
