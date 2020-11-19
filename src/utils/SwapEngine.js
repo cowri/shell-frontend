@@ -50,8 +50,8 @@ export default class SwapEngine {
                 display: target.getDisplayFromRaw(max, target.swapDecimals),
                 raw: max
             },
-            shellIx: shellIx,
-            shellDerivativeIx: shellDerivativeIx
+            _shellIx: shellIx,
+            _shellDerivativeIx: shellDerivativeIx
         }
         
     }
@@ -68,18 +68,26 @@ export default class SwapEngine {
             )
         }))
 
-        let shell
+        let shellIx
+        let shellDerivativeIx
         let min = new BigNumber(1e80)
         
         for (let i = 0; i < shells.length; i++) {
             if (!quotes[i] || quotes[i].toString() == REVERTED) continue
             if (quotes[i].isLessThan(min)){
                 min = quotes[i]
-                shell = shells[i]
+                shellIx = shells[i]
             }
         }
 
-        if (shell == undefined) throw( new Error("reverted"))
+        if (shellIx == undefined) throw( new Error("reverted"))
+            
+        for (let i = 0; i < this.shells[shellIx].derivatives.length; i++) {
+            if (this.shells[shellIx].derivatives[i].address == origin.address) {
+                shellDerivativeIx = i
+                break
+            }
+        }
         
         return {
             originAmount: {
@@ -92,7 +100,8 @@ export default class SwapEngine {
                 raw: target.getRawFromDisplay(targetAmount),
                 display: targetAmount
             },
-            shellIx: shell
+            _shellIx: shellIx,
+            _shellDerivativeIx: shellDerivativeIx
         }
 
     }

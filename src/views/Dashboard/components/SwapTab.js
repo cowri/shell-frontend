@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { fromJS } from 'immutable'
 
 import BigNumber from 'bignumber.js'
 
@@ -111,10 +112,9 @@ const SwapTab = () => {
   const [step, setStep] = useState('start')
   const [originIx, setOriginIx] = useState(0)
   const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
-  const [originValue, setOriginValue] = useState('')
+  const [originValue, setOriginValue] = useState('1')
   const [targetValue, setTargetValue] = useState('')
-  const [shellIx, setShellIx] = useState(null)
-  const [shellDerivativeIx, setShellDerivativeIx] = useState(null)
+  const [ixs, setIxs] = useState(fromJS({'shell': 0, 'derivative': 0}))
   const [swapType, setSwapType] = useState('origin')
   const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
@@ -125,10 +125,11 @@ const SwapTab = () => {
 
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
-
-  const initiallyLocked = state.getIn(['assets', originIx, 'allowance', 'raw']) == 0
-  const [unlocked, setUnlocked] = useState(false)
-
+  
+  const [unlocked, setUnlocked] = useState(
+    !state.getIn(['shells', 0, 'derivatives', 0, 'allowance', 'numeraire']).isZero()
+  )
+  
   const sanitizeNumber = (number, decimals) => {
     number = number.replace(/,/g,'')
     if (number.indexOf('.') != -1 && number.split('.')[1].length > decimals) {
@@ -143,8 +144,7 @@ const SwapTab = () => {
 
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
       
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return 
 
     }
@@ -154,8 +154,7 @@ const SwapTab = () => {
       setTargetValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -165,8 +164,7 @@ const SwapTab = () => {
       setOriginValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -175,8 +173,7 @@ const SwapTab = () => {
 
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -185,12 +182,12 @@ const SwapTab = () => {
       try {
         
         const method = swapType == 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
-
+        
         const { 
           originAmount,
           targetAmount,
-          shellIx,
-          shellDerivativeIx
+          _shellIx,
+          _shellDerivativeIx
         } = await engine[method](
           origin, 
           target, 
@@ -201,12 +198,19 @@ const SwapTab = () => {
           ? setTargetValue(targetAmount.display)
           : setOriginValue(originAmount.display)
           
+        setIxs(ixs.set('shell', _shellIx).set('derivative', _shellDerivativeIx))
         setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
-        setShellIx(shellIx)
-        setShellDerivativeIx(shellDerivativeIx)
+        setUnlocked(state.getIn([
+          'shells', 
+          _shellIx, 
+          'derivatives', 
+          _shellDerivativeIx, 
+          'allowance', 
+          'numeraire'
+        ]).isGreaterThanOrEqualTo(originAmount.numeraire))
 
       } catch (e) {
-
+        
         swapType == 'origin'
           ? setTargetValue('')
           : setOriginValue('')
@@ -257,7 +261,7 @@ const SwapTab = () => {
     let method = swapType === 'origin' ? 'executeOriginSwap' : 'executeTargetSwap'
     
     let tx = engine[method](
-      shellIx, 
+      ixs.get('shell'), 
       origin, 
       target, 
       sanitizeNumber(originValue, origin.decimals), 
@@ -305,7 +309,7 @@ const SwapTab = () => {
     setStep('confirming')
 
     const tx = origin.approve(
-      engine.shells[shellIx].address,
+      engine.shells[ixs.get('shell')].address,
       amount.toString()
     )
 
@@ -318,15 +322,20 @@ const SwapTab = () => {
       setTxHash(hash)
       setStep('broadcasting')
     }
+    
+    let success = false
 
     function onConfirmation () {
+      success = true
       setStep('unlockSuccess')
       setUnlocked(true)
       engine.sync()
     }
 
     function onError () {
-      setStep('error')
+
+      if (!success) setStep('error')
+
     }
 
   }
@@ -340,10 +349,6 @@ const SwapTab = () => {
   }
   
   const _handleOriginSelect = v => {
-    
-    const allowance = state.getIn(['assets', v, 'allowance', 'raw'])
-
-    setUnlocked(allowance != 0)
 
     setOriginIx(v)
 
@@ -427,7 +432,7 @@ const SwapTab = () => {
 
   let toolTipMsg = ''
 
-  if (initiallyLocked && !unlocked) {
+  if (!unlocked) {
 
     toolTipMsg = 'You must unlock ' + origin.symbol + ' to swap'
 
@@ -444,13 +449,13 @@ const SwapTab = () => {
   
   let allowance
   
-  if (shellIx != null && shellDerivativeIx != null) {
-
+  if (ixs.get('shell') != null && ixs.get('derivative') != null) {
+    
     allowance = state.getIn([
       'shells', 
-      shellIx,
+      ixs.get('shell'),
       'derivatives',
-      shellDerivativeIx, 
+      ixs.get('derivative'), 
       'allowance', 
       'numeraire'
     ])
@@ -462,9 +467,9 @@ const SwapTab = () => {
     } else {
       allowance = state.getIn([
         'shells', 
-        shellIx, 
+        ixs.get('shell'), 
         'derivatives',
-        shellDerivativeIx,
+        ixs.get('derivative'),
         'allowance', 
         'display'
       ])
@@ -472,16 +477,14 @@ const SwapTab = () => {
 
   }
     
-  
-  
   const unlockOrigin = () => setStep('unlocking')
-    
+  
   return (
 
     <StyledSwapTab>
 
       { step === 'unlocking' && <ModalUnlock 
-          coin={state.getIn(['derivatives', originIx])} 
+          coin={state.getIn(['shells', ixs.get('shell'), 'derivatives', ixs.get('derivative') ])} 
           handleUnlock={handleUnlock} 
           handleCancel={ () => setStep('none') } 
         /> }
@@ -539,14 +542,14 @@ const SwapTab = () => {
       </StyledRows>
       <StyledActions>
         <Button 
-          disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
+          disabled={( (targetValue == 0 || originValue == 0) || !unlocked)}
           onClick={handleSwap}
-          outlined={initiallyLocked && !unlocked}
+          outlined={!unlocked}
         >
           Swap
         </Button> 
         <div style={{ width: 12 }} />
-        { (initiallyLocked && !unlocked) ? <Button onClick={ () => setStep('unlocking') }> Unlock { origin.symbol } </Button> : null } 
+        { !unlocked ? <Button onClick={ () => setStep('unlocking') }> Unlock { origin.symbol } </Button> : null } 
       </StyledActions>
     </StyledSwapTab>
   )
