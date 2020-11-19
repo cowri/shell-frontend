@@ -22,12 +22,14 @@ import { List } from 'immutable'
 
 import BigNumber from 'bignumber.js'
 
+BigNumber.config({ DECIMAL_PLACES: 18 })
+
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
 
 const StyledInput = styled.div`
   margin: 24px 0;
+  display: flex;
 `
-
 const StyledStartAdornment = styled.div`
   align-items: center;
   display: flex;
@@ -35,7 +37,6 @@ const StyledStartAdornment = styled.div`
   min-width: 44px;
   min-height: 44px;
 `
-
 const StyledWithdrawEverything = styled.div`
   position: relative;
   height: 25px;
@@ -47,21 +48,17 @@ const StyledWithdrawEverything = styled.div`
     right: 0px;
   }
 `
-
 const StyledEndAdornment = styled.div`
   padding-left: 6px;
   padding-right: 12px;
 `
-
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
 `
-
 const StyledRows = styled.div`
   margin-top: -24px;
 `
-
 const StyledShells = styled.div`
   align-items: center;
   height: 50px;
@@ -77,12 +74,10 @@ const StyledShellBalance = styled.div`
   font-size: 36px;
   font-weight: 300;
 `
-
 const StyledWithdrawMessage = styled.div`
   padding: 20px 10px 10px 10px;
   font-size: 22px;
 `
-
 const errorStyles = {
   color: 'red',
   fontSize: '26px',
@@ -107,10 +102,121 @@ const StartModal = ({
   const [ inputs, setInputs ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
   const [ errors, setErrors ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
   const [ fees, setFees ] = useState(new Array(engine.shells[shellIx].assets.length).fill(null))
+  const [ maxed, setMaxed ] = useState(null)
+  const [ maxedNoSlip, setMaxedNoSlip ] = useState(null)
   const [ feeTip, setFeeTip ] = useState(DEFAULT)
   const [ proportional, setProportional ] = useState(false)
   const [ zero, setZero ] = useState(true)
   const [ error, setError ] = useState(null)
+  
+  const withdrawSingleMax = async (ix) => {
+
+    const totalLiq = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
+    const totalShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
+    const ownedShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'numeraire'])
+    const percentToBurn = ownedShells.dividedBy(totalShells)
+    let withdraw = totalLiq.multipliedBy(percentToBurn)
+    
+    let calcedShells = false 
+    
+    const one = new BigNumber('1')
+    const reducer = new BigNumber('.95')
+
+    while (!calcedShells) {
+      
+      withdraw = withdraw.multipliedBy(reducer)
+      calcedShells = engine.calculateWithdraw(shellIx, withdraw, ix)
+
+    }
+
+    let up = new BigNumber('.025')
+    let down = up.dividedBy('2')
+    let multiple = one.plus(up)
+
+    let iterate = true
+    const convergence = ('.000001')
+    
+    while (iterate) {
+
+      if (up.isLessThan(convergence)) {
+        
+        iterate = false
+
+      } else {
+
+        const test = withdraw.multipliedBy(multiple)
+        calcedShells = engine.calculateWithdraw(shellIx, test, ix)
+
+        if (calcedShells) withdraw = test
+        else {
+          multiple = multiple.minus(down)
+          up = up.dividedBy(2)
+          down = down.dividedBy(2)
+        }
+
+      }
+    }
+    
+    withdraw = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(withdraw)
+    
+    setMaxed(ix)
+    setMaxedNoSlip(null)
+    setProportional(false)  
+    setInputs(inputs.map( (v, i) => i == ix ? withdraw : ''))
+
+  }
+  
+  const withdrawMaxNoSlip = (ix) => {
+    
+    const totalLiq = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
+    const totalShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
+    const ownedShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'numeraire'])
+    const percentToBurn = ownedShells.dividedBy(totalShells)
+    let withdraw = totalLiq.multipliedBy(percentToBurn)
+    
+    const one = new BigNumber('1')
+    const reducer = new BigNumber('.95')
+    
+    let shellsToBurn = false
+
+    while (!shellsToBurn) {
+      
+      withdraw = withdraw.multipliedBy(reducer)
+      shellsToBurn = engine.calculateWithdraw(shellIx, withdraw, ix)
+
+    }
+    
+    let iterate = true
+    while (iterate) {
+
+      shellsToBurn = engine.calculateWithdraw(shellIx, withdraw, ix).absoluteValue()
+      
+      const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
+      const liquidityChange = withdraw.dividedBy(liqTotal)
+      
+      const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
+      const shellsChange = shellsToBurn.dividedBy(shellsTotal)
+
+      const slippage = new BigNumber(1)
+        .minus(shellsChange.dividedBy(liquidityChange))
+        .absoluteValue()
+      
+      withdraw = withdraw.multipliedBy('.99')
+      
+      if (slippage.isEqualTo(engine.shells[shellIx].epsilon)) {
+        iterate = false
+      }
+      
+    }
+    
+    withdraw = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(withdraw)
+
+    setMaxed(ix)
+    setMaxedNoSlip(ix)
+    setProportional(false)  
+    setInputs(inputs.map( (v, i) => i == ix ? withdraw : ''))
+    
+  }
 
   const handleSubmit = (e) => {
     
@@ -137,11 +243,13 @@ const StartModal = ({
     const amounts = []
 
     inputs.forEach( (v,i) => {
-      if (0 < v) {
+
+      if (v.replace('.','') != '') {
         const asset = engine.shells[shellIx].assets[i]
         addresses.push(asset.address)
         amounts.push(asset.getAllFormatsFromDisplay(v))
       }
+
     })
     
     return { addresses, amounts }
@@ -179,6 +287,8 @@ const StartModal = ({
       setFeeTip(feeMessage)
       setZero(false)
       setProportional(true)
+      setMaxed(null)
+      setMaxedNoSlip(null)
 
     } else {
       
@@ -187,12 +297,19 @@ const StartModal = ({
       setFeeTip(DEFAULT)
       setProportional(false)
       setZero(true)
+      setMaxed(null)
+      setMaxedNoSlip(null)
 
     }
 
   }
   
   const onInput = (v, i) => {
+
+    if (maxed != null && inputs.get(i).replace(/,/g,'') != v) {
+      setMaxed(null)
+      setMaxedNoSlip(null)
+    }
 
     const updatedInputs = inputs.set(i,v)
       
@@ -211,18 +328,18 @@ const StartModal = ({
   }
   
   const primeWithdraw = async () => {
-    
+
     if (zero) return
-    
-    const { addresses, amounts } = getAddressesAndAmounts()
-    
+
+    var { addresses, amounts } = getAddressesAndAmounts()
+
     const totalWithdraw = amounts.reduce( (a, c) => a.plus(c.numeraire), new BigNumber(0) )
     
-    const fees = engine.getFees(shellIx, addresses, amounts.map( a => {
-      return engine.shells[shellIx].getAllFormatsFromNumeraire(a.numeraire.negated())
-    }))
+    if (totalWithdraw.isZero()) return
     
     const shellsToBurn = await engine.shells[shellIx].viewSelectiveWithdraw(addresses, amounts)
+    
+    console.log("Shells to burn!", shellsToBurn.toString())
     
     if (shellsToBurn === false || shellsToBurn.toString() == REVERTED) {
       
@@ -240,11 +357,13 @@ const StartModal = ({
 
     const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
     const liquidityChange = totalWithdraw.dividedBy(liqTotal)
-
+    
     const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
     const shellsChange = shellsToBurn.dividedBy(shellsTotal)
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
+    
+    console.log("slippage", slippage.toString())
     
     const fee = shellsToBurn.multipliedBy(slippage)
     
@@ -322,9 +441,14 @@ const StartModal = ({
       <TokenInput
         disabled={proportional}
         icon={asset.icon}
-        onChange={ payload => onInput(payload.value, ix) }
+        isMaxed={maxed == ix}
+        isMaxedNoSlip={maxedNoSlip == ix}
+        onChange={ payload => (console.log("on change"), onInput(payload.value, ix)) }
+        onValueChange={ value => console.log("val change", value) }
         symbol={asset.symbol}
         value={inputs.get(ix)}
+        withdrawMax={() => withdrawSingleMax(ix)}
+        withdrawMaxNoSlip={() => withdrawMaxNoSlip(ix)}
       />
     )
 
@@ -371,9 +495,13 @@ const TokenInput = ({
   disabled,
   error,
   icon,
+  isMaxed,
+  isMaxedNoSlip,
   onChange,
   symbol,
-  value
+  value,
+  withdrawMax,
+  withdrawMaxNoSlip,
 }) => (
   <StyledInput>
     <NumberFormat fullWidth
@@ -385,6 +513,7 @@ const TokenInput = ({
       min="0"
       onValueChange={ onChange }
       placeholder="0"
+      style={{width:'90%', marginRight: '5px'}}
       thousandSeparator={true}
       type="text"
       value={value}
@@ -401,6 +530,23 @@ const TokenInput = ({
         )
       }}
     />
+    <Button 
+      outlined={!isMaxed}
+      small
+      style={{height: '40px', margin: 'auto', marginLeft: '5px'}}
+      onClick={withdrawMax}
+    >
+      Max 
+    </Button>
+    <Button 
+      // disabled={!isMaxed}
+      outlined={!isMaxedNoSlip}
+      small
+      style={{height: '40px', width: '140px', margin: 'auto', marginLeft: '5px'}}
+      onClick={withdrawMaxNoSlip}
+    >
+      No Slippage
+    </Button>
   </StyledInput>
 )
 

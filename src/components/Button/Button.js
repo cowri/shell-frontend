@@ -30,6 +30,7 @@ const Button = ({
   onClick,
   outlined,
   small,
+  style
 }) => {
 
   return (
@@ -38,6 +39,7 @@ const Button = ({
       onClick={onClick}
       outlined={outlined}
       small={small}
+      style={style}
       type="button"
     >
       {children}

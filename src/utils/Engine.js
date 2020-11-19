@@ -1,13 +1,14 @@
 import React from 'react'
 import { fromJS, List, Map  } from "immutable"
-import config from "../mainnet.multiple.config"
+import config from "../kovan.multiple.compound.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"
 import BigNumber from "bignumber.js"
 import { CircularProgress } from '@material-ui/core'
-
 import shellIcon from "../assets/logo.png"
+
+BigNumber.set({ DECIMAL_PLACES: 18 })
 
 export default class Engine extends SwapEngine {
 
@@ -401,6 +402,41 @@ export default class Engine extends SwapEngine {
             })
             .on('error', onError)
 
+    }
+    
+    calculateWithdraw (shellIx, withdrawal, withdrawalIx) {
+        
+        const totalShells = this.state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire' ])
+        const liquidity = this.state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire' ])
+        const liquidities = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal' ]).toJS()
+            .map(n => n.numeraire)
+        
+        const oldBalances = liquidities.slice()
+        const newBalances = liquidities.slice()
+        
+        const oldTotal = liquidity
+        const newTotal = liquidity.minus(withdrawal)
+        
+        newBalances[withdrawalIx] = newBalances[withdrawalIx].minus(withdrawal)
+        
+        try {
+
+            const burnt = this.shells[shellIx].calculateLiquidity(
+                oldTotal,
+                newTotal,
+                oldBalances,
+                newBalances,
+                totalShells
+            )
+            
+            return burnt
+
+        } catch (e) { 
+
+            return false 
+
+        }
+        
     }
 
     selectiveWithdraw (shellIx, addresses, amounts, onHash, onConfirmation, onError) {

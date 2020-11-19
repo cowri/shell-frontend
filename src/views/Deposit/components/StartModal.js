@@ -288,7 +288,7 @@ const StartModal = ({
       <ModalActions>
         <Button outlined onClick={onDismiss}> Cancel </Button>
         <Button disabled={ isInputError || zero } 
-          style={{cursor: 'no-drop'}}
+          style={isInputError || zero ? {cursor: 'no-drop'} : null}
           onClick={ () => setPrompting(true) } > 
           Deposit 
         </Button>

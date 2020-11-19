@@ -4,7 +4,7 @@ export default class NumericFormats {
     
     getNumeraireFromDisplay (display) { 
 
-      display = display.replace(',','')
+      display = display.replace(/,/g,'')
 
       return new BigNumber(display === '' ? 0 : display);
 
@@ -12,7 +12,7 @@ export default class NumericFormats {
 
     getAllFormatsFromDisplay (display) {
 
-      display = display.replace(',','')
+      display = display.replace(/,/g,'')
 
       return {
         display: display,
@@ -60,7 +60,7 @@ export default class NumericFormats {
 
     getRawFromDisplay (display) {
 
-      display = display.replace(',','')
+      display = display.replace(/,/g,'')
 
       return new BigNumber(display).multipliedBy(10 ** this.decimals)
 
@@ -79,8 +79,7 @@ export default class NumericFormats {
     getDisplayFromNumeraire (numeraire, decimals) {
 
       decimals = decimals ? decimals : this.displayDecimals
-
-      return Number(numeraire.toFixed(decimals))
+      return Number(numeraire.toFixed(decimals, 1))
         .toLocaleString('en-US', { minimumFractionDigits: decimals })
 
     }

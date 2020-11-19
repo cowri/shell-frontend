@@ -63,6 +63,8 @@ const ModalUnlock = ({
   
   let current = coin.getIn(['allowance', 'numeraire'])
   
+  console.log("current", current.toString())
+  
   if ( current.isGreaterThan(new BigNumber('100000000'))) {
     current = '100,000,000+'
   } else if ( current.isGreaterThan(new BigNumber(10000000))) {

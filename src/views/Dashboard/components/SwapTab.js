@@ -111,10 +111,10 @@ const SwapTab = () => {
   const [step, setStep] = useState('start')
   const [originIx, setOriginIx] = useState(0)
   const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
-  const [originValue, setOriginValue] = useState('')
+  const [originValue, setOriginValue] = useState('1')
   const [targetValue, setTargetValue] = useState('')
-  const [shellIx, setShellIx] = useState(null)
-  const [shellDerivativeIx, setShellDerivativeIx] = useState(null)
+  const [shellIx, setShellIx] = useState(0)
+  const [shellDerivativeIx, setShellDerivativeIx] = useState(0)
   const [swapType, setSwapType] = useState('origin')
   const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
@@ -125,10 +125,11 @@ const SwapTab = () => {
 
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
-
-  const initiallyLocked = state.getIn(['assets', originIx, 'allowance', 'raw']) == 0
-  const [unlocked, setUnlocked] = useState(false)
-
+  
+  const [unlocked, setUnlocked] = useState(
+    !state.getIn(['shells', 0, 'derivatives', 0, 'allowance', 'numeraire']).isZero()
+  )
+  
   const sanitizeNumber = (number, decimals) => {
     number = number.replace(/,/g,'')
     if (number.indexOf('.') != -1 && number.split('.')[1].length > decimals) {
@@ -140,6 +141,8 @@ const SwapTab = () => {
   }
   
   useEffect(() => {
+    
+    console.log("hello")
 
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
       
@@ -204,6 +207,14 @@ const SwapTab = () => {
         setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
         setShellIx(shellIx)
         setShellDerivativeIx(shellDerivativeIx)
+        setUnlocked(state.getIn([
+          'shells', 
+          shellIx, 
+          'derivatives', 
+          shellDerivativeIx, 
+          'allowance', 
+          'numeraire'
+        ]).isGreaterThanOrEqualTo(originAmount.numeraire))
 
       } catch (e) {
 
@@ -340,10 +351,6 @@ const SwapTab = () => {
   }
   
   const _handleOriginSelect = v => {
-    
-    const allowance = state.getIn(['assets', v, 'allowance', 'raw'])
-
-    setUnlocked(allowance != 0)
 
     setOriginIx(v)
 
@@ -427,7 +434,7 @@ const SwapTab = () => {
 
   let toolTipMsg = ''
 
-  if (initiallyLocked && !unlocked) {
+  if (!unlocked) {
 
     toolTipMsg = 'You must unlock ' + origin.symbol + ' to swap'
 
@@ -472,16 +479,20 @@ const SwapTab = () => {
 
   }
     
-  
-  
   const unlockOrigin = () => setStep('unlocking')
+  
+  const thing = state.getIn(['shells', shellIx, 'derivatives', shellDerivativeIx ])
+  
+  console.log('allowance', thing ?  thing.getIn(['allowance', 'numeraire']).toString() : null)
+  
+  window.thing = thing
     
   return (
 
     <StyledSwapTab>
 
       { step === 'unlocking' && <ModalUnlock 
-          coin={state.getIn(['derivatives', originIx])} 
+          coin={state.getIn(['shells', shellIx, 'derivatives', shellDerivativeIx ])} 
           handleUnlock={handleUnlock} 
           handleCancel={ () => setStep('none') } 
         /> }
@@ -539,14 +550,14 @@ const SwapTab = () => {
       </StyledRows>
       <StyledActions>
         <Button 
-          disabled={( (targetValue == 0 || originValue == 0) || (initiallyLocked && !unlocked))}
+          disabled={( (targetValue == 0 || originValue == 0) || !unlocked)}
           onClick={handleSwap}
-          outlined={initiallyLocked && !unlocked}
+          outlined={!unlocked}
         >
           Swap
         </Button> 
         <div style={{ width: 12 }} />
-        { (initiallyLocked && !unlocked) ? <Button onClick={ () => setStep('unlocking') }> Unlock { origin.symbol } </Button> : null } 
+        { !unlocked ? <Button onClick={ () => setStep('unlocking') }> Unlock { origin.symbol } </Button> : null } 
       </StyledActions>
     </StyledSwapTab>
   )

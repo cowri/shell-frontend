@@ -4,6 +4,8 @@ import ShellABI from '../abi/Shell.abi.json';
 
 import NumericFormats from "./NumberFormats.js";
 
+BigNumber.config({ DECIMAL_PLACES: 18 })
+
 const ONE = new BigNumber(1)
 
 export default class Shell extends NumericFormats {
@@ -18,6 +20,7 @@ export default class Shell extends NumericFormats {
         this.symbol = symbol
         this.icon = icon
         this.decimals = decimals
+        this.max = new BigNumber('.25')
 
     }
     
@@ -41,7 +44,7 @@ export default class Shell extends NumericFormats {
 
         const liquiditiesOwned = liq[1].map(l => this.getAllFormatsFromRaw(l.raw.multipliedBy(ownedRatio)))
         
-        const [ utilityTotal, utilitiesTotal, fees ] = this.calculateUtilities(liq[0], liq[1])
+        const [ utilityTotal, utilitiesTotal, fees ] = this.calculateUtilities(liq[0].numeraire, liq[1].map(n => n.numeraire))
         
         const utilitiesOwned = utilitiesTotal.map(util => this.getAllFormatsFromRaw(util.raw.multipliedBy(ownedRatio)))
             
@@ -69,9 +72,10 @@ export default class Shell extends NumericFormats {
         let fees = []
 
         for (let i = 0; i < liquidities.length; i++) {
+
+            const balance = liquidities[i]
             
-            const balance = liquidities[i].numeraire
-            const ideal = liquidity.numeraire.multipliedBy(this.weights[i])
+            const ideal = liquidity.multipliedBy(this.weights[i])
 
             let margin = new BigNumber(0)
 
@@ -112,7 +116,7 @@ export default class Shell extends NumericFormats {
                 if (fee.isGreaterThan(this.max)) fee = this.max
                 
                 fee = fee.multipliedBy(margin)
-
+                
                 fees.push(this.getAllFormatsFromNumeraire(fee))
                 
                 let discreteUtility = balance.minus(fee)
@@ -129,6 +133,102 @@ export default class Shell extends NumericFormats {
         
         return [ utility, utilities, fees ]
         
+    }
+    
+    calculateLiquidity (oldTotal, newTotal, oldBalances, newBalances, totalShells) {
+        
+        try {
+
+            this.enforceHalts(oldTotal, newTotal, oldBalances, newBalances)
+
+        } catch (e) { return false }
+        
+        const [ oldUtil, _nothing, omegas ] = this.calculateUtilities(oldTotal, oldBalances)
+        const [ newUtil, _empty, psis ] = this.calculateUtilities(newTotal, newBalances)
+        
+        const omega = omegas.reduce( ((t,c) => t.plus(c.numeraire)), new BigNumber(0) )
+        const psi = psis.reduce( ((t,c) => t.plus(c.numeraire)), new BigNumber(0) )
+        
+        const feeDiff = psi.minus(omega)
+        const liqDiff = newTotal.minus(oldTotal)
+        
+        let shellMultiplier
+        
+        if (totalShells.isZero()) {
+            
+            return newTotal.minus(psi)
+
+        } else if (feeDiff >= 0) {
+            
+            shellMultiplier = liqDiff
+                .minus(feeDiff)
+                .dividedBy(oldUtil.numeraire)
+
+        } else {
+            
+            shellMultiplier = liqDiff
+                .minus( feeDiff.multipliedBy(this.lambda) )
+                .dividedBy(oldUtil.numeraire)
+            
+        }
+        
+        const burnt = totalShells
+            .multipliedBy(shellMultiplier)
+            .multipliedBy(ONE.plus(this.epsilon))
+        
+        return burnt 
+        
+    }
+    
+    enforceHalts (oldTotal, newTotal, oldBalances, newBalances) {
+        
+        for (let i = 0; i < oldBalances.length; i++) {
+            
+            const newBal = newBalances[i]
+            const oldBal = oldBalances[i]
+
+            const nIdeal = newTotal.multipliedBy(this.weights[i])
+            
+            if (newBal.isGreaterThan(nIdeal)) {
+                
+                const upperAlpha = ONE.plus(this.alpha)
+                
+                const newHalt = nIdeal.multipliedBy(upperAlpha)
+                
+                if (newBal.isGreaterThan(newHalt)) {
+                    
+                    const oldHalt = oldTotal.multipliedBy(this.weights[i]).multipliedBy(upperAlpha)
+                    
+                    const exacerbated = newBal.minus(newHalt).isGreaterThan(oldBal.minus(oldHalt))
+                    
+                    if (oldBal.isGreaterThan(oldHalt) || exacerbated) {
+
+                        throw new Error("above-upper-halt")
+
+                    }
+                    
+                }
+
+            } else {
+                
+                const lowerAlpha = ONE.minus(this.alpha)
+                
+                const newHalt = nIdeal.multipliedBy(lowerAlpha)
+
+                if (newBal.isLessThan(newHalt)) {
+                    
+                    const oldHalt = oldTotal.multipliedBy(this.weights[i]).multipliedBy(lowerAlpha)
+
+                    const exacerbated = newHalt.minus(newBal).isGreaterThan(oldHalt.minus(oldBal))
+                    
+                    if (oldBal.isLessThan(oldHalt) || exacerbated) {
+                        
+                        throw new Error("below-lower-halt")
+                        
+                    }
+                }
+            }
+        }
     }
     
     async getParams () {
