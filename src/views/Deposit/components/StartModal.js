@@ -266,6 +266,7 @@ const StartModal = ({
   })
 
   const isInputError = error || errors.find( c => !!c )
+  console.log("ERROR", error, "ERRORS", errors)
   
   return (
     <Modal onDismiss={onDismiss}>

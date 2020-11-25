@@ -19,8 +19,8 @@ const StyledModalActions = withTheme(styled.div`
   }
 `)
 
-const ModalActions = ({ centered, children }) => (
-  <StyledModalActions centered={centered}>
+const ModalActions = ({ centered, children, marginTop }) => (
+  <StyledModalActions style={{marginTop: marginTop ? marginTop : 0}} centered={centered}>
     {children}
   </StyledModalActions>
 )

@@ -32,6 +32,8 @@ const Button = ({
   small,
   style
 }) => {
+  
+  if (disabled && style) style['color'] = '#9fbcd8'
 
   return (
     <StyledButton

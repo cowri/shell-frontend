@@ -10,7 +10,7 @@ import ModalIcon from '../ModalIcon'
 import ModalTitle from '../ModalTitle'
 
 const ModalConfirm = ({wallet}) => (
-  <Modal>
+  <Modal width="400px" >
     <ModalTitle> Confirming with { wallet } </ModalTitle>
     <ModalIcon>
       <img 
@@ -22,7 +22,7 @@ const ModalConfirm = ({wallet}) => (
         style={{ height: 96 }} 
       />
     </ModalIcon>
-    <ModalActions>
+    <ModalActions marginTop="10px">
       <div style={{ width: '100%' }}>
       <Loader />
       </div>

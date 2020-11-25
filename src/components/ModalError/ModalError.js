@@ -25,7 +25,7 @@ const ModalError = ({
   title
 }) => {
   return (
-    <Modal>
+    <Modal width="400px" >
       <ModalTitle>{title}</ModalTitle>
       <ModalIcon>
         <WarningIcon />

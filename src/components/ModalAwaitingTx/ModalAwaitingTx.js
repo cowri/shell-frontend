@@ -27,7 +27,7 @@ const AwaitingTxModal = ({ txHash }) => {
     : "https://etherscan.io/tx/" + txHash
 
   return (
-    <Modal>
+    <Modal width="400px">
       <ModalTitle> Please wait while your transaction confirms </ModalTitle>
       <ModalIcon>
         <HourglassFullIcon />

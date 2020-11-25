@@ -167,8 +167,8 @@ export default class Shell extends NumericFormats {
         } else {
             
             shellMultiplier = liqDiff
-                .minus( feeDiff.multipliedBy(this.lambda) )
-                .dividedBy(oldUtil.numeraire)
+                .minus( this.lambda.multipliedBy(feeDiff) )
+                .dividedBy( oldUtil.numeraire )
             
         }
         
@@ -188,7 +188,7 @@ export default class Shell extends NumericFormats {
             const oldBal = oldBalances[i]
 
             const nIdeal = newTotal.multipliedBy(this.weights[i])
-            
+
             if (newBal.isGreaterThan(nIdeal)) {
                 
                 const upperAlpha = ONE.plus(this.alpha)
@@ -302,7 +302,7 @@ export default class Shell extends NumericFormats {
                 addresses, 
                 amounts.map( a => a.raw.integerValue().toFixed() )
             ).call() )
-
+            
             return this.getNumeraireFromRaw(shellsToBurn)
 
         } catch {

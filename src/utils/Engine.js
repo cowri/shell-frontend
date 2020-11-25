@@ -404,20 +404,30 @@ export default class Engine extends SwapEngine {
 
     }
     
-    calculateWithdraw (shellIx, withdrawal, withdrawalIx) {
+    calculateWithdraw (shellIx, withdrawals) {
         
         const totalShells = this.state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire' ])
         const liquidity = this.state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire' ])
         const liquidities = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal' ]).toJS()
             .map(n => n.numeraire)
-        
+            
         const oldBalances = liquidities.slice()
         const newBalances = liquidities.slice()
         
         const oldTotal = liquidity
-        const newTotal = liquidity.minus(withdrawal)
+        let newTotal = liquidity
+
+        for (let i = 0; i < withdrawals.length; i++) {
+            
+            newTotal = newTotal.minus(withdrawals[i])
+            newBalances[i] = newBalances[i].minus(withdrawals[i])
+            
+        }
         
-        newBalances[withdrawalIx] = newBalances[withdrawalIx].minus(withdrawal)
+        // console.log("old total", oldTotal.toString())
+        // console.log("new total", newTotal.toString())
+        // console.log("old balances", oldBalances.map(b => b.toString()))
+        // console.log("new balances", newBalances.map(b => b.toString()))
         
         try {
 
@@ -429,13 +439,36 @@ export default class Engine extends SwapEngine {
                 totalShells
             )
             
-            return burnt
+            // console.log("burnt", burnt, burnt.toString())
+            
+            return burnt.absoluteValue()
 
         } catch (e) { 
 
             return false 
 
         }
+        
+    }
+    
+    calculateSingleWithdraw (shellIx, withdrawal, withdrawalIx) {
+        
+        const length = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal' ]).toJS().length
+        // console.log(":LENGTH", length)
+        
+        // console.log("withdrawalIx", withdrawalIx)
+        
+        let withdrawals = new Array(length)
+
+        // console.log("withdrawals 1", withdrawals)
+        withdrawals.fill(new BigNumber('0'))
+
+        // console.log("withdrawals 2", withdrawals)
+        withdrawals[withdrawalIx] = withdrawal
+        
+        // console.log("withdrawals 3", withdrawals)
+        
+        return this.calculateWithdraw(shellIx, withdrawals)
         
     }
 

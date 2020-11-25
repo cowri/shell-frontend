@@ -110,54 +110,16 @@ const StartModal = ({
   const [ error, setError ] = useState(null)
   
   const withdrawSingleMax = async (ix) => {
-
-    const totalLiq = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
-    const totalShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
-    const ownedShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'numeraire'])
-    const percentToBurn = ownedShells.dividedBy(totalShells)
-    let withdraw = totalLiq.multipliedBy(percentToBurn)
     
-    let calcedShells = false 
+    if (maxed == ix && maxedNoSlip != ix) {
+      setMaxed(null)
+      return setMaxedNoSlip(null)
+    } 
     
-    const one = new BigNumber('1')
-    const reducer = new BigNumber('.95')
-
-    while (!calcedShells) {
-      
-      withdraw = withdraw.multipliedBy(reducer)
-      calcedShells = engine.calculateWithdraw(shellIx, withdraw, ix)
-
-    }
-
-    let up = new BigNumber('.025')
-    let down = up.dividedBy('2')
-    let multiple = one.plus(up)
-
-    let iterate = true
-    const convergence = ('.000001')
+    let withdraw = getMaxWithdraw(ix).absoluteValue()
     
-    while (iterate) {
-
-      if (up.isLessThan(convergence)) {
-        
-        iterate = false
-
-      } else {
-
-        const test = withdraw.multipliedBy(multiple)
-        calcedShells = engine.calculateWithdraw(shellIx, test, ix)
-
-        if (calcedShells) withdraw = test
-        else {
-          multiple = multiple.minus(down)
-          up = up.dividedBy(2)
-          down = down.dividedBy(2)
-        }
-
-      }
-    }
-    
-    withdraw = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(withdraw)
+    const decimals = engine.shells[shellIx].assets[ix].decimals
+    withdraw = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(withdraw, decimals)
     
     setMaxed(ix)
     setMaxedNoSlip(null)
@@ -166,50 +128,119 @@ const StartModal = ({
 
   }
   
-  const withdrawMaxNoSlip = (ix) => {
+  const getMaxWithdraw = (ix) => {
     
     const totalLiq = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
     const totalShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
     const ownedShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'numeraire'])
     const percentToBurn = ownedShells.dividedBy(totalShells)
+    
     let withdraw = totalLiq.multipliedBy(percentToBurn)
     
-    const one = new BigNumber('1')
-    const reducer = new BigNumber('.95')
+    let shellsToBurn = engine.calculateSingleWithdraw(shellIx, withdraw, ix)
     
-    let shellsToBurn = false
-
-    while (!shellsToBurn) {
+    while (!shellsToBurn || (shellsToBurn && shellsToBurn.isGreaterThan(ownedShells))) {
       
-      withdraw = withdraw.multipliedBy(reducer)
-      shellsToBurn = engine.calculateWithdraw(shellIx, withdraw, ix)
+      withdraw = withdraw.multipliedBy(new BigNumber('.99'))
+      shellsToBurn = engine.calculateSingleWithdraw(shellIx, withdraw, ix)
 
     }
     
-    let iterate = true
-    while (iterate) {
+    let down = new BigNumber('.0125')
+    let upper =new BigNumber('1.025')
 
-      shellsToBurn = engine.calculateWithdraw(shellIx, withdraw, ix).absoluteValue()
+    let priorShellsToBurn = shellsToBurn
+    while (true) {
+
+        priorShellsToBurn = shellsToBurn 
+          ? shellsToBurn 
+          : priorShellsToBurn
+
+        const test = withdraw.multipliedBy(upper)
+
+        shellsToBurn = engine.calculateSingleWithdraw(shellIx, test, ix)
+
+        if (shellsToBurn) shellsToBurn = shellsToBurn.absoluteValue()
+        
+        if (!shellsToBurn || shellsToBurn.isGreaterThan(ownedShells)) {
+
+          upper = upper.minus(down)
+          down = down.dividedBy(2)
+
+        } else if (shellsToBurn.isLessThanOrEqualTo(ownedShells)) {
+
+          withdraw = test
+
+          if (shellsToBurn.isEqualTo(ownedShells)) break
+          if (priorShellsToBurn.minus(shellsToBurn).absoluteValue()
+            .isLessThanOrEqualTo('.00000001')) break
+
+        } 
+
+    }
+    
+    return withdraw
+
+  }
+  
+  const withdrawMaxNoSlip = (ix) => {
+
+    let withdraw
+
+    if (maxed == ix) {
+
+      withdraw = engine
+        .shells[shellIx]
+        .assets[ix]
+        .getNumeraireFromDisplay(inputs.get(ix))
+
+    } else withdraw = getMaxWithdraw(ix).absoluteValue()
+    
+    let downer = new BigNumber('.975')
+    let upper = new BigNumber('.0125')
+
+    const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
+    const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
+    const epsilon = engine.shells[shellIx].epsilon
+    
+    
+    let priorShellsToBurn = engine.calculateSingleWithdraw(shellIx, withdraw, ix).absoluteValue()
+    let shellsToBurn
+    
+    while (true) {
+
+      const test = withdraw.multipliedBy(downer)
       
-      const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
-      const liquidityChange = withdraw.dividedBy(liqTotal)
-      
-      const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
+      shellsToBurn = engine.calculateSingleWithdraw(shellIx, test, ix).absoluteValue()
+      const liquidityChange = test.dividedBy(liqTotal)
       const shellsChange = shellsToBurn.dividedBy(shellsTotal)
+      let slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
 
-      const slippage = new BigNumber(1)
-        .minus(shellsChange.dividedBy(liquidityChange))
-        .absoluteValue()
       
-      withdraw = withdraw.multipliedBy('.99')
-      
-      if (slippage.isEqualTo(engine.shells[shellIx].epsilon)) {
-        iterate = false
-      }
+      if (slippage.isNegative()) {
+        const diff = slippage.plus(epsilon).absoluteValue()
+        
+        if (priorShellsToBurn && priorShellsToBurn.minus(shellsToBurn).absoluteValue().isLessThanOrEqualTo('.00000001')) break
+        if (diff.absoluteValue().isLessThanOrEqualTo('.0000000001')) {
+
+          downer = downer.plus(upper)
+          upper = upper.dividedBy(2)
+
+        } else {
+
+          priorShellsToBurn = shellsToBurn
+          withdraw = test
+
+        } 
+
+      } else break
       
     }
     
-    withdraw = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(withdraw)
+    const decimals = engine.shells[shellIx].assets[ix].decimals
+    withdraw = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(withdraw, decimals)
+    
+    // console.log("!<>#<!#><!#>!<# withdraw !<>!<!><>!<>!<@!><@!", withdraw)
 
     setMaxed(ix)
     setMaxedNoSlip(ix)
@@ -332,14 +363,20 @@ const StartModal = ({
     if (zero) return
 
     var { addresses, amounts } = getAddressesAndAmounts()
-
+    
     const totalWithdraw = amounts.reduce( (a, c) => a.plus(c.numeraire), new BigNumber(0) )
     
     if (totalWithdraw.isZero()) return
-    
+      
+    let amts = []
+
+    inputs.forEach( (v,i) => {
+      const asset = engine.shells[shellIx].assets[i]
+      amts.push(asset.getNumeraireFromDisplay(v))
+    })
+      
     const shellsToBurn = await engine.shells[shellIx].viewSelectiveWithdraw(addresses, amounts)
-    
-    console.log("Shells to burn!", shellsToBurn.toString())
+    const calculatedShellsToBurn = engine.calculateWithdraw(shellIx, amts)
     
     if (shellsToBurn === false || shellsToBurn.toString() == REVERTED) {
       
@@ -362,6 +399,15 @@ const StartModal = ({
     const shellsChange = shellsToBurn.dividedBy(shellsTotal)
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
+    
+    // console.log("<^><^><^><^><^><^><^><^><^><^>")
+    // console.log("calculatedShellsToBurn", calculatedShellsToBurn.toString())
+    // console.log("shellsToBurn", shellsToBurn.toString())
+    // console.log("total withdraw", totalWithdraw.toString())
+    // console.log("shellsTotal", shellsTotal.toString())
+    // console.log("shellsChange", shellsChange.toString())
+    // console.log("liq total", liqTotal.toString())
+    // console.log("liq change", liquidityChange.toString())
     
     console.log("slippage", slippage.toString())
     
@@ -443,7 +489,7 @@ const StartModal = ({
         icon={asset.icon}
         isMaxed={maxed == ix}
         isMaxedNoSlip={maxedNoSlip == ix}
-        onChange={ payload => (console.log("on change"), onInput(payload.value, ix)) }
+        onChange={ payload => onInput(payload.value, ix) }
         onValueChange={ value => console.log("val change", value) }
         symbol={asset.symbol}
         value={inputs.get(ix)}
@@ -454,9 +500,11 @@ const StartModal = ({
 
   })
   
+  console.log("maxed", maxed)
+  
   return (
-    <Modal onDismiss={onDismiss}>
-      <ModalTitle>Withdraw Funds</ModalTitle>
+    <Modal width="500px" onDismiss={onDismiss}>
+      <ModalTitle marginBottom="20px" >Withdraw Funds</ModalTitle>
       <ModalContent>
         <StyledForm onSubmit={handleSubmit}>
           <StyledRows>

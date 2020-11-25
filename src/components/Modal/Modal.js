@@ -35,16 +35,15 @@ const StyledModalContent = styled.div`
   display: flex;
   flex-direction: column;
   max-height: calc(100% - 12px);
-  max-width: 450px;
   position: sticky;
   width: calc(100% - 12px);
   margin: 6px;
 `
 
-const Modal = ({ children, onDismiss }) => (
+const Modal = ({ children, onDismiss, width }) => (
   <StyledModal>
     <StyledModalBg onClick={onDismiss} />
-    <StyledModalContent>
+    <StyledModalContent style={{marginTop: '-20%', maxWidth: width ? width : '450px'}} >
       <Surface>
         {children}
       </Surface>

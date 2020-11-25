@@ -9,6 +9,7 @@ import NumberFormat from 'react-number-format'
 import Button from '../Button'
 import Modal from '../Modal'
 import ModalActions from '../ModalActions'
+import ModalTitle from '../ModalTitle'
 
 import BigNumber from 'bignumber.js'
 
@@ -19,13 +20,6 @@ const ModalContent = withTheme(styled.div`
   padding: 0px 40px 20px;
   margin-top: -10px;
   font-size: 24px;
-`)
-
-const ModalTitle = withTheme(styled.div`
-  font-size: 1.75rem;
-  margin-bottom: 6px;
-  margin-top: 24px;
-  padding: 0 24px;
 `)
 
 const UnlimitedCheckbox = styled.div`
@@ -74,7 +68,7 @@ const ModalUnlock = ({
   }
 
   return (
-    <Modal>
+    <Modal width="400px" >
       <ModalTitle> Unlock { coin.get('symbol') } </ModalTitle>
       <ModalContent>
         <p> Shell's current allowance is { current } </p>
