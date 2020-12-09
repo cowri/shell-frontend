@@ -98,7 +98,7 @@
           "derivatives": [
             {
               "address": "0x625aE63000f46200499120B906716420bd059240",
-              "decimals": 6,
+              "decimals": 18,
               "icon": "asusd.svg",
               "name": "Aave Interest Bearing sUSD",
               "symbol": "aSUSD",

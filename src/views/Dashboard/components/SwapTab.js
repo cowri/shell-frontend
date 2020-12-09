@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { fromJS } from 'immutable'
 
 import BigNumber from 'bignumber.js'
 
@@ -113,8 +114,7 @@ const SwapTab = () => {
   const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
   const [originValue, setOriginValue] = useState('1')
   const [targetValue, setTargetValue] = useState('')
-  const [shellIx, setShellIx] = useState(0)
-  const [shellDerivativeIx, setShellDerivativeIx] = useState(0)
+  const [ixs, setIxs] = useState(fromJS({'shell': 0, 'derivative': 0}))
   const [swapType, setSwapType] = useState('origin')
   const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
@@ -146,8 +146,7 @@ const SwapTab = () => {
 
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
       
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return 
 
     }
@@ -157,8 +156,7 @@ const SwapTab = () => {
       setTargetValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -168,8 +166,7 @@ const SwapTab = () => {
       setOriginValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -178,8 +175,7 @@ const SwapTab = () => {
 
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setShellIx(null)
-      setShellDerivativeIx(null)
+      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -188,12 +184,12 @@ const SwapTab = () => {
       try {
         
         const method = swapType == 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
-
+        
         const { 
           originAmount,
           targetAmount,
-          shellIx,
-          shellDerivativeIx
+          _shellIx,
+          _shellDerivativeIx
         } = await engine[method](
           origin, 
           target, 
@@ -204,20 +200,19 @@ const SwapTab = () => {
           ? setTargetValue(targetAmount.display)
           : setOriginValue(originAmount.display)
           
+        setIxs(ixs.set('shell', _shellIx).set('derivative', _shellDerivativeIx))
         setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
-        setShellIx(shellIx)
-        setShellDerivativeIx(shellDerivativeIx)
         setUnlocked(state.getIn([
           'shells', 
-          shellIx, 
+          _shellIx, 
           'derivatives', 
-          shellDerivativeIx, 
+          _shellDerivativeIx, 
           'allowance', 
           'numeraire'
         ]).isGreaterThanOrEqualTo(originAmount.numeraire))
 
       } catch (e) {
-
+        
         swapType == 'origin'
           ? setTargetValue('')
           : setOriginValue('')
@@ -268,7 +263,7 @@ const SwapTab = () => {
     let method = swapType === 'origin' ? 'executeOriginSwap' : 'executeTargetSwap'
     
     let tx = engine[method](
-      shellIx, 
+      ixs.get('shell'), 
       origin, 
       target, 
       sanitizeNumber(originValue, origin.decimals), 
@@ -316,7 +311,7 @@ const SwapTab = () => {
     setStep('confirming')
 
     const tx = origin.approve(
-      engine.shells[shellIx].address,
+      engine.shells[ixs.get('shell')].address,
       amount.toString()
     )
 
@@ -329,15 +324,20 @@ const SwapTab = () => {
       setTxHash(hash)
       setStep('broadcasting')
     }
+    
+    let success = false
 
     function onConfirmation () {
+      success = true
       setStep('unlockSuccess')
       setUnlocked(true)
       engine.sync()
     }
 
     function onError () {
-      setStep('error')
+
+      if (!success) setStep('error')
+
     }
 
   }
@@ -451,13 +451,13 @@ const SwapTab = () => {
   
   let allowance
   
-  if (shellIx != null && shellDerivativeIx != null) {
-
+  if (ixs.get('shell') != null && ixs.get('derivative') != null) {
+    
     allowance = state.getIn([
       'shells', 
-      shellIx,
+      ixs.get('shell'),
       'derivatives',
-      shellDerivativeIx, 
+      ixs.get('derivative'), 
       'allowance', 
       'numeraire'
     ])
@@ -469,9 +469,9 @@ const SwapTab = () => {
     } else {
       allowance = state.getIn([
         'shells', 
-        shellIx, 
+        ixs.get('shell'), 
         'derivatives',
-        shellDerivativeIx,
+        ixs.get('derivative'),
         'allowance', 
         'display'
       ])
@@ -481,18 +481,12 @@ const SwapTab = () => {
     
   const unlockOrigin = () => setStep('unlocking')
   
-  const thing = state.getIn(['shells', shellIx, 'derivatives', shellDerivativeIx ])
-  
-  console.log('allowance', thing ?  thing.getIn(['allowance', 'numeraire']).toString() : null)
-  
-  window.thing = thing
-    
   return (
 
     <StyledSwapTab>
 
       { step === 'unlocking' && <ModalUnlock 
-          coin={state.getIn(['shells', shellIx, 'derivatives', shellDerivativeIx ])} 
+          coin={state.getIn(['shells', ixs.get('shell'), 'derivatives', ixs.get('derivative') ])} 
           handleUnlock={handleUnlock} 
           handleCancel={ () => setStep('none') } 
         /> }
