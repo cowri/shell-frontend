@@ -1,0 +1,47 @@
+{
+  "defaultWeb3Provider": "rinkeby.infura.io/v3/23656e31a1a34049bc03807c64bcd017",
+  "infuraKey": "23656e31a1a34049bc03807c64bcd017",
+  "blocknative": "9bb42eeb-6448-414d-94ee-6f91b875fd2d",
+  "network": 4,
+  "shells": [
+    {
+      "shell": "0x85240Ade8cc78a12D95cA71D149E76e5392c9625",
+      "name": "50% StableX 50% TestCollateral",
+      "displayDecimals": 2,
+      "swapDecimals": 2,
+      "assets": [
+        { 
+          "address": "0xaC6a43e78c55B4774bfD1db5A982F2805D7d1C81", 
+          "decimals": 18,
+          "icon": "stablex.svg",
+          "name": "Stable X",
+          "symbol": "StableX",
+          "weight": ".5",
+          "derivatives": [ {
+            "address": "0x8ED0B6EcddB914A689a882E9538C7d01e297AB32", 
+            "decimals": 18,
+            "icon": "istablex.svg",
+            "name": "iStable X",
+            "symbol": "iStableX"
+          }]
+        },
+        { 
+          "address": "0x8b8c1ad953dfc13a990d1726e124f020111f9690", 
+          "decimals": 18,
+          "icon": "test.svg",
+          "name": "Collateral Test Token",
+          "symbol": "TEST",
+          "weight": ".5",
+          "derivatives" : []
+        }
+      ],
+      "params": {
+        "alpha": ".8",
+        "beta": ".4",
+        "delta": ".3",
+        "epsilon": ".00035",
+        "lambda": "1"
+      }
+    }
+  ]
+}

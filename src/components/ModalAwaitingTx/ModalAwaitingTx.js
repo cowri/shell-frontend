@@ -1,6 +1,6 @@
 import React from 'react'
 
-import config from "../../mainnet.multiple.config"
+import config from "../../mainnet.multiple.config.json"
 
 import styled from 'styled-components'
 
@@ -24,7 +24,9 @@ const AwaitingTxModal = ({ txHash }) => {
   
   const etherscanlink = config.network == '42'
     ? "https://kovan.etherscan.io/tx/" + txHash
-    : "https://etherscan.io/tx/" + txHash
+    : config.network == '4' 
+      ? "https://rinkeby.etherscan.io/tx/" + txHash
+      : "https://etherscan.io/tx/" + txHash
 
   return (
     <Modal>

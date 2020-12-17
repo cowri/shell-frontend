@@ -9,6 +9,7 @@
       "name": "30% Dai 30% USDt 30% USDc 10% sUSD",
       "displayDecimals": 2,
       "swapDecimals": 2,
+      "tag": "STABLECOIN1",
       "assets": [
         {
           "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
@@ -120,6 +121,7 @@
       "name": "50% wBTC 40% renBTC 10% sBTC",
       "displayDecimals": 4,
       "swapDecimals": 8,
+      "tag": "BTC1",
       "assets": [
         {
           "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
@@ -158,6 +160,42 @@
         "delta": ".1",
         "epsilon": ".00035",
         "lambda": "1"
+      }
+    },
+    {
+      "shell": "0x456aAd873Eb70566A2AD4c3ef4fd162fc93fF074",
+      "name": "50% Arc STABLEx 50% USDC",
+      "displayDecimals": 2,
+      "swapDecimals": 2,
+      "hideapy": true,
+      "tag": "STABLEx",
+      "assets": [
+        {
+          "address": "0xcD91538B91B4ba7797D39a2f66E63810b50A33d0",
+          "decimals": 18,
+          "icon": "arcx.svg",
+          "name": "Arc STABLEx",
+          "symbol": "STABLEx",
+          "type": "ERC20",
+          "weight": ".5",
+          "derivatives": [ ]
+        },
+        {
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "decimals": 6,
+          "icon": "usdc.svg",
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "weight": ".5",
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".8",
+        "beta": ".4",
+        "delta": ".05",
+        "epsilon": ".0005",
+        "lambda": ".9999"
       }
     }
   ]

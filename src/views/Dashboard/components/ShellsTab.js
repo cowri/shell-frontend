@@ -193,7 +193,9 @@ const ShellRow = ({showShell, liqTotal, assets, apy}) => {
     <Row onClick={showShell} {...handlers} style={{cursor:'pointer'}}>
       {name}
       <StyledBalance className="number" moused={hovered}> { liqTotal } </StyledBalance>
-      <StyledBalance className="number" moused={hovered}> {apy} </StyledBalance>
+      { !apy ? <StyledBalance> -- &nbsp; </StyledBalance> 
+          : <StyledBalance className="number" moused={hovered}> {apy} </StyledBalance> }
+          
     </Row>
   )
 

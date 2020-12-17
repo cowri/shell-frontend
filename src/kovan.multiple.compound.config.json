@@ -9,6 +9,7 @@
       "name": "30% Dai 30% USDt 30% USDc 10% sUSD",
       "displayDecimals": 2,
       "swapDecimals": 2,
+      "tag": "STABLECOIN1",
       "assets": [
         { 
           "address": "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", 
@@ -100,6 +101,7 @@
       "name": "70% wBTC 30% renBTC",
       "displayDecimals": 4,
       "swapDecimals": 8,
+      "tag": "BTC-TEST",
       "assets": [
         { 
           "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
@@ -135,6 +137,7 @@
       "name": "50% wBTC 40% renBTC 10% sBTC",
       "displayDecimals": 4,
       "swapDecimals": 8,
+      "tag": "BTC1",
       "assets": [
         { 
           "address": "0xCc0b1D0690776d894bb5B6b3d86C20e56125106B", 
@@ -174,6 +177,41 @@
         "epsilon": ".00035",
         "lambda": "1"
       }
-    } 
+    },
+    {
+      "shell": "0x6D1761A4d6E98fC81DF835A4B1c562f9a7fc63cf",
+      "name": "50% StableX 50% MockOne",
+      "displayDecimals": 2,
+      "swapDecimals": 2,
+      "hideapy": true,
+      "tag": "STABLEx",
+      "assets": [
+        { 
+          "address": "0x835F4a720e6f16Abf9F4Cb6eb87488C5b68CA8C7", 
+          "decimals": 18,
+          "icon": "arcx.svg",
+          "name": "StableX",
+          "symbol": "STABLEX",
+          "weight": ".5",
+          "derivatives": [ ]
+        },
+        { 
+          "address": "0x05c8388C3D6F8598d8042434702Dbb50eDb545dc", 
+          "decimals": 6,
+          "icon": "mockone.svg",
+          "name": "MockOne",
+          "symbol": "mockone",
+          "weight": ".5",
+          "derivatives" : []
+        }
+      ],
+      "params": {
+        "alpha": ".8",
+        "beta": ".4",
+        "delta": ".05",
+        "epsilon": ".0005",
+        "lambda": ".9999"
+      }
+    }
   ]
 }

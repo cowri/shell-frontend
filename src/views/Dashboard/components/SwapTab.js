@@ -50,6 +50,16 @@ const StyledLabelBar = withTheme(styled.div`
   margin-top: 24px;
 `)
 
+const StyledCoinHint = withTheme(styled.div`
+  align-items: flex-end;
+  align-content: baseline;
+  display: flex;
+  height: 18px;
+  margin-left: 24px;
+  margin-top: 0px;
+  margin-bottom: 5px;
+`)
+
 const StyledTitle = styled.div`
   margin-left: 24px;
   font-size: 24px;
@@ -122,7 +132,7 @@ const SwapTab = () => {
   
   const origin = engine.derivatives[originIx]
   const target = engine.derivatives[targetIx]
-
+  
   const haltCheckMessage = 'amount triggers halt check'
   const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
   
@@ -141,7 +151,7 @@ const SwapTab = () => {
   }
   
   useEffect(() => {
-
+    
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
       
       setIxs(ixs.set('shell', null).set('derivative', null))
@@ -177,6 +187,7 @@ const SwapTab = () => {
       return
 
     }
+    
 
     ;(async function () { 
       try {
@@ -198,7 +209,10 @@ const SwapTab = () => {
           ? setTargetValue(targetAmount.display)
           : setOriginValue(originAmount.display)
           
-        setIxs(ixs.set('shell', _shellIx).set('derivative', _shellDerivativeIx))
+        setIxs(ixs
+          .set('shell', _shellIx)
+          .set('derivative', _shellDerivativeIx))
+
         setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
         setUnlocked(state.getIn([
           'shells', 
@@ -254,6 +268,17 @@ const SwapTab = () => {
 
   const handleSwap = async (e) => {
 
+    const noAllowance = state.getIn([
+        'shells',
+        ixs.get('shell'),
+        'derivatives',
+        ixs.get('derivative'),
+        'allowance',
+        'numeraire'
+    ]).isLessThan(originValue)
+    
+    if (noAllowance) return setStep('unlocking')
+        
     e.preventDefault()
 
     setStep('confirming')
@@ -399,9 +424,9 @@ const SwapTab = () => {
       return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
       
   })
-
+  
   const targetSelections = engine.derivatives.reduce( (a, c, i) => {
-
+    
     if (engine.overlaps[c.symbol].indexOf(origin.symbol) != -1) {
       a.push( 
         <MenuItem className={selectionCss.root} key={i} value={i} > 
@@ -448,37 +473,30 @@ const SwapTab = () => {
   })()
   
   let allowance
+  let balance
   
   if (ixs.get('shell') != null && ixs.get('derivative') != null) {
     
-    allowance = state.getIn([
+    const asset = state.getIn([
       'shells', 
       ixs.get('shell'),
       'derivatives',
-      ixs.get('derivative'), 
-      'allowance', 
-      'numeraire'
+      ixs.get('derivative')
     ])
     
-    if ( allowance.isGreaterThan(new BigNumber('100000000'))) {
+    allowance = asset.getIn(['allowance'])
+    balance = asset.getIn(['balance', 'display'])
+    
+    if ( allowance.get('numeraire').isGreaterThan(new BigNumber('100000000'))) {
       allowance = '100,000,000+'
-    } else if ( allowance.isGreaterThan(new BigNumber(10000000))) {
-      allowance = allowance.toExponential()
+    } else if ( allowance.get('numeraire').isGreaterThan(new BigNumber('10000000'))) {
+      allowance = allowance.get('numeraire').toExponential()
     } else {
-      allowance = state.getIn([
-        'shells', 
-        ixs.get('shell'), 
-        'derivatives',
-        ixs.get('derivative'),
-        'allowance', 
-        'display'
-      ])
+      allowance = allowance.get('display')
     }
 
   }
     
-  const unlockOrigin = () => setStep('unlocking')
-  
   return (
 
     <StyledSwapTab>
@@ -516,13 +534,14 @@ const SwapTab = () => {
         <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
         <AmountInput 
           allowance={allowance}
+          balance={balance}
           icon={origin.icon}
           onChange={ handleOriginInput }
           selections={getDropdown(_handleOriginSelect, selections, originIx)}
           styles={inputStyles}
           symbol={origin.symbol}
           title='From'
-          unlock={unlockOrigin}
+          unlock={ () => setStep('unlocking') }
           value={originValue}
         />
         <StyledSwapRow>
@@ -542,14 +561,12 @@ const SwapTab = () => {
       </StyledRows>
       <StyledActions>
         <Button 
-          disabled={( (targetValue == 0 || originValue == 0) || !unlocked)}
+          disabled={ targetValue == 0 || originValue == 0 }
           onClick={handleSwap}
-          outlined={!unlocked}
         >
           Swap
         </Button> 
         <div style={{ width: 12 }} />
-        { !unlocked ? <Button onClick={ () => setStep('unlocking') }> Unlock { origin.symbol } </Button> : null } 
       </StyledActions>
     </StyledSwapTab>
   )
@@ -558,6 +575,7 @@ const SwapTab = () => {
 
 const AmountInput = ({
   allowance,
+  balance,
   icon,
   error,
   helperText,
@@ -573,11 +591,18 @@ const AmountInput = ({
     <StyledInput>
       <StyledLabelBar>
         <StyledTitle> { title } </StyledTitle>
-        { allowance ? <StyledAvailability onClick={unlock}> 
-              Shell's allowance: {allowance + ' '}  
-              <span style={{textDecoration: 'underline', color: '#8a8a8a'}}>click to change </span>
-            </StyledAvailability> : null }
       </StyledLabelBar>
+      { balance ? 
+        <StyledCoinHint style={{ marginLeft: '24px', marginTop: '0px' }}>
+          Your wallet's balance:
+          <span class="number">&nbsp;{ balance }</span> 
+        </StyledCoinHint> : null }
+      { allowance ? 
+        <StyledCoinHint onClick={unlock} style={{ cursor:'pointer', marginLeft: '24px', marginTop: '0px' }}>
+          Shell's allowance:
+          <span class="number">&nbsp;{ allowance }&nbsp;</span> 
+          <span style={{textDecoration: 'underline'}}> click to change </span>
+        </StyledCoinHint> : null }
       <NumberFormat fullWidth
         allowNegative={false}
         customInput={TextField}

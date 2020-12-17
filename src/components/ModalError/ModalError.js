@@ -1,5 +1,7 @@
 import React from 'react'
 
+import config from "../../mainnet.multiple.config.json"
+
 import styled from 'styled-components'
 
 import WarningIcon from '@material-ui/icons/Warning'
@@ -24,6 +26,14 @@ const ModalError = ({
   onDismiss,
   title
 }) => {
+  
+    
+  const etherscanlink = config.network == '42'
+    ? "https://kovan.etherscan.io/tx/" + txHash
+    : config.network == '4' 
+      ? "https://rinkeby.etherscan.io/tx/" + txHash
+      : "https://etherscan.io/tx/" + txHash
+
   return (
     <Modal>
       <ModalTitle>{title}</ModalTitle>
@@ -32,7 +42,7 @@ const ModalError = ({
       </ModalIcon>
       {
         txHash ? <StyledViewOnEtherscan>
-              <a href={"https://etherscan.io/tx/" + txHash} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
+              <a href={etherscanlink} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
                 <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
                 <span>
                   View On Etherscan
