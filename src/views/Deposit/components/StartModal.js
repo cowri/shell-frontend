@@ -259,7 +259,7 @@ const StartModal = ({
 
     const assetState = state.getIn([ 'shells', shellIx, 'assets', ix ])
     
-    let balance = assetState.getIn([ 'balance', 'display'])
+    let balance = assetState.getIn([ 'balance', 'numeraire']).toString()
 
     let available = assetState.getIn([ 'allowance', 'numeraire' ])
     
