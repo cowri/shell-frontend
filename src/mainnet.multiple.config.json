@@ -18,24 +18,7 @@
           "name": "MultiCollateral Dai",
           "symbol": "DAI",
           "weight": ".3",
-          "derivatives": [
-            {
-              "address": "0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d",
-              "decimals": 18,
-              "icon": "adai.svg",
-              "name": "Aave Interest Bearing Dai",
-              "symbol": "aDAI",
-              "type": "aERC20"
-            },
-            {
-              "address": "0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643",
-              "decimals": 8,
-              "icon": "cdai.svg",
-              "name": "Compound Dai",
-              "symbol": "cDAI",
-              "type": "cERC20"
-            }
-          ]
+          "derivatives": [ ]
         },
         {
           "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -44,24 +27,7 @@
           "name": "USD Coin",
           "symbol": "USDC",
           "weight": ".3",
-          "derivatives": [
-            {
-              "address": "0x9bA00D6856a4eDF4665BcA2C2309936572473B7E",
-              "decimals": 6,
-              "icon": "ausdc.svg",
-              "name": "Aave Interest Bearing USD Coin",
-              "symbol": "aUSDC",
-              "type": "aERC20"
-            },
-            {
-              "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
-              "decimals": 8,
-              "icon": "cusdc.svg",
-              "name": "Compound USD Coin",
-              "symbol": "cUSDC",
-              "type": "cERC20"
-            }
-          ]
+          "derivatives": [ ]
         },
         {
           "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
@@ -70,24 +36,7 @@
           "name": "Tether Stablecoin",
           "symbol": "USDT",
           "weight": ".3",
-          "derivatives": [
-            {
-              "address": "0x71fc860F7D3A592A4a98740e39dB31d25db65ae8",
-              "decimals": 6,
-              "icon": "ausdt.svg",
-              "name": "Aave Interest Bearing USDT",
-              "symbol": "aUSDT",
-              "type": "aERC20"
-            },
-            {
-              "address": "0xf650C3d88D12dB855b8bf7D11Be6C55A4e07dCC9",
-              "decimals": 8,
-              "icon": "cusdt.svg",
-              "name": "Compound USDT",
-              "symbol": "cUSDT",
-              "type": "cERC20"
-            }
-          ]
+          "derivatives": [ ]
         },
         {
           "address": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
@@ -96,16 +45,7 @@
           "name": "Synthetix USD",
           "symbol": "SUSD",
           "weight": ".1",
-          "derivatives": [
-            {
-              "address": "0x625aE63000f46200499120B906716420bd059240",
-              "decimals": 18,
-              "icon": "asusd.svg",
-              "name": "Aave Interest Bearing sUSD",
-              "symbol": "aSUSD",
-              "type": "aERC20"
-            }
-          ]
+          "derivatives": [ ]
         }
       ],
       "params": {
