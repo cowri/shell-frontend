@@ -80,7 +80,7 @@ const DashboardContent = ({ }) => {
             disabled={!state.has('shells')}
             onClick={shellTabClick}
           >
-            { activeTab != 'shell' ? 'Decommissioned Shells' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Decommissioned Shells </a> }
+            { activeTab != 'shell' ? 'Withdraw From Deactivated Shells' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Deactivated Shells </a> }
           </Tab>
         </Tabs>
         { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
