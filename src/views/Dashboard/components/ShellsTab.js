@@ -81,7 +81,6 @@ const Weight = styled.span`
 `
 const StyledActions = withTheme(styled.div`
   align-items: center;
-  background-color: ${props => props.theme.palette.grey[50]};
   display: flex;
   height: 80px;
   padding: 0 24px;
@@ -141,6 +140,29 @@ const ShellsTab = ({showShell}) => {
 
   return (
     <StyledShellsTab>
+        <p style={{padding: '20px', textAlign: 'center'}}>
+          We have decided to migrate liquidity from the old shells to the new shells.
+          In order to test various Shell parameters before our new model, 
+          we have decided to deploy new pools.
+          <p>
+            <a href="https://google.com">
+              Read more about this in our blog post.
+            </a>
+          </p>
+          <p>
+            Please click the button below to migrate your liquidity out of the old shells.
+          </p>
+          <StyledActions>
+            <StyledButton style={{ margin: '0 auto' }} >
+              <a style={{ color: 'white', textDecoration: 'none' }} 
+                target="_blank" 
+                href="https://deactivated.shells.exchange"
+              >
+                Withdraw from Deactivated Shells
+              </a>
+            </StyledButton>
+          </StyledActions>
+        </p>
       <StyledRows>
         <Row head>
           <span style={{ flex: 1.5 }}> Shells </span>
@@ -149,16 +171,6 @@ const ShellsTab = ({showShell}) => {
         </Row>
         { rows }
       </StyledRows>
-      <StyledActions>
-        <StyledButton style={{ margin: '0 auto' }} >
-          <a style={{ color: 'white', textDecoration: 'none' }} 
-            target="_blank" 
-            href="https://deactivated.shells.exchange"
-          >
-            Withdraw from Deactivated Shells
-          </a>
-        </StyledButton>
-      </StyledActions>
     </StyledShellsTab>
   )
 }
