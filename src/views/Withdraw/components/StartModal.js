@@ -114,13 +114,28 @@ const StartModal = ({
     proportionalInputs[i] = engine.shells[shellIx].getDisplayFromNumeraire(adjusted)
   }
 
+
+  const fee = engine.shells[shellIx].epsilon.multipliedBy(100).toString()
+  const feeMessage = (
+    <div>
+      You will burn
+      <span style={{ position: 'relative', paddingLeft: '16.5px' }}> 
+        <img alt=""
+          src={tinyShellIcon} 
+          style={{position:'absolute', top:'1px', left: '0px' }} 
+        /> 
+        { ' ' + state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) } 
+      </span>
+      <span> and pay a {fee}% fee to liquidity providers for this withdrawal </span>
+    </div>
+  )
     
   console.log("proportionalInputs", proportionalInputs)
   
   const [ inputs, setInputs ] = useState(new List(proportionalInputs))
   const [ errors, setErrors ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
   const [ fees, setFees ] = useState(new Array(engine.shells[shellIx].assets.length).fill(null))
-  const [ feeTip, setFeeTip ] = useState(DEFAULT)
+  const [ feeTip, setFeeTip ] = useState(feeMessage)
   const [ proportional, setProportional ] = useState(true)
   const [ zero, setZero ] = useState(true)
   const [ error, setError ] = useState(null)
@@ -161,21 +176,6 @@ const StartModal = ({
 
   }
 
-  const fee = engine.shells[shellIx].epsilon.multipliedBy(100).toString()
-      
-  const feeMessage = (
-    <div>
-      You will burn
-      <span style={{ position: 'relative', paddingLeft: '16.5px' }}> 
-        <img alt=""
-          src={tinyShellIcon} 
-          style={{position:'absolute', top:'1px', left: '0px' }} 
-        /> 
-        { ' ' + state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) } 
-      </span>
-      <span> and pay a {fee}% fee to liquidity providers for this withdrawal </span>
-    </div>
-  )
     
 
   const primeProportionalWithdraw = (event) => {
@@ -372,16 +372,6 @@ const StartModal = ({
             </StyledShells>
             <StyledWithdrawMessage> { error || feeTip } </StyledWithdrawMessage>
               { tokenInputs }
-            <StyledWithdrawEverything>
-              <Checkbox 
-                disabled={ true }
-                checked={ true }
-                className={ checkboxClasses.root }
-                onChange={ primeProportionalWithdraw }
-              >
-              </Checkbox>
-                Withdraw Everything
-            </StyledWithdrawEverything>
           </StyledRows>
         </StyledForm>
       </ModalContent>
