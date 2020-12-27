@@ -80,29 +80,11 @@ const DashboardContent = ({ }) => {
             disabled={!state.has('shells')}
             onClick={shellTabClick}
           >
-            { activeTab != 'shell' ? 'Shells' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Shells </a> }
-          </Tab>
-          <Tab 
-            active={activeTab === 'swap'}
-            disabled={!state.has('shells')}
-            onClick={() => setActiveTab('swap')}
-          >
-            Swap
+            { activeTab != 'shell' ? 'Decommissioned Shells' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Decommissioned Shells </a> }
           </Tab>
         </Tabs>
         { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
         { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
-        { activeTab === 'swap' && <SwapTab /> }
-        <StyledActions>
-          <StyledButton style={{ margin: '0 auto' }} >
-            <a style={{ color: 'white', textDecoration: 'none' }} 
-              target="_blank" 
-              href="https://decommissioned.shells.exchange"
-            >
-              Withdraw from Decomissioned Shells
-            </a>
-          </StyledButton>
-        </StyledActions>
       </Surface>
     </Container> 
   )
