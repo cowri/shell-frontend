@@ -141,24 +141,30 @@ const ShellsTab = ({showShell}) => {
   return (
     <StyledShellsTab>
         <p style={{padding: '20px', textAlign: 'center'}}>
-          We have decided to migrate liquidity from the old shells to the new shells.
-          In order to test various Shell parameters before our new model, 
-          we have decided to deploy new pools.
+          <p style={{fontSize: '20px', fontWeight: 'bold'}}> ATTENTION: LIQUIDITY MIGRATION </p>
+
           <p>
-            <a href="https://google.com">
-              Read more about this in our blog post.
-            </a>
+            We have deployed new pools with improved automated market making parameters. 
+            The new parameters will allow the pool to offer better swap rates. 
+            It will also help us collect data to further improve the Shell algorithm. 
           </p>
+    
           <p>
-            Please click the button below to migrate your liquidity out of the old shells.
+            If you were an LP in the old pools, you can withdraw your liquidity clicking the button below. 
+            However, deposits and swaps for these pools have been deactivated on the front-end. 
+            Please migrate your liquidity from the old pools to the updated pools.
           </p>
+    
+          <p> Thank you for your patience and happy holidays, </p>
+          <p> The Shell Team </p>
+
           <StyledActions>
             <StyledButton style={{ margin: '0 auto' }} >
               <a style={{ color: 'white', textDecoration: 'none' }} 
                 target="_blank" 
                 href="https://deactivated.shells.exchange"
               >
-                Withdraw from Deactivated Shells
+                Withdraw From Deactivated Shells
               </a>
             </StyledButton>
           </StyledActions>
