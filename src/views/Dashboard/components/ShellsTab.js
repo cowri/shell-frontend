@@ -141,7 +141,10 @@ const ShellsTab = ({showShell}) => {
   return (
     <StyledShellsTab>
         <p style={{padding: '20px', textAlign: 'center'}}>
-          <p style={{fontSize: '20px', fontWeight: 'bold'}}> ATTENTION: LIQUIDITY MIGRATION </p>
+
+          <p style={{marginTop: '0px', fontSize: '20px', fontWeight: 'bold'}}> 
+            ATTENTION: LIQUIDITY MIGRATION 
+          </p>
 
           <p>
             We have deployed new pools with improved automated market making parameters. 
@@ -156,7 +159,7 @@ const ShellsTab = ({showShell}) => {
           </p>
     
           <p> Thank you for your patience and happy holidays, </p>
-          <p> The Shell Team </p>
+          <p style={{fontSize: '18px'}}> The Shell Team </p>
 
           <StyledActions>
             <StyledButton style={{ margin: '0 auto' }} >
