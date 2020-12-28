@@ -1,6 +1,6 @@
 import React from 'react'
 import { fromJS, List, Map  } from "immutable"
-import config from "../kovan.multiple.compound.config"
+import config from "../mainnet.multiple.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
 import SwapEngine from "./SwapEngine"

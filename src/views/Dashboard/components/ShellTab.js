@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
-import config from '../../../kovan.multiple.compound.config.json'
+import config from '../../../mainnet.multiple.config.json'
 
 import Button from '../../../components/Button'
 import LabelledValue from '../../../components/LabelledValue'
