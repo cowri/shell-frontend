@@ -153,7 +153,7 @@ const ShellsTab = ({showShell}) => {
           </p>
     
           <p>
-            If you were an LP in the old pools, you can withdraw your liquidity clicking the button below. 
+            If you were an LP in the old pools, you can withdraw your liquidity by clicking the button below. 
             However, deposits and swaps for these pools have been deactivated on the front-end. 
             Please migrate your liquidity from the old pools to the updated pools.
           </p>
