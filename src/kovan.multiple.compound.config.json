@@ -39,6 +39,7 @@
           "symbol": "USDT",
           "type": "ERC20",
           "weight": ".3",
+          "approveToZero": true,
           "derivatives": [ ]
         },
         { 

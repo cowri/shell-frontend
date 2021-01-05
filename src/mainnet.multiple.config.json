@@ -37,6 +37,7 @@
           "name": "Tether Stablecoin",
           "symbol": "USDT",
           "weight": ".3",
+          "approveToZero": true,
           "derivatives": [ ]
         },
         {

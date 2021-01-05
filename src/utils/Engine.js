@@ -66,10 +66,11 @@ export default class Engine extends SwapEngine {
                     _asset_.icon,
                     _asset_.decimals
                 )
-
+                
                 asset.displayDecimals = _shell_.displayDecimals
                 asset.swapDecimals = _shell_.swapDecimals
                 asset.weight = new BigNumber(_asset_.weight)
+                asset.approveToZero = _asset_.approveToZero
 
                 shell.assetIx[_asset_.address] = ix
                 shell.derivativeIx[_asset_.address] = shell.derivatives.length
@@ -277,6 +278,8 @@ export default class Engine extends SwapEngine {
         const assets = await Promise.all(_shell_.assets.map(async function (_asset_, ix) {
 
             const asset = await queryAsset(_asset_)
+            
+            asset.approveToZero = _asset_.approveToZero
 
             asset.utilityTotal = shell.utilitiesTotal[ix]
 

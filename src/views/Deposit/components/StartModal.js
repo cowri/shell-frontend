@@ -76,8 +76,6 @@ const StartModal = ({
   state
 }) => {
   
-  console.log("egnine.shells[shellix].tag", engine.shells[shellIx].tag)
-  
   const errorStyles = {
     color: 'red',
     fontSize: '26px',
