@@ -286,12 +286,6 @@ const StartModal = ({
 
   })
 
-<<<<<<< HEAD
-  const isInputError = error || errors.find( c => !!c )
-  console.log("ERROR", error, "ERRORS", errors)
-  
-=======
->>>>>>> master
   return (
     <Modal onDismiss={onDismiss}>
       { prompting && <WarningModal 
@@ -313,12 +307,7 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}> Cancel </Button>
-<<<<<<< HEAD
-        <Button disabled={ isInputError || zero } 
-          style={isInputError || zero ? {cursor: 'no-drop'} : null}
-=======
         <Button style={{cursor: 'no-drop'}}
->>>>>>> master
           onClick={ () => setPrompting(true) } > 
           Deposit 
         </Button>

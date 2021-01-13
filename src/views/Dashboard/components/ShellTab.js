@@ -1,11 +1,7 @@
 import React, { useContext, useState } from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
-<<<<<<< HEAD
 import config from '../../../kovan.multiple.compound.config'
-=======
-import config from '../../../mainnet.multiple.config.json'
->>>>>>> master
 
 import Button from '../../../components/Button'
 import LabelledValue from '../../../components/LabelledValue'

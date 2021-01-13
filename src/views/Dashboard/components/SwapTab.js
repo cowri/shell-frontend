@@ -152,11 +152,6 @@ const SwapTab = () => {
   
   useEffect(() => {
     
-<<<<<<< HEAD
-    console.log("hello")
-
-=======
->>>>>>> master
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
       
       setIxs(ixs.set('shell', null).set('derivative', null))
