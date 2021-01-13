@@ -1,5 +1,9 @@
 import React, { useContext, useState } from 'react'
+import styled from 'styled-components'
 
+import { withTheme } from '@material-ui/core/styles'
+
+import Button from '../../../components/Button'
 import Container from '../../../components/Container'
 import Surface from '../../../components/Surface'
 import Tab from '../../../components/Tab'
@@ -10,6 +14,18 @@ import ShellsTab from './ShellsTab'
 import SwapTab from './SwapTab'
 
 import DashboardContext from '../context'
+
+const StyledActions = withTheme(styled.div`
+  align-items: center;
+  background-color: ${props => props.theme.palette.grey[50]};
+  display: flex;
+  height: 80px;
+  padding: 0 24px;
+  @media (max-width: 512px) {
+    padding: 0 12px;
+  }
+`)
+
 
 const DashboardContent = ({ }) => {
 

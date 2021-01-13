@@ -34,17 +34,6 @@ const StyledBalance = styled.div`
   color: ${ props => props.moused ? '#0000EE' : 'black' }
 `
 
-const StyledActions = withTheme(styled.div`
-  align-items: center;
-  background-color: ${props => props.theme.palette.grey[50]};
-  display: flex;
-  height: 80px;
-  padding: 0 24px;
-  @media (max-width: 512px) {
-    padding: 0 12px;
-  }
-`)
-
 const StyledRows = styled.div`
   margin-bottom: 12px;
 `
@@ -90,6 +79,37 @@ const Weight = styled.span`
   text-decoration: ${ props => props.moused ? 'underlined' : 'none' };
   color: ${ props => props.moused ? '#0000EE' : 'grey' };
 `
+const StyledActions = withTheme(styled.div`
+  align-items: center;
+  display: flex;
+  height: 80px;
+  padding: 0 24px;
+  @media (max-width: 512px) {
+    padding: 0 12px;
+  }
+`)
+
+const StyledButton = withTheme(styled.button`
+  align-items: center;
+  background-color: ${props => props.outlined ? props.theme.palette.grey[50] : props.theme.palette.primary.main};
+  border: ${props => props.outlined ? `1px solid ${props.theme.palette.grey[200]}` : '0'};
+  border-radius: ${props => props.theme.shape.borderRadius}px;
+  box-sizing: border-box;
+  color: ${props => props.outlined ? props.theme.palette.grey[600] : '#FFF'};
+  cursor: pointer;
+  display: flex;
+  font-size: ${props => props.small ? '0.8rem' : '1rem'};
+  font-weight: 700;
+  height: ${props => props.small ? 32 : 48}px;
+  padding: 0 ${props => props.small ? 12 : 32}px;
+  transition: background-color .2s, border-color .2s;
+  pointer-events: ${props => props.disabled ? 'none' : 'all'};
+  opacity: ${props => props.disabled ? 0.8 : 1};
+  &:hover {
+    background-color: ${props => props.outlined ? '#FFF' : props.theme.palette.primary.dark};
+    color: ${props => props.outlined ? props.theme.palette.primary.main : '#FFF' };
+  }
+`)
 
 const ShellsTab = ({showShell}) => {
 
@@ -105,13 +125,14 @@ const ShellsTab = ({showShell}) => {
   if (state.has('shells')) {
     for (let i = 0; i < engine.shells.length; i++) {
       let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
+      let liqOwned = state.getIn(['shells',i,'shell','liquidityOwned','display'])
 
       rows.push(
         <ShellRow
           showShell={() => showShell(i)}
           assets={engine.shells[i].assets}
           liqTotal={liqTotal}
-          apy={engine.shells[i].apy}
+          liqOwned={liqOwned}
         />
       )
 
@@ -120,11 +141,43 @@ const ShellsTab = ({showShell}) => {
 
   return (
     <StyledShellsTab>
+        <p style={{padding: '20px', textAlign: 'center'}}>
+
+          <p style={{marginTop: '0px', fontSize: '20px', fontWeight: 'bold'}}> 
+            ATTENTION: LIQUIDITY MIGRATION 
+          </p>
+
+          <p>
+            We have deployed new pools with improved automated market making parameters. 
+            The new parameters will allow the pool to offer better swap rates. 
+            It will also help us collect data to further improve the Shell algorithm. 
+          </p>
+    
+          <p>
+            If you were an LP in the old pools, you can withdraw your liquidity by clicking the button below. 
+            However, deposits and swaps for these pools have been deactivated on the front-end. 
+            Please migrate your liquidity from the old pools to the updated pools.
+          </p>
+    
+          <p> Thank you for your patience and happy holidays, </p>
+          <p style={{fontSize: '18px'}}> The Shell Team </p>
+
+          <StyledActions>
+            <StyledButton style={{ margin: '0 auto' }} >
+              <a style={{ color: 'white', textDecoration: 'none' }} 
+                target="_blank" 
+                href="https://deactivated.shells.exchange"
+              >
+                Withdraw From Deactivated Shells
+              </a>
+            </StyledButton>
+          </StyledActions>
+        </p>
       <StyledRows>
         <Row head>
           <span style={{ flex: 1.5 }}> Shells </span>
           <span style={{ flex: 1, textAlign: 'right' }}> Liquidity </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> APY </span>
+          <span style={{ flex: 1, textAlign: 'right' }}> Your Balance </span>
         </Row>
         { rows }
       </StyledRows>
@@ -132,7 +185,7 @@ const ShellsTab = ({showShell}) => {
   )
 }
 
-const ShellRow = ({showShell, liqTotal, assets, apy}) => {
+const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
 
   const useHover = () => {
     const [hovered, setHovered] = useState()
@@ -193,7 +246,7 @@ const ShellRow = ({showShell, liqTotal, assets, apy}) => {
     <Row onClick={showShell} {...handlers} style={{cursor:'pointer'}}>
       {name}
       <StyledBalance className="number" moused={hovered}> { liqTotal } </StyledBalance>
-      <StyledBalance className="number" moused={hovered}> {apy} </StyledBalance>
+      <StyledBalance className="number" moused={hovered}> { liqOwned } </StyledBalance>
     </Row>
   )
 

@@ -54,8 +54,10 @@ const ModalUnlock = ({
   }, { name: 'MuiCheckbox' })()
   
   const decimals = coin.get('decimals')
-  
+
   let current = coin.getIn(['allowance', 'numeraire'])
+
+  const approveToZero = coin.get('approveToZero') && !current.isZero()
   
   console.log("current", current.toString())
   
@@ -66,15 +68,23 @@ const ModalUnlock = ({
   } else {
     current = coin.getIn(['allowance', 'display'])
   }
-
+  
+  const symbol = coin.get('symbol')
+  
   return (
-    <Modal width="400px" >
-      <ModalTitle> Unlock { coin.get('symbol') } </ModalTitle>
+    <Modal>
+      <ModalTitle> 
+        { coin.getIn(['allowance', 'numeraire']).isZero() ? 'Unlock ' : 'Change Allowance For ' }
+        { symbol } 
+      </ModalTitle>
       <ModalContent>
         <p> Shell's current allowance is { current } </p>
+        { approveToZero 
+          ? <p> You must set {symbol}'s allowance to zero before adjusting it to something else. </p> 
+          : null }
         <NumberFormat
-          value={ unlimited ? MAX : amount }
-          disabled={ unlimited }
+          value={ unlimited ? MAX : approveToZero ? 0 : amount }
+          disabled={ unlimited || approveToZero }
           inputMode={ "numeric" }
           inputProps={{style: { fontSize: '22px', textAlign: 'center' } } }
           customInput={TextField}
@@ -82,18 +92,23 @@ const ModalUnlock = ({
           thousandSeparator={true}
           onValueChange={ payload => setAmount(payload.value) }
         />
-        <UnlimitedCheckbox>
-          <Checkbox 
-            checked={ unlimited }
-            className={ checkboxClasses.root }
-            onChange={ () => ( setAmount(''), setUnlimited(!unlimited) ) }
-          />
-          Unlimited Approval
-        </UnlimitedCheckbox>
+        { !approveToZero 
+            ? <UnlimitedCheckbox>
+                <Checkbox 
+                  checked={ unlimited }
+                  className={ checkboxClasses.root }
+                  onChange={ () => ( setAmount(''), setUnlimited(!unlimited) ) }
+                />
+                Unlimited Approval
+              </UnlimitedCheckbox>
+            : null }
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={ handleCancel }> Cancel </Button>
-        <Button onClick={ () => handleUnlock(unlimited ? amount : new BigNumber(amount).multipliedBy(new BigNumber(10 ** decimals )).toFixed()) }> Continue </Button>
+        <Button onClick={ () => handleUnlock(
+          unlimited ? amount 
+            : approveToZero ? '0'
+              : new BigNumber(amount).multipliedBy(new BigNumber(10 ** decimals )).toFixed()) }> Continue </Button>
       </ModalActions>
     </Modal>
   )

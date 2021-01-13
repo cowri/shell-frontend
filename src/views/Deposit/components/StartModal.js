@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import CircularProgress from '@material-ui/core/CircularProgress'
 import TextField from '@material-ui/core/TextField'
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 
@@ -50,11 +49,9 @@ const StyledRows = styled.div`
 
 const StyledLabelBar = withTheme(styled.div`
   align-items: center;
-  color: ${props => props.theme.palette.grey[500]};
   display: flex;
   height: 32px;
   justify-content: space-between;
-  margin-top: 18px;
 `)
 
 const StyledWarning = styled.div`
@@ -221,7 +218,28 @@ const StartModal = ({
   const handleSubmit = (e) => {
     
     const { addresses, amounts } = getAddressesAndAmounts()
+    
+    for (let ix = 0; ix < engine.shells[shellIx].assets.length; ix++) {
 
+      const asset = engine.shells[shellIx].assets[ix]
+
+      const exists = addresses.indexOf(asset.address)
+
+      if (exists >= 0) {
+
+        const allowance = state.getIn([
+          'shells', shellIx, 
+          'assets', ix, 
+          'allowance', 'raw'
+        ])
+        
+        if (allowance.isZero()) return setUnlocking(ix)
+        if (allowance.isLessThan(amounts[exists].raw)) return setUnlocking(ix)
+
+      }
+
+    }
+    
     onDeposit(addresses, amounts)
 
   }
@@ -238,6 +256,8 @@ const StartModal = ({
   const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => {
 
     const assetState = state.getIn([ 'shells', shellIx, 'assets', ix ])
+    
+    let balance = assetState.getIn([ 'balance', 'numeraire']).toString()
 
     let available = assetState.getIn([ 'allowance', 'numeraire' ])
     
@@ -248,10 +268,11 @@ const StartModal = ({
     } else {
       available = assetState.getIn(['allowance', 'display'])
     }
-    
+
     return (
       <TokenInput
         available={available}
+        balance={balance}
         icon={asset.icon}
         isError={ errors[ix] ? true : false }
         helperText={ errors[ix] }
@@ -265,12 +286,16 @@ const StartModal = ({
 
   })
 
+<<<<<<< HEAD
   const isInputError = error || errors.find( c => !!c )
   console.log("ERROR", error, "ERRORS", errors)
   
+=======
+>>>>>>> master
   return (
     <Modal onDismiss={onDismiss}>
       { prompting && <WarningModal 
+          tag={engine.shells[shellIx].tag}
           onCancel={ () => setPrompting(false) } 
           onContinue={handleSubmit} /> }
       { unlocking != null && <UnlockingModal
@@ -288,8 +313,12 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}> Cancel </Button>
+<<<<<<< HEAD
         <Button disabled={ isInputError || zero } 
           style={isInputError || zero ? {cursor: 'no-drop'} : null}
+=======
+        <Button style={{cursor: 'no-drop'}}
+>>>>>>> master
           onClick={ () => setPrompting(true) } > 
           Deposit 
         </Button>
@@ -300,6 +329,7 @@ const StartModal = ({
 
 const TokenInput = ({
   available,
+  balance,
   isError,
   icon,
   helperText,
@@ -311,11 +341,17 @@ const TokenInput = ({
 }) => {
 
   return ( <>
+    <StyledLabelBar style={{ marginTop: '18px', marginBottom: '-10px' }} >
+      <span>  
+        Your wallet's balance:
+        <span class="number"> {balance} </span>
+      </span> 
+    </StyledLabelBar>
     <StyledLabelBar>
       <span onClick={onAllowanceClick} style={{cursor:'pointer'}} >  
         Shell's allowance:
         <span class="number"> {available} </span>
-        <span style={{ color: '#8a8a8a', textDecoration: 'underline' }} > click to change </span>
+        <span style={{ textDecoration: 'underline' }} > click to change </span>
       </span> 
     </StyledLabelBar>
     <NumberFormat fullWidth

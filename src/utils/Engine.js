@@ -24,7 +24,7 @@ export default class Engine extends SwapEngine {
 
         this.setState = setState
 
-        this.shells = []
+        this.shells =    []
         this.assets = []
         this.derivatives = []
         this.overlaps = {}
@@ -67,10 +67,11 @@ export default class Engine extends SwapEngine {
                     _asset_.icon,
                     _asset_.decimals
                 )
-
+                
                 asset.displayDecimals = _shell_.displayDecimals
                 asset.swapDecimals = _shell_.swapDecimals
                 asset.weight = new BigNumber(_asset_.weight)
+                asset.approveToZero = _asset_.approveToZero
 
                 shell.assetIx[_asset_.address] = ix
                 shell.derivativeIx[_asset_.address] = shell.derivatives.length
@@ -173,12 +174,15 @@ export default class Engine extends SwapEngine {
                     }
                 }
             }
+            
+            if (!_shell_.hideapy) {
 
-            shell.apy = <CircularProgress />
+                shell.apy = <CircularProgress />
+                this.getAPY(_shell_.shell).then(result => shell.apy = result)
 
-            this.getAPY(_shell_.shell).then(result => {
-                shell.apy = result
-            })
+            } else shell.apy = false
+            
+            shell.tag = _shell_.tag
 
             this.shells.push(shell)
 
@@ -275,6 +279,8 @@ export default class Engine extends SwapEngine {
         const assets = await Promise.all(_shell_.assets.map(async function (_asset_, ix) {
 
             const asset = await queryAsset(_asset_)
+            
+            asset.approveToZero = _asset_.approveToZero
 
             asset.utilityTotal = shell.utilitiesTotal[ix]
 
@@ -284,20 +290,24 @@ export default class Engine extends SwapEngine {
 
             asset.derivatives = await Promise.all(_asset_.derivatives.map(queryAsset))
 
+            return asset;
+
+        }))
+        
+        for (const asset of assets) { 
+
             derivatives.push(asset)
 
             derivatives = derivatives.concat(asset.derivatives)
 
-            return asset;
-
-        }))
+        }
 
         async function queryAsset (asset) {
 
             const allowance = await asset.allowance(self.account, _shell_.address)
 
             const balance = await asset.balanceOf(self.account)
-
+            
             return {
                 allowance: allowance,
                 balance: balance,
