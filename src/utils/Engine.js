@@ -434,14 +434,9 @@ export default class Engine extends SwapEngine {
             
         }
         
-        // console.log("old total", oldTotal.toString())
-        // console.log("new total", newTotal.toString())
-        // console.log("old balances", oldBalances.map(b => b.toString()))
-        // console.log("new balances", newBalances.map(b => b.toString()))
-        
         try {
 
-            const burnt = this.shells[shellIx].calculateLiquidity(
+            const burnt = this.shells[shellIx].calculateWithdraw(
                 oldTotal,
                 newTotal,
                 oldBalances,
@@ -449,35 +444,64 @@ export default class Engine extends SwapEngine {
                 totalShells
             )
             
-            // console.log("burnt", burnt, burnt.toString())
-            
             return burnt.absoluteValue()
 
-        } catch (e) { 
+        } catch (e) { return false }
+        
+    }
+    
+    calculateDeposit (shellIx, deposits) {
 
-            return false 
+        const totalShells = this.state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire' ])
+        const liquidity = this.state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire' ])
+        const liquidities = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal' ]).toJS()
+            .map(n => n.numeraire)
+            
+        const oldBalances = liquidities.slice()
+        const newBalances = liquidities.slice()
 
+        const oldTotal = liquidity
+        let newTotal = liquidity
+
+        for (let i = 0; i < deposits.length; i++) {
+            
+            newTotal = newTotal.plus(deposits[i])
+            newBalances[i] = newBalances[i].plus(deposits[i])
+            
         }
+        
+        try {
+
+            const mint = this.shells[shellIx].calculateDeposit(
+                oldTotal,
+                newTotal,
+                oldBalances,
+                newBalances,
+                totalShells
+            )
+            
+            return mint
+
+        } catch (e) { return false }
+
+    }
+    
+    calculateSingleDeposit (shellIx, deposit, depositIx) {
+        
+        const length = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal' ]).toJS().length
+        let deposits = new Array(length)
+        deposits.fill(new BigNumber('0'))
+        deposits[depositIx] = deposit
+        return this.calculateDeposit(shellIx, deposits)
         
     }
     
     calculateSingleWithdraw (shellIx, withdrawal, withdrawalIx) {
         
         const length = this.state.getIn(['shells', shellIx, 'shell', 'liquiditiesTotal' ]).toJS().length
-        // console.log(":LENGTH", length)
-        
-        // console.log("withdrawalIx", withdrawalIx)
-        
         let withdrawals = new Array(length)
-
-        // console.log("withdrawals 1", withdrawals)
         withdrawals.fill(new BigNumber('0'))
-
-        // console.log("withdrawals 2", withdrawals)
         withdrawals[withdrawalIx] = withdrawal
-        
-        // console.log("withdrawals 3", withdrawals)
-        
         return this.calculateWithdraw(shellIx, withdrawals)
         
     }

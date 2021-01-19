@@ -21,9 +21,13 @@ import WarningModal from './WarningModal'
 import { List } from 'immutable'
 
 import BigNumber from 'bignumber.js'
+import { AirlineSeatLegroomExtraRounded } from '@material-ui/icons'
 
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
 
+const StyledInput = styled.div`
+  display: flex;
+`
 const StyledStartAdornment = styled.div`
   align-items: center;
   display: flex;
@@ -92,8 +96,169 @@ const StartModal = ({
   const [ unlocking, setUnlocking ] = useState(null)
   const [ feeTip, setFeeTip ] = useState(DEFAULT)
   const [ prompting, setPrompting ] = useState(false)
+  const [ maxed, setMaxed ] = useState(null)
+  const [ maxedNoSlip, setMaxedNoSlip ] = useState(null)
+  
+  const depositSingleMax = async (ix) => {
+
+    if (maxed == ix && maxedNoSlip != ix) {
+      setMaxed(null)
+      return setMaxedNoSlip(null)
+    }
+    
+    
+    let deposit = getMaxDeposit(ix).abs()
+    
+    const decimals = engine.shells[shellIx].assets[ix].decimals
+    deposit = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(deposit, decimals)
+
+    // console.log("deposit single max ~<>~~<>~<>~<>~<>~<>~<>~<>~<>~<>~")
+    // console.log("deposit", deposit)
+
+    setMaxed(ix)
+    setMaxedNoSlip(null)
+    setInputs(inputs.map( (v, i) => {
+      const rv = i == ix ? deposit : ''
+      // console.log("i", i, "v", v, "rv", rv)
+      return rv
+    }))
+    
+  }
+  
+  const getMaxDeposit = (ix) => {
+    
+    let deposit = state.getIn(['shells', shellIx, 'assets', ix, 'balance', 'numeraire'])
+    
+    let mint = engine.calculateSingleDeposit(shellIx, deposit, ix)
+    
+    if (mint) return deposit
+    
+    while (!mint) {
+
+      deposit = deposit.times(new BigNumber('.99'))
+      mint = engine.calculateSingleDeposit(shellIx, deposit, ix)
+      
+
+    }
+    
+    let down = new BigNumber('.00125')
+    let upper = new BigNumber('1.0025')
+    
+    let pmint
+    while (true) {
+
+      pmint = mint ? mint : pmint
+      
+      const test = deposit.times(upper)
+      
+      
+      mint = engine.calculateSingleDeposit(shellIx, test, ix)
+      
+      if (!mint) {
+        
+        upper = upper.minus(down)
+        down = down.div(2)
+        continue
+
+      } 
+      
+      deposit = test
+      
+      if (pmint.minus(mint).abs().lte('.00000001')) {
+
+        mint = mint.abs()
+        break
+      
+      }
+
+    }
+    
+    const digited = new BigNumber(10 ** (engine.shells[shellIx].assets[ix].decimals - 2))
+    const one = new BigNumber(1).div(digited)
+    
+    return deposit.minus(one)
+    
+  }
+  
+  const getMaxDepositNoSlip = (deposit, ix) => {
+
+    const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
+    const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
+    const sweetspot = '.000001'
+    
+    let mint = engine.calculateSingleDeposit(shellIx, deposit, ix)
+    let pmint = mint
+    let liqChange = deposit.div(liqTotal)
+    let shellsChange = mint.div(shellsTotal)
+    let slip = new BigNumber(1).minus(shellsChange.div(liqChange))
+    let pslip = slip
+    
+    if (slip.lte(sweetspot)) return deposit
+
+    let pointer = new BigNumber('.975')
+    let tuner = new BigNumber('.0125')
+    
+    while (true) {
+      
+      let test = deposit.times(pointer)
+      
+      pmint = mint
+      mint = engine.calculateSingleDeposit(shellIx, test, ix).abs()
+      liqChange = test.div(liqTotal)
+      shellsChange = mint.div(shellsTotal)
+      slip = new BigNumber(1).minus(shellsChange.div(liqChange))
+      const fee = mint.times(slip)
+      const pfee = pmint.times(pslip)
+      
+      if (slip.lte(sweetspot) || slip.minus(pslip).abs().lte(sweetspot)) {
+        deposit = test
+        break
+      } else if (pointer.isZero()) {
+        tuner = tuner.div(2)
+        pointer = pointer.plus(tuner)
+        continue
+      } else {
+        pointer = pointer.minus(tuner)
+        pmint = mint
+      }
+
+      pslip = slip
+
+    }
+    
+    return deposit
+
+  }
+  
+  const depositMaxNoSlip = (ix) => {
+
+    let deposit
+
+    if (maxed == ix) {
+
+      deposit = engine
+        .shells[shellIx]
+        .assets[ix]
+        .getNumeraireFromDisplay(inputs.get(ix))
+
+    } else deposit = getMaxDeposit(ix).abs()
+    
+    deposit = getMaxDepositNoSlip(deposit, ix)
+
+    const decimals = engine.shells[shellIx].assets[ix].decimals
+    deposit = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(deposit, decimals)
+    
+    setMaxed(ix)
+    setMaxedNoSlip(ix)
+    setInputs(inputs.map( (v,i) => i == ix ? deposit : ''))
+
+  }
   
   const onInput = (v, i) => {
+    
+    // console.log("on input #######################")
+    // console.log("v", v)
+    // console.log("i", i)
     
     setInputs(inputs.set(i,v))
 
@@ -116,8 +281,13 @@ const StartModal = ({
   }
   
   useEffect( () => {
+    
 
     const total = inputs.reduce( (a,c) => a + c )
+
+    console.log("use effect ^^^^^^^^^^^^^^^^^^^^^^^^^")
+    // console.log("inputs", inputs)
+    // console.log("total", total)
     
     if (total == 0) {
 
@@ -138,9 +308,15 @@ const StartModal = ({
 
     const { addresses, amounts } = getAddressesAndAmounts()
     
-    const shellsToMint = await engine.shells[shellIx].viewSelectiveDeposit(addresses, amounts)
+    // console.log("prime deposit _________________________")
+    // console.log("addresses", addresses)
+    // console.log("amounts", amounts)
+    
+    const mint = await engine.shells[shellIx].viewSelectiveDeposit(addresses, amounts)
+    
+    console.log("mint", mint.toFixed(10))
 
-    if (shellsToMint === false || shellsToMint.toString() === REVERTED) {
+    if (mint === false || mint.toString() === REVERTED) {
 
       setError(SAFETY_CHECK)
       setFeeTip(null)
@@ -153,14 +329,14 @@ const StartModal = ({
     const totalDeposit = amounts.reduce((a,c) =>  a.plus(c.numeraire), new BigNumber(0))
 
     const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'numeraire' ])
-    const liquidityChange = totalDeposit.dividedBy(liqTotal)
+    const liqChange = totalDeposit.dividedBy(liqTotal)
 
     const shellsTotal = state.getIn([ 'shells', shellIx, 'shell', 'shellsTotal', 'numeraire' ])
-    const shellsChange = shellsToMint.dividedBy(shellsTotal)
+    const shellsChange = mint.dividedBy(shellsTotal)
 
-    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
+    const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liqChange))
     
-    const fee = shellsToMint.multipliedBy(slippage)
+    const fee = mint.multipliedBy(slippage)
 
     const slippageMessage = slippage.absoluteValue().isGreaterThan(0.0001)
       ? slippage.isNegative()
@@ -188,7 +364,7 @@ const StartModal = ({
             src={tinyShellIcon} 
             style={{position:'absolute', top:'1px', left: '1px' }} 
           /> 
-          { ' ' + engine.shells[shellIx].getDisplayFromNumeraire(shellsToMint) } 
+          { ' ' + engine.shells[shellIx].getDisplayFromNumeraire(mint) } 
         </span> 
       { slippageMessage }
     </div>
@@ -199,12 +375,15 @@ const StartModal = ({
   
 
   const getAddressesAndAmounts = () => {
+    
+    console.log("get addresses and amounts /\_/\_/\_/\_/\_/\_/\_/\_/\_/\_")
 
     const addresses = []
     const amounts = []
 
     inputs.forEach( (v,i) => {
-      if (0 < v) {
+
+      if (0 < Number(v.replace(/,/g,''))) {
         const asset = engine.shells[shellIx].assets[i]
         addresses.push(asset.address)
         amounts.push(asset.getAllFormatsFromDisplay(v))
@@ -274,6 +453,8 @@ const StartModal = ({
         available={available}
         balance={balance}
         icon={asset.icon}
+        isMaxed={maxed == ix}
+        isMaxedNoSlip={maxedNoSlip == ix}
         isError={ errors[ix] ? true : false }
         helperText={ errors[ix] }
         onAllowanceClick={ () => setUnlocking(ix) }
@@ -281,13 +462,15 @@ const StartModal = ({
         styles={inputStyles}
         symbol={asset.symbol}
         value={inputs.get(ix)}
+        depositMax={() => depositSingleMax(ix)}
+        depositMaxNoSlip={() => depositMaxNoSlip(ix) }
       />
     )
 
   })
 
   return (
-    <Modal onDismiss={onDismiss}>
+    <Modal width="500px" onDismiss={onDismiss}>
       { prompting && <WarningModal 
           tag={engine.shells[shellIx].tag}
           onCancel={ () => setPrompting(false) } 
@@ -319,8 +502,12 @@ const StartModal = ({
 const TokenInput = ({
   available,
   balance,
-  isError,
+  depositMax,
+  depositMaxNoSlip,
   icon,
+  isMaxed,
+  isMaxedNoSlip,
+  isError,
   helperText,
   onChange,
   onAllowanceClick,
@@ -330,7 +517,7 @@ const TokenInput = ({
 }) => {
 
   return ( <>
-    <StyledLabelBar style={{ marginTop: '18px', marginBottom: '-10px' }} >
+    <StyledLabelBar style={{ marginTop: '12px', marginBottom: '-10px' }} >
       <span>  
         Your wallet's balance:
         <span class="number"> {balance} </span>
@@ -343,30 +530,44 @@ const TokenInput = ({
         <span style={{ textDecoration: 'underline' }} > click to change </span>
       </span> 
     </StyledLabelBar>
-    <NumberFormat fullWidth
-      allowNegative={false}
-      customInput={TextField}
-      defaultColor="red"
-      error={isError}
-      FormHelperTextProps={{className: styles.helperText}}
-      helperText={helperText}
-      inputMode={"numeric"}
-      min="0"
-      onValueChange={ onChange }
-      placeholder="0"
-      thousandSeparator={true}
-      type="text"
-      value={value}
-      InputProps={{
-        style: isError ? { color: 'red' } : null,
-        endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
-        startAdornment: (
-          <StyledStartAdornment>
-            <TokenIcon size={24}> <img alt="" src={icon} /> </TokenIcon>
-          </StyledStartAdornment>
-        )
-      }}
-    />
+    <StyledInput>
+      <NumberFormat fullWidth
+        allowNegative={false}
+        customInput={TextField}
+        defaultColor="red"
+        error={isError}
+        FormHelperTextProps={{className: styles.helperText}}
+        helperText={helperText}
+        inputMode={"numeric"}
+        min="0"
+        onValueChange={ onChange }
+        onChange={ () => console.log(">>>>>>>>>>>>>> we have a change <<<<<<<<<<<<<<<") }
+        placeholder="0"
+        style={{width: '90%', marginRight: '5px'}}
+        thousandSeparator={true}
+        type="text"
+        value={value}
+        InputProps={{
+          style: isError ? { color: 'red' } : null,
+          endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
+          startAdornment: (
+            <StyledStartAdornment>
+              <TokenIcon size={24}> <img alt="" src={icon} /> </TokenIcon>
+            </StyledStartAdornment>
+          )
+        }}
+      />
+      <Button small
+        outlined={!isMaxed}
+        style={{height: '40px', margin: 'auto', marginLeft: '5px'}}
+        onClick={depositMax}
+      > Max </Button>
+      <Button small
+        outlined={!isMaxedNoSlip}
+        style={{height: '40px', width: '140px', margin: 'auto', marginLeft: '5px'}}
+        onClick={depositMaxNoSlip}
+      > No Slippage </Button>
+    </StyledInput>
   </>)
 }
 

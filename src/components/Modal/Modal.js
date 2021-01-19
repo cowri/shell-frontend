@@ -39,7 +39,6 @@ const StyledModalContent = styled.div`
   width: calc(100% - 12px);
   margin: 6px;
   position: fixed;
-  top: 150px;
 `
 
 const Modal = ({ children, onDismiss, width }) => (

@@ -172,12 +172,22 @@ export default class Shell extends NumericFormats {
             
         }
         
-        const burnt = totalShells
-            .multipliedBy(shellMultiplier)
-            .multipliedBy(ONE.plus(this.epsilon))
+        return totalShells.multipliedBy(shellMultiplier)
         
-        return burnt 
+    }
+    
+    calculateWithdraw(oldTotal, newTotal, oldBalances, newBalances, totalShells) {
+
+        const burnt = this.calculateLiquidity(oldTotal, newTotal, oldBalances, newBalances, totalShells)
+
+        return burnt.times(ONE.plus(this.epsilon))
         
+    }
+    
+    calculateDeposit (oldTotal, newTotal, oldBalances, newBalances, totalShells) {
+
+        return this.calculateLiquidity(oldTotal, newTotal, oldBalances, newBalances, totalShells)
+
     }
     
     enforceHalts (oldTotal, newTotal, oldBalances, newBalances) {

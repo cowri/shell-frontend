@@ -206,47 +206,18 @@ const StartModal = ({
 
     const iterate = slip.minus(targetslip).abs().gt(sweetspot)
     
-    let i = 0
-
     while (iterate) {
       
-      // console.log("-_-_-_-_-_-_-_-_-")
-      // console.log("hello", i++)
       
       let test = withdraw.times(pointer)
-      // console.log(" - withdraw - ", withdraw.toFixed(6))
-      // console.log(" - test - ", test.toFixed(6))
       priorShellsToBurn = shellsToBurn
       shellsToBurn = engine.calculateSingleWithdraw(shellIx, test, ix).abs()
       let liquidityChange = test.div(liqTotal)
       let shellsChange = shellsToBurn.div(shellsTotal)
       slip = new BigNumber(1).minus(shellsChange.div(liquidityChange))
       
-      // console.log(" - to burn - ", shellsToBurn.toFixed(6))
-
-      // console.log(" - slippage - ", slip.toFixed(10))
-
-      // console.log(" - p slippage - ", pslip.toFixed(10))
-
-      // console.log(" - slippage gte target - ", slip.gte(targetslip))
-      
-      // console.log(" - p slippage - ", pslip.gte(targetslip))
-      
-      // console.log(" - pointer - ", pointer.toFixed(6))
-      
-      // console.log(" - tuner - ", tuner.toFixed(6))
-      
-      // console.log(" - test - ", test.toFixed(6))
-      
-      // console.log(" - withdraw - ", withdraw.toFixed(6))
-      
-      // console.log("prior shells", priorShellsToBurn.toFixed(10))
-      // console.log("shells", shellsToBurn.toFixed(10))
-      // console.log("diff", priorShellsToBurn.minus(shellsToBurn).abs().toFixed(10))
-      
       if ( slip.gte(targetslip) != pslip.gte(targetslip) ) {
 
-        // console.log(" - flipped - ")
         tuner = tuner.div(2)
 
       }
@@ -287,8 +258,6 @@ const StartModal = ({
       
     }
     
-    console.log("before loop", withdraw.toFixed(10))
-   
     while (true) { 
       const test = withdraw.times('1.001')
       priorShellsToBurn = shellsToBurn
@@ -296,15 +265,12 @@ const StartModal = ({
       let liquidityChange = test.div(liqTotal)
       let shellsChange = shellsToBurn.div(shellsTotal)
       slip = new BigNumber(1).minus(shellsChange.div(liquidityChange))
-      console.log("slippage", slip.toFixed(10))
       if (slip.minus(targetslip).abs().lte('.0000001')) withdraw = test
       else break 
     }
     
     pointer = new BigNumber('1.0005')
     tuner = new BigNumber('.00025')
-    
-    console.log("mid loop", withdraw.toFixed(10))
     
     while (true) {
       
@@ -314,10 +280,6 @@ const StartModal = ({
       let liquidityChange = test.div(liqTotal)
       let shellsChange = shellsToBurn.div(shellsTotal)
       slip = new BigNumber(1).minus(shellsChange.div(liquidityChange))
-      // console.log("shellsToBurn", shellsToBurn.toFixed(10))
-      // console.log("priorShellsToBurn", priorShellsToBurn.toFixed(10))
-      // console.log("diff", shellsToBurn.minus(priorShellsToBurn).toFixed(10))
-      console.log("slip 2", slip.toFixed(10))
       if (shellsToBurn.minus(priorShellsToBurn).abs().lte('.0000001')) {
         withdraw = test
         break
@@ -329,9 +291,6 @@ const StartModal = ({
       } 
       
     }
-    
-
-    console.log("after loop", withdraw.toFixed(10))
     
     return withdraw
   
@@ -352,144 +311,6 @@ const StartModal = ({
     } else withdraw = getMaxWithdraw(ix).abs()
     
     withdraw = getMaxWithdrawNoSlip(withdraw, ix)
-    
-    // const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
-    // const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
-    // const targetslip = engine.shells[shellIx].epsilon.times(-1)
-    // const sweetspot = '.0000000001'
-    
-    // let priorShellsToBurn = engine.calculateSingleWithdraw(shellIx, withdraw, ix).abs()
-    // let shellsToBurn = priorShellsToBurn
-    // let liquidityChange = withdraw.div(liqTotal)
-    // let shellsChange = shellsToBurn.div(shellsTotal)
-    // let slip = new BigNumber(1).minus(shellsChange.div(liquidityChange))
-    // let pslip = slip
-    
-    // let pointer = new BigNumber(slip.lte(targetslip) ? '.975' : '1.025')
-    // let tuner = new BigNumber('.0125')
-
-    // const iterate = slip.minus(targetslip).abs().gt(sweetspot)
-    
-    // let i = 0
-
-    // while (iterate) {
-      
-    //   // console.log("-_-_-_-_-_-_-_-_-")
-    //   // console.log("hello", i++)
-      
-    //   let test = withdraw.times(pointer)
-    //   // console.log(" - withdraw - ", withdraw.toFixed(6))
-    //   // console.log(" - test - ", test.toFixed(6))
-    //   priorShellsToBurn = shellsToBurn
-    //   shellsToBurn = engine.calculateSingleWithdraw(shellIx, test, ix).abs()
-    //   let liquidityChange = test.div(liqTotal)
-    //   let shellsChange = shellsToBurn.div(shellsTotal)
-    //   slip = new BigNumber(1).minus(shellsChange.div(liquidityChange))
-      
-    //   // console.log(" - to burn - ", shellsToBurn.toFixed(6))
-
-    //   // console.log(" - slippage - ", slip.toFixed(10))
-
-    //   // console.log(" - p slippage - ", pslip.toFixed(10))
-
-    //   // console.log(" - slippage gte target - ", slip.gte(targetslip))
-      
-    //   // console.log(" - p slippage - ", pslip.gte(targetslip))
-      
-    //   // console.log(" - pointer - ", pointer.toFixed(6))
-      
-    //   // console.log(" - tuner - ", tuner.toFixed(6))
-      
-    //   // console.log(" - test - ", test.toFixed(6))
-      
-    //   // console.log(" - withdraw - ", withdraw.toFixed(6))
-      
-    //   // console.log("prior shells", priorShellsToBurn.toFixed(10))
-    //   // console.log("shells", shellsToBurn.toFixed(10))
-    //   // console.log("diff", priorShellsToBurn.minus(shellsToBurn).abs().toFixed(10))
-      
-    //   if ( slip.gte(targetslip) != pslip.gte(targetslip) ) {
-
-    //     // console.log(" - flipped - ")
-    //     tuner = tuner.div(2)
-
-    //   }
-      
-    //   if (slip.minus(targetslip).abs().lte(sweetspot)) {
-        
-    //     withdraw = test
-    //     break 
-
-    //   } else if (slip.minus(pslip).abs().lte(sweetspot)) {
-   
-    //     withdraw = test
-    //     break
-
-    //   } else if (pointer.isZero()) {
-        
-    //     tuner = tuner.div(2)
-    //     pointer = pointer.plus(tuner)
-    //     continue
-        
-    //   } else {
-        
-    //     if (slip.lte(targetslip)) {
-          
-    //       pointer = pointer.minus(tuner)
-    //       priorShellsToBurn = shellsToBurn
-
-    //     } else {
-          
-    //       pointer = pointer.plus(tuner)
-    //       priorShellsToBurn = shellsToBurn
-          
-    //     }
-        
-    //   }
-      
-    //   pslip = slip
-      
-    // }
-    
-
-    // pointer = new BigNumber('1.025')
-    // tuner = new BigNumber('.0125')
-    
-        
-    // while (true) {
-
-    //   let test = withdraw.times(pointer)
-    //   priorShellsToBurn = shellsToBurn
-    //   shellsToBurn = engine.calculateSingleWithdraw(shellIx, test, ix).abs()
-    //   let liquidityChange = test.div(liqTotal)
-    //   let shellsChange = shellsToBurn.div(shellsTotal)
-    //   pslip = slip
-    //   slip = new BigNumber(1).minus(shellsChange.div(liquidityChange))
-      
-    //   console.log("prior shells to burn ", priorShellsToBurn.toFixed(10))
-
-    //   console.log("shells to burn ", shellsToBurn.toFixed(10))
-      
-    //   if (priorShellsToBurn.minus(shellsToBurn).abs().lte('.00000001')) {
-
-    //     withdraw = test
-    //     break
-
-    //   }
-
-    //   if (slip.minus(targetslip).abs().lte('.00000000001')) {
-        
-    //     pointer = tuner.plus(pointer)
-        
-    //   } else {
-        
-    //     pointer = pointer.minus(tuner)
-    //     tuner = tuner.div(2)
-    //     pointer = pointer.plus(tuner)
-
-    //   }
-      
-    // }
     
     const decimals = engine.shells[shellIx].assets[ix].decimals
     withdraw = engine.shells[shellIx].assets[ix].getDisplayFromNumeraire(withdraw, decimals)
@@ -652,17 +473,6 @@ const StartModal = ({
 
     const slippage = new BigNumber(1).minus(shellsChange.div(liquidityChange))
     
-    // console.log("<^><^><^><^><^><^><^><^><^><^>")
-    // console.log("calculatedShellsToBurn", calculatedShellsToBurn.toString())
-    // console.log("shellsToBurn", shellsToBurn.toString())
-    // console.log("total withdraw", totalWithdraw.toString())
-    // console.log("shellsTotal", shellsTotal.toString())
-    // console.log("shellsChange", shellsChange.toString())
-    // console.log("liq total", liqTotal.toString())
-    // console.log("liq change", liquidityChange.toString())
-    
-    console.log("slippage", slippage.toFixed(10))
-    
     const fee = shellsToBurn.times(slippage)
     
     const slippageMessage = slippage.isNegative()
@@ -741,7 +551,7 @@ const StartModal = ({
         isMaxed={maxed == ix}
         isMaxedNoSlip={maxedNoSlip == ix}
         onChange={ payload => onInput(payload.value, ix) }
-        onValueChange={ value => console.log("val change", value) }
+        // onValueChange={ value => console.log("val change", value) }
         symbol={asset.symbol}
         value={inputs.get(ix)}
         withdrawMax={() => withdrawSingleMax(ix)}
@@ -827,23 +637,16 @@ const TokenInput = ({
         )
       }}
     />
-    <Button 
+    <Button small
       outlined={!isMaxed}
-      small
       style={{height: '40px', margin: 'auto', marginLeft: '5px'}}
       onClick={withdrawMax}
-    >
-      Max 
-    </Button>
-    <Button 
-      // disabled={!isMaxed}
+    > Max </Button>
+    <Button small
       outlined={!isMaxedNoSlip}
-      small
       style={{height: '40px', width: '140px', margin: 'auto', marginLeft: '5px'}}
       onClick={withdrawMaxNoSlip}
-    >
-      No Slippage
-    </Button>
+    > No Slippage </Button>
   </StyledInput>
 )
 
