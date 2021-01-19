@@ -21,7 +21,6 @@ import WarningModal from './WarningModal'
 import { List } from 'immutable'
 
 import BigNumber from 'bignumber.js'
-import { AirlineSeatLegroomExtraRounded } from '@material-ui/icons'
 
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
 
@@ -181,6 +180,8 @@ const StartModal = ({
   }
   
   const getMaxDepositNoSlip = (deposit, ix) => {
+    
+    if (deposit.isZero()) return deposit
 
     const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
     const shellsTotal = state.getIn(['shells', shellIx, 'shell', 'shellsTotal', 'numeraire'])
