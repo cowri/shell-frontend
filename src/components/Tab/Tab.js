@@ -1,10 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
+import * as colors from "../../theme/colors";
 
 const StyledTab = styled.div`
   align-items: center;
   background: ${props => props.active ? '#FFF' : 'transparent'};
-  color: ${props => props.active ? '#0043ff' : '#000'};
+  color: ${props => props.active ? colors.primary.main : '#000'};
   cursor: pointer;
   display: flex;
   flex: 1;

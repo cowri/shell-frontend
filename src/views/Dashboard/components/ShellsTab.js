@@ -1,14 +1,8 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
 
-import Button from '../../../components/Button'
-import LabelledValue from '../../../components/LabelledValue'
-
-import Overview from '../../../components/Overview'
-import OverviewSection from '../../../components/OverviewSection'
 import Row from '../../../components/Row'
-import TokenIcon from '../../../components/TokenIcon'
 
 import BigNumber from 'bignumber.js';
 
@@ -143,39 +137,19 @@ const ShellsTab = ({showShell}) => {
     <StyledShellsTab>
         <p style={{padding: '20px', textAlign: 'center'}}>
 
-          <p style={{marginTop: '0px', fontSize: '20px', fontWeight: 'bold'}}> 
-            ATTENTION: LIQUIDITY MIGRATION 
+          <p style={{marginTop: '0px', fontSize: '20px', fontWeight: 'bold'}}>
+            ANNOUNCEMENT: LIQUIDITY FARMING
           </p>
 
           <p>
-            We have deployed new pools with improved automated market making parameters. 
-            The new parameters will allow the pool to offer better swap rates. 
-            It will also help us collect data to further improve the Shell algorithm. 
+            The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively. Detailed information will be provided soon.
           </p>
-    
-          <p>
-            If you were an LP in the old pools, you can withdraw your liquidity by clicking the button below. 
-            However, deposits and swaps for these pools have been deactivated on the front-end. 
-            Please migrate your liquidity from the old pools to the updated pools.
-          </p>
-    
-          <p> Thank you for your patience and happy holidays, </p>
-          <p style={{fontSize: '18px'}}> The Shell Team </p>
 
-          <StyledActions>
-            <StyledButton style={{ margin: '0 auto' }} >
-              <a style={{ color: 'white', textDecoration: 'none' }} 
-                target="_blank" 
-                href="https://deactivated.shells.exchange"
-              >
-                Withdraw From Deactivated Shells
-              </a>
-            </StyledButton>
-          </StyledActions>
+          <p style={{fontSize: '18px'}}> The Component Team </p>
         </p>
       <StyledRows>
         <Row head>
-          <span style={{ flex: 1.5 }}> Shells </span>
+          <span style={{ flex: 1.5 }}> Pools </span>
           <span style={{ flex: 1, textAlign: 'right' }}> Liquidity </span>
           <span style={{ flex: 1, textAlign: 'right' }}> Your Balance </span>
         </Row>

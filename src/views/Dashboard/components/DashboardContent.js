@@ -1,9 +1,4 @@
 import React, { useContext, useState } from 'react'
-import styled from 'styled-components'
-
-import { withTheme } from '@material-ui/core/styles'
-
-import Button from '../../../components/Button'
 import Container from '../../../components/Container'
 import Surface from '../../../components/Surface'
 import Tab from '../../../components/Tab'
@@ -15,19 +10,8 @@ import SwapTab from './SwapTab'
 
 import DashboardContext from '../context'
 
-const StyledActions = withTheme(styled.div`
-  align-items: center;
-  background-color: ${props => props.theme.palette.grey[50]};
-  display: flex;
-  height: 80px;
-  padding: 0 24px;
-  @media (max-width: 512px) {
-    padding: 0 12px;
-  }
-`)
 
-
-const DashboardContent = ({ }) => {
+const DashboardContent = () => {
 
   const { state } = useContext(DashboardContext)
 
@@ -42,10 +26,10 @@ const DashboardContent = ({ }) => {
   }
 
   const shellTabClick = () => {
-    if (activeTab == 'shell') {
+    if (activeTab === 'shell') {
       setShellsTab('shells')
       setActiveTab('shells')
-    } else if (activeTab == 'swap') {
+    } else if (activeTab === 'swap') {
       setActiveTab(shellsTab)
     }
   }
@@ -55,11 +39,11 @@ const DashboardContent = ({ }) => {
       <Surface>
         <Tabs>
           <Tab 
-            active={activeTab === 'shell' || activeTab == 'shells'}
+            active={activeTab === 'shell' || activeTab === 'shells'}
             disabled={!state.has('shells')}
             onClick={shellTabClick}
           >
-            { activeTab != 'shell' ? 'Shells' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Shells </a> }
+            { activeTab !== 'shell' ? 'Pools' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Pools </a> }
           </Tab>
           <Tab 
             active={activeTab === 'swap'}

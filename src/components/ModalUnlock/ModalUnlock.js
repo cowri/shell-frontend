@@ -16,7 +16,7 @@ const MAX = '1157920892373161954235709850086879078532699846656405640394575840079
 
 const ModalContent = withTheme(styled.div`
   flex: 1;
-  padding: 0px 40px 20px;
+  padding: 0 40px 20px;
   margin-top: -10px;
   font-size: 24px;
 `)
@@ -32,10 +32,11 @@ const UnlimitedCheckbox = styled.div`
   position: relative;
   height: 25px;
   padding: 20px;
+
   & .MuiIconButton-root {
     position: relative;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
   }
 `
 
@@ -82,7 +83,7 @@ const ModalUnlock = ({
         { symbol } 
       </ModalTitle>
       <ModalContent>
-        <p> Shell's current allowance is { current } </p>
+        <p> Current allowance is { current } </p>
         { approveToZero 
           ? <p> You must set {symbol}'s allowance to zero before adjusting it to something else. </p> 
           : null }
@@ -101,7 +102,7 @@ const ModalUnlock = ({
                 <Checkbox 
                   checked={ unlimited }
                   className={ checkboxClasses.root }
-                  onChange={ () => ( setAmount(''), setUnlimited(!unlimited) ) }
+                  onChange={ () => { setAmount(''); setUnlimited(!unlimited) } }
                 />
                 Unlimited Approval
               </UnlimitedCheckbox>

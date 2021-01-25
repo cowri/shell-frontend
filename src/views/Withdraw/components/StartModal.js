@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import shellIcon from '../../../assets/logo.png'
 
-import tinyShellIcon from '../../../assets/shell_icon_24.svg'
+import tinyShellIcon from '../../../assets/logo.png'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
@@ -41,10 +41,11 @@ const StyledWithdrawEverything = styled.div`
   height: 25px;
   margin-top: -10px;
   padding-bottom: 20px;
+
   & .MuiIconButton-root {
     position: relative;
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
   }
 `
 
@@ -92,7 +93,7 @@ const errorStyles = {
 const ONE = new BigNumber(1)
 
 const StartModal = ({
-  engine, 
+  engine,
   onProportionalWithdraw,
   onWithdraw,
   onDismiss,
@@ -100,24 +101,23 @@ const StartModal = ({
   state
 }) => {
 
-  const SAFETY_CHECK = <span style={errorStyles}> These amounts trigger Shell's Safety Check  </span>
-  const EXCEEDS_BALANCE = <span style={errorStyles}> This withdrawal exceeds your Shell balance </span>
+  const SAFETY_CHECK = <span style={errorStyles}> These amounts trigger pool's Safety Check  </span>
+  const EXCEEDS_BALANCE = <span style={errorStyles}> This withdrawal exceeds your LP balance </span>
   const DEFAULT = <span> Your rate for this withdrawal will be... </span>
-  
+
   const [ inputs, setInputs ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
   const [ errors, setErrors ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
-  const [ fees, setFees ] = useState(new Array(engine.shells[shellIx].assets.length).fill(null))
   const [ feeTip, setFeeTip ] = useState(DEFAULT)
   const [ proportional, setProportional ] = useState(false)
   const [ zero, setZero ] = useState(true)
   const [ error, setError ] = useState(null)
 
   const handleSubmit = (e) => {
-    
+
     e.preventDefault()
 
     if (proportional) {
-      
+
       const totalShells = state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'raw' ])
 
       onProportionalWithdraw(totalShells)
@@ -143,7 +143,7 @@ const StartModal = ({
         amounts.push(asset.getAllFormatsFromDisplay(v))
       }
     })
-    
+
     return { addresses, amounts }
 
   }
@@ -153,21 +153,21 @@ const StartModal = ({
     if (event.target.checked) {
 
       const fee = engine.shells[shellIx].epsilon.multipliedBy(100).toString()
-      
+
       const feeMessage = (
         <div>
           You will burn
-          <span style={{ position: 'relative', paddingLeft: '16.5px' }}> 
+          <span style={{ paddingLeft: '16.5px' }}>
             <img alt=""
-              src={tinyShellIcon} 
-              style={{position:'absolute', top:'1px', left: '0px' }} 
-            /> 
-            { ' ' + state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) } 
+              src={tinyShellIcon}
+              style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }}
+            />
+            { ' ' + state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) }
           </span>
           <span> and pay a {fee}% fee to liquidity providers for this withdrawal </span>
         </div>
       )
-        
+
       const updatedInputs = inputs.map( (v, i) => {
         return engine.shells[shellIx].getDisplayFromNumeraire(
           state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesOwned', i, 'numeraire'])
@@ -181,7 +181,7 @@ const StartModal = ({
       setProportional(true)
 
     } else {
-      
+
       setInputs(inputs.map( () => '' ))
       setErrors(errors.map ( () => null ))
       setFeeTip(DEFAULT)
@@ -191,52 +191,48 @@ const StartModal = ({
     }
 
   }
-  
+
   const onInput = (v, i) => {
 
     const updatedInputs = inputs.set(i,v)
-      
+
     setInputs(updatedInputs)
 
     const total = updatedInputs.reduce( (a,c) => a + c )
-    
-    if (total == 0) {
-      
+
+    if (total === 0) {
+
       setZero(true)
       setError(null)
       setFeeTip(DEFAULT)
-    
+
     }
 
   }
-  
+
   const primeWithdraw = async () => {
-    
+
     if (zero) return
-    
+
     const { addresses, amounts } = getAddressesAndAmounts()
-    
+
     const totalWithdraw = amounts.reduce( (a, c) => a.plus(c.numeraire), new BigNumber(0) )
-    
-    const fees = engine.getFees(shellIx, addresses, amounts.map( a => {
-      return engine.shells[shellIx].getAllFormatsFromNumeraire(a.numeraire.negated())
-    }))
-    
+
     const shellsToBurn = await engine.shells[shellIx].viewSelectiveWithdraw(addresses, amounts)
-    
-    if (shellsToBurn === false || shellsToBurn.toString() == REVERTED) {
-      
+
+    if (shellsToBurn === false || shellsToBurn.toString() === REVERTED) {
+
       setError(SAFETY_CHECK)
       setFeeTip(null)
       return
 
     } else if (shellsToBurn.isGreaterThan(state.getIn(['shells', shellIx, 'shell', 'shellsOwned', 'numeraire']))) {
-      
+
       setError(EXCEEDS_BALANCE)
       setFeeTip(null)
       return
 
-    } 
+    }
 
     const liqTotal = state.getIn(['shells', shellIx, 'shell', 'liquidityTotal', 'numeraire'])
     const liquidityChange = totalWithdraw.dividedBy(liqTotal)
@@ -245,37 +241,37 @@ const StartModal = ({
     const shellsChange = shellsToBurn.dividedBy(shellsTotal)
 
     const slippage = new BigNumber(1).minus(shellsChange.dividedBy(liquidityChange))
-    
+
     const fee = shellsToBurn.multipliedBy(slippage)
-    
+
     const slippageMessage = slippage.isNegative()
-      ? ( <span> 
-            and pay a liquidity provider fee of 
-            <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
-              <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
-              { Math.abs(fee.toFixed(8)) } 
+      ? ( <span>
+            and pay a liquidity provider fee of
+            <span style={{ paddingLeft: '23px', paddingRight: '4px' }}>
+              <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
+              &nbsp;{ isNaN(fee.toFixed(8)) ? '0.00' : Math.abs(fee.toFixed(8)) }
             </span>
           </span>
-      ) : ( <span > 
-            and earn a rebalancing subsidy of 
-            <span style={{ position: 'relative', paddingLeft: '23px', paddingRight: '4px' }}>
-              <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '1px' }} /> 
-              { fee.toFixed(8) } 
+      ) : ( <span >
+            and earn a rebalancing subsidy of
+            <span style={{ paddingLeft: '23px', paddingRight: '4px' }}>
+              <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
+              &nbsp;{ isNaN(fee.toFixed(8)) ? '0.00' : fee.toFixed(8) }
             </span>
-          </span> 
+          </span>
         )
 
     const shells = (
       <div>
-        You will burn 
-        <span style={{position: 'relative', paddingLeft: '16.5px', paddingRight: '4px' }}> 
-          <img alt="" src={tinyShellIcon} style={{ position:'absolute', top:'1px', left: '0px' }} /> 
-          { ' ' + engine.shells[shellIx].getDisplayFromNumeraire(shellsToBurn) }
+        You will burn
+        <span style={{ paddingLeft: '16.5px', paddingRight: '4px' }}>
+          <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
+          &nbsp;{ ' ' + engine.shells[shellIx].getDisplayFromNumeraire(shellsToBurn) }
         </span>
         { slippageMessage }
       </div>
     )
-        
+
     setFeeTip(shells)
     setError(null)
 
@@ -284,39 +280,38 @@ const StartModal = ({
   useEffect( () => {
 
     const total = inputs.reduce( (a,c) => a + c )
-    
-    if (total == 0) {
-      
+
+    if (total === 0) {
+
       setZero(true)
       setError(null)
       setFeeTip(DEFAULT)
-      return
-      
+
     } else if (!proportional) {
-      
+
       setZero(false);
 
       (async function () {
         if (!proportional) await primeWithdraw()
       })()
-      
+
     }
-    
+
   }, [ inputs, zero ])
 
 
   const checkboxClasses = makeStyles({
     root: {
-      '& .MuiSvgIcon-root': { 
+      '& .MuiSvgIcon-root': {
         color: 'rgba(0, 0, 0, 0.54)',
-        fontSize: '1.65em' 
+        fontSize: '1.65em'
       },
       color: 'rgba(0, 0, 0, 0.54)',
       padding: 'none'
     }
   }, { name: 'MuiCheckbox' })()
 
-  const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => { 
+  const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => {
 
     return (
       <TokenInput
@@ -329,7 +324,7 @@ const StartModal = ({
     )
 
   })
-  
+
   return (
     <Modal onDismiss={onDismiss}>
       <ModalTitle>Withdraw Funds</ModalTitle>
@@ -338,12 +333,12 @@ const StartModal = ({
           <StyledRows>
             <StyledShells>
                 <StyledShellIcon src={shellIcon}/>
-                <StyledShellBalance> { state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) + ' Shells'} </StyledShellBalance>
+                <StyledShellBalance> { state.getIn([ 'shells', shellIx, 'shell', 'shellsOwned', 'display' ]) + ' LP tokens'} </StyledShellBalance>
             </StyledShells>
             <StyledWithdrawMessage> { error || feeTip } </StyledWithdrawMessage>
               { tokenInputs }
             <StyledWithdrawEverything>
-              <Checkbox 
+              <Checkbox
                 checked={ proportional }
                 className={ checkboxClasses.root }
                 onChange={ primeProportionalWithdraw }
@@ -358,7 +353,7 @@ const StartModal = ({
         <Button onClick={onDismiss} outlined >Cancel</Button>
         <Button onClick={handleSubmit}
           style={ error ? { cursor: 'no-drop'} : null }
-          disabled={ error || zero } 
+          disabled={ error || zero }
         >
           { proportional ? 'Withdraw Everything' : 'Withdraw' }
        </Button>
@@ -389,7 +384,7 @@ const TokenInput = ({
       type="text"
       value={value}
       InputProps={{
-        endAdornment: ( 
+        endAdornment: (
           <StyledEndAdornment>
             <span> {symbol} </span>
           </StyledEndAdornment>

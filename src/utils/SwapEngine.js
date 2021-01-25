@@ -23,7 +23,7 @@ export default class SwapEngine {
         let max = new BigNumber(0)
         
         for (let i = 0; i < shells.length; i++) {
-            if (!quotes[i] || quotes[i].toString() == REVERTED) continue
+            if (!quotes[i] || quotes[i].toString() === REVERTED) continue
             if (quotes[i].isGreaterThan(max)){
                 max = quotes[i]
                 shellIx = shells[i]
@@ -33,7 +33,7 @@ export default class SwapEngine {
         if (shellIx == undefined) { throw( new Error("reverted")) }
         
         for (let i = 0; i < this.shells[shellIx].derivatives.length; i++) {
-            if (this.shells[shellIx].derivatives[i].address == origin.address) {
+            if (this.shells[shellIx].derivatives[i].address === origin.address) {
                 shellDerivativeIx = i
                 break
             }
@@ -73,7 +73,7 @@ export default class SwapEngine {
         let min = new BigNumber(1e80)
         
         for (let i = 0; i < shells.length; i++) {
-            if (!quotes[i] || quotes[i].toString() == REVERTED) continue
+            if (!quotes[i] || quotes[i].toString() === REVERTED) continue
             if (quotes[i].isLessThan(min)){
                 min = quotes[i]
                 shellIx = shells[i]
@@ -83,7 +83,7 @@ export default class SwapEngine {
         if (shellIx == undefined) throw( new Error("reverted"))
             
         for (let i = 0; i < this.shells[shellIx].derivatives.length; i++) {
-            if (this.shells[shellIx].derivatives[i].address == origin.address) {
+            if (this.shells[shellIx].derivatives[i].address === origin.address) {
                 shellDerivativeIx = i
                 break
             }
@@ -114,7 +114,7 @@ export default class SwapEngine {
         
         minTarget = minTarget.multipliedBy(new BigNumber(.99))
 
-        let deadline = Math.floor(Date.now() /1000 + 900)
+        let deadline = Math.floor(Date.now() / 1000 + 900)
 
         return this.shells[shellIx].originSwap(
             origin.address,

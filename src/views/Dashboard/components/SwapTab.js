@@ -23,7 +23,6 @@ import Button from '../../../components/Button'
 
 import TokenIcon from '../../../components/TokenIcon'
 
-const MAX = "115792089237316195423570985008687907853269984665640564039457584007913129639935"
 const DEFAULT_MSG = "Your price for this trade will be..."
 
 const StyledStartAdornment = styled.div`
@@ -48,6 +47,10 @@ const StyledLabelBar = withTheme(styled.div`
   height: 32px;
   align-content: baseline;
   margin-top: 24px;
+`)
+
+const StyledTokenInfo = withTheme(styled.div`
+  margin: 15px 0;
 `)
 
 const StyledCoinHint = withTheme(styled.div`
@@ -94,13 +97,6 @@ const StyledRows = styled.div`
   text-align: center;
 `
 
-const StyledWarning = styled.div`
-  color: red;
-  font-size: 18px;
-  width: 80%;
-  margin: 20px auto 10px;
-`
-
 const StyledActions = withTheme(styled.div`
   align-items: center;
   background-color: ${props => props.theme.palette.grey[50]};
@@ -129,33 +125,30 @@ const SwapTab = () => {
   const [priceMessage, setPriceMessage] = useState(DEFAULT_MSG)
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
-  
+
   const origin = engine.derivatives[originIx]
   const target = engine.derivatives[targetIx]
-  
-  const haltCheckMessage = 'amount triggers halt check'
-  const insufficientBalanceMessage = 'amount is greater than your wallet\'s balance'
-  
+
   const [unlocked, setUnlocked] = useState(
     !state.getIn(['shells', 0, 'derivatives', 0, 'allowance', 'numeraire']).isZero()
   )
-  
+
   const sanitizeNumber = (number, decimals) => {
     number = number.replace(/,/g,'')
-    if (number.indexOf('.') != -1 && number.split('.')[1].length > decimals) {
+    if (number.indexOf('.') !== -1 && number.split('.')[1].length > decimals) {
       number = number.split('.')
       number[1] = number[1].substring(0, decimals)
       number = number.join('.')
     }
     return number
   }
-  
+
   useEffect(() => {
-    
+
     if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
-      
+
       setIxs(ixs.set('shell', null).set('derivative', null))
-      return 
+      return
 
     }
 
@@ -187,64 +180,64 @@ const SwapTab = () => {
       return
 
     }
-    
 
-    ;(async function () { 
+
+    ;(async function () {
       try {
-        
+
         const method = swapType == 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
-        
-        const { 
+
+        const {
           originAmount,
           targetAmount,
           _shellIx,
           _shellDerivativeIx
         } = await engine[method](
-          origin, 
-          target, 
+          origin,
+          target,
           swapType == 'origin' ? originValue : targetValue
         )
 
-        swapType == 'origin' 
+        swapType == 'origin'
           ? setTargetValue(targetAmount.display)
           : setOriginValue(originAmount.display)
-          
+
         setIxs(ixs
           .set('shell', _shellIx)
           .set('derivative', _shellDerivativeIx))
 
         setPriceIndication(originAmount.numeraire, targetAmount.numeraire)
         setUnlocked(state.getIn([
-          'shells', 
-          _shellIx, 
-          'derivatives', 
-          _shellDerivativeIx, 
-          'allowance', 
+          'shells',
+          _shellIx,
+          'derivatives',
+          _shellDerivativeIx,
+          'allowance',
           'numeraire'
         ]).isGreaterThanOrEqualTo(originAmount.numeraire))
 
       } catch (e) {
-        
+
         swapType == 'origin'
           ? setTargetValue('')
           : setOriginValue('')
-        
+
         setHaltIndication()
 
       }
     })()
 
   }, [ originValue, targetValue, originIx, targetIx ])
-  
+
   function setHaltIndication () {
-    
+
     const errorStyles = { color: 'red', fontSize: '26px', fontWeight: 'bold' }
 
-    setHaltMessage(<span style={errorStyles}> This amount triggers Shell's Safety Check </span>)
+    setHaltMessage(<span style={errorStyles}> This amount triggers pool's Safety Check </span>)
 
     setPriceMessage('')
 
-  } 
+  }
 
   async function setPriceIndication (originAmount, targetAmount) {
 
@@ -253,14 +246,14 @@ const SwapTab = () => {
     const oSymbol = engine.derivatives[originIx].symbol
     const tSymbol = engine.derivatives[targetIx].symbol
 
-    let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI') 
+    let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI')
       ? <span> <span> 1.00 </span> of { oSymbol } is worth </span>
       : <span> <span> 1.00 </span> { oSymbol } is worth </span>
 
     let right = (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI')
       ? <span> <span> { tPrice } </span> of { tSymbol } for this trade </span>
       : <span> <span> { tPrice } </span> { tSymbol } for this trade </span>
-      
+
     setPriceMessage(<span> {left} {right} </span>)
     setHaltMessage('')
 
@@ -276,20 +269,20 @@ const SwapTab = () => {
         'allowance',
         'numeraire'
     ]).isLessThan(originValue)
-    
+
     if (noAllowance) return setStep('unlocking')
-        
+
     e.preventDefault()
 
     setStep('confirming')
-    
+
     let method = swapType === 'origin' ? 'executeOriginSwap' : 'executeTargetSwap'
-    
+
     let tx = engine[method](
-      ixs.get('shell'), 
-      origin, 
-      target, 
-      sanitizeNumber(originValue, origin.decimals), 
+      ixs.get('shell'),
+      origin,
+      target,
+      sanitizeNumber(originValue, origin.decimals),
       sanitizeNumber(targetValue, target.decimals)
     )
 
@@ -297,11 +290,11 @@ const SwapTab = () => {
       .once('transactionHash', handleTransactionHash)
       .once('confirmation', handleConfirmation)
       .on('error', handleError)
-    
+
     let success = false
 
     function handleTransactionHash (hash) {
-      
+
       setTxHash(hash)
       setStep('broadcasting')
 
@@ -310,9 +303,9 @@ const SwapTab = () => {
     function handleConfirmation (conf) {
 
       success = true
-      
-      swapType === 'origin' 
-        ? setOriginValue('') 
+
+      swapType === 'origin'
+        ? setOriginValue('')
         : setTargetValue('')
 
       setPriceMessage(DEFAULT_MSG)
@@ -322,13 +315,13 @@ const SwapTab = () => {
     }
 
     function handleError (e) {
-      
+
       if (!success) setStep('error')
 
     }
 
   }
-  
+
   const handleUnlock = async (amount) => {
 
     setStep('confirming')
@@ -347,7 +340,7 @@ const SwapTab = () => {
       setTxHash(hash)
       setStep('broadcasting')
     }
-    
+
     let success = false
 
     function onConfirmation () {
@@ -364,15 +357,15 @@ const SwapTab = () => {
     }
 
   }
-  
+
   const handleOriginInput = e => {
 
     setSwapType('origin')
     setOriginValue(sanitizeNumber(e.target.value, origin.decimals))
     if (e.target.value == '') setTargetValue('')
-    
+
   }
-  
+
   const _handleOriginSelect = v => {
 
     setOriginIx(v)
@@ -393,26 +386,26 @@ const SwapTab = () => {
     }
 
   }
-  
+
   const handleTargetInput = e => {
 
     setSwapType('target')
     setTargetValue(sanitizeNumber(e.target.value, target.decimals))
     if (e.target.value == '') setOriginValue('')
-    
+
   }
-  
+
   const _handleTargetSelect = v => {
-    
+
     setTargetIx(v)
-    
+
   }
 
   const handleSwitch = () => {
-    
+
     setOriginIx(targetIx)
     setTargetIx(originIx)
-    
+
   }
 
   const selectionCss = makeStyles({
@@ -422,15 +415,15 @@ const SwapTab = () => {
   const selections = engine.derivatives.map( (asset, ix) => {
 
       return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
-      
+
   })
-  
+
   const targetSelections = engine.derivatives.reduce( (a, c, i) => {
-    
+
     if (engine.overlaps[c.symbol].indexOf(origin.symbol) != -1) {
-      a.push( 
-        <MenuItem className={selectionCss.root} key={i} value={i} > 
-          { c.symbol } 
+      a.push(
+        <MenuItem className={selectionCss.root} key={i} value={i} >
+          { c.symbol }
         </MenuItem>
       )
     }
@@ -466,27 +459,27 @@ const SwapTab = () => {
   const inputStyles = makeStyles({
     inputBase: { fontSize: '20px', height: '60px' },
     helperText: {
-      color: 'red', 
+      color: 'red',
       fontSize: '16px',
       marginLeft: '25px'
     }
   })()
-  
+
   let allowance
   let balance
-  
+
   if (ixs.get('shell') != null && ixs.get('derivative') != null) {
-    
+
     const asset = state.getIn([
-      'shells', 
+      'shells',
       ixs.get('shell'),
       'derivatives',
       ixs.get('derivative')
     ])
-    
+
     allowance = asset.getIn(['allowance'])
     balance = asset.getIn(['balance', 'display'])
-    
+
     if ( allowance.get('numeraire').isGreaterThan(new BigNumber('100000000'))) {
       allowance = '100,000,000+'
     } else if ( allowance.get('numeraire').isGreaterThan(new BigNumber('10000000'))) {
@@ -496,43 +489,43 @@ const SwapTab = () => {
     }
 
   }
-    
+
   return (
 
     <StyledSwapTab>
 
-      { step === 'unlocking' && <ModalUnlock 
-          coin={state.getIn(['shells', ixs.get('shell'), 'derivatives', ixs.get('derivative') ])} 
-          handleUnlock={handleUnlock} 
-          handleCancel={ () => setStep('none') } 
+      { step === 'unlocking' && <ModalUnlock
+          coin={state.getIn(['shells', ixs.get('shell'), 'derivatives', ixs.get('derivative') ])}
+          handleUnlock={handleUnlock}
+          handleCancel={ () => setStep('none') }
         /> }
 
       { step === 'confirming' && <ModalConfirm wallet={engine.wallet} /> }
-    
+
       { step === 'broadcasting' && <ModalTx txHash={txHash} /> }
 
-      { step === 'success' && <ModalSuccess 
-          buttonBlurb={'Finish'} 
-          txHash={txHash} 
-          onDismiss={() => setStep('none')} 
+      { step === 'success' && <ModalSuccess
+          buttonBlurb={'Finish'}
+          txHash={txHash}
+          onDismiss={() => setStep('none')}
           title={'Swap Successful.'}
         /> }
 
-      { step === 'unlockSuccess' && <ModalSuccess 
-        buttonBlurb={'Finish'} 
-        onDismiss={() => setStep('none')} 
+      { step === 'unlockSuccess' && <ModalSuccess
+        buttonBlurb={'Finish'}
+        onDismiss={() => setStep('none')}
         title={'Unlocking Successful.'}
         /> }
 
-      { step === 'error' && <ModalError 
-        buttonBlurb={'Finish'} 
-        onDismiss={() => setStep('none')} 
-        title={'An error occurred.'} 
+      { step === 'error' && <ModalError
+        buttonBlurb={'Finish'}
+        onDismiss={() => setStep('none')}
+        title={'An error occurred.'}
         /> }
 
       <StyledRows>
         <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
-        <AmountInput 
+        <AmountInput
           allowance={allowance}
           balance={balance}
           icon={origin.icon}
@@ -549,7 +542,7 @@ const SwapTab = () => {
             <SwapCallsIcon fontSize={'large'}/>
           </IconButton>
         </StyledSwapRow>
-        <AmountInput 
+        <AmountInput
           icon={target.icon}
           onChange={ handleTargetInput }
           selections={getDropdown(_handleTargetSelect, targetSelections, targetIx)}
@@ -557,15 +550,15 @@ const SwapTab = () => {
           symbol={target.symbol}
           title='To'
           value={targetValue}
-        /> 
+        />
       </StyledRows>
       <StyledActions>
-        <Button 
+        <Button
           disabled={ targetValue == 0 || originValue == 0 }
           onClick={handleSwap}
         >
           Swap
-        </Button> 
+        </Button>
         <div style={{ width: 12 }} />
       </StyledActions>
     </StyledSwapTab>
@@ -586,23 +579,25 @@ const AmountInput = ({
   value,
   selections
 }) => {
-  
+
   return (
     <StyledInput>
       <StyledLabelBar>
         <StyledTitle> { title } </StyledTitle>
       </StyledLabelBar>
-      { balance ? 
-        <StyledCoinHint style={{ marginLeft: '24px', marginTop: '0px' }}>
-          Your wallet's balance:
-          <span class="number">&nbsp;{ balance }</span> 
-        </StyledCoinHint> : null }
-      { allowance ? 
-        <StyledCoinHint onClick={unlock} style={{ cursor:'pointer', marginLeft: '24px', marginTop: '0px' }}>
-          Shell's allowance:
-          <span class="number">&nbsp;{ allowance }&nbsp;</span> 
-          <span style={{textDecoration: 'underline'}}> click to change </span>
-        </StyledCoinHint> : null }
+      <StyledTokenInfo>
+        { balance ?
+          <StyledCoinHint style={{ marginLeft: '24px', marginTop: '0px' }}>
+            Your wallet's balance:
+            <span className="number">&nbsp;{ balance }</span>
+          </StyledCoinHint> : null }
+        { allowance ?
+          <StyledCoinHint onClick={unlock} style={{ cursor:'pointer', marginLeft: '24px', marginTop: '0px' }}>
+            Current allowance:
+            <span className="number">&nbsp;{ allowance }&nbsp;</span>
+            <span style={{textDecoration: 'underline'}}> click to change </span>
+          </StyledCoinHint> : null }
+      </StyledTokenInfo>
       <NumberFormat fullWidth
         allowNegative={false}
         customInput={TextField}
@@ -618,9 +613,9 @@ const AmountInput = ({
         value={value}
         InputProps={{
           className: styles.inputBase,
-          endAdornment: ( 
-            <div style={{ marginRight: 6, fontFamily: 'Geomanist' }}> 
-              { selections } 
+          endAdornment: (
+            <div style={{ marginRight: 6, fontFamily: 'Geomanist' }}>
+              { selections }
             </div>
           ),
           startAdornment: (

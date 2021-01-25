@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import Intercom from 'react-intercom'
 import cookie from 'js-cookie'
 import randomWords from 'random-words'
 
@@ -15,7 +14,7 @@ import DashboardContext from './context'
 
 const StyledDashboard = styled.div`
   align-items: center;
-  background: radial-gradient(circle at top, #00fff3 -0%, #0043ff, #000079);
+  background: radial-gradient(circle at top, #fff -0%, rgb(242, 193, 241), rgba(203, 0, 255, 0.18));
   background-size: cover;
   background-position: center center;
   min-height: 100vh;

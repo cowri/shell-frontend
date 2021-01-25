@@ -11,11 +11,7 @@ import ModalSuccess from '../../components/ModalSuccess'
 
 import { fromJS } from 'immutable'
 import BigNumber from 'bignumber.js'
-
-const MAX_APPROVAL = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
-
-const ZERO = new BigNumber(0)
-
+new BigNumber(0);
 const Deposit = ({ shellIx, onDismiss }) => {
   const { 
     engine,
@@ -58,7 +54,7 @@ const Deposit = ({ shellIx, onDismiss }) => {
           .delete('prompting')
           .update('assets', assets => assets.map(asset => asset.set('input', ''))))
       },
-      function onError (e) {
+      function onError () {
         if (!success) {
           setStep('error')
           setLocalState(localState

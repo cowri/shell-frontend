@@ -25,7 +25,7 @@ const StyledShellTab = styled.div`
 const StyledTokenName = styled.span`
   align-items: center;
   display: flex;
-  flex: 1.5;j
+  flex: 1.5;
 `
 
 const StyledSocialIcon = styled.a`
@@ -102,8 +102,8 @@ const ShellTab = ({ shellIx }) => {
   const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ]) 
   const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ]) 
   
-  let etherscan = config.network == 1 ? 'https://etherscan.io/address/' + config.shells[shellIx].shell
-    : config.network == 41 ? 'https://kovan.etherscan.io/address/' + config.shells[shellIx].shell
+  let etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
+    : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
     : ''
 
 
@@ -113,7 +113,7 @@ const ShellTab = ({ shellIx }) => {
     <StyledShellTab>
       <Overview>
         <OverviewSection>
-          <LabelledValue label="Shell Reserves" value={ liqTotal} />
+          <LabelledValue label="Pool Reserves" value={ liqTotal} />
         </OverviewSection>
         <OverviewSection>
           <LabelledValue label="Your Balance" value={ liqOwned } />
@@ -122,7 +122,7 @@ const ShellTab = ({ shellIx }) => {
       <StyledRows>
         <Row head>
           <span style={{ flex: 1.5 }}> Token </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> Shell Reserves </span>
+          <span style={{ flex: 1, textAlign: 'right' }}> Pool Reserves </span>
           <span style={{ flex: 1, textAlign: 'right' }}> My Balances </span>
         </Row>
         { rows }

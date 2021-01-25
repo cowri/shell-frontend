@@ -6,23 +6,25 @@ import logo from '../../assets/logo.png'
 const StyledLogo = styled.div`
   align-items: center;
   display: flex;
-  color: ${props => props.color};
   font-size: 24px;
   font-weight: 700;
 `
 
 const StyledImg = styled.img`
-  height: 48px;
-  position: relative;
-  top: -2px;
+  width: 48px;
 `
 
-const Logo = ({ color = "#FFF" }) => (
-  <StyledLogo color={color}>
-    <StyledImg src={logo} />
-    <div style={{ width: 4 }} />
-    <span>Shell Protocol</span>
-  </StyledLogo>
-)
+const StyledName = styled.span`
+  color: rgb(0,0,0);
+  margin-top: -.15em;
+  margin-left: .6em;
+`
 
-export default Logo
+export default function (){
+  return (
+    <StyledLogo>
+      <StyledImg src={logo} />
+      <StyledName>component</StyledName>
+    </StyledLogo>
+  )
+}

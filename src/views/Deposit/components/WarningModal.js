@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { withTheme } from '@material-ui/core/styles'
 import styled from 'styled-components'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
 import ModalActions from '../../../components/ModalActions'
-import ModalIcon from '../../../components/ModalIcon'
 
 const ModalContent = withTheme(styled.div`
   flex: 1;
@@ -32,7 +31,7 @@ const ModalWarning = ({
   let message 
   
 
-  if (tag == 'STABLEx') {
+  if (tag === 'STABLEx') {
 
     message = ( <ModalContent> 
         <p> 
@@ -43,14 +42,14 @@ const ModalWarning = ({
           See here for details.
           </a>
         </p>
-        <p> Furthermore, Shell Protocol is in beta. </p>
+        <p> Furthermore, Component is in beta. </p>
         <p> Please do not deposit any funds you can not afford to lose. </p>
       </ModalContent> )
 
   } else {
     
     message = ( <ModalContent>
-        <p> Shell Protocol is in beta. </p>
+        <p> Component is in beta. </p>
         <p> Please do not deposit any funds you can not afford to lose. </p>
       </ModalContent> )
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDiscord, faTelegram, faTwitter, faGithub } from '@fortawesome/free-brands-svg-icons'
+import {faDiscord, faTelegram, faTwitter, faGithub, faMedium} from '@fortawesome/free-brands-svg-icons';
 
 import Container from '../Container'
 
@@ -31,17 +31,20 @@ const StyledSocialIcon = styled.a`
 const Footer = () => (
   <Container>
     <StyledFooter>
-      <StyledSocialIcon target="_blank" href="https://twitter.com/shellprotocol">
+      <StyledSocialIcon target="_blank" href="https://twitter.com/componentx">
         <FontAwesomeIcon icon={faTwitter} size="lg" />
       </StyledSocialIcon>
-      <StyledSocialIcon target="_blank" href="https://t.me/joinchat/IXE6vxd2VqQT1-VyAxAqig">
-        <FontAwesomeIcon icon={faTelegram} size="lg" />
-      </StyledSocialIcon>
-      <StyledSocialIcon target="_blank" href="https://discord.gg/ZqMJPr4">
+      <StyledSocialIcon target="_blank" href="https://discord.gg/E5DDmXYc">
         <FontAwesomeIcon icon={faDiscord} size="lg" />
       </StyledSocialIcon>
-      <StyledSocialIcon target="_blank" href="https://github.com/cowri/shell-solidity-v1">
+      <StyledSocialIcon target="_blank" href="https://github.com/Componentfinance">
         <FontAwesomeIcon icon={faGithub} size="lg" />
+      </StyledSocialIcon>
+      <StyledSocialIcon target="_blank" href="https://componentfinance.medium.com/">
+        <FontAwesomeIcon icon={faMedium} size="lg" />
+      </StyledSocialIcon>
+      <StyledSocialIcon target="_blank" href="https://t.me/componentfinance">
+        <FontAwesomeIcon icon={faTelegram} size="lg" />
       </StyledSocialIcon>
     </StyledFooter>
   </Container>

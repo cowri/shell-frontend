@@ -27,9 +27,9 @@ const ModalSuccess = ({
   txHash
 }) => {
     
-  const etherscanlink = config.network == '42'
+  const etherscanlink = config.network === 42
     ? "https://kovan.etherscan.io/tx/" + txHash
-    : config.network == '4' 
+    : config.network === 4
       ? "https://rinkeby.etherscan.io/tx/" + txHash
       : "https://etherscan.io/tx/" + txHash
 

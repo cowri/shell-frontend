@@ -1,5 +1,5 @@
 import React from 'react'
-import { fromJS, List, Map  } from "immutable"
+import { fromJS } from "immutable"
 import config from "../mainnet.multiple.config"
 import Asset from "./Asset"
 import Shell from "./Shell"
@@ -29,24 +29,24 @@ export default class Engine extends SwapEngine {
         this.overlaps = {}
         this.pairsToShells = {}
 
-        for (const _shell_ of config.shells) {
+        for (const _pool_ of config.pools) {
 
             const shell = new Shell(
                 this.web3,
-                _shell_.shell,
-                "Shell Protocol",
+                _pool_.shell,
+                "Component",
                 "SHL",
                 shellIcon,
                 18
             )
 
-            shell.displayDecimals = _shell_.displayDecimals
-            shell.swapDecimals = _shell_.swapDecimals
-            shell.alpha = new BigNumber(_shell_.params.alpha)
-            shell.beta = new BigNumber(_shell_.params.beta)
-            shell.delta = new BigNumber(_shell_.params.delta)
-            shell.epsilon = new BigNumber(_shell_.params.epsilon)
-            shell.lambda = new BigNumber(_shell_.params.lambda)
+            shell.displayDecimals = _pool_.displayDecimals
+            shell.swapDecimals = _pool_.swapDecimals
+            shell.alpha = new BigNumber(_pool_.params.alpha)
+            shell.beta = new BigNumber(_pool_.params.beta)
+            shell.delta = new BigNumber(_pool_.params.delta)
+            shell.epsilon = new BigNumber(_pool_.params.epsilon)
+            shell.lambda = new BigNumber(_pool_.params.lambda)
 
             shell.weights = []
             shell.assets = []
@@ -54,9 +54,9 @@ export default class Engine extends SwapEngine {
             shell.assetIx = {}
             shell.derivativeIx = {}
 
-            for (let ix = 0; ix < _shell_.assets.length; ix++) {
+            for (let ix = 0; ix < _pool_.assets.length; ix++) {
 
-                const _asset_ = _shell_.assets[ix]
+                const _asset_ = _pool_.assets[ix]
 
                 const asset = new Asset(
                     this.web3,
@@ -67,8 +67,8 @@ export default class Engine extends SwapEngine {
                     _asset_.decimals
                 )
                 
-                asset.displayDecimals = _shell_.displayDecimals
-                asset.swapDecimals = _shell_.swapDecimals
+                asset.displayDecimals = _pool_.displayDecimals
+                asset.swapDecimals = _pool_.swapDecimals
                 asset.weight = new BigNumber(_asset_.weight)
                 asset.approveToZero = _asset_.approveToZero
 
@@ -88,8 +88,8 @@ export default class Engine extends SwapEngine {
                         _asset_.derivatives[dix].decimals
                     )
 
-                    derivative.displayDecimals = _shell_.displayDecimals
-                    derivative.swapDecimals = _shell_.swapDecimals
+                    derivative.displayDecimals = _pool_.displayDecimals
+                    derivative.swapDecimals = _pool_.swapDecimals
 
                     asset.derivatives.push(derivative)
 
@@ -108,80 +108,79 @@ export default class Engine extends SwapEngine {
 
             }
 
-            for (let ix = 0; ix < _shell_.assets.length; ix++) {
-                const _symbol = _shell_.assets[ix].symbol
-                for (let xi = ix + 1; xi < _shell_.assets.length; xi++) {
+            for (let ix = 0; ix < _pool_.assets.length; ix++) {
+                for (let xi = ix + 1; xi < _pool_.assets.length; xi++) {
                     setOverlap(
-                        _shell_.assets[ix].symbol,
-                        _shell_.assets[xi].symbol,
+                        _pool_.assets[ix].symbol,
+                        _pool_.assets[xi].symbol,
                     )
                     setPair(
                         this.shells.length,
-                        _shell_.assets[ix].address,
-                        _shell_.assets[xi].address
+                        _pool_.assets[ix].address,
+                        _pool_.assets[xi].address
                     )
-                    for (let dix = 0; dix < _shell_.assets[ix].derivatives.length; dix++) {
+                    for (let dix = 0; dix < _pool_.assets[ix].derivatives.length; dix++) {
                         setOverlap(
-                            _shell_.assets[ix].symbol, 
-                            _shell_.assets[ix].derivatives[dix].symbol
+                            _pool_.assets[ix].symbol,
+                            _pool_.assets[ix].derivatives[dix].symbol
                         )
                         setPair(
                             this.shells.length,
-                            _shell_.assets[ix].address, 
-                            _shell_.assets[ix].derivatives[dix].address
+                            _pool_.assets[ix].address,
+                            _pool_.assets[ix].derivatives[dix].address
                         )
-                        for (let dixid = dix + 1; dixid < _shell_.assets[ix].derivatives.length; dixid++){
+                        for (let dixid = dix + 1; dixid < _pool_.assets[ix].derivatives.length; dixid++){
                             setOverlap(
-                                _shell_.assets[ix].derivatives[dix].symbol, 
-                                _shell_.assets[ix].derivatives[dixid].symbol
+                                _pool_.assets[ix].derivatives[dix].symbol,
+                                _pool_.assets[ix].derivatives[dixid].symbol
                             )
                             setPair(
                                 this.shells.length,
-                                _shell_.assets[ix].derivatives[dix].address, 
-                                _shell_.assets[ix].derivatives[dixid].address
+                                _pool_.assets[ix].derivatives[dix].address,
+                                _pool_.assets[ix].derivatives[dixid].address
                             )
                         }
-                        for (let xid = 0; xid < _shell_.assets[xi].derivatives.length; xid++) {
+                        for (let xid = 0; xid < _pool_.assets[xi].derivatives.length; xid++) {
                             setOverlap(
-                                _shell_.assets[ix].symbol,
-                                _shell_.assets[xi].derivatives[xid].symbol
+                                _pool_.assets[ix].symbol,
+                                _pool_.assets[xi].derivatives[xid].symbol
                             )
                             setOverlap(
-                                _shell_.assets[ix].derivatives[dix].symbol,
-                                _shell_.assets[xi].derivatives[xid].symbol
+                                _pool_.assets[ix].derivatives[dix].symbol,
+                                _pool_.assets[xi].derivatives[xid].symbol
                             )
                             setOverlap(
-                                _shell_.assets[xi].symbol, 
-                                _shell_.assets[ix].derivatives[dix].symbol
+                                _pool_.assets[xi].symbol,
+                                _pool_.assets[ix].derivatives[dix].symbol
                             )
                             setPair(
                                 this.shells.length,
-                                _shell_.assets[xi].address,
-                                _shell_.assets[ix].derivatives[dix].address
+                                _pool_.assets[xi].address,
+                                _pool_.assets[ix].derivatives[dix].address
                             )
                             setPair(
                                 this.shells.length,
-                                _shell_.assets[ix].address,
-                                _shell_.assets[xi].derivatives[xid].address
+                                _pool_.assets[ix].address,
+                                _pool_.assets[xi].derivatives[xid].address
                             )
                             setPair(
                                 this.shells.length,
-                                _shell_.assets[ix].derivatives[dix].address,
-                                _shell_.assets[xi].derivatives[xid].address
+                                _pool_.assets[ix].derivatives[dix].address,
+                                _pool_.assets[xi].derivatives[xid].address
                             )
                         }
                     }
                 }
             }
             
-            if (!_shell_.hideapy) {
+            if (!_pool_.hideapy) {
 
                 shell.apy = <CircularProgress />
-                this.getAPY(_shell_.shell).then(result => shell.apy = result)
+                this.getAPY(_pool_.shell).then(result => shell.apy = result)
 
             } else shell.apy = false
             
-            shell.tag = _shell_.tag
+            shell.tag = _pool_.tag
 
             this.shells.push(shell)
 
@@ -194,8 +193,8 @@ export default class Engine extends SwapEngine {
         function setOverlap (left, right) {
             const ltr = self.overlaps[left] ? self.overlaps[left] : [ ]
             const rtl = self.overlaps[right] ? self.overlaps[right] : [ ]
-            if (ltr.indexOf(right) == -1) ltr.push(right)
-            if (rtl.indexOf(left) == -1) rtl.push(left)
+            if (ltr.indexOf(right) === -1) ltr.push(right)
+            if (rtl.indexOf(left) === -1) rtl.push(left)
             self.overlaps[left] = ltr
             self.overlaps[right] = rtl
         }
@@ -239,8 +238,8 @@ export default class Engine extends SwapEngine {
 
         }
 
-        const [ _nothing, nothing_, prevFees ] = this.shells[shellIx].calculateUtilities(prevLiq, prevLiqs)
-        const [ _empty, empty_, nextFees ] = this.shells[shellIx].calculateUtilities(nextLiq, nextLiqs)
+        const [ , , prevFees ] = this.shells[shellIx].calculateUtilities(prevLiq, prevLiqs)
+        const [ , , nextFees ] = this.shells[shellIx].calculateUtilities(nextLiq, nextLiqs)
 
         const fees = []
 
@@ -256,15 +255,9 @@ export default class Engine extends SwapEngine {
     }
 
     async syncShells (account) {
-
-        const self = this
-
         account = account ? account : this.account
 
         this.account = account
-
-        let shells = []
-
     }
 
     async readShell (_shell_) {
