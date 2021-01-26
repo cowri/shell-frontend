@@ -1,6 +1,6 @@
 {
- "defaultWeb3Provider": "https://mainnet.infura.io/v3/23656e31a1a34049bc03807c64bcd017",
- "infuraKey": "23656e31a1a34049bc03807c64bcd017",
+ "defaultWeb3Provider": "https://mainnet.infura.io/v3/3c3dfdec6ce94abc935977aa995d1a8c",
+ "infuraKey": "3c3dfdec6ce94abc935977aa995d1a8c",
  "blocknative": "73db068a-608c-4d6a-8849-b184f50eda34",
  "network": 1,
   "pools": [
