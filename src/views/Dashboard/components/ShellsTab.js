@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
 
@@ -7,6 +7,7 @@ import Row from '../../../components/Row'
 import BigNumber from 'bignumber.js';
 
 import DashboardContext from '../context'
+import {primary} from '../../../theme/colors.js';
 
 const StyledShellsTab = styled.div`
   display: flex;
@@ -24,8 +25,8 @@ const StyledBalance = styled.div`
   @media (max-width: 512px) {
     font-size: 18px;
   }
-  text-decoration: ${ props => props.moused ? 'underlined' : 'none' };
-  color: ${ props => props.moused ? '#0000EE' : 'black' }
+  text-decoration: none;
+  color: black;
 `
 
 const StyledRows = styled.div`
@@ -36,193 +37,149 @@ const ShellName = styled.span`
   align-items: center;
   display: flex;
   flex: 1.5;
-`
-const ShellNamePart = styled.span`
-  margin: 4px;
-  padding-right: 8px;
-  position: relative;
-  &:after {
-    content: "";
-    height: 75%;
-    width: .5px;
-    background-color: black;
-    position: absolute;
-    right: 0;
-    top: 5px;
+  @media (max-width: 512px) {
+    flex-wrap: wrap;
   }
 `
-
-const ShellNamePartLast = styled.span`
-  margin: 4px;
-  position: relative;
-`
-
 const Symbol = styled.span`
   text-align: center;
   display: inline;
   width: 100%;
   font-size: 18px;
-  text-decoration: ${ props => props.moused ? 'underlined' : 'none' };
-  color: ${ props => props.moused ? '#0000EE' : 'black' };
+  text-decoration: none;
+  color: black;
 `
 const Weight = styled.span`
   text-align: center;
   display: block;
   width: 100%;
   font-size: 12px;
-  text-decoration: ${ props => props.moused ? 'underlined' : 'none' };
-  color: ${ props => props.moused ? '#0000EE' : 'grey' };
+  text-decoration: none;
+  color: grey;
 `
-const StyledActions = withTheme(styled.div`
-  align-items: center;
-  display: flex;
-  height: 80px;
-  padding: 0 24px;
+const ShellNamePart = styled.span`
+  margin: 4px;
+  padding-right: 8px;
+  position: relative;
+  :not(:last-child) {
+    border-right: 1px solid rgba(0, 0, 0, .4);
+  }
+`
+const Farming = styled.span`
+  font-size: 0.8rem;
+  display: inline-block;
+  padding: .2em .6em;
+  border: 1px solid rgba(0,0,0,.2);
+  border-radius: 0.3em;
+  color: rgba(0,0,0,.5);
+  text-transform: uppercase;
   @media (max-width: 512px) {
-    padding: 0 12px;
+    order: -1;
+  }
+`
+const StyledRow = withTheme(styled.div`
+  align-items: center;
+  border-top: ${props => props.hideBorder ? 0 : `1px solid ${props.theme.palette.grey[50]}`};
+  color: ${props => props.head ? props.theme.palette.grey[500] : 'inherit'};
+  display: flex;
+  font-weight: ${props => props.head ? 500 : 400};
+  margin: 0;
+  padding: 12px 24px;
+  cursor: pointer;
+  :hover {
+    ${Farming},
+    ${Symbol},
+    ${StyledBalance},
+    ${Weight} {
+      color: ${primary.dark};
+      border-color: ${primary.dark};
+    }
+  }
+  @media (max-width: 512px) {
+    padding: 6px 12px;
   }
 `)
 
-const StyledButton = withTheme(styled.button`
-  align-items: center;
-  background-color: ${props => props.outlined ? props.theme.palette.grey[50] : props.theme.palette.primary.main};
-  border: ${props => props.outlined ? `1px solid ${props.theme.palette.grey[200]}` : '0'};
-  border-radius: ${props => props.theme.shape.borderRadius}px;
-  box-sizing: border-box;
-  color: ${props => props.outlined ? props.theme.palette.grey[600] : '#FFF'};
-  cursor: pointer;
+const ShellNameBody = styled.div`
   display: flex;
-  font-size: ${props => props.small ? '0.8rem' : '1rem'};
-  font-weight: 700;
-  height: ${props => props.small ? 32 : 48}px;
-  padding: 0 ${props => props.small ? 12 : 32}px;
-  transition: background-color .2s, border-color .2s;
-  pointer-events: ${props => props.disabled ? 'none' : 'all'};
-  opacity: ${props => props.disabled ? 0.8 : 1};
-  &:hover {
-    background-color: ${props => props.outlined ? '#FFF' : props.theme.palette.primary.dark};
-    color: ${props => props.outlined ? props.theme.palette.primary.main : '#FFF' };
-  }
-`)
+  align-items: center;
+`;
 
 const ShellsTab = ({showShell}) => {
 
-  const {
-    presentShell,
-    engine,
-    state
-  } = useContext(DashboardContext)
+    const {
+        engine,
+        state
+    } = useContext(DashboardContext)
+    let rows = []
 
-  let hovers = []
-  let rows = []
+    if (state.has('shells')) {
+        for (let i = 0; i < engine.shells.length; i++) {
+            let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
+            let liqOwned = state.getIn(['shells',i,'shell','liquidityOwned','display'])
 
-  if (state.has('shells')) {
-    for (let i = 0; i < engine.shells.length; i++) {
-      let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
-      let liqOwned = state.getIn(['shells',i,'shell','liquidityOwned','display'])
+            rows.push(
+                <ShellRow
+                    key={i}
+                    showShell={() => showShell(i)}
+                    assets={engine.shells[i].assets}
+                    liqTotal={liqTotal}
+                    liqOwned={liqOwned}
+                />
+            )
 
-      rows.push(
-        <ShellRow
-          showShell={() => showShell(i)}
-          assets={engine.shells[i].assets}
-          liqTotal={liqTotal}
-          liqOwned={liqOwned}
-        />
-      )
-
+        }
     }
-  }
 
-  return (
-    <StyledShellsTab>
-        <p style={{padding: '20px', textAlign: 'center'}}>
+    return (
+        <StyledShellsTab>
+            <div style={{padding: '20px', textAlign: 'center'}}>
 
-          <p style={{marginTop: '0px', fontSize: '20px', fontWeight: 'bold'}}>
-            ANNOUNCEMENT: LIQUIDITY FARMING
-          </p>
+                <p style={{marginTop: '0px', fontSize: '20px', fontWeight: 'bold'}}>
+                    ANNOUNCEMENT: LIQUIDITY FARMING
+                </p>
 
-          <p>
-            The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively. Detailed information will be provided soon.
-          </p>
+                <p>
+                    The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively. Detailed information will be provided soon.
+                </p>
 
-          <p style={{fontSize: '18px'}}> The Component Team </p>
-        </p>
-      <StyledRows>
-        <Row head>
-          <span style={{ flex: 1.5 }}> Pools </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> Liquidity </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> Your Balance </span>
-        </Row>
-        { rows }
-      </StyledRows>
-    </StyledShellsTab>
-  )
+                <p style={{fontSize: '18px'}}> The Component Team </p>
+            </div>
+            <StyledRows>
+                <Row head>
+                    <span style={{ flex: 1.5 }}> Pools </span>
+                    <span style={{ flex: 1, textAlign: 'right' }}> Liquidity </span>
+                    <span style={{ flex: 1, textAlign: 'right' }}> Your Balance </span>
+                </Row>
+                { rows }
+            </StyledRows>
+        </StyledShellsTab>
+    )
 }
 
 const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
 
-  const useHover = () => {
-    const [hovered, setHovered] = useState()
-    const handlers = useMemo(() => ({
-      onMouseOver(){ setHovered(true) },
-      onMouseOut(){ setHovered(false) }
-    }),[])
-    return [hovered, handlers]
-  }
-
-  const [ hovered, handlers ] = useHover()
-
-  const name = getName(assets)
-
-  function getName (assets) {
-
-    const parts = assets.map( (a,i) => {
-
-      if (i == assets.length - 1) {
-
-        return (
-          <ShellNamePartLast>
-            <Symbol moused={hovered}>
-              { a.symbol }
-            </Symbol>
-            <Weight moused={hovered}>
-              { a.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
-            </Weight>
-          </ShellNamePartLast>
-        )
-
-      } else {
-
-        return (
-          <ShellNamePart>
-            <Symbol moused={hovered}>
-              { a.symbol }
-            </Symbol>
-            <Weight moused={hovered}>
-              { a.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
-            </Weight>
-          </ShellNamePart>
-        )
-
-      }
-
-    })
-
     return (
-      <ShellName>
-        {parts}
-      </ShellName>
+        <StyledRow onClick={showShell}>
+            <ShellName>
+                <ShellNameBody>
+                    {assets.map((asset) => (
+                        <ShellNamePart key={asset.symbol}>
+                            <Symbol>
+                                { asset.symbol }
+                            </Symbol>
+                            <Weight>
+                                { asset.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
+                            </Weight>
+                        </ShellNamePart>
+                    ))}
+                </ShellNameBody>
+                <Farming>farming</Farming>
+            </ShellName>
+            <StyledBalance className="number"> { liqTotal } </StyledBalance>
+            <StyledBalance className="number"> { liqOwned } </StyledBalance>
+        </StyledRow>
     )
-
-  }
-
-  return (
-    <Row onClick={showShell} {...handlers} style={{cursor:'pointer'}}>
-      {name}
-      <StyledBalance className="number" moused={hovered}> { liqTotal } </StyledBalance>
-      <StyledBalance className="number" moused={hovered}> { liqOwned } </StyledBalance>
-    </Row>
-  )
 
 }
 
