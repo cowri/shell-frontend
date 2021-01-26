@@ -34,7 +34,7 @@ const Footer = () => (
       <StyledSocialIcon target="_blank" href="https://twitter.com/componentx">
         <FontAwesomeIcon icon={faTwitter} size="lg" />
       </StyledSocialIcon>
-      <StyledSocialIcon target="_blank" href="https://discord.gg/E5DDmXYc">
+      <StyledSocialIcon target="_blank" href="https://discord.gg/M6HHXdEp">
         <FontAwesomeIcon icon={faDiscord} size="lg" />
       </StyledSocialIcon>
       <StyledSocialIcon target="_blank" href="https://github.com/Componentfinance">
