@@ -45,7 +45,7 @@
         "alpha": ".95",
         "beta": ".45",
         "delta": ".05",
-        "epsilon": ".002",
+        "epsilon": "0",
         "lambda": "1"
       }
     }
