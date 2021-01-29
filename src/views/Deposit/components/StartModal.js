@@ -247,6 +247,10 @@ const StartModal = ({
 
   const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => {
 
+    console.log(errors)
+    console.log(ix)
+    console.log(errors[ix])
+
     const assetState = state.getIn([ 'shells', shellIx, 'assets', ix ])
 
     let balance = assetState.getIn([ 'balance', 'numeraire']).toString()
@@ -266,8 +270,8 @@ const StartModal = ({
         available={available}
         balance={balance}
         icon={asset.icon}
-        isError={ errors[ix] ? true : false }
-        helperText={ errors[ix] }
+        isError={ errors.get(ix) ? true : false }
+        helperText={ errors.get(ix) }
         onAllowanceClick={ () => setUnlocking(ix) }
         onChange={payload => onInput(payload.value, ix) }
         styles={inputStyles}
@@ -299,8 +303,11 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button outlined onClick={onDismiss}> Cancel </Button>
-        <Button style={{cursor: 'no-drop'}}
-          onClick={ () => setPrompting(true) } >
+        <Button
+          style={{cursor: 'no-drop'}}
+          onClick={ () => setPrompting(true) }
+          disabled={errors.filter((error) => error).size}
+        >
           Deposit
         </Button>
       </ModalActions>
