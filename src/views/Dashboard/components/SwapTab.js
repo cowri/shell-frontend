@@ -563,7 +563,7 @@ const SwapTab = () => {
       </StyledRows>
       <StyledActions>
         <Button
-          disabled={ targetValue == 0 || originValue == 0 }
+          disabled={ !targetValue || !originValue || errorMessage }
           onClick={handleSwap}
         >
           Swap
