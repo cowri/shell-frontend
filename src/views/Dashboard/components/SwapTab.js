@@ -116,6 +116,7 @@ const SwapTab = () => {
   } = useContext(DashboardContext)
 
   const [step, setStep] = useState('start')
+  const [errorMessage, setErrorMessage] = useState('')
   const [originIx, setOriginIx] = useState(0)
   const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
   const [originValue, setOriginValue] = useState('1')
@@ -363,6 +364,11 @@ const SwapTab = () => {
     setSwapType('origin')
     setOriginValue(sanitizeNumber(e.target.value, origin.decimals))
     if (e.target.value == '') setTargetValue('')
+    if (new BigNumber(e.target.value.replace(/,/g,'')).gt(balance)) {
+      setErrorMessage('Amount is greater than your wallet\'s balance')
+    } else {
+      setErrorMessage('');
+    }
 
   }
 
@@ -536,6 +542,8 @@ const SwapTab = () => {
           title='From'
           unlock={ () => setStep('unlocking') }
           value={originValue}
+          error={!!errorMessage}
+          helperText={errorMessage}
         />
         <StyledSwapRow>
           <IconButton className={iconClasses.root} onClick={handleSwitch} >
@@ -550,6 +558,7 @@ const SwapTab = () => {
           symbol={target.symbol}
           title='To'
           value={targetValue}
+
         />
       </StyledRows>
       <StyledActions>
