@@ -158,16 +158,16 @@ const StartModal = ({
       ? slippage.isNegative()
         ? ( <span>
               and earn a rebalance subsidy of
-              <span style={{ paddingLeft: '23px', paddingRight: '4px' }}>
+              <span style={{ paddingLeft: '4px', paddingRight: '4px' }}>
                 <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
-                { Math.abs(fee.toFixed(8)) }
+                {" "}{ Math.abs(fee.toFixed(8)) }
               </span>
             </span>
         ):( <span>
               and pay liquidity providers a fee of
-              <span style={{ paddingLeft: '23px', paddingRight: '4px' }}>
+              <span style={{ paddingLeft: '4px', paddingRight: '4px' }}>
                 <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
-                { fee.toFixed(8) }
+                {" "}{ fee.toFixed(8) }
               </span>
             </span>
         )
@@ -175,7 +175,7 @@ const StartModal = ({
 
     const feeMessage = <div>
       You will mint
-        <span style={{paddingLeft: '16.5px', paddingRight: '4px' }}>
+        <span style={{paddingLeft: '4px', paddingRight: '4px' }}>
           <img alt=""
             src={tinyShellIcon}
             style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }}

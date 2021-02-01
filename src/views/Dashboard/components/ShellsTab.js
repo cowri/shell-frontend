@@ -140,7 +140,11 @@ const ShellsTab = ({showShell}) => {
                 </p>
 
                 <p>
-                    The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively. Detailed information will be provided soon.
+                    The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
+                </p>
+
+                <p>
+                    Track your share on the <a target="_blank" rel="noopener noreferrer" href="https://distribution.component.finance">rewards estimation page</a>
                 </p>
 
                 <p style={{fontSize: '18px'}}> The Component Team </p>
