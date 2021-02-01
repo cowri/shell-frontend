@@ -9,7 +9,7 @@
       "name": "50% USDP 25% USDt 25% USDc",
       "displayDecimals": 2,
       "swapDecimals": 2,
-      "tag": "STABLECOIN2",
+      "tag": "STABLECOIN1",
       "hideapy": true,
       "assets": [
         {
@@ -38,6 +38,51 @@
           "symbol": "USDT",
           "weight": ".25",
           "approveToZero": true,
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".95",
+        "beta": ".45",
+        "delta": ".05",
+        "epsilon": "0",
+        "lambda": "1"
+      }
+    },
+
+    {
+      "shell": "0x6477960dd932d29518D7e8087d5Ea3D11E606068",
+      "name": "50% USDP 25% DAI 25% sUSD",
+      "displayDecimals": 2,
+      "swapDecimals": 2,
+      "tag": "STABLECOIN2",
+      "hideapy": true,
+      "assets": [
+        {
+          "address": "0x1456688345527bE1f37E9e627DA0837D6f08C925",
+          "decimals": 18,
+          "icon": "usdp.png",
+          "name": "Unit Protocol Stablecoin",
+          "symbol": "USDP",
+          "weight": ".5",
+          "derivatives": [ ]
+        },
+        {
+          "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+          "decimals": 18,
+          "icon": "dai.svg",
+          "name": "MultiCollateral Dai",
+          "symbol": "DAI",
+          "weight": ".25",
+          "derivatives": [ ]
+        },
+        {
+          "address": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
+          "decimals": 18,
+          "icon": "susd.svg",
+          "name": "Synthetix USD",
+          "symbol": "SUSD",
+          "weight": ".25",
           "derivatives": [ ]
         }
       ],
