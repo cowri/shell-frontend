@@ -104,6 +104,7 @@ const ShellTab = ({ shellIx }) => {
   
   let etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
     : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
+    : config.network === 100 ? 'https://blockscout.com/poa/xdai/address/' + config.pools[shellIx].shell
     : ''
 
 

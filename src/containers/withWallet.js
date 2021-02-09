@@ -116,7 +116,13 @@ const withWallet = (WrappedComponent) => {
           walletSelect: {
             wallets: [
               { walletName: "metamask", preferred: true },
-              { walletName: "walletConnect", preferred: true, infuraKey: config.infuraKey },
+              {
+                walletName: "walletConnect",
+                preferred: true,
+                infuraKey: config.infuraKey,
+                rpc: { 100: 'https://rpc.xdaichain.com/' },
+                bridge: 'https://bridge.walletconnect.org',
+              },
             ]
           }
         });

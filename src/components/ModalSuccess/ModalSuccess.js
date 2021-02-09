@@ -26,34 +26,35 @@ const ModalSuccess = ({
   title,
   txHash
 }) => {
-    
-  const etherscanlink = config.network === 42
-    ? "https://kovan.etherscan.io/tx/" + txHash
-    : config.network === 4
-      ? "https://rinkeby.etherscan.io/tx/" + txHash
-      : "https://etherscan.io/tx/" + txHash
 
-  return (
-    <Modal>
-      <ModalTitle>{title}</ModalTitle>
-      <ModalIcon>
-        <DoneIcon />
-      </ModalIcon>
-      {
-        txHash ? <StyledViewOnEtherscan>
-              <a href={etherscanlink} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
-                <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
-                <span>
-                  View On Etherscan
+    const etherscanlink = config.network === 42
+        ? "https://kovan.etherscan.io/tx/" + txHash
+        : config.network === 4 ? "https://rinkeby.etherscan.io/tx/" + txHash
+            : config.network === 100 ? "https://blockscout.com/poa/xdai/tx/" + txHash
+                : "https://etherscan.io/tx/" + txHash
+
+    return (
+        <Modal>
+            <ModalTitle>{title}</ModalTitle>
+            <ModalIcon>
+                <DoneIcon/>
+            </ModalIcon>
+            {
+                txHash ? <StyledViewOnEtherscan>
+                    <a href={etherscanlink} style={{textDecoration: 'none', color: 'inherit'}} target="_blank"
+                       rel="noopener noreferrer">
+                        <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt=""/>
+                        <span>
+                  View On Blockscout
                 </span>
-              </a>
-            </StyledViewOnEtherscan> : null
-      }
-      <ModalActions>
-        <Button onClick={onDismiss}>{buttonBlurb}</Button>
-      </ModalActions>
-    </Modal>
-  )
+                    </a>
+                </StyledViewOnEtherscan> : null
+            }
+            <ModalActions>
+                <Button onClick={onDismiss}>{buttonBlurb}</Button>
+            </ModalActions>
+        </Modal>
+    )
 }
 
 export default ModalSuccess

@@ -1,19 +1,19 @@
 {
- "defaultWeb3Provider": "https://mainnet.infura.io/v3/3c3dfdec6ce94abc935977aa995d1a8c",
+ "defaultWeb3Provider": "https://rpc.xdaichain.com/",
  "infuraKey": "3c3dfdec6ce94abc935977aa995d1a8c",
- "blocknative": "73db068a-608c-4d6a-8849-b184f50eda34",
- "network": 1,
-  "pools": [
+ "blocknative": "70a8519d-1a7c-4bc5-bf62-5b38617208ff",
+ "network": 100,
+ "pools": [
     {
-      "shell": "0x49519631B404E06ca79C9C7b0dC91648D86F08db",
-      "name": "50% USDP 25% USDt 25% USDc",
+      "shell": "0x1A8A1A7844E07389e4Ca8d8fd098ba8fE3680260",
+      "name": "50% USDP 25% WXDAI 25% USDc",
       "displayDecimals": 2,
       "swapDecimals": 2,
       "tag": "STABLECOIN1",
       "hideapy": true,
       "assets": [
         {
-          "address": "0x1456688345527bE1f37E9e627DA0837D6f08C925",
+          "address": "0xFe7ed09C4956f7cdb54eC4ffCB9818Db2D7025b8",
           "decimals": 18,
           "icon": "usdp.png",
           "name": "Unit Protocol Stablecoin",
@@ -22,66 +22,20 @@
           "derivatives": [ ]
         },
         {
-          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "address": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+          "decimals": 18,
+          "icon": "dai.svg",
+          "name": "Wrapped XDAI",
+          "symbol": "WXDAI",
+          "weight": ".25",
+          "derivatives": [ ]
+        },
+        {
+          "address": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
           "decimals": 6,
           "icon": "usdc.svg",
           "name": "USD Coin",
           "symbol": "USDC",
-          "weight": ".25",
-          "derivatives": [ ]
-        },
-        {
-          "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-          "decimals": 6,
-          "icon": "usdt.svg",
-          "name": "Tether Stablecoin",
-          "symbol": "USDT",
-          "weight": ".25",
-          "approveToZero": true,
-          "derivatives": [ ]
-        }
-      ],
-      "params": {
-        "alpha": ".95",
-        "beta": ".45",
-        "delta": ".05",
-        "epsilon": "0",
-        "lambda": "1"
-      }
-    },
-
-    {
-      "shell": "0x6477960dd932d29518D7e8087d5Ea3D11E606068",
-      "name": "50% USDP 25% DAI 25% sUSD",
-      "displayDecimals": 2,
-      "swapDecimals": 2,
-      "tag": "STABLECOIN2",
-      "hideapy": true,
-      "assets": [
-        {
-          "address": "0x1456688345527bE1f37E9e627DA0837D6f08C925",
-          "decimals": 18,
-          "icon": "usdp.png",
-          "name": "Unit Protocol Stablecoin",
-          "symbol": "USDP",
-          "weight": ".5",
-          "derivatives": [ ]
-        },
-        {
-          "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-          "decimals": 18,
-          "icon": "dai.svg",
-          "name": "MultiCollateral Dai",
-          "symbol": "DAI",
-          "weight": ".25",
-          "derivatives": [ ]
-        },
-        {
-          "address": "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
-          "decimals": 18,
-          "icon": "susd.svg",
-          "name": "Synthetix USD",
-          "symbol": "SUSD",
           "weight": ".25",
           "derivatives": [ ]
         }

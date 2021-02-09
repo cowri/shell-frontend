@@ -24,7 +24,7 @@ export default function (){
   return (
     <StyledLogo>
       <StyledImg src={logo} />
-      <StyledName>component</StyledName>
+      <StyledName>component on xDai</StyledName>
     </StyledLogo>
   )
 }
