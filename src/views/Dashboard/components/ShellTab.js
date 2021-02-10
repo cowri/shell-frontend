@@ -67,7 +67,7 @@ const StyledRows = styled.div`
 `
 
 const ShellTab = ({ shellIx }) => {
-  
+
   const {
     engine,
     state
@@ -76,7 +76,7 @@ const ShellTab = ({ shellIx }) => {
   const [ presentDeposit, setPresentDeposit ] = useState(false)
   const [ presentWithdraw, setPresentWithdraw ] = useState(false)
 
-  const rows = engine.shells[shellIx].assets.map( (asset, ix) => { 
+  const rows = engine.shells[shellIx].assets.map( (asset, ix) => {
 
     const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesTotal', ix, 'display' ])
     const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesOwned', ix, 'display' ])
@@ -96,12 +96,12 @@ const ShellTab = ({ shellIx }) => {
         </StyledBalance>
       </Row>
     )
-    
+
   })
 
-  const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ]) 
-  const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ]) 
-  
+  const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ])
+  const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ])
+
   let etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
     : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
     : config.network === 100 ? 'https://blockscout.com/poa/xdai/address/' + config.pools[shellIx].shell
@@ -110,7 +110,7 @@ const ShellTab = ({ shellIx }) => {
 
   return ( <>
     { presentDeposit && <Deposit shellIx={shellIx} onDismiss={() => setPresentDeposit(false)} />}
-    { presentWithdraw && <Withdraw shellIx={shellIx} onDismiss={() => setPresentWithdraw(false)} />} 
+    { presentWithdraw && <Withdraw shellIx={shellIx} onDismiss={() => setPresentWithdraw(false)} />}
     <StyledShellTab>
       <Overview>
         <OverviewSection>
@@ -133,7 +133,7 @@ const ShellTab = ({ shellIx }) => {
         <div style={{ width: 12 }} />
         <Button outlined onClick={setPresentWithdraw}>Withdraw</Button>
         <StyledSocialIcon target="_blank" href={etherscan} >
-          <img src="./etherscan-logo-circle.svg" style={{width:'2em'}} alt="" />
+          <img src="./etherscan-logo-circle.png" style={{width:'2em'}} alt="" />
         </StyledSocialIcon>
       </StyledActions>
     </StyledShellTab>

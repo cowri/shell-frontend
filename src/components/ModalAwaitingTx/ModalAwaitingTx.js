@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import HourglassFullIcon from '@material-ui/icons/HourglassFull'
 
-import etherscan from '../../assets/etherscan-logo-circle.svg'
+import etherscan from '../../assets/etherscan-logo-circle.png'
 
 import Loader from '../Loader'
 import Modal from '../Modal'

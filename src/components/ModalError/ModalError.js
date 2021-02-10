@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import WarningIcon from '@material-ui/icons/Warning'
 
-import etherscan from '../../assets/etherscan-logo-circle.svg'
+import etherscan from '../../assets/etherscan-logo-circle.png'
 
 import Button from '../Button'
 import Modal from '../Modal'
@@ -26,8 +26,8 @@ const ModalError = ({
   onDismiss,
   title
 }) => {
-  
-    
+
+
   const etherscanlink = config.network === 42
     ? "https://kovan.etherscan.io/tx/" + txHash
     : config.network === 4 ? "https://rinkeby.etherscan.io/tx/" + txHash
@@ -49,7 +49,7 @@ const ModalError = ({
                 </span>
               </a>
             </StyledViewOnEtherscan> : null
-      } 
+      }
       <ModalActions>
         <Button onClick={onDismiss}>{buttonBlurb}</Button>
       </ModalActions>
