@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import WarningIcon from '@material-ui/icons/Warning'
 
-import etherscan from '../../assets/etherscan-logo-circle.png'
+import etherscan from '../../assets/etherscan-logo-circle.svg'
 
 import Button from '../Button'
 import Modal from '../Modal'

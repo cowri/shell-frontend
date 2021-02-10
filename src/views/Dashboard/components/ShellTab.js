@@ -133,7 +133,7 @@ const ShellTab = ({ shellIx }) => {
         <div style={{ width: 12 }} />
         <Button outlined onClick={setPresentWithdraw}>Withdraw</Button>
         <StyledSocialIcon target="_blank" href={etherscan} >
-          <img src="./etherscan-logo-circle.png" style={{width:'2em'}} alt="" />
+          <img src="./etherscan-logo-circle.svg" style={{width:'2em'}} alt="" />
         </StyledSocialIcon>
       </StyledActions>
     </StyledShellTab>

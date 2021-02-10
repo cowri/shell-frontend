@@ -4,7 +4,7 @@ import config from "../../mainnet.multiple.config"
 
 import styled from 'styled-components'
 
-import etherscan from '../../assets/etherscan-logo-circle.png'
+import etherscan from '../../assets/etherscan-logo-circle.svg'
 
 import DoneIcon from '@material-ui/icons/Done'
 
