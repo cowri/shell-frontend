@@ -5,7 +5,7 @@
  "network": 100,
  "pools": [
     {
-      "shell": "0x1A8A1A7844E07389e4Ca8d8fd098ba8fE3680260",
+      "shell": "0x53De001bbfAe8cEcBbD6245817512F8DBd8EEF18",
       "name": "50% USDP 25% WXDAI 25% USDc",
       "displayDecimals": 2,
       "swapDecimals": 2,
