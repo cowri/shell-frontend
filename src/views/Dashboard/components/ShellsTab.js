@@ -8,6 +8,7 @@ import BigNumber from 'bignumber.js';
 
 import DashboardContext from '../context'
 import {primary} from '../../../theme/colors.js';
+import theme from '../../../theme';
 
 const StyledShellsTab = styled.div`
   display: flex;
@@ -19,7 +20,6 @@ const StyledBalance = styled.div`
   display: flex;
   flex: 1;
   font-size: 22px;
-  font-family: Arial;
   justify-content: flex-end;
   text-align: right;
   @media (max-width: 512px) {
@@ -29,7 +29,7 @@ const StyledBalance = styled.div`
   color: black;
 `
 
-const StyledRows = styled.div`
+const PoolsTable = styled.div`
   margin-bottom: 12px;
 `
 
@@ -61,22 +61,25 @@ const ShellNamePart = styled.span`
   margin: 4px;
   padding-right: 8px;
   position: relative;
+  :first-child {
+    margin-left: 0;
+  }
   :not(:last-child) {
     border-right: 1px solid rgba(0, 0, 0, .4);
   }
 `
-const Farming = styled.span`
+const Farming = withTheme(styled.span`
   font-size: 0.8rem;
   display: inline-block;
   padding: .2em .6em;
-  border: 1px solid rgba(0,0,0,.2);
+  border: 1px solid ${(props) => props.theme.palette.primary.main};
   border-radius: 0.3em;
   color: rgba(0,0,0,.5);
   text-transform: uppercase;
   @media (max-width: 512px) {
     order: -1;
   }
-`
+`)
 const StyledRow = withTheme(styled.div`
   align-items: center;
   border-top: ${props => props.hideBorder ? 0 : `1px solid ${props.theme.palette.grey[50]}`};
@@ -118,6 +121,9 @@ const ShellsTab = ({showShell}) => {
             let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
             let liqOwned = state.getIn(['shells',i,'shell','liquidityOwned','display'])
 
+            liqTotal = liqTotal.slice(0, liqTotal.indexOf('.') === -1 ? undefined : liqTotal.indexOf('.'))
+            liqOwned = liqOwned.slice(0, liqOwned.indexOf('.') === -1 ? undefined : liqOwned.indexOf('.'))
+
             rows.push(
                 <ShellRow
                     key={i}
@@ -133,30 +139,29 @@ const ShellsTab = ({showShell}) => {
 
     return (
         <StyledShellsTab>
-            <div style={{padding: '20px', textAlign: 'center'}}>
+            <div style={{padding: '60px 20px 30px', textAlign: 'center'}}>
 
-                <p style={{marginTop: '0px', fontSize: '20px', fontWeight: 'bold'}}>
+                <p style={{marginTop: '0px', fontSize: '24px', fontWeight: 'bold'}}>
                     ANNOUNCEMENT: LIQUIDITY FARMING
                 </p>
 
-                <p>
+                <p style={{ textAlign: 'left', fontSize: '20px' }}>
                     The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
                 </p>
 
-                <p>
-                    Track your share on the <a target="_blank" rel="noopener noreferrer" href="https://distribution.component.finance">rewards estimation page</a>
+                <p style={{ textAlign: 'left', fontSize: '20px' }}>
+                    Track your share on the <a style={{ color: theme.palette.primary.main}} target="_blank" rel="noopener noreferrer" href="https://distribution.component.finance">rewards estimation page</a>
                 </p>
 
-                <p style={{fontSize: '18px'}}> The Component Team </p>
             </div>
-            <StyledRows>
+            <PoolsTable>
                 <Row head>
                     <span style={{ flex: 1.5 }}> Pools </span>
                     <span style={{ flex: 1, textAlign: 'right' }}> Liquidity </span>
                     <span style={{ flex: 1, textAlign: 'right' }}> Your Balance </span>
                 </Row>
                 { rows }
-            </StyledRows>
+            </PoolsTable>
         </StyledShellsTab>
     )
 }

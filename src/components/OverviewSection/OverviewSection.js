@@ -9,6 +9,11 @@ const StyledOverviewSection = withTheme(styled.div`
   &:last-of-type {
     border-right: 0;
   }
+  @media (max-width: 512px) {
+    :first-child {
+      margin-bottom: 15px;
+    }
+  }
 `)
 
 const OverviewSection = ({ children }) => (

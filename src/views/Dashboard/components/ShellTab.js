@@ -25,7 +25,7 @@ const StyledShellTab = styled.div`
 const StyledTokenName = styled.span`
   align-items: center;
   display: flex;
-  flex: 1.5;
+  flex: 1;
 `
 
 const StyledSocialIcon = styled.a`
@@ -34,7 +34,6 @@ const StyledSocialIcon = styled.a`
   display: flex;
   height: 44px;
   justify-content: center;
-  margin: 10px;
   width: 44px;
   margin-left: auto;
 `
@@ -43,9 +42,7 @@ const StyledBalance = styled.div`
   display: flex;
   flex: 1;
   font-size: 22px;
-  font-family: Arial;
-  justify-content: flex-end;
-  text-align: right;
+  justify-content: flex-start;
   @media (max-width: 512px) {
     font-size: 18px;
   }
@@ -53,7 +50,6 @@ const StyledBalance = styled.div`
 
 const StyledActions = withTheme(styled.div`
   align-items: center;
-  background-color: ${props => props.theme.palette.grey[50]};
   display: flex;
   height: 80px;
   padding: 0 24px;
@@ -67,7 +63,7 @@ const StyledRows = styled.div`
 `
 
 const ShellTab = ({ shellIx }) => {
-  
+
   const {
     engine,
     state
@@ -76,7 +72,7 @@ const ShellTab = ({ shellIx }) => {
   const [ presentDeposit, setPresentDeposit ] = useState(false)
   const [ presentWithdraw, setPresentWithdraw ] = useState(false)
 
-  const rows = engine.shells[shellIx].assets.map( (asset, ix) => { 
+  const rows = engine.shells[shellIx].assets.map( (asset, ix) => {
 
     const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesTotal', ix, 'display' ])
     const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquiditiesOwned', ix, 'display' ])
@@ -86,22 +82,22 @@ const ShellTab = ({ shellIx }) => {
         <StyledTokenName>
           <TokenIcon> <img alt="" src={asset.icon} /> </TokenIcon>
           <div style={{ width: 12 }} />
-          <LabelledValue label={asset.symbol} value={asset.name} />
+          <LabelledValue label={asset.symbol} />
         </StyledTokenName>
         <StyledBalance className="number">
           { liqTotal }
         </StyledBalance>
-        <StyledBalance>
+        <StyledBalance style={{justifyContent: 'flex-end'}}>
           { liqOwned }
         </StyledBalance>
       </Row>
     )
-    
+
   })
 
-  const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ]) 
-  const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ]) 
-  
+  const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ])
+  const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ])
+
   let etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
     : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
     : ''
@@ -109,7 +105,7 @@ const ShellTab = ({ shellIx }) => {
 
   return ( <>
     { presentDeposit && <Deposit shellIx={shellIx} onDismiss={() => setPresentDeposit(false)} />}
-    { presentWithdraw && <Withdraw shellIx={shellIx} onDismiss={() => setPresentWithdraw(false)} />} 
+    { presentWithdraw && <Withdraw shellIx={shellIx} onDismiss={() => setPresentWithdraw(false)} />}
     <StyledShellTab>
       <Overview>
         <OverviewSection>
@@ -121,8 +117,8 @@ const ShellTab = ({ shellIx }) => {
       </Overview>
       <StyledRows>
         <Row head>
-          <span style={{ flex: 1.5 }}> Token </span>
-          <span style={{ flex: 1, textAlign: 'right' }}> Pool Reserves </span>
+          <span style={{ flex: 1 }}> Token </span>
+          <span style={{ flex: 1, textAlign: 'left' }}> Pool Reserves </span>
           <span style={{ flex: 1, textAlign: 'right' }}> My Balances </span>
         </Row>
         { rows }

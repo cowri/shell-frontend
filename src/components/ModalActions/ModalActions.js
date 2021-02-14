@@ -4,9 +4,8 @@ import styled from 'styled-components'
 
 const StyledModalActions = withTheme(styled.div`
   align-items: center;
-  background-color: ${props => props.theme.palette.grey[50]};
   display: flex;
-  justify-content: ${props => props.centered ? 'center' : 'flex-end'};
+  justify-content: center;
   margin: 0;
   min-height: 48px;
   padding: 12px 18px;

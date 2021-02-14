@@ -60,7 +60,6 @@ const StyledForm = styled.form`
 `
 
 const StyledRows = styled.div`
-  margin-top: -24px;
 `
 
 const StyledShells = styled.div`

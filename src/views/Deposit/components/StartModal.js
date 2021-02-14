@@ -44,7 +44,6 @@ const StyledForm = styled.form`
 
 const StyledRows = styled.div`
   margin-bottom: 24px;
-  margin-top: -24px;
 `
 
 const StyledLabelBar = withTheme(styled.div`
@@ -58,6 +57,11 @@ const StyledDepositMessage = styled.div`
   padding: 20px 10px 10px 10px;
   font-size: 22px;
 `
+
+const InputContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const StartModal = ({
   engine,
@@ -86,6 +90,8 @@ const StartModal = ({
   const [ prompting, setPrompting ] = useState(false)
 
   const onInput = (v, i) => {
+
+    console.log(v);
 
     setInputs(inputs.set(i,v))
 
@@ -247,10 +253,6 @@ const StartModal = ({
 
   const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => {
 
-    console.log(errors)
-    console.log(ix)
-    console.log(errors[ix])
-
     const assetState = state.getIn([ 'shells', shellIx, 'assets', ix ])
 
     let balance = assetState.getIn([ 'balance', 'numeraire']).toString()
@@ -331,41 +333,44 @@ const TokenInput = ({
   return ( <>
     <StyledLabelBar style={{ marginTop: '18px', marginBottom: '-10px' }} >
       <span>
-        Your wallet's balance:
-        <span class="number"> {balance} </span>
+        Your wallet balance:
+        <span className="number"> {balance} </span>
       </span>
     </StyledLabelBar>
     <StyledLabelBar>
       <span onClick={onAllowanceClick} style={{cursor:'pointer'}} >
         Current allowance:
-        <span class="number"> {available} </span>
+        <span className="number"> {available} </span>
         <span style={{ textDecoration: 'underline' }} > click to change </span>
       </span>
     </StyledLabelBar>
-    <NumberFormat fullWidth
-      allowNegative={false}
-      customInput={TextField}
-      defaultColor="red"
-      error={isError}
-      FormHelperTextProps={{className: styles.helperText}}
-      helperText={helperText}
-      inputMode={"numeric"}
-      min="0"
-      onValueChange={ onChange }
-      placeholder="0"
-      thousandSeparator={true}
-      type="text"
-      value={value}
-      InputProps={{
-        style: isError ? { color: 'red' } : null,
-        endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
-        startAdornment: (
-          <StyledStartAdornment>
-            <TokenIcon size={24}> <img alt="" src={icon} /> </TokenIcon>
-          </StyledStartAdornment>
-        )
-      }}
-    />
+    <InputContainer>
+      <NumberFormat fullWidth
+        allowNegative={false}
+        customInput={TextField}
+        defaultColor="red"
+        error={isError}
+        FormHelperTextProps={{className: styles.helperText}}
+        helperText={helperText}
+        inputMode={"numeric"}
+        min="0"
+        onValueChange={ onChange }
+        placeholder="0"
+        thousandSeparator={true}
+        type="text"
+        value={value}
+        InputProps={{
+          style: isError ? { color: 'red' } : null,
+          endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
+          startAdornment: (
+            <StyledStartAdornment>
+              <TokenIcon size={24}> <img alt="" src={icon} /> </TokenIcon>
+            </StyledStartAdornment>
+          )
+        }}
+      />
+      <Button small withInput outlined onClick={() => onChange({value: balance})}>Max</Button>
+    </InputContainer>
   </>)
 }
 

@@ -4,18 +4,19 @@ import * as colors from "../../theme/colors";
 
 const StyledTab = styled.div`
   align-items: center;
-  background: ${props => props.active ? '#FFF' : 'transparent'};
-  color: ${props => props.active ? colors.primary.main : '#000'};
+  background: ${props => props.active ? 'rgba(255,66,161,1)' : 'rgb(246 211 246)'};
+  color: ${props => props.active ? '#fff' : '#000' };
   cursor: pointer;
   display: flex;
   flex: 1;
   font-weight: 700;
   height: 72px;
-  font-size: 18px;
+  font-size: 21px;
   justify-content: center;
-  opacity: ${props => props.active ? 1 : 0.5};
+  opacity: 1;
   pointer-events: ${props => props.disabled ? 'none' : 'all'};
   &:hover {
+    background: rgba(255,66,161,0.6);
     opacity: 1;
   }
 `

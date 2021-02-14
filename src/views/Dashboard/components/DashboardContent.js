@@ -6,7 +6,7 @@ import Tabs from '../../../components/Tabs'
 
 import ShellTab from './ShellTab'
 import ShellsTab from './ShellsTab'
-import SwapTab from './SwapTab'
+import SwapTab from './SwapTab/SwapTab.js'
 
 import DashboardContext from '../context'
 
@@ -38,14 +38,14 @@ const DashboardContent = () => {
     <Container>
       <Surface>
         <Tabs>
-          <Tab 
+          <Tab
             active={activeTab === 'shell' || activeTab === 'shells'}
             disabled={!state.has('shells')}
             onClick={shellTabClick}
           >
-            { activeTab !== 'shell' ? 'Pools' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Pools </a> }
+            { activeTab !== 'shell' ? 'Pools' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}>  </span> Back to pools </a> }
           </Tab>
-          <Tab 
+          <Tab
             active={activeTab === 'swap'}
             disabled={!state.has('shells')}
             onClick={() => setActiveTab('swap')}
@@ -57,7 +57,7 @@ const DashboardContent = () => {
         { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
         { activeTab === 'swap' && <SwapTab /> }
       </Surface>
-    </Container> 
+    </Container>
   )
 }
 

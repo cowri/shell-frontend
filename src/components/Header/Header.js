@@ -8,12 +8,12 @@ const StyledHeader = styled.div`
   align-items: center;
   color: #FFF;
   display: flex;
-  height: 96px;
+  height: 130px;
   justify-content: space-between;
 `
 
 const Header = () => (
-  <Container full>
+  <Container>
     <StyledHeader>
       <Logo />
     </StyledHeader>
