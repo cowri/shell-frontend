@@ -451,7 +451,10 @@ const SwapTab = () => {
     inputBase: { fontSize: '20px', height: '60px' },
     helperText: {
       color: 'red',
-      fontSize: '16px',
+      fontSize: '13px',
+      marginLeft: '10px',
+      position: 'absolute',
+      top: '100%',
     }
   })()
 

@@ -258,7 +258,7 @@ const StartModal = ({
   }
 
   const inputStyles = makeStyles({
-    inputBase: { fontSize: '22px', height: '60px' },
+    inputBase: { fontSize: '20px', height: '60px' },
     helperText: {
       color: 'red',
       fontSize: '13px',
