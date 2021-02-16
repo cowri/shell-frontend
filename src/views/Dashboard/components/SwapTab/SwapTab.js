@@ -15,15 +15,11 @@ import NumberFormat from 'react-number-format'
 
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem';
-import IconButton from '@material-ui/core/IconButton';
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 
 import Button from '../../../../components/Button'
 
 import TokenIcon from '../../../../components/TokenIcon'
-import {SwapVert} from '@material-ui/icons';
-import {Icon} from '@material-ui/core';
-import {SwapIconContainer} from './styled.js';
 import {SwapDirectionIcon} from './SwapDirectionIcon/SwapDirectionIcon.js';
 
 const DEFAULT_MSG = "Your price for this trade will be..."
@@ -551,8 +547,9 @@ const SwapTab = () => {
         fullWidth
         disabled={!targetValue || !originValue || errorMessage}
         onClick={handleSwap}
+        style={{ marginTop: '40px' }}
       >
-        Swap
+        Execute
       </Button>): (
         <Button onClick={() => handleUnlock(MAX)} fullWidth>
           Approve {origin.symbol}

@@ -35,7 +35,7 @@ const StyledModalContent = styled.div`
   display: flex;
   flex-direction: column;
   max-height: calc(100% - 12px);
-  max-width: 450px;
+  max-width: 650px;
   position: sticky;
   width: calc(100% - 12px);
   margin: 6px;
@@ -45,7 +45,7 @@ const Modal = ({ children, onDismiss }) => (
   <StyledModal>
     <StyledModalBg onClick={onDismiss} />
     <StyledModalContent>
-      <Surface>
+      <Surface modal>
         {children}
       </Surface>
     </StyledModalContent>

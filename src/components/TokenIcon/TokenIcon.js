@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const StyledTokenIcon = styled.div`
+export const StyledTokenIcon = styled.div`
   align-items: center;
   display: flex;
   height: ${props => props.size}px;

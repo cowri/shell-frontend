@@ -26,6 +26,19 @@ const StyledTokenName = styled.span`
   align-items: center;
   display: flex;
   flex: 1;
+  font-size: 22px;
+  @media (max-width: 512px) {
+    font-size: 18px;
+  }
+`
+
+
+const Devider = styled.div`
+  width: 40px;
+  flex-shrink: 0;
+  @media screen and (max-width: 512px) {
+    width: 20px;
+  }
 `
 
 const StyledSocialIcon = styled.a`
@@ -51,8 +64,7 @@ const StyledBalance = styled.div`
 const StyledActions = withTheme(styled.div`
   align-items: center;
   display: flex;
-  height: 80px;
-  padding: 0 24px;
+  padding: 10px 40px 0;
   @media (max-width: 512px) {
     padding: 0 12px;
   }
@@ -82,7 +94,7 @@ const ShellTab = ({ shellIx }) => {
         <StyledTokenName>
           <TokenIcon> <img alt="" src={asset.icon} /> </TokenIcon>
           <div style={{ width: 12 }} />
-          <LabelledValue label={asset.symbol} />
+          <span>{asset.symbol}</span>
         </StyledTokenName>
         <StyledBalance className="number">
           { liqTotal }
@@ -97,10 +109,6 @@ const ShellTab = ({ shellIx }) => {
 
   const liqTotal = state.getIn([ 'shells', shellIx, 'shell', 'liquidityTotal', 'display' ])
   const liqOwned = state.getIn([ 'shells', shellIx, 'shell', 'liquidityOwned', 'display' ])
-
-  let etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
-    : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
-    : ''
 
 
   return ( <>
@@ -124,12 +132,9 @@ const ShellTab = ({ shellIx }) => {
         { rows }
       </StyledRows>
       <StyledActions>
-        <Button onClick={setPresentDeposit}>Deposit</Button>
-        <div style={{ width: 12 }} />
-        <Button outlined onClick={setPresentWithdraw}>Withdraw</Button>
-        <StyledSocialIcon target="_blank" href={etherscan} >
-          <img src="./etherscan-logo-circle.svg" style={{width:'2em'}} alt="" />
-        </StyledSocialIcon>
+        <Button onClick={setPresentDeposit} fullWidth>Deposit</Button>
+        <Devider />
+        <Button outlined onClick={setPresentWithdraw} fullWidth>Withdraw</Button>
       </StyledActions>
     </StyledShellTab>
   </> )

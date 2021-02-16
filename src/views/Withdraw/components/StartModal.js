@@ -34,24 +34,21 @@ const StyledStartAdornment = styled.div`
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
+  margin: 0 10px;
 `
 
 const StyledWithdrawEverything = styled.div`
-  position: relative;
-  height: 25px;
-  margin-top: -10px;
-  padding-bottom: 20px;
-
-  & .MuiIconButton-root {
-    position: relative;
-    top: 0;
-    right: 0;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: -20px;
 `
 
 const StyledEndAdornment = styled.div`
   padding-left: 6px;
   padding-right: 12px;
+  margin: 0 10px;
 `
 
 const StyledForm = styled.form`
@@ -70,11 +67,12 @@ const StyledShells = styled.div`
   justify-content: center;
 `
 const StyledShellIcon = styled.img`
-  height: 48px;
+  height: 30px;
   float: left;
+  margin-right: 10px;
 `
 const StyledShellBalance = styled.div`
-  font-size: 36px;
+  font-size: 24px;
   font-weight: 300;
 `
 
@@ -88,6 +86,14 @@ const errorStyles = {
   fontSize: '26px',
   fontWeight: 'bold'
 }
+
+const Devider = styled.div`
+  width: 40px;
+  flex-shrink: 0;
+  @media screen and (max-width: 512px) {
+    width: 20px;
+  }
+`
 
 const ONE = new BigNumber(1)
 
@@ -244,26 +250,28 @@ const StartModal = ({
     const fee = shellsToBurn.multipliedBy(slippage)
 
     const slippageMessage = slippage.isNegative()
-      ? ( <span>
+      ? ( <div>
             and pay a liquidity provider fee of
-            <span style={{ paddingLeft: '23px', paddingRight: '4px' }}>
+            <span style={{ paddingLeft: '10px', paddingRight: '4px' }}>
               <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
-              &nbsp;{ isNaN(fee.toFixed(8)) ? '0.00' : Math.abs(fee.toFixed(8)) }
+              &nbsp;
+              <span>{ isNaN(fee.toFixed(8)) ? '0.00' : Math.abs(fee.toFixed(8)) }</span>
             </span>
-          </span>
-      ) : ( <span >
+          </div>
+      ) : ( <div >
             and earn a rebalancing subsidy of
-            <span style={{ paddingLeft: '23px', paddingRight: '4px' }}>
+            <span style={{ paddingLeft: '10px', paddingRight: '4px' }}>
               <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
-              &nbsp;{ isNaN(fee.toFixed(8)) ? '0.00' : fee.toFixed(8) }
+              &nbsp;
+              <span>{ isNaN(fee.toFixed(8)) ? '0.00' : fee.toFixed(8) }</span>
             </span>
-          </span>
+          </div>
         )
 
     const shells = (
       <div>
         You will burn
-        <span style={{ paddingLeft: '16.5px', paddingRight: '4px' }}>
+        <span style={{ paddingLeft: '10px', paddingRight: '4px' }}>
           <img alt="" src={tinyShellIcon} style={{ width: '20px', display: 'inline-block', verticalAlign: 'middle' }} />
           &nbsp;{ ' ' + engine.shells[shellIx].getDisplayFromNumeraire(shellsToBurn) }
         </span>
@@ -349,8 +357,9 @@ const StartModal = ({
         </StyledForm>
       </ModalContent>
       <ModalActions>
-        <Button onClick={onDismiss} outlined >Cancel</Button>
-        <Button onClick={handleSubmit}
+        <Button fullWidth onClick={onDismiss} outlined >Cancel</Button>
+        <Devider />
+        <Button fullWidth onClick={handleSubmit}
           style={ error ? { cursor: 'no-drop'} : null }
           disabled={ error || zero }
         >
@@ -368,34 +377,49 @@ const TokenInput = ({
   onChange,
   symbol,
   value
-}) => (
-  <StyledInput>
-    <NumberFormat fullWidth
-      allowNegative={false}
-      customInput={TextField}
-      disabled={disabled}
-      error={error}
-      inputMode={"numeric"}
-      min="0"
-      onValueChange={ onChange }
-      placeholder="0"
-      thousandSeparator={true}
-      type="text"
-      value={value}
-      InputProps={{
-        endAdornment: (
-          <StyledEndAdornment>
-            <span> {symbol} </span>
-          </StyledEndAdornment>
-        ),
-        startAdornment: (
-          <StyledStartAdornment>
-            <TokenIcon size={24}> <img src={icon} alt="" /> </TokenIcon>
-          </StyledStartAdornment>
-        )
-      }}
-    />
-  </StyledInput>
-)
+}) => {
+  const inputStyles = makeStyles({
+    inputBase: { fontSize: '22px', height: '60px' },
+    helperText: {
+      color: 'red',
+      fontSize: '13px',
+      marginLeft: '10px',
+      position: 'absolute',
+      top: '100%',
+    }
+  })()
+
+  return (
+    <StyledInput>
+      <NumberFormat
+        fullWidth
+        allowNegative={false}
+        customInput={TextField}
+        disabled={disabled}
+        error={error}
+        inputMode={"numeric"}
+        min="0"
+        onValueChange={ onChange }
+        placeholder="0"
+        thousandSeparator={true}
+        type="text"
+        value={value}
+        InputProps={{
+          className: inputStyles.inputBase,
+          endAdornment: (
+            <StyledEndAdornment>
+              <span> {symbol} </span>
+            </StyledEndAdornment>
+          ),
+          startAdornment: (
+            <StyledStartAdornment>
+              <TokenIcon> <img src={icon} alt="" /> </TokenIcon>
+            </StyledStartAdornment>
+          )
+        }}
+      />
+    </StyledInput>
+  )
+}
 
 export default StartModal

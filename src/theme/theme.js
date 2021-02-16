@@ -15,7 +15,7 @@ const theme = createMuiTheme({
 theme.overrides = {
   MuiTextField: {
     root: {
-      background: '#efefef',
+      background: '#e9cff9',
       borderRadius: theme.shape.borderRadius,
     },
   },

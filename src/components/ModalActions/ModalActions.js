@@ -8,13 +8,9 @@ const StyledModalActions = withTheme(styled.div`
   justify-content: center;
   margin: 0;
   min-height: 48px;
-  padding: 12px 18px;
-  & > * {
-    margin-left: 6px;
-    margin-right: 6px;
-  }
-  @media (max-width: 512px) {
-    padding: 12px;
+  padding: 0 40px;
+  @media screen and (max-width: 512px) {
+    padding: 0 24px;
   }
 `)
 

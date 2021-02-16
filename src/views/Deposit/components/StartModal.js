@@ -23,6 +23,16 @@ import { List } from 'immutable'
 import BigNumber from 'bignumber.js'
 
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
+const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+
+
+const Devider = styled.div`
+  width: 40px;
+  flex-shrink: 0;
+  @media screen and (max-width: 512px) {
+    width: 20px;
+  }
+`
 
 const StyledStartAdornment = styled.div`
   align-items: center;
@@ -30,11 +40,13 @@ const StyledStartAdornment = styled.div`
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
+  margin: 0 10px;
 `
 
 const StyledEndAdornment = styled.div`
   padding-left: 6px;
   padding-right: 12px;
+  margin: 0 10px;
 `
 
 const StyledForm = styled.form`
@@ -83,6 +95,7 @@ const StartModal = ({
 
   const [ inputs, setInputs ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
   const [ errors, setErrors ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
+  const [ errorsAllowance, setErrorsAllowance ] = useState(new List(new Array(engine.shells[shellIx].assets.length).fill('')))
   const [ error, setError ] = useState(null)
   const [ zero, setZero ] = useState(true)
   const [ unlocking, setUnlocking ] = useState(null)
@@ -104,10 +117,12 @@ const StartModal = ({
     } else if (v.isGreaterThan(state.getIn([ 'shells', shellIx, 'assets', i, 'allowance', 'numeraire' ]))) {
 
       setErrors(errors.set(i, 'Amount is greater than pool\'s allowance'))
+      setErrorsAllowance(errorsAllowance.set(i, true))
 
     } else {
 
       setErrors(errors.set(i, ''))
+      setErrorsAllowance(errors.set(i, ''))
 
     }
 
@@ -243,11 +258,13 @@ const StartModal = ({
   }
 
   const inputStyles = makeStyles({
-    // inputBase: { fontSize: '22px', height: '60px' },
+    inputBase: { fontSize: '22px', height: '60px' },
     helperText: {
       color: 'red',
       fontSize: '13px',
-      marginLeft: '10px'
+      marginLeft: '10px',
+      position: 'absolute',
+      top: '100%',
     }
   })()
 
@@ -272,13 +289,15 @@ const StartModal = ({
         available={available}
         balance={balance}
         icon={asset.icon}
-        isError={ errors.get(ix) ? true : false }
+        isError={ !!errors.get(ix) }
+        isAllowanceError={errorsAllowance.get(ix)}
         helperText={ errors.get(ix) }
         onAllowanceClick={ () => setUnlocking(ix) }
         onChange={payload => onInput(payload.value, ix) }
         styles={inputStyles}
         symbol={asset.symbol}
         value={inputs.get(ix)}
+        onUnlock={() => onUnlock(ix, MAX)}
       />
     )
 
@@ -290,10 +309,6 @@ const StartModal = ({
           tag={engine.shells[shellIx].tag}
           onCancel={ () => setPrompting(false) }
           onContinue={handleSubmit} /> }
-      { unlocking != null && <UnlockingModal
-          coin={ state.getIn(['shells', shellIx, 'assets', unlocking]) }
-          handleCancel={ () => setUnlocking(null) }
-          handleUnlock={ amount => { setUnlocking(null); onUnlock(unlocking, amount) } } /> }
       <ModalTitle> Deposit Funds </ModalTitle>
       <ModalContent>
         <StyledForm>
@@ -304,8 +319,9 @@ const StartModal = ({
         </StyledForm>
       </ModalContent>
       <ModalActions>
-        <Button outlined onClick={onDismiss}> Cancel </Button>
-        <Button
+        <Button fullWidth outlined onClick={onDismiss}> Cancel </Button>
+        <Devider />
+        <Button fullWidth
           style={{cursor: 'no-drop'}}
           onClick={ () => setPrompting(true) }
           disabled={errors.filter((error) => error).size}
@@ -318,34 +334,29 @@ const StartModal = ({
 }
 
 const TokenInput = ({
-  available,
   balance,
   isError,
+  isAllowanceError,
   icon,
   helperText,
   onChange,
   onAllowanceClick,
   styles,
   symbol,
-  value
+  value,
+  onUnlock,
 }) => {
 
   return ( <>
-    <StyledLabelBar style={{ marginTop: '18px', marginBottom: '-10px' }} >
+    <StyledLabelBar style={{ marginTop: '18px', marginBottom: '0px' }} >
       <span>
-        Your wallet balance:
-        <span className="number"> {balance} </span>
-      </span>
-    </StyledLabelBar>
-    <StyledLabelBar>
-      <span onClick={onAllowanceClick} style={{cursor:'pointer'}} >
-        Current allowance:
-        <span className="number"> {available} </span>
-        <span style={{ textDecoration: 'underline' }} > click to change </span>
+        Your balance:
+        <span className="number"> {Number(balance).toFixed(2)} </span>
       </span>
     </StyledLabelBar>
     <InputContainer>
-      <NumberFormat fullWidth
+      <NumberFormat
+        fullWidth
         allowNegative={false}
         customInput={TextField}
         defaultColor="red"
@@ -360,16 +371,30 @@ const TokenInput = ({
         type="text"
         value={value}
         InputProps={{
+          className: styles.inputBase,
           style: isError ? { color: 'red' } : null,
           endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
           startAdornment: (
             <StyledStartAdornment>
-              <TokenIcon size={24}> <img alt="" src={icon} /> </TokenIcon>
+              <TokenIcon> <img alt="" src={icon} /> </TokenIcon>
             </StyledStartAdornment>
           )
         }}
       />
-      <Button small withInput outlined onClick={() => onChange({value: balance})}>Max</Button>
+      {isAllowanceError ? (
+        <Button
+          small
+          withInput
+          outlined
+          onClick={onUnlock}
+        >Approve</Button>
+      ) : (<Button
+          small
+          withInput
+          outlined
+          onClick={() => onChange({value: balance})}
+        >Max</Button>
+      )}
     </InputContainer>
   </>)
 }

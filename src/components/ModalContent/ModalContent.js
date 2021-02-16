@@ -6,9 +6,9 @@ const StyledModalContent = withTheme(styled.div`
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 24px;
+  padding: 0 40px;
   @media (max-width: 512px) {
-    padding: 12px;
+    padding: 24px 24px 0;
   }
 `)
 

@@ -51,7 +51,6 @@ const Dashboard = ({
           <StyledDashboard>
             <Header />
             { loggedIn && web3 && <DashboardContent/> }
-            <Footer />
           </StyledDashboard>
       </DashboardContext.Provider>
     </>

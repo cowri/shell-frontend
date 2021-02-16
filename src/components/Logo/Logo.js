@@ -8,6 +8,11 @@ const StyledLogo = styled.div`
   display: flex;
   font-size: 24px;
   font-weight: 700;
+  @media screen and (max-width: 512px) {
+    margin: 0 auto;
+    align-items: center;
+    justify-content: center;
+  }
 `
 
 const StyledImg = styled.img`
@@ -18,6 +23,7 @@ const StyledName = styled.span`
   color: rgb(0,0,0);
   margin-top: -.15em;
   margin-left: .6em;
+  font-size: 1.2em;
 `
 
 export default function (){

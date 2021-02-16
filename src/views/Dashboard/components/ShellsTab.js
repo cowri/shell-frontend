@@ -9,6 +9,8 @@ import BigNumber from 'bignumber.js';
 import DashboardContext from '../context'
 import {primary} from '../../../theme/colors.js';
 import theme from '../../../theme';
+import TokenIcon from '../../../components/TokenIcon';
+import {StyledTokenIcon} from '../../../components/TokenIcon/TokenIcon.js';
 
 const StyledShellsTab = styled.div`
   display: flex;
@@ -24,19 +26,22 @@ const StyledBalance = styled.div`
   text-align: right;
   @media (max-width: 512px) {
     font-size: 18px;
+    &.mobile-hide {
+      display: none;
+    }
   }
   text-decoration: none;
   color: black;
 `
 
 const PoolsTable = styled.div`
-  margin-bottom: 12px;
+  margin-bottom: 40px;
 `
 
 const ShellName = styled.span`
   align-items: center;
   display: flex;
-  flex: 1.5;
+  flex: 1.3;
   @media (max-width: 512px) {
     flex-wrap: wrap;
   }
@@ -67,6 +72,18 @@ const ShellNamePart = styled.span`
   :not(:last-child) {
     border-right: 1px solid rgba(0, 0, 0, .4);
   }
+  ${StyledTokenIcon} {
+    display: none;
+  }
+  @media screen and (max-width: 512px) {
+    :not(:last-child) {
+      border-right: none;
+    }
+    padding-right: 4px;
+    ${Symbol} {
+      font-size: 13px;
+    }
+  }
 `
 const Farming = withTheme(styled.span`
   font-size: 0.8rem;
@@ -74,20 +91,27 @@ const Farming = withTheme(styled.span`
   padding: .2em .6em;
   border: 1px solid ${(props) => props.theme.palette.primary.main};
   border-radius: 0.3em;
-  color: rgba(0,0,0,.5);
+  color: ${(props) => props.theme.palette.primary.main};
   text-transform: uppercase;
+  margin-right: auto;
+  &.mobile {
+    display: none;
+  }
   @media (max-width: 512px) {
     order: -1;
+    display: none;
+    &.mobile {
+      display: inline-block;
+    }
   }
 `)
 const StyledRow = withTheme(styled.div`
   align-items: center;
-  border-top: ${props => props.hideBorder ? 0 : `1px solid ${props.theme.palette.grey[50]}`};
   color: ${props => props.head ? props.theme.palette.grey[500] : 'inherit'};
   display: flex;
   font-weight: ${props => props.head ? 500 : 400};
   margin: 0;
-  padding: 12px 24px;
+  padding: 12px 40px;
   cursor: pointer;
   :hover {
     ${Farming},
@@ -99,9 +123,23 @@ const StyledRow = withTheme(styled.div`
     }
   }
   @media (max-width: 512px) {
-    padding: 6px 12px;
+    padding: 10px 12px;
   }
 `)
+
+const StyledInfoBlock = styled.div`
+  padding: 60px 40px 30px;
+  text-align: center;
+  .title {
+    margin-top: 0;
+  }
+  @media (max-width: 512px) {
+    padding: 30px 12px;
+    .title {
+      margin: 0.8em 0 1.6em;
+    }
+  }
+`
 
 const ShellNameBody = styled.div`
   display: flex;
@@ -110,85 +148,94 @@ const ShellNameBody = styled.div`
 
 const ShellsTab = ({showShell}) => {
 
-    const {
-        engine,
-        state
-    } = useContext(DashboardContext)
-    let rows = []
+  const {
+    engine,
+    state
+  } = useContext(DashboardContext)
+  let rows = []
 
-    if (state.has('shells')) {
-        for (let i = 0; i < engine.shells.length; i++) {
-            let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
-            let liqOwned = state.getIn(['shells',i,'shell','liquidityOwned','display'])
+  if (state.has('shells')) {
+    for (let i = 0; i < engine.shells.length; i++) {
+      let liqTotal = state.getIn(['shells',i,'shell','liquidityTotal','display'])
+      let liqOwned = state.getIn(['shells',i,'shell','liquidityOwned','display'])
 
-            liqTotal = liqTotal.slice(0, liqTotal.indexOf('.') === -1 ? undefined : liqTotal.indexOf('.'))
-            liqOwned = liqOwned.slice(0, liqOwned.indexOf('.') === -1 ? undefined : liqOwned.indexOf('.'))
+      liqTotal = liqTotal.slice(0, liqTotal.indexOf('.') === -1 ? undefined : liqTotal.indexOf('.'))
+      liqOwned = liqOwned.slice(0, liqOwned.indexOf('.') === -1 ? undefined : liqOwned.indexOf('.'))
 
-            rows.push(
-                <ShellRow
-                    key={i}
-                    showShell={() => showShell(i)}
-                    assets={engine.shells[i].assets}
-                    liqTotal={liqTotal}
-                    liqOwned={liqOwned}
-                />
-            )
+      rows.push(
+        <ShellRow
+          key={i}
+          showShell={() => showShell(i)}
+          assets={engine.shells[i].assets}
+          liqTotal={liqTotal}
+          liqOwned={liqOwned}
+        />
+      )
 
-        }
     }
+  }
 
-    return (
-        <StyledShellsTab>
-            <div style={{padding: '60px 20px 30px', textAlign: 'center'}}>
+  return (
+    <StyledShellsTab>
+      <StyledInfoBlock>
 
-                <p style={{marginTop: '0px', fontSize: '24px', fontWeight: 'bold'}}>
-                    ANNOUNCEMENT: LIQUIDITY FARMING
-                </p>
+        <p className="title" style={{fontSize: '24px', fontWeight: 'bold'}}>
+          ANNOUNCEMENT: LIQUIDITY FARMING
+        </p>
 
-                <p style={{ textAlign: 'left', fontSize: '20px' }}>
-                    The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
-                </p>
+        <p style={{ textAlign: 'left', fontSize: '20px' }}>
+          The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
+        </p>
 
-                <p style={{ textAlign: 'left', fontSize: '20px' }}>
-                    Track your share on the <a style={{ color: theme.palette.primary.main}} target="_blank" rel="noopener noreferrer" href="https://distribution.component.finance">rewards estimation page</a>
-                </p>
+        <p style={{ textAlign: 'left', fontSize: '20px', marginTop: '-7px' }}>
+          Track your share: <a style={{ color: theme.palette.primary.main}} target="_blank" rel="noopener noreferrer" href="https://distribution.component.finance">rewards estimation page</a>
+        </p>
 
-            </div>
-            <PoolsTable>
-                <Row head>
-                    <span style={{ flex: 1.5 }}> Pools </span>
-                    <span style={{ flex: 1, textAlign: 'right' }}> Liquidity </span>
-                    <span style={{ flex: 1, textAlign: 'right' }}> Your Balance </span>
-                </Row>
-                { rows }
-            </PoolsTable>
-        </StyledShellsTab>
-    )
+      </StyledInfoBlock>
+      <PoolsTable>
+        <Row head>
+          <span style={{ flex: 1.3 }}>Pools</span>
+          <span className="mobile-hide" style={{ flex: 0.7 }}>
+            <Farming style={{opacity: '0'}}>farming</Farming>
+          </span>
+          <span style={{ flex: 1.2, textAlign: 'left' }}>Liquidity</span>
+          <span style={{ flex: 1, textAlign: 'right' }}>Your Balance</span>
+        </Row>
+        { rows }
+      </PoolsTable>
+    </StyledShellsTab>
+  )
 }
 
 const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
 
-    return (
-        <StyledRow onClick={showShell}>
-            <ShellName>
-                <ShellNameBody>
-                    {assets.map((asset) => (
-                        <ShellNamePart key={asset.symbol}>
-                            <Symbol>
-                                { asset.symbol }
-                            </Symbol>
-                            <Weight>
-                                { asset.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
-                            </Weight>
-                        </ShellNamePart>
-                    ))}
-                </ShellNameBody>
-                <Farming>farming</Farming>
-            </ShellName>
-            <StyledBalance className="number"> { liqTotal } </StyledBalance>
-            <StyledBalance className="number"> { liqOwned } </StyledBalance>
-        </StyledRow>
-    )
+  return (
+    <StyledRow onClick={showShell}>
+      <ShellName>
+        <ShellNameBody>
+          {assets.map((asset) => (
+            <>
+              <ShellNamePart key={asset.symbol}>
+                <Symbol>
+                  { asset.symbol }
+                </Symbol>
+                <TokenIcon size={24}> <img src={asset.icon} alt="" /> </TokenIcon>
+                <Weight>
+                  { asset.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
+                </Weight>
+              </ShellNamePart>
+            </>
+          ))}
+        </ShellNameBody>
+        <Farming className="mobile">farming</Farming>
+      </ShellName>
+      <StyledBalance className="mobile-hide" style={{ flex: 0.7 }}>
+        <Farming>farming</Farming>
+      </StyledBalance>
+      <StyledBalance className="number" style={{justifyContent: 'flex-start', flex: '1.2'}}> { liqTotal } </StyledBalance>
+      <StyledBalance className="number" style={{justifyContent: 'flex-end', flex: '1'}}> { liqOwned } </StyledBalance>
+    </StyledRow>
+  )
 
 }
 
