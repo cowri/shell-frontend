@@ -6,7 +6,7 @@ const StyledModalActions = withTheme(styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
-  margin: 0;
+  margin: 40px;
   min-height: 48px;
   padding: 0 40px;
   @media screen and (max-width: 512px) {
