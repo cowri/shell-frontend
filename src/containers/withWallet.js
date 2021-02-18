@@ -120,7 +120,7 @@ const withWallet = (WrappedComponent) => {
                 walletName: "walletConnect",
                 preferred: true,
                 infuraKey: config.infuraKey,
-                rpc: { 100: 'https://rpc.xdaichain.com/' },
+                rpc: { 100: config.defaultWeb3Provider },
                 bridge: 'https://bridge.walletconnect.org',
               },
             ]

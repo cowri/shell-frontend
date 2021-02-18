@@ -41,6 +41,7 @@ export default class Engine extends SwapEngine {
             )
 
             shell.displayDecimals = _pool_.displayDecimals
+            shell.farming = _pool_.farming
             shell.swapDecimals = _pool_.swapDecimals
             shell.alpha = new BigNumber(_pool_.params.alpha)
             shell.beta = new BigNumber(_pool_.params.beta)

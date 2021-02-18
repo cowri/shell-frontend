@@ -1,5 +1,5 @@
 {
- "defaultWeb3Provider": "https://rpc.xdaichain.com/",
+ "defaultWeb3Provider": "https://xdai.poanetwork.dev",
  "infuraKey": "3c3dfdec6ce94abc935977aa995d1a8c",
  "blocknative": "70a8519d-1a7c-4bc5-bf62-5b38617208ff",
  "network": 100,
@@ -11,6 +11,7 @@
       "swapDecimals": 2,
       "tag": "STABLECOIN1",
       "hideapy": true,
+      "farming": true,
       "assets": [
         {
           "address": "0xFe7ed09C4956f7cdb54eC4ffCB9818Db2D7025b8",
@@ -45,6 +46,42 @@
         "beta": ".45",
         "delta": ".05",
         "epsilon": "0",
+        "lambda": "1"
+      }
+    },
+    {
+      "shell": "0xF82fc0ecBf3ff8e253a262447335d3d8A72CD028",
+      "name": "50% WXDAI 50% DAI",
+      "displayDecimals": 2,
+      "swapDecimals": 2,
+      "tag": "STABLECOIN2",
+      "hideapy": true,
+      "farming": false,
+      "assets": [
+        {
+          "address": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+          "decimals": 18,
+          "icon": "dai.svg",
+          "name": "Wrapped XDAI",
+          "symbol": "WXDAI",
+          "weight": ".5",
+          "derivatives": [ ]
+        },
+        {
+          "address": "0xFc8B2690F66B46fEC8B3ceeb95fF4Ac35a0054BC",
+          "decimals": 18,
+          "icon": "dai.svg",
+          "name": "Dai Token on xDai",
+          "symbol": "DAI (BSC)",
+          "weight": ".5",
+          "derivatives": [ ]
+        }
+      ],
+      "params": {
+        "alpha": ".95",
+        "beta": ".45",
+        "delta": ".05",
+        "epsilon": ".002",
         "lambda": "1"
       }
     }

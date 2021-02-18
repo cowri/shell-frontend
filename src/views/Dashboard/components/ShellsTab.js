@@ -123,6 +123,7 @@ const ShellsTab = ({showShell}) => {
                     key={i}
                     showShell={() => showShell(i)}
                     assets={engine.shells[i].assets}
+                    farming={engine.shells[i].farming}
                     liqTotal={liqTotal}
                     liqOwned={liqOwned}
                 />
@@ -140,7 +141,7 @@ const ShellsTab = ({showShell}) => {
                 </p>
 
                 <p>
-                    The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
+                    Some of the pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
                 </p>
 
                 <p>
@@ -161,7 +162,7 @@ const ShellsTab = ({showShell}) => {
     )
 }
 
-const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
+const ShellRow = ({showShell, liqTotal, liqOwned, assets, farming}) => {
 
     return (
         <StyledRow onClick={showShell}>
@@ -178,7 +179,7 @@ const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
                         </ShellNamePart>
                     ))}
                 </ShellNameBody>
-                <Farming>farming</Farming>
+                {farming && <Farming>farming</Farming>}
             </ShellName>
             <StyledBalance className="number"> { liqTotal } </StyledBalance>
             <StyledBalance className="number"> { liqOwned } </StyledBalance>

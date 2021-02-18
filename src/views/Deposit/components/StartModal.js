@@ -247,10 +247,6 @@ const StartModal = ({
 
   const tokenInputs = engine.shells[shellIx].assets.map( (asset, ix) => {
 
-    console.log(errors)
-    console.log(ix)
-    console.log(errors[ix])
-
     const assetState = state.getIn([ 'shells', shellIx, 'assets', ix ])
 
     let balance = assetState.getIn([ 'balance', 'numeraire']).toString()
