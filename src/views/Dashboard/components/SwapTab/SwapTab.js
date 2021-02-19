@@ -4,26 +4,26 @@ import { fromJS } from 'immutable'
 
 import BigNumber from 'bignumber.js'
 
-import DashboardContext from '../context'
+import DashboardContext from '../../context.js'
 
-import ModalConfirm from '../../../components/ModalConfirm'
-import ModalError from '../../../components/ModalError'
-import ModalSuccess from '../../../components/ModalSuccess'
-import ModalTx from '../../../components/ModalAwaitingTx'
-import ModalUnlock from '../../../components/ModalUnlock'
+import ModalConfirm from '../../../../components/ModalConfirm'
+import ModalError from '../../../../components/ModalError'
+import ModalSuccess from '../../../../components/ModalSuccess'
+import ModalTx from '../../../../components/ModalAwaitingTx'
+import ModalUnlock from '../../../../components/ModalUnlock'
 import NumberFormat from 'react-number-format'
 
 import TextField from '@material-ui/core/TextField'
 import MenuItem from '@material-ui/core/MenuItem';
-import IconButton from '@material-ui/core/IconButton';
-import SwapCallsIcon from '@material-ui/icons/SwapCalls';
 import { makeStyles, withTheme } from '@material-ui/core/styles'
 
-import Button from '../../../components/Button'
+import Button from '../../../../components/Button'
 
-import TokenIcon from '../../../components/TokenIcon'
+import TokenIcon from '../../../../components/TokenIcon'
+import {SwapDirectionIcon} from './SwapDirectionIcon/SwapDirectionIcon.js';
 
 const DEFAULT_MSG = "Your price for this trade will be..."
+const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
 
 const StyledStartAdornment = styled.div`
   align-items: center;
@@ -39,6 +39,9 @@ const StyledSwapTab = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
+  max-width: 460px;
+  margin: 0 auto;
+  width: 90%;
 `
 
 const StyledLabelBar = withTheme(styled.div`
@@ -50,16 +53,10 @@ const StyledLabelBar = withTheme(styled.div`
 `)
 
 const StyledTokenInfo = withTheme(styled.div`
-  margin: 15px 0;
 `)
 
 const StyledCoinHint = withTheme(styled.div`
-  align-items: flex-end;
-  align-content: baseline;
-  display: flex;
-  height: 18px;
-  margin-left: 24px;
-  margin-top: 0px;
+  text-align: right;
   margin-bottom: 5px;
 `)
 
@@ -78,14 +75,7 @@ const StyledAvailability = withTheme(styled.div`
 `)
 
 const StyledInput = styled.div`
-  margin-bottom: 24px;
 `
-
-const StyledSwapRow = styled.div`
-  position: relative;
-  height: 0px;
-`
-
 const StyledMessage = styled.div`
   font-size: 20px;
   padding: 30px;
@@ -119,7 +109,7 @@ const SwapTab = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [originIx, setOriginIx] = useState(0)
   const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
-  const [originValue, setOriginValue] = useState('1')
+  const [originValue, setOriginValue] = useState('1.00')
   const [targetValue, setTargetValue] = useState('')
   const [ixs, setIxs] = useState(fromJS({'shell': 0, 'derivative': 0}))
   const [swapType, setSwapType] = useState('origin')
@@ -248,14 +238,14 @@ const SwapTab = () => {
     const tSymbol = engine.derivatives[targetIx].symbol
 
     let left = (oSymbol === 'cUSDC' || oSymbol === 'cDAI' || oSymbol === 'CHAI')
-      ? <span> <span> 1.00 </span> of { oSymbol } is worth </span>
-      : <span> <span> 1.00 </span> { oSymbol } is worth </span>
+      ? <span style={{fontSize: '24px'}}> <span> 1.00 </span> of { oSymbol } is worth </span>
+      : <span style={{fontSize: '24px'}}> <span> 1.00 </span> { oSymbol } is worth </span>
 
     let right = (tSymbol === 'cUSDC' || tSymbol === 'cDAI' || tSymbol === 'CHAI')
-      ? <span> <span> { tPrice } </span> of { tSymbol } for this trade </span>
-      : <span> <span> { tPrice } </span> { tSymbol } for this trade </span>
+      ? <span style={{fontSize: '24px'}}> <span> { Number(tPrice).toFixed(2) } </span> of { tSymbol } for this trade </span>
+      : <span style={{fontSize: '24px'}}> <span> { Number(tPrice).toFixed(2) } </span> { tSymbol } for this trade </span>
 
-    setPriceMessage(<span> {left} {right} </span>)
+    setPriceMessage(<span style={{fontWeight: 'bold'}}> {left} {right} </span>)
     setHaltMessage('')
 
   }
@@ -415,7 +405,7 @@ const SwapTab = () => {
   }
 
   const selectionCss = makeStyles({
-    root: { 'fontFamily': 'Geomanist', 'fontSize': '17.5px' }
+    root: { 'fontFamily': 'Metric, Arial, sans-serif;', 'fontSize': '17.5px' }
   })()
 
   const selections = engine.derivatives.map( (asset, ix) => {
@@ -438,7 +428,7 @@ const SwapTab = () => {
 
   }, [])
 
-  const getDropdown = (handler, selections,value) => {
+  const getDropdown = (handler, selections, value) => {
 
     return ( <TextField select
       InputProps={{ className: selectionCss.root }}
@@ -448,11 +438,6 @@ const SwapTab = () => {
     /> )
 
   }
-
-  const iconClasses = makeStyles({
-      root: { position: 'absolute', right: '12.5px', top: '-25px' }
-    }, { name: 'MuiIconButton' }
-  )()
 
   let toolTipMsg = ''
 
@@ -466,17 +451,20 @@ const SwapTab = () => {
     inputBase: { fontSize: '20px', height: '60px' },
     helperText: {
       color: 'red',
-      fontSize: '16px',
-      marginLeft: '25px'
+      fontSize: '13px',
+      marginLeft: '10px',
+      position: 'absolute',
+      top: '100%',
     }
   })()
 
   let allowance
   let balance
+  let asset
 
   if (ixs.get('shell') != null && ixs.get('derivative') != null) {
 
-    const asset = state.getIn([
+    asset = state.getIn([
       'shells',
       ixs.get('shell'),
       'derivatives',
@@ -497,6 +485,7 @@ const SwapTab = () => {
   }
 
   return (
+    <>
 
     <StyledSwapTab>
 
@@ -540,16 +529,11 @@ const SwapTab = () => {
           styles={inputStyles}
           symbol={origin.symbol}
           title='From'
-          unlock={ () => setStep('unlocking') }
           value={originValue}
           error={!!errorMessage}
           helperText={errorMessage}
         />
-        <StyledSwapRow>
-          <IconButton className={iconClasses.root} onClick={handleSwitch} >
-            <SwapCallsIcon fontSize={'large'}/>
-          </IconButton>
-        </StyledSwapRow>
+        <SwapDirectionIcon onClick={handleSwitch} />
         <AmountInput
           icon={target.icon}
           onChange={ handleTargetInput }
@@ -558,19 +542,25 @@ const SwapTab = () => {
           symbol={target.symbol}
           title='To'
           value={targetValue}
-
         />
       </StyledRows>
-      <StyledActions>
-        <Button
-          disabled={ !targetValue || !originValue || errorMessage }
-          onClick={handleSwap}
-        >
-          Swap
-        </Button>
-        <div style={{ width: 12 }} />
-      </StyledActions>
     </StyledSwapTab>
+      {asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue ?
+          (<Button
+            fullWidth
+            disabled={!targetValue || !originValue || errorMessage}
+            onClick={handleSwap}
+            style={{ marginTop: '40px' }}
+          >
+            Execute
+          </Button>)
+          : (
+            <Button onClick={() => handleUnlock(MAX)} fullWidth>
+              Approve {origin.symbol}
+            </Button>
+          ))}
+    <div style={{ width: 12 }} />
+  </>
   )
 }
 
@@ -591,23 +581,15 @@ const AmountInput = ({
 
   return (
     <StyledInput>
-      <StyledLabelBar>
-        <StyledTitle> { title } </StyledTitle>
-      </StyledLabelBar>
       <StyledTokenInfo>
         { balance ?
-          <StyledCoinHint style={{ marginLeft: '24px', marginTop: '0px' }}>
-            Your wallet's balance:
+          <StyledCoinHint>
+            Your balance:
             <span className="number">&nbsp;{ balance }</span>
           </StyledCoinHint> : null }
-        { allowance ?
-          <StyledCoinHint onClick={unlock} style={{ cursor:'pointer', marginLeft: '24px', marginTop: '0px' }}>
-            Current allowance:
-            <span className="number">&nbsp;{ allowance }&nbsp;</span>
-            <span style={{textDecoration: 'underline'}}> click to change </span>
-          </StyledCoinHint> : null }
       </StyledTokenInfo>
-      <NumberFormat fullWidth
+      <NumberFormat
+        fullWidth
         allowNegative={false}
         customInput={TextField}
         error={error}
@@ -622,16 +604,16 @@ const AmountInput = ({
         value={value}
         InputProps={{
           className: styles.inputBase,
-          endAdornment: (
-            <div style={{ marginRight: 6, fontFamily: 'Geomanist' }}>
-              { selections }
-            </div>
-          ),
           startAdornment: (
             <StyledStartAdornment>
               <TokenIcon > <img src={icon} alt="" /> </TokenIcon>
             </StyledStartAdornment>
-          )
+          ),
+          endAdornment: (
+            <div style={{ marginRight: 6, fontFamily: 'Metric, Arial, sans-serif;' }}>
+              { selections }
+            </div>
+          ),
         }}
       />
     </StyledInput>

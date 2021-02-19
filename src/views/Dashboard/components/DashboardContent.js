@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Container from '../../../components/Container'
 import Surface from '../../../components/Surface'
 import Tab from '../../../components/Tab'
@@ -6,9 +7,11 @@ import Tabs from '../../../components/Tabs'
 
 import ShellTab from './ShellTab'
 import ShellsTab from './ShellsTab'
-import SwapTab from './SwapTab'
+import SwapTab from './SwapTab/SwapTab.js'
 
 import DashboardContext from '../context'
+import Footer from '../../../components/Footer';
+import {faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons/faArrowCircleLeft.js';
 
 
 const DashboardContent = () => {
@@ -35,29 +38,40 @@ const DashboardContent = () => {
   }
 
   return (
-    <Container>
-      <Surface>
-        <Tabs>
-          <Tab 
-            active={activeTab === 'shell' || activeTab === 'shells'}
-            disabled={!state.has('shells')}
-            onClick={shellTabClick}
-          >
-            { activeTab !== 'shell' ? 'Pools' : <a style={{display: 'flex', alignItems: 'center'}}> <span style={{fontSize: '1.65em'}}> ← </span> Back To Pools </a> }
-          </Tab>
-          <Tab 
-            active={activeTab === 'swap'}
-            disabled={!state.has('shells')}
-            onClick={() => setActiveTab('swap')}
-          >
-            Swap
-          </Tab>
-        </Tabs>
-        { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
-        { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
-        { activeTab === 'swap' && <SwapTab /> }
-      </Surface>
-    </Container> 
+    <>
+      <Container>
+        <Surface>
+          <Tabs>
+            <Tab
+              active={activeTab === 'shell' || activeTab === 'shells'}
+              disabled={!state.has('shells')}
+              onClick={shellTabClick}
+            >
+              { activeTab !== 'shell'
+                ? 'Pools'
+                : (
+                    <a style={{display: 'flex', alignItems: 'center'}}>
+                      <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
+                      <span>Back to pools</span>
+                    </a>
+                )
+              }
+            </Tab>
+            <Tab
+              active={activeTab === 'swap'}
+              disabled={!state.has('shells')}
+              onClick={() => setActiveTab('swap')}
+            >
+              Swap
+            </Tab>
+          </Tabs>
+          { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
+          { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
+          { activeTab === 'swap' && <SwapTab /> }
+        </Surface>
+      </Container>
+      <Footer shellIx={shellIx}/>
+    </>
   )
 }
 

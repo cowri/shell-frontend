@@ -4,7 +4,7 @@ import { withTheme } from '@material-ui/core/styles'
 
 const StyledTabs = withTheme(styled.div`
   align-items: center;
-  background-color: ${props => props.theme.palette.grey[50]};
+  background-color: #fff;
   display: flex;
 `)
 

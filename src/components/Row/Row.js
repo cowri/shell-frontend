@@ -4,27 +4,31 @@ import { withTheme } from'@material-ui/core/styles'
 
 const StyledRow = withTheme(styled.div`
   align-items: center;
-  border-top: ${props => props.hideBorder ? 0 : `1px solid ${props.theme.palette.grey[50]}`};
-  color: ${props => props.head ? props.theme.palette.grey[500] : 'inherit'};
+  color: ${props => props.head ? '#000' : 'inherit'};
   display: flex;
-  font-weight: ${props => props.head ? 500 : 400};
+  font-weight: ${props => props.head ? 600 : 400};
   height: ${props => props.head ? 40 : 80}px;
   margin: 0;
-  padding: 0 24px;
+  padding: 0 40px;
+  font-size: ${p => p.head ? '20px' : 'inherit'};
   @media (max-width: 512px) {
     height: ${props => props.head ? 26 : 65}px;
     padding: 0 12px;
+    font-size: ${p => p.head ? '16px' : 'inherit'};
+    .mobile-hide {
+      display: none;
+    }
   }
 `)
 
 const Row = ({ children, onClick, onMouseOver, onMouseOut, head, hideBorder, ref, style }) => (
-  <StyledRow 
+  <StyledRow
     onClick={onClick}
-    onMouseOver={onMouseOver} 
-    onMouseOut={onMouseOut} 
-    style={style} 
-    head={head} 
-    hideBorder={hideBorder} 
+    onMouseOver={onMouseOver}
+    onMouseOut={onMouseOut}
+    style={style}
+    head={head}
+    hideBorder={hideBorder}
   >
     {children}
   </StyledRow>

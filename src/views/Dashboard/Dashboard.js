@@ -14,7 +14,7 @@ import DashboardContext from './context'
 
 const StyledDashboard = styled.div`
   align-items: center;
-  background: radial-gradient(circle at top, #fff -0%, rgb(242, 193, 241), rgba(203, 0, 255, 0.18));
+  background: radial-gradient(circle at center top,rgb(255 230 247) 0,rgb(255 218 254),rgba(203,0,255,.18)) no-repeat fixed;
   background-size: cover;
   background-position: center center;
   min-height: 100vh;
@@ -38,7 +38,7 @@ const Dashboard = ({
 
     cookie.set('userId', userId)
 
-  } 
+  }
 
   return (
     <>
@@ -51,7 +51,6 @@ const Dashboard = ({
           <StyledDashboard>
             <Header />
             { loggedIn && web3 && <DashboardContent/> }
-            <Footer />
           </StyledDashboard>
       </DashboardContext.Provider>
     </>
