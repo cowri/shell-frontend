@@ -12,7 +12,6 @@ import ModalActions from '../../../components/ModalActions'
 import ModalContent from '../../../components/ModalContent'
 import ModalTitle from '../../../components/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
-import UnlockingModal from '../../../components/ModalUnlock'
 
 import NumberFormat from 'react-number-format'
 
@@ -103,8 +102,6 @@ const StartModal = ({
   const [ prompting, setPrompting ] = useState(false)
 
   const onInput = (v, i) => {
-
-    console.log(v);
 
     setInputs(inputs.set(i,v))
 

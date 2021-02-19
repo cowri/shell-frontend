@@ -542,22 +542,23 @@ const SwapTab = () => {
           symbol={target.symbol}
           title='To'
           value={targetValue}
-
         />
       </StyledRows>
     </StyledSwapTab>
-      {asset.getIn(['allowance']).get('numeraire').isGreaterThan(10000000) ? (<Button
-        fullWidth
-        disabled={!targetValue || !originValue || errorMessage}
-        onClick={handleSwap}
-        style={{ marginTop: '40px' }}
-      >
-        Execute
-      </Button>): (
-        <Button onClick={() => handleUnlock(MAX)} fullWidth>
-          Approve {origin.symbol}
-        </Button>
-      )}
+      {asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue ?
+          (<Button
+            fullWidth
+            disabled={!targetValue || !originValue || errorMessage}
+            onClick={handleSwap}
+            style={{ marginTop: '40px' }}
+          >
+            Execute
+          </Button>)
+          : (
+            <Button onClick={() => handleUnlock(MAX)} fullWidth>
+              Approve {origin.symbol}
+            </Button>
+          ))}
     <div style={{ width: 12 }} />
   </>
   )
