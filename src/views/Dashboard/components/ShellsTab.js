@@ -167,6 +167,7 @@ const ShellsTab = ({showShell}) => {
           key={i}
           showShell={() => showShell(i)}
           assets={engine.shells[i].assets}
+          farming={engine.shells[i].farming}
           liqTotal={liqTotal}
           liqOwned={liqOwned}
         />
@@ -184,7 +185,7 @@ const ShellsTab = ({showShell}) => {
         </p>
 
         <p style={{ textAlign: 'left', fontSize: '20px' }}>
-          The pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
+          Some of pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
         </p>
 
         <p style={{ textAlign: 'left', fontSize: '20px', marginTop: '-7px' }}>
@@ -207,7 +208,7 @@ const ShellsTab = ({showShell}) => {
   )
 }
 
-const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
+const ShellRow = ({showShell, liqTotal, liqOwned, assets, farming}) => {
 
   return (
     <StyledRow onClick={showShell}>
@@ -230,7 +231,7 @@ const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
         <Farming className="mobile">farming</Farming>
       </ShellName>
       <StyledBalance className="mobile-hide" style={{ flex: 0.7 }}>
-        <Farming>farming</Farming>
+          {farming && <Farming>farming</Farming>}
       </StyledBalance>
       <StyledBalance className="number" style={{justifyContent: 'flex-start', flex: '1.2'}}> { liqTotal } </StyledBalance>
       <StyledBalance className="number" style={{justifyContent: 'flex-end', flex: '1'}}> { liqOwned } </StyledBalance>

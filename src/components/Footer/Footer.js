@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faDiscord, faTelegram, faTwitter, faGithub, faMedium, faEthereum} from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faTelegram, faTwitter, faGithub, faMedium } from '@fortawesome/free-brands-svg-icons';
 
 import Container from '../Container'
 import theme from '../../theme';
@@ -71,7 +71,7 @@ const Footer = ({ shellIx }) => {
         {shellIx !== null && (
           <StyledSocialIcon>
             <IconBox href={etherscan} target="_blank">
-              <img src={etherscanIcon}/>
+              <img alt="" src={etherscanIcon}/>
             </IconBox>
           </StyledSocialIcon>
         )}
