@@ -113,7 +113,7 @@ const StartModal = ({
 
     } else if (v.isGreaterThan(state.getIn([ 'shells', shellIx, 'assets', i, 'allowance', 'numeraire' ]))) {
 
-      setErrors(errors.set(i, 'Amount is greater than pool\'s allowance'))
+      setErrors(errors.set(i, 'Amount is greater than current allowance. Approve tokens first.'))
       setErrorsAllowance(errorsAllowance.set(i, true))
 
     } else {
