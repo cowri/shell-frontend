@@ -38,19 +38,30 @@ const PoolsTable = styled.div`
   margin-bottom: 40px;
 `
 
+const PoolsTableTh = styled.div`
+  flex: 1.5;
+  @media (max-width: 512px) {
+    flex: 2.5;
+  }
+`
+
 const ShellName = styled.span`
   align-items: center;
   display: flex;
-  flex: 1.3;
+  flex: 1.5;
   @media (max-width: 512px) {
+    flex: 2.5;
     flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: center;
   }
 `
 const Symbol = styled.span`
   text-align: center;
   display: inline;
   width: 100%;
-  font-size: 18px;
+  font-size: 14px;
   text-decoration: none;
   color: black;
 `
@@ -64,7 +75,7 @@ const Weight = styled.span`
 `
 const ShellNamePart = styled.span`
   margin: 4px;
-  padding-right: 8px;
+  padding-right: 4px;
   position: relative;
   :first-child {
     margin-left: 0;
@@ -195,7 +206,7 @@ const ShellsTab = ({showShell}) => {
       </StyledInfoBlock>
       <PoolsTable>
         <Row head>
-          <span style={{ flex: 1.3 }}>Pools</span>
+          <PoolsTableTh>Pools</PoolsTableTh>
           <span className="mobile-hide" style={{ flex: 0.7 }}>
             <Farming style={{opacity: '0'}}>farming</Farming>
           </span>
