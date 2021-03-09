@@ -22,6 +22,7 @@ const StyledButton = withTheme(styled.button`
   max-width: ${props => props.fullWidth ? '460px' : 'auto'};
   width: ${props => props.fullWidth ? '90%' : 'auto'};
   justify-content: center;
+  outline: none;
   &:hover {
     background-color: ${props => props.outlined && '#FFF'};
     border-color: ${props => props.outlined ? props.theme.palette.primary.main : 'transparent'};
@@ -37,6 +38,7 @@ const Button = ({
   withInput,
   small,
   fullWidth,
+  ...props
 }) => {
 
   return (
@@ -48,6 +50,7 @@ const Button = ({
       withInput={withInput}
       fullWidth={fullWidth}
       type="button"
+      {...props}
     >
       {children}
     </StyledButton>

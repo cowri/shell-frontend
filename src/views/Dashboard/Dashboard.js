@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import cookie from 'js-cookie'
 import randomWords from 'random-words'
 
-import Footer from '../../components/Footer'
 import Header from '../../components/Header'
 
 import withWallet from '../../containers/withWallet'
@@ -11,6 +10,8 @@ import withWallet from '../../containers/withWallet'
 import DashboardContent from './components/DashboardContent'
 
 import DashboardContext from './context'
+import Loader from '../../components/Loader';
+import Spinner from './components/DistributionTab/Spinner.js';
 
 const StyledDashboard = styled.div`
   align-items: center;
@@ -47,10 +48,9 @@ const Dashboard = ({
         engine,
         state,
       }}>
-          {/* <Intercom appID='zr42wlxq' user_id={userId} /> */}
           <StyledDashboard>
             <Header />
-            { loggedIn && web3 && <DashboardContent/> }
+            { loggedIn && web3 && (engine.shells.length && state.size ? <DashboardContent/> : <Spinner />)}
           </StyledDashboard>
       </DashboardContext.Provider>
     </>
