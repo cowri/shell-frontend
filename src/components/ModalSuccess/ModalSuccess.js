@@ -30,7 +30,7 @@ const ModalSuccess = ({
     const etherscanlink = config.network === 42
         ? "https://kovan.etherscan.io/tx/" + txHash
         : config.network === 4 ? "https://rinkeby.etherscan.io/tx/" + txHash
-            : config.network === 100 ? "https://blockscout.com/poa/xdai/tx/" + txHash
+            : config.network === 56 ? "https://bscscan.com/tx/" + txHash
                 : "https://etherscan.io/tx/" + txHash
 
     return (
@@ -45,7 +45,7 @@ const ModalSuccess = ({
                        rel="noopener noreferrer">
                         <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt=""/>
                         <span>
-                  View On Blockscout
+                  View On Explorer
                 </span>
                     </a>
                 </StyledViewOnEtherscan> : null

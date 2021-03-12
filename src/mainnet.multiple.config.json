@@ -1,12 +1,11 @@
 {
- "defaultWeb3Provider": "https://little-wispy-sun.xdai.quiknode.pro/b3fea81156c1abb58de12e3819e9de382216c99c",
- "infuraKey": "3c3dfdec6ce94abc935977aa995d1a8c",
+ "defaultWeb3Provider": "https://icy-small-sound.bsc.quiknode.pro/4baedf5d827d8d9c3c17aa08b0bc5dd8b1ce2378/",
  "blocknative": "70a8519d-1a7c-4bc5-bf62-5b38617208ff",
- "network": 100,
+ "network": 56,
  "pools": [
     {
-      "shell": "0x53De001bbfAe8cEcBbD6245817512F8DBd8EEF18",
-      "name": "50% USDP 25% WXDAI 25% USDc",
+      "shell": "0xcf76a0ceDf50DA184FDef08A9d04E6829D7FefDF",
+      "name": "50% USDP 25% BUSD 25% USDC",
       "displayDecimals": 2,
       "swapDecimals": 2,
       "tag": "STABLECOIN1",
@@ -14,7 +13,7 @@
       "farming": true,
       "assets": [
         {
-          "address": "0xFe7ed09C4956f7cdb54eC4ffCB9818Db2D7025b8",
+          "address": "0xDACD011A71f8c9619642bf482f1D4CeB338cfFCf",
           "decimals": 18,
           "icon": "usdp.png",
           "name": "Unit Protocol Stablecoin",
@@ -23,20 +22,20 @@
           "derivatives": [ ]
         },
         {
-          "address": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+          "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
           "decimals": 18,
-          "icon": "dai.svg",
-          "name": "Wrapped XDAI",
-          "symbol": "WXDAI",
+          "icon": "busd.svg",
+          "name": "BUSD",
+          "symbol": "BUSD",
           "weight": ".25",
           "derivatives": [ ]
         },
         {
-          "address": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-          "decimals": 6,
-          "icon": "usdc.svg",
-          "name": "USD Coin",
-          "symbol": "USDC",
+          "address": "0x55d398326f99059fF775485246999027B3197955",
+          "decimals": 18,
+          "icon": "usdt.svg",
+          "name": "USDT",
+          "symbol": "USDT",
           "weight": ".25",
           "derivatives": [ ]
         }
@@ -50,8 +49,8 @@
       }
     },
     {
-      "shell": "0xF82fc0ecBf3ff8e253a262447335d3d8A72CD028",
-      "name": "50% WXDAI 50% DAI",
+      "shell": "0x3Bb6Bf6EcBC71f8f78D1Eec9c91de4f8Fd5C891c",
+      "name": "45% BUSD 45% USDT 10% USDC",
       "displayDecimals": 2,
       "swapDecimals": 2,
       "tag": "STABLECOIN2",
@@ -59,83 +58,38 @@
       "farming": false,
       "assets": [
         {
-          "address": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
+          "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
           "decimals": 18,
-          "icon": "dai.svg",
-          "name": "Wrapped XDAI",
-          "symbol": "WXDAI",
-          "weight": ".5",
+          "icon": "busd.svg",
+          "name": "BUSD",
+          "symbol": "BUSD",
+          "weight": ".45",
           "derivatives": [ ]
         },
         {
-          "address": "0xFc8B2690F66B46fEC8B3ceeb95fF4Ac35a0054BC",
+          "address": "0x55d398326f99059fF775485246999027B3197955",
           "decimals": 18,
-          "icon": "dai.svg",
-          "name": "Dai Token on xDai",
-          "symbol": "DAI (BSC)",
-          "weight": ".5",
-          "derivatives": [ ]
-        }
-      ],
-      "params": {
-        "alpha": ".95",
-        "beta": ".45",
-        "delta": ".05",
-        "epsilon": ".002",
-        "lambda": "1"
-      }
-    },
-    {
-      "shell": "0xfbbd0F67cEbCA3252717E66c1Ed1E97ad8B06377",
-      "name": "25% DAI(bsc) 25% USDC(bsc) 25% USDC 25% WXDAI",
-      "displayDecimals": 2,
-      "swapDecimals": 2,
-      "tag": "STABLECOIN3",
-      "hideapy": true,
-      "farming": false,
-      "assets": [
-        {
-          "address": "0xFc8B2690F66B46fEC8B3ceeb95fF4Ac35a0054BC",
-          "decimals": 18,
-          "icon": "dai.svg",
-          "name": "Dai Token on xDai",
-          "symbol": "DAI (BSC)",
-          "weight": ".25",
+          "icon": "usdt.svg",
+          "name": "USDT",
+          "symbol": "USDT",
+          "weight": ".45",
           "derivatives": [ ]
         },
         {
-          "address": "0xD10Cc63531a514BBa7789682E487Add1f15A51E2",
+          "address": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
           "decimals": 18,
           "icon": "usdc.svg",
-          "name": "USD Coin on xDai",
-          "symbol": "USDC (BSC)",
-          "weight": ".25",
-          "derivatives": [ ]
-        },
-        {
-          "address": "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83",
-          "decimals": 6,
-          "icon": "usdc.svg",
-          "name": "USD Coin",
+          "name": "USDC",
           "symbol": "USDC",
-          "weight": ".25",
-          "derivatives": [ ]
-        },
-        {
-          "address": "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
-          "decimals": 18,
-          "icon": "dai.svg",
-          "name": "Wrapped XDAI",
-          "symbol": "WXDAI",
-          "weight": ".25",
+          "weight": ".10",
           "derivatives": [ ]
         }
       ],
       "params": {
         "alpha": ".95",
-        "beta": ".45",
+        "beta": ".25",
         "delta": ".05",
-        "epsilon": ".002",
+        "epsilon": ".0004",
         "lambda": "1"
       }
     }

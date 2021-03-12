@@ -119,7 +119,7 @@ const withWallet = (WrappedComponent) => {
               {
                 walletName: "walletConnect",
                 preferred: true,
-                rpc: { 100: config.defaultWeb3Provider },
+                rpc: { 56: config.defaultWeb3Provider },
                 bridge: 'https://bridge.walletconnect.org',
               },
             ]

@@ -47,7 +47,7 @@ const Footer = ({ shellIx }) => {
   if (shellIx !== null) {
     etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
       : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
-        : config.network === 100 ? 'https://blockscout.com/poa/xdai/address/' + config.pools[shellIx].shell
+        : config.network === 56 ? 'https://bscscan.com/address/' + config.pools[shellIx].shell
           : ''
   }
   return (
