@@ -473,7 +473,7 @@ const SwapTab = () => {
     ])
 
     allowance = asset.getIn(['allowance'])
-    balance = asset.getIn(['balance', 'numeraire']).toFixed(2)
+    balance = asset.getIn(['balance', 'numeraire']).toString()
 
     if ( allowance.get('numeraire').isGreaterThan(new BigNumber('100000000'))) {
       allowance = '100,000,000+'
