@@ -44,34 +44,16 @@ const StyledSwapTab = styled.div`
   width: 90%;
 `
 
-const StyledLabelBar = withTheme(styled.div`
-  align-items: flex-end;
-  display: flex;
-  height: 32px;
-  align-content: baseline;
-  margin-top: 24px;
-`)
-
 const StyledTokenInfo = withTheme(styled.div`
 `)
 
 const StyledCoinHint = withTheme(styled.div`
   text-align: right;
   margin-bottom: 5px;
-`)
-
-const StyledTitle = styled.div`
-  margin-left: 24px;
-  font-size: 24px;
-  margin-bottom: 4px;
-  align-items: center;
-`
-const StyledAvailability = withTheme(styled.div`
-  color: ${props => props.theme.palette.grey[500]};
-  margin-left: 8px;
-  font-size: 16px;
-  margin-bottom: 6.5px;
   cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `)
 
 const StyledInput = styled.div`
@@ -87,17 +69,6 @@ const StyledRows = styled.div`
   text-align: center;
 `
 
-const StyledActions = withTheme(styled.div`
-  align-items: center;
-  background-color: ${props => props.theme.palette.grey[50]};
-  display: flex;
-  height: 80px;
-  padding: 0 24px;
-  @media (max-width: 512px) {
-    padding: 0 12px;
-  }
-`)
-
 const SwapTab = () => {
 
   const {
@@ -105,10 +76,22 @@ const SwapTab = () => {
     engine
   } = useContext(DashboardContext)
 
+  function getInitOriginIx() {
+    const queryParams = new URLSearchParams(window.location.search);
+    const ix = queryParams.get('token0');
+    return ix || 0;
+  }
+
+  function getInitTargetIx() {
+    const queryParams = new URLSearchParams(window.location.search);
+    const ix = queryParams.get('token1');
+    return ix || 1 + engine.assets[0].derivatives.length;
+  }
+
   const [step, setStep] = useState('start')
   const [errorMessage, setErrorMessage] = useState('')
-  const [originIx, setOriginIx] = useState(0)
-  const [targetIx, setTargetIx] = useState(1 + engine.assets[0].derivatives.length)
+  const [originIx, setOriginIx] = useState(getInitOriginIx())
+  const [targetIx, setTargetIx] = useState(getInitTargetIx())
   const [originValue, setOriginValue] = useState('1.00')
   const [targetValue, setTargetValue] = useState('')
   const [ixs, setIxs] = useState(fromJS({'shell': 0, 'derivative': 0}))
@@ -117,11 +100,12 @@ const SwapTab = () => {
   const [haltMessage, setHaltMessage] = useState('')
   const [txHash, setTxHash] = useState('')
 
+
   const origin = engine.derivatives[originIx]
   const target = engine.derivatives[targetIx]
 
   const [unlocked, setUnlocked] = useState(
-    !state.getIn(['shells', 0, 'derivatives', 0, 'allowance', 'numeraire']).isZero()
+    !state.getIn(['shells', 0, 'derivatives', 0, 'allowance', 'numeraire'])?.isZero()
   )
 
   const sanitizeNumber = (number, decimals) => {
@@ -148,7 +132,6 @@ const SwapTab = () => {
       setTargetValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -158,7 +141,6 @@ const SwapTab = () => {
       setOriginValue('')
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -167,7 +149,6 @@ const SwapTab = () => {
 
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
-      setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
@@ -366,9 +347,17 @@ const SwapTab = () => {
 
     setOriginIx(v)
 
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set('token0', v)
+    window.history.replaceState(null, null, "?"+queryParams.toString());
+
     if (v == targetIx) {
 
       setTargetIx(originIx)
+
+      const queryParams = new URLSearchParams(window.location.search);
+      queryParams.set('token1', originIx)
+      window.history.replaceState(null, null, "?"+queryParams.toString());
 
     }
 
@@ -378,6 +367,10 @@ const SwapTab = () => {
 
       const find = asset => asset.symbol == overlaps[0]
       setTargetIx(engine.derivatives.findIndex(find))
+
+      const queryParams = new URLSearchParams(window.location.search);
+      queryParams.set('token1', engine.derivatives.findIndex(find))
+      window.history.replaceState(null, null, "?"+queryParams.toString());
 
     }
 
@@ -395,12 +388,21 @@ const SwapTab = () => {
 
     setTargetIx(v)
 
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set('token1', v)
+    window.history.replaceState(null, null, "?"+queryParams.toString());
+
   }
 
   const handleSwitch = () => {
 
     setOriginIx(targetIx)
     setTargetIx(originIx)
+
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set('token0', targetIx)
+    queryParams.set('token1', originIx)
+    window.history.replaceState(null, null, "?"+queryParams.toString());
 
   }
 
@@ -463,7 +465,6 @@ const SwapTab = () => {
   let asset
 
   if (ixs.get('shell') != null && ixs.get('derivative') != null) {
-
     asset = state.getIn([
       'shells',
       ixs.get('shell'),
@@ -472,7 +473,7 @@ const SwapTab = () => {
     ])
 
     allowance = asset.getIn(['allowance'])
-    balance = asset.getIn(['balance', 'display'])
+    balance = asset.getIn(['balance', 'numeraire']).toString()
 
     if ( allowance.get('numeraire').isGreaterThan(new BigNumber('100000000'))) {
       allowance = '100,000,000+'
@@ -566,15 +567,12 @@ const SwapTab = () => {
 
 
 const AmountInput = ({
-  allowance,
   balance,
   icon,
   error,
   helperText,
   onChange,
   styles,
-  title,
-  unlock,
   value,
   selections
 }) => {
@@ -583,8 +581,8 @@ const AmountInput = ({
     <StyledInput>
       <StyledTokenInfo>
         { balance ?
-          <StyledCoinHint>
-            Your balance:
+          <StyledCoinHint onClick={() => onChange({target: {value: balance}})}>
+            Max:
             <span className="number">&nbsp;{ balance }</span>
           </StyledCoinHint> : null }
       </StyledTokenInfo>

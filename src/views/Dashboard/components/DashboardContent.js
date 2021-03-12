@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, {useContext, useEffect, useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Container from '../../../components/Container'
 import Surface from '../../../components/Surface'
@@ -22,19 +22,51 @@ const DashboardContent = () => {
   const [shellsTab, setShellsTab] = useState('shells')
   const [shellIx, setShellIx] = useState(null)
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const currentTab = queryParams.get('tab');
+    const currentShellId = queryParams.get('shellId');
+    if (currentTab) {
+      if (currentTab !== 'shell') {
+        setActiveTab(currentTab)
+      } else {
+        setActiveTab(currentTab)
+        setShellIx(currentShellId || 0)
+      }
+    }
+  }, [])
+
   const showShell = (ix) => {
     setActiveTab('shell')
     setShellsTab('shell')
     setShellIx(ix)
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set('tab', 'shell')
+    queryParams.set('shellId', ix)
+    window.history.replaceState(null, null, `?${queryParams}`)
   }
 
   const shellTabClick = () => {
     if (activeTab === 'shell') {
       setShellsTab('shells')
       setActiveTab('shells')
-    } else if (activeTab === 'swap') {
+      storeTabTypeToUrl('shells')
+    } else {
       setActiveTab(shellsTab)
+      storeTabTypeToUrl(shellsTab)
     }
+  }
+
+  function tabClickAction(tabName) {
+    setActiveTab(tabName)
+    storeTabTypeToUrl(tabName)
+  }
+
+  function storeTabTypeToUrl(tabName) {
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set('tab', tabName)
+    queryParams.delete('shellId')
+    window.history.replaceState(null, null, `?${queryParams}`)
   }
 
   return (
@@ -60,7 +92,7 @@ const DashboardContent = () => {
             <Tab
               active={activeTab === 'swap'}
               disabled={!state.has('shells')}
-              onClick={() => setActiveTab('swap')}
+              onClick={() => tabClickAction('swap')}
             >
               Swap
             </Tab>
