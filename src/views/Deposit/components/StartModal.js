@@ -44,13 +44,32 @@ const StyledStartAdornment = styled.div`
 
 const StyledEndAdornment = styled.div`
   padding-left: 6px;
-  padding-right: 12px;
+  padding-right: 6px;
   margin: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  @media screen and (min-width: 512px) {
+    font-size: inherit;
+  }
+  span {
+    margin: 0 0 0 5px;
+    line-height: 1em;
+  }
 `
 
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
+`
+
+const MaxAmount = styled.div`
+  margin: 0 5px 0 auto;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
 `
 
 const StyledRows = styled.div`
@@ -62,6 +81,8 @@ const StyledLabelBar = withTheme(styled.div`
   display: flex;
   height: 32px;
   justify-content: space-between;
+  max-width: 460px;
+  margin: 0 auto;
 `)
 
 const StyledDepositMessage = styled.div`
@@ -72,6 +93,9 @@ const StyledDepositMessage = styled.div`
 const InputContainer = styled.div`
   display: flex;
   align-items: center;
+  position: relative;
+  max-width: 460px;
+  margin: 0 auto;
 `;
 
 const StartModal = ({
@@ -255,7 +279,7 @@ const StartModal = ({
   }
 
   const inputStyles = makeStyles({
-    inputBase: { fontSize: '20px', height: '60px' },
+    inputBase: { paddingLeft: '20px', fontSize: '20px', height: '60px' },
     helperText: {
       color: 'red',
       fontSize: '13px',
@@ -318,8 +342,8 @@ const StartModal = ({
       <ModalActions>
         <Button fullWidth outlined onClick={onDismiss}> Cancel </Button>
         <Devider />
-        <Button fullWidth
-          style={{cursor: 'no-drop'}}
+        <Button
+          fullWidth
           onClick={ () => setPrompting(true) }
           disabled={errors.filter((error) => error).size}
         >
@@ -346,10 +370,10 @@ const TokenInput = ({
 
   return ( <>
     <StyledLabelBar style={{ marginTop: '18px', marginBottom: '0px' }} >
-      <span>
-        Your balance:
-        <span className="number"> {Number(balance).toFixed(2)} </span>
-      </span>
+      <MaxAmount onClick={() => onChange({value: balance})}>
+        Max:
+        <span className="number"> {balance} </span>
+      </MaxAmount>
     </StyledLabelBar>
     <InputContainer>
       <NumberFormat
@@ -370,28 +394,31 @@ const TokenInput = ({
         InputProps={{
           className: styles.inputBase,
           style: isError ? { color: 'red' } : null,
-          endAdornment: <StyledEndAdornment>{symbol}</StyledEndAdornment>,
-          startAdornment: (
-            <StyledStartAdornment>
-              <TokenIcon> <img alt="" src={icon} /> </TokenIcon>
-            </StyledStartAdornment>
-          )
+          endAdornment: (
+            <StyledEndAdornment>
+              {isAllowanceError ? (
+                <Button
+                  small
+                  withInput
+                  onClick={onUnlock}
+                >
+                  Approve
+                </Button>
+              ) : balance !== value && balance != '0' ? (
+                <Button
+                  small
+                  withInput
+                  onClick={() => onChange({value: balance})}
+                >
+                  MAX
+                </Button>
+              ) : null}
+              <TokenIcon size='24'> <img alt={symbol} src={icon} /> </TokenIcon>
+              <span>{symbol}</span>
+            </StyledEndAdornment>
+          ),
         }}
       />
-      {isAllowanceError ? (
-        <Button
-          small
-          withInput
-          outlined
-          onClick={onUnlock}
-        >Approve</Button>
-      ) : (<Button
-          small
-          withInput
-          outlined
-          onClick={() => onChange({value: balance})}
-        >Max</Button>
-      )}
     </InputContainer>
   </>)
 }
