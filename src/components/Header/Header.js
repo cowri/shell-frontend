@@ -12,10 +12,23 @@ const StyledHeader = styled.div`
   justify-content: space-between;
 `
 
+const StyledHeaderLink = styled.a`
+  color: #ac0cee;
+  text-decoration: none;
+  font-size: 20px;
+  margin-right: 10px;
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
 const Header = () => (
   <Container>
     <StyledHeader>
       <Logo />
+      <div>
+        <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
+      </div>
     </StyledHeader>
   </Container>
 )

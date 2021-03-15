@@ -9,9 +9,7 @@ const StyledLogo = styled.div`
   font-size: 24px;
   font-weight: 700;
   @media screen and (max-width: 512px) {
-    margin: 0 auto;
-    align-items: center;
-    justify-content: center;
+    margin-left: 5px;
   }
 `
 
