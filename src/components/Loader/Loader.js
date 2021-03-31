@@ -6,7 +6,7 @@ const styles = theme => ({
     backgroundColor: theme.palette.primary.dark,
   },
   barColorPrimary: {
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: '#fff',
   },
 })
 
