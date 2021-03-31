@@ -11,7 +11,7 @@ const StyledModalActions = withTheme(styled.div`
   padding: 0 40px;
   @media screen and (max-width: 512px) {
     padding: 0;
-    margin: 20px;
+    margin: 20px 20px 50px;
   }
 `)
 

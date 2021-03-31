@@ -7,7 +7,8 @@ const StyledSurface = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: ${p => p.modal ? '4rem 0 0' : '0'};
+  padding: ${p => p.modal ? '3rem 0 0' : '0'};
+  
 `
 
 const Surface = ({ children, modal }) => (
