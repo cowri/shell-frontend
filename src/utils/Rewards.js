@@ -37,6 +37,8 @@ export default class Rewards {
   }
 
   async getClaimedStatus() {
-    this.isClaimed = await this.contract.methods.isClaimed(this.index).call();
+    if (rewardsData.claims[this.account]) {
+      this.isClaimed = await this.contract.methods.isClaimed(this.index).call();
+    }
   }
 }
