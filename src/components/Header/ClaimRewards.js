@@ -6,10 +6,10 @@ import {ClaimRewardsModal} from './ClaimRewardsModal.js';
 const ClaimRewardsContainer = styled.div`
   @media screen and (max-width: 600px) {
     width: 100%;
-  }
-  ${StyledButton} {
-    margin: 40px auto 0 !important;
-    justify-self: center !important;
+    ${StyledButton} {
+      margin: 40px auto 0 !important;
+      justify-self: center !important;
+    }
   }
 `
 
