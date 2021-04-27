@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
 
-const StyledButton = withTheme(styled.button`
+export const StyledButton = withTheme(styled.button`
   // position: ${props => props.withInput ? 'absolute' : 'initial'};
   // top: 15px;
   // right: 15px;

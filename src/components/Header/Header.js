@@ -9,8 +9,11 @@ import DashboardContext from '../../views/Dashboard/context.js';
 const StyledHeader = styled.div`
   align-items: center;
   display: flex;
-  height: 130px;
+  padding: 40px 0;
   justify-content: space-between;
+  @media screen and (max-width: 600px) {
+    flex-wrap: wrap;
+  }
 `
 
 const StyledHeaderLink = styled.a`

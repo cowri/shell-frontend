@@ -19,9 +19,19 @@ const ClaimModalParam = styled.div`
   font-size: 22px;
   span:first-child {
     font-weight: 600;
+    @media screen and (max-width: 600px) {
+      font-size: 18px;
+    }
   }
   span:last-child {
     margin-left: 20px;
+    @media screen and (max-width: 600px) {
+      margin-left: 0;
+    }
+  }
+  @media screen and (max-width: 600px) {
+    flex-direction: column;
+    font-size: 16px;
   }
 `
 
@@ -58,8 +68,8 @@ export function ClaimRewardsModal({onDismiss}) {
         <Modal onDismiss={onDismiss}>
           <ModalTitle>Claim Rewards</ModalTitle>
           <ModalContent>
-            <ClaimModalParam><span>Wallet:</span> <span>{engine.rewards.account}</span></ClaimModalParam>
-            <ClaimModalParam><span>Claimable:</span> <span>{new BigNumber(engine.rewards.amount).div(10 ** 18).toFixed(4)} CMP</span></ClaimModalParam>
+            <ClaimModalParam><span>Wallet:</span><span>{engine.rewards.account}</span></ClaimModalParam>
+            <ClaimModalParam><span>Claimable:</span><span>{new BigNumber(engine.rewards.amount).div(10 ** 18).toFixed(4)} CMP</span></ClaimModalParam>
           </ModalContent>
           <ModalActions>
             <Button outlined onClick={onDismiss}> Cancel </Button>
