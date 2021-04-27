@@ -10,7 +10,6 @@ import withWallet from '../../containers/withWallet'
 import DashboardContent from './components/DashboardContent'
 
 import DashboardContext from './context'
-import Loader from '../../components/Loader';
 import Spinner from './components/DistributionTab/Spinner.js';
 
 const StyledDashboard = styled.div`
