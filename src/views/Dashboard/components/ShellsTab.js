@@ -8,7 +8,6 @@ import BigNumber from 'bignumber.js';
 
 import DashboardContext from '../context'
 import {primary} from '../../../theme/colors.js';
-import theme from '../../../theme';
 import TokenIcon from '../../../components/TokenIcon';
 import {StyledTokenIcon} from '../../../components/TokenIcon/TokenIcon.js';
 
@@ -191,25 +190,10 @@ const ShellsTab = ({showShell}) => {
     <StyledShellsTab>
       <StyledInfoBlock>
 
-        <p className="title" style={{fontSize: '24px', fontWeight: 'bold'}}>
-          ANNOUNCEMENT: LIQUIDITY FARMING
-        </p>
-
-        <p style={{ textAlign: 'left', fontSize: '20px' }}>
-          Some of pools listed below are incentivized with upcoming CMP governance token. The distribution will be applied retrospectively.
-        </p>
-
-        <p style={{ textAlign: 'left', fontSize: '20px', marginTop: '-7px' }}>
-          Track your share: <a style={{ color: theme.palette.primary.main}} target="_blank" rel="noopener noreferrer" href="https://distribution.component.finance">rewards estimation page</a>
-        </p>
-
       </StyledInfoBlock>
       <PoolsTable>
         <Row head>
           <PoolsTableTh>Pools</PoolsTableTh>
-          <span className="mobile-hide" style={{ flex: 0.7 }}>
-            <Farming style={{opacity: '0'}}>farming</Farming>
-          </span>
           <span style={{ flex: 1.2, textAlign: 'left' }}>Liquidity</span>
           <span style={{ flex: 1, textAlign: 'right' }}>Your Balance</span>
         </Row>
