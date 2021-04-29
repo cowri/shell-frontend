@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import RewardABI from '../abi/Rewards.abi.json';
 import config from '../mainnet.multiple.config';
 import rewardsData from '../distr_mainnet.json';

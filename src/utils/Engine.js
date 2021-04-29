@@ -357,6 +357,7 @@ export default class Engine extends SwapEngine {
 
     assets = assets.filter(filter, new Set());
     derivatives = derivatives.filter(filter, new Set());
+
     rewards = new Rewards(this.web3, account);
     await rewards.getClaimedStatus()
     this.rewards = rewards
