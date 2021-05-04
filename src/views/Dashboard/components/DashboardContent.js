@@ -12,6 +12,7 @@ import SwapTab from './SwapTab/SwapTab.js'
 import DashboardContext from '../context'
 import Footer from '../../../components/Footer';
 import {faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons/faArrowCircleLeft.js';
+import StakingTab from './StakingTab/StakingTab.js';
 
 
 const DashboardContent = () => {
@@ -96,10 +97,17 @@ const DashboardContent = () => {
             >
               Swap
             </Tab>
+            <Tab
+              active={activeTab === 'stake'}
+              onClick={() => tabClickAction('stake')}
+            >
+              Stake
+            </Tab>
           </Tabs>
           { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
           { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
           { activeTab === 'swap' && <SwapTab /> }
+          { activeTab === 'stake' && <StakingTab />}
         </Surface>
       </Container>
       <Footer shellIx={shellIx}/>
