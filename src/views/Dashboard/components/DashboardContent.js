@@ -13,6 +13,7 @@ import DashboardContext from '../context'
 import Footer from '../../../components/Footer';
 import {faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons/faArrowCircleLeft.js';
 import StakingTab from './StakingTab/StakingTab.js';
+import {StackTab} from './StackTab';
 
 
 const DashboardContent = () => {
@@ -21,6 +22,8 @@ const DashboardContent = () => {
 
   const [activeTab, setActiveTab] = useState('shells')
   const [shellsTab, setShellsTab] = useState('shells')
+  const [stacksTab, setStacksTab] = useState('stacks')
+  const [selectedStackAddress, setSelectedStackAddress] = useState(null)
   const [shellIx, setShellIx] = useState(null)
 
   useEffect(() => {
@@ -47,6 +50,16 @@ const DashboardContent = () => {
     window.history.replaceState(null, null, `?${queryParams}`)
   }
 
+  function showStack(stackAddress) {
+    setActiveTab('stack')
+    setStacksTab('stack')
+    setSelectedStackAddress(stackAddress)
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set('tab', 'stack')
+    queryParams.set('address', stackAddress)
+    window.history.replaceState(null, null, `?${queryParams}`)
+  }
+
   const shellTabClick = () => {
     if (activeTab === 'shell') {
       setShellsTab('shells')
@@ -55,6 +68,17 @@ const DashboardContent = () => {
     } else {
       setActiveTab(shellsTab)
       storeTabTypeToUrl(shellsTab)
+    }
+  }
+
+  const stackTabClick = () => {
+    if (activeTab === 'stack') {
+      setStacksTab('stacks')
+      setActiveTab('stacks')
+      storeTabTypeToUrl('stacks')
+    } else {
+      setActiveTab(stacksTab)
+      storeTabTypeToUrl(stacksTab)
     }
   }
 
@@ -67,6 +91,7 @@ const DashboardContent = () => {
     const queryParams = new URLSearchParams(window.location.search);
     queryParams.set('tab', tabName)
     queryParams.delete('shellId')
+    queryParams.delete('address')
     window.history.replaceState(null, null, `?${queryParams}`)
   }
 
@@ -98,16 +123,25 @@ const DashboardContent = () => {
               Swap
             </Tab>
             <Tab
-              active={activeTab === 'stake'}
-              onClick={() => tabClickAction('stake')}
+              active={activeTab === 'stacks' || activeTab === 'stack'}
+              onClick={stackTabClick}
             >
-              Stake
+              { activeTab !== 'stack'
+                ? 'Yield'
+                : (
+                  <a style={{display: 'flex', alignItems: 'center'}}>
+                    <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
+                    <span>Yield</span>
+                  </a>
+                )
+              }
             </Tab>
           </Tabs>
           { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
           { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
           { activeTab === 'swap' && <SwapTab /> }
-          { activeTab === 'stake' && <StakingTab />}
+          { activeTab === 'stacks' && <StakingTab showStack={showStack} />}
+          { activeTab === 'stack' && <StackTab stackAddress={selectedStackAddress}/>}
         </Surface>
       </Container>
       <Footer shellIx={shellIx}/>

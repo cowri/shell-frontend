@@ -8,9 +8,9 @@ import tinyShellIcon from '../../../assets/logo.png'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
-import ModalActions from '../../../components/ModalActions'
-import ModalContent from '../../../components/ModalContent'
-import ModalTitle from '../../../components/ModalTitle'
+import ModalActions from '../../../components/Modal/ModalActions'
+import ModalContent from '../../../components/Modal/ModalContent'
+import ModalTitle from '../../../components/Modal/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
 
 import NumberFormat from 'react-number-format'
@@ -81,7 +81,6 @@ const StyledLabelBar = withTheme(styled.div`
   display: flex;
   height: 32px;
   justify-content: space-between;
-  max-width: 460px;
   margin: 0 auto;
 `)
 
@@ -94,7 +93,6 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
   position: relative;
-  max-width: 460px;
   margin: 0 auto;
 `;
 
@@ -330,7 +328,7 @@ const StartModal = ({
           tag={engine.shells[shellIx].tag}
           onCancel={ () => setPrompting(false) }
           onContinue={handleSubmit} /> }
-      <ModalTitle> Deposit Funds </ModalTitle>
+      <ModalTitle>Deposit Funds</ModalTitle>
       <ModalContent>
         <StyledForm>
           <StyledRows>

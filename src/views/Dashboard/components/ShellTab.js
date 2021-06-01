@@ -15,6 +15,7 @@ import Deposit from '../../Deposit'
 import Withdraw from '../../Withdraw'
 
 import DashboardContext from '../context'
+import {TabActions, TabContainer} from '../../../components/TabContainer/styled.js';
 
 const StyledShellTab = styled.div`
   display: flex;
@@ -70,9 +71,7 @@ const StyledActions = withTheme(styled.div`
   }
 `)
 
-const StyledRows = styled.div`
-  margin-bottom: 12px;
-`
+const StyledRows = styled.div``
 
 const ShellTab = ({ shellIx }) => {
 
@@ -114,7 +113,7 @@ const ShellTab = ({ shellIx }) => {
   return ( <>
     { presentDeposit && <Deposit shellIx={shellIx} onDismiss={() => setPresentDeposit(false)} />}
     { presentWithdraw && <Withdraw shellIx={shellIx} onDismiss={() => setPresentWithdraw(false)} />}
-    <StyledShellTab>
+    <TabContainer>
       <Overview>
         <OverviewSection>
           <LabelledValue label="Pool Reserves" value={ liqTotal} />
@@ -131,12 +130,12 @@ const ShellTab = ({ shellIx }) => {
         </Row>
         { rows }
       </StyledRows>
-      <StyledActions>
+      <TabActions>
         <Button onClick={setPresentDeposit} fullWidth>Deposit</Button>
         <Devider />
         <Button outlined onClick={setPresentWithdraw} fullWidth>Withdraw</Button>
-      </StyledActions>
-    </StyledShellTab>
+      </TabActions>
+    </TabContainer>
   </> )
 }
 

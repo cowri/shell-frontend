@@ -9,7 +9,7 @@ const StyledRow = withTheme(styled.div`
   font-weight: ${props => props.head ? 600 : 400};
   height: ${props => props.head ? 40 : 80}px;
   margin: 0;
-  padding: 0 40px;
+  padding: 0;
   font-size: ${p => p.head ? '20px' : 'inherit'};
   @media (max-width: 512px) {
     height: ${props => props.head ? 26 : 65}px;

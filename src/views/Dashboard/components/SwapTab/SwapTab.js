@@ -6,11 +6,11 @@ import BigNumber from 'bignumber.js'
 
 import DashboardContext from '../../context.js'
 
-import ModalConfirm from '../../../../components/ModalConfirm'
-import ModalError from '../../../../components/ModalError'
-import ModalSuccess from '../../../../components/ModalSuccess'
-import ModalTx from '../../../../components/ModalAwaitingTx'
-import ModalUnlock from '../../../../components/ModalUnlock'
+import ModalConfirm from '../../../../components/Modal/ModalConfirm'
+import ModalError from '../../../../components/Modal/ModalError'
+import ModalSuccess from '../../../../components/Modal/ModalSuccess'
+import ModalTx from '../../../../components/Modal/ModalAwaitingTx'
+import ModalUnlock from '../../../../components/Modal/ModalUnlock'
 import NumberFormat from 'react-number-format'
 
 import TextField from '@material-ui/core/TextField'
@@ -21,6 +21,7 @@ import Button from '../../../../components/Button'
 
 import TokenIcon from '../../../../components/TokenIcon'
 import {SwapDirectionIcon} from './SwapDirectionIcon/SwapDirectionIcon.js';
+import {TabActions, TabContainer} from '../../../../components/TabContainer/styled.js';
 
 const DEFAULT_MSG = "Your price for this trade will be..."
 const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
@@ -44,8 +45,7 @@ const StyledSwapTab = styled.div`
   width: 90%;
 `
 
-const StyledTokenInfo = withTheme(styled.div`
-`)
+const StyledTokenInfo = withTheme(styled.div``)
 
 const StyledCoinHint = withTheme(styled.div`
   text-align: right;
@@ -56,8 +56,7 @@ const StyledCoinHint = withTheme(styled.div`
   }
 `)
 
-const StyledInput = styled.div`
-`
+const StyledInput = styled.div``
 const StyledMessage = styled.div`
   font-size: 20px;
   padding: 30px;
@@ -407,7 +406,7 @@ const SwapTab = () => {
   }
 
   const selectionCss = makeStyles({
-    root: { 'fontFamily': 'Metric, Arial, sans-serif;', 'fontSize': '17.5px' }
+    root: { 'fontFamily': 'Metric, Arial, sans-serif', 'fontSize': '17.5px' }
   })()
 
   const selections = engine.derivatives.map( (asset, ix) => {
@@ -432,12 +431,15 @@ const SwapTab = () => {
 
   const getDropdown = (handler, selections, value) => {
 
-    return ( <TextField select
-      InputProps={{ className: selectionCss.root }}
-      children={selections}
-      onChange={e => handler(e.target.value)}
-      value={value}
-    /> )
+    return (
+      <TextField
+        select
+        InputProps={{ className: selectionCss.root }}
+        children={selections}
+        onChange={e => handler(e.target.value)}
+        value={value}
+      />
+    )
 
   }
 
@@ -488,7 +490,7 @@ const SwapTab = () => {
   return (
     <>
 
-    <StyledSwapTab>
+    <TabContainer>
 
       { step === 'unlocking' && <ModalUnlock
           coin={state.getIn(['shells', ixs.get('shell'), 'derivatives', ixs.get('derivative') ])}
@@ -545,13 +547,12 @@ const SwapTab = () => {
           value={targetValue}
         />
       </StyledRows>
-    </StyledSwapTab>
-      {asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue ?
+      <TabActions>
+        {asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue ?
           (<Button
             fullWidth
             disabled={!targetValue || !originValue || errorMessage}
             onClick={handleSwap}
-            style={{ marginTop: '40px' }}
           >
             Execute
           </Button>)
@@ -559,8 +560,10 @@ const SwapTab = () => {
             <Button onClick={() => handleUnlock(MAX)} fullWidth>
               Approve {origin.symbol}
             </Button>
-          ))}
-    <div style={{ width: 12 }} />
+          )
+        )}
+      </TabActions>
+    </TabContainer>
   </>
   )
 }
@@ -608,7 +611,7 @@ const AmountInput = ({
             </StyledStartAdornment>
           ),
           endAdornment: (
-            <div style={{ marginRight: 6, fontFamily: 'Metric, Arial, sans-serif;' }}>
+            <div style={{ marginRight: 6, fontFamily: 'Metric, Arial, sans-serif' }}>
               { selections }
             </div>
           ),

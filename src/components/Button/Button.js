@@ -3,9 +3,6 @@ import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
 
 export const StyledButton = withTheme(styled.button`
-  // position: ${props => props.withInput ? 'absolute' : 'initial'};
-  // top: 15px;
-  // right: 15px;
   align-items: center;
   background: ${props => props.outlined ? '#e9cff9' : '#ff42a1'};
   border: none;
@@ -20,7 +17,7 @@ export const StyledButton = withTheme(styled.button`
   transition: background-color .2s, border-color .2s;
   pointer-events: ${props => props.disabled ? 'none' : 'all'};
   opacity: ${props => props.disabled ? 0.8 : 1};
-  margin: ${props => props.fullWidth ? '20px auto 70px' : props.withInput ? '0 12px 0 0' : ''};
+  margin: ${props => props.withInput ? '0 12px 0 0' : ''};
   max-width: ${props => props.fullWidth ? '460px' : 'auto'};
   width: ${props => props.fullWidth ? '90%' : 'auto'};
   justify-content: center;
@@ -34,7 +31,7 @@ export const StyledButton = withTheme(styled.button`
   @media screen and (min-width: 512px) {
     height: ${props => props.withInput ? 30 : props.small ? 32 : 60}px;
     padding: 0 ${props => props.withInput ? 12 : props.small ? 30 : 32}px;
-    font-size: ${props => props.small ? '1rem' : '1.2rem'};
+    font-size: ${props => props.small ? '12px' : '1.2rem'};
   }
 `)
 

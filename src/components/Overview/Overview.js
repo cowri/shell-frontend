@@ -9,8 +9,7 @@ const StyledOverview = withTheme(styled.div`
   flex: 1;
   font-size: 36px;
   justify-content: space-between;
-  margin: 30px 24px 24px 24px;
-  padding: 24px 0;
+  margin: 0 0 24px 0;
   @media (max-width: 512px) {
     margin: 24px 0;
     padding: 12px 0;

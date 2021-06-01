@@ -163,7 +163,7 @@ const ShellsTab = ({showShell}) => {
 
       rows.push(
         <ShellRow
-          key={i}
+          key={`${i}_${engine.shells[i].assets.address}`}
           showShell={() => showShell(i)}
           assets={engine.shells[i].assets}
           liqTotal={liqTotal}
@@ -197,22 +197,18 @@ const ShellRow = ({showShell, liqTotal, liqOwned, assets}) => {
       <ShellName>
         <ShellNameBody>
           {assets.map((asset) => (
-            <>
-              <ShellNamePart key={asset.symbol}>
-                <Symbol>
-                  { asset.symbol }
-                </Symbol>
-                <TokenIcon size={24}> <img src={asset.icon} alt="" /> </TokenIcon>
-                <Weight>
-                  { asset.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
-                </Weight>
-              </ShellNamePart>
-            </>
+            <ShellNamePart key={asset.symbol}>
+              <Symbol>
+                { asset.symbol }
+              </Symbol>
+              <TokenIcon size={24}> <img src={asset.icon} alt="" /> </TokenIcon>
+              <Weight>
+                { asset.weight.multipliedBy(new BigNumber(100)).toString() + '%' }
+              </Weight>
+            </ShellNamePart>
           ))}
         </ShellNameBody>
       </ShellName>
-      <StyledBalance className="mobile-hide" style={{ flex: 0.7 }}>
-      </StyledBalance>
       <StyledBalance className="number" style={{justifyContent: 'flex-start', flex: '1.2'}}> { liqTotal } </StyledBalance>
       <StyledBalance className="number" style={{justifyContent: 'flex-end', flex: '1'}}> { liqOwned } </StyledBalance>
     </StyledRow>
