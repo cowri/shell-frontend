@@ -44,7 +44,7 @@
         "alpha": ".95",
         "beta": ".45",
         "delta": ".05",
-        "epsilon": "0",
+        "epsilon": ".0004",
         "lambda": "1"
       }
     },
@@ -87,7 +87,7 @@
       ],
       "params": {
         "alpha": ".95",
-        "beta": ".25",
+        "beta": ".45",
         "delta": ".05",
         "epsilon": ".0004",
         "lambda": "1"
