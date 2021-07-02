@@ -5,6 +5,7 @@ import Container from '../Container'
 import Logo from '../Logo'
 import {ClaimRewards} from './ClaimRewards.js';
 import DashboardContext from '../../views/Dashboard/context.js';
+import Button from '../Button';
 
 const StyledHeader = styled.div`
   align-items: center;
@@ -28,12 +29,13 @@ const StyledHeaderLink = styled.a`
 `
 
 const Header = () => {
-  const {engine} = useContext(DashboardContext)
+  const {engine, loggedIn, selectWallet, disconnect} = useContext(DashboardContext)
   return (
     <Container>
       <StyledHeader>
         <Logo />
         <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
+        <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
         {engine && engine.rewards.amount && !engine.rewards.isClaimed && <ClaimRewards />}
       </StyledHeader>
     </Container>
