@@ -16,5 +16,6 @@ export default React.createContext({
   web3: undefined,
   engine: {},
   state: {},
-  login: {}
+  login: {},
+  rewards: {},
 })

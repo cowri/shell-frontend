@@ -10,7 +10,6 @@ import withWallet from '../../containers/withWallet'
 import DashboardContent from './components/DashboardContent'
 
 import DashboardContext from './context'
-import Loader from '../../components/Loader';
 import Spinner from './components/DistributionTab/Spinner.js';
 
 const StyledDashboard = styled.div`
@@ -28,7 +27,9 @@ const Dashboard = ({
   web3,
   engine,
   state,
-  loggedIn
+  loggedIn,
+  selectWallet,
+  disconnect,
 }) => {
 
   let userId = cookie.get('userId')
@@ -47,10 +48,13 @@ const Dashboard = ({
         web3,
         engine,
         state,
+        loggedIn,
+        selectWallet,
+        disconnect,
       }}>
           <StyledDashboard>
             <Header />
-            { loggedIn && web3 && (engine.shells.length && state.size ? <DashboardContent/> : <Spinner />)}
+            { web3 && (engine.shells.length && state.size ? <DashboardContent/> : <Spinner />)}
           </StyledDashboard>
       </DashboardContext.Provider>
     </>

@@ -1,36 +1,44 @@
-import React from 'react'
+import React, {useContext} from 'react';
 import styled from 'styled-components'
 
 import Container from '../Container'
 import Logo from '../Logo'
+import {ClaimRewards} from './ClaimRewards.js';
+import DashboardContext from '../../views/Dashboard/context.js';
+import Button from '../Button';
 
 const StyledHeader = styled.div`
   align-items: center;
-  color: #FFF;
   display: flex;
-  height: 130px;
+  padding: 40px 0;
   justify-content: space-between;
+  @media screen and (max-width: 600px) {
+    flex-wrap: wrap;
+  }
 `
 
 const StyledHeaderLink = styled.a`
   color: #ac0cee;
   text-decoration: none;
   font-size: 20px;
-  margin-right: 10px;
+  margin-right: 20px;
+  margin-left: auto;
   &:hover {
     text-decoration: underline;
   }
 `
 
-const Header = () => (
-  <Container>
-    <StyledHeader>
-      <Logo />
-      <div>
+const Header = () => {
+  const {loggedIn, selectWallet, disconnect} = useContext(DashboardContext)
+  return (
+    <Container>
+      <StyledHeader>
+        <Logo />
         <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
-      </div>
-    </StyledHeader>
-  </Container>
-)
+        <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
+      </StyledHeader>
+    </Container>
+  )
+}
 
 export default Header

@@ -5,8 +5,8 @@ import Surface from '../../../components/Surface'
 import Tab from '../../../components/Tab'
 import Tabs from '../../../components/Tabs'
 
-import ShellTab from './ShellTab'
-import ShellsTab from './ShellsTab'
+import {ShellTab} from './ShellTab'
+import {ShellsTab} from './ShellsTab';
 import SwapTab from './SwapTab/SwapTab.js'
 
 import DashboardContext from '../context'
