@@ -54,7 +54,7 @@ const Dashboard = ({
       }}>
           <StyledDashboard>
             <Header />
-            { web3 && (engine.shells.length && state.size ? <DashboardContent/> : <Spinner />)}
+            { (web3 && engine.shells.length && state.size) ? <DashboardContent/> : <Spinner />}
           </StyledDashboard>
       </DashboardContext.Provider>
     </>

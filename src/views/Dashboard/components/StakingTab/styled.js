@@ -7,6 +7,9 @@ export const StakeItemContainer = styled.div`
   font-weight: ${(p) => p.th ? 'bold' : 'normal'};
   font-size: ${(p) => p.th ? '20px' : '22px'};
   padding: 12px 0;
+  @media (max-width: 512px) {
+    font-size: ${p => p.head ? '16px' : 'inherit'};
+  }
 `
 
 export const StakeItemTd = styled.div`

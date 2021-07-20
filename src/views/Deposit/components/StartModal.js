@@ -81,6 +81,7 @@ const StyledLabelBar = withTheme(styled.div`
   display: flex;
   height: 32px;
   justify-content: space-between;
+  max-width: 460px;
   margin: 0 auto;
 `)
 
@@ -93,6 +94,7 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
   position: relative;
+  max-width: 460px;
   margin: 0 auto;
 `;
 

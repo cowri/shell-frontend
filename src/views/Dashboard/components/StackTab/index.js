@@ -13,7 +13,11 @@ export function StackTab({stackAddress}) {
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showClaimModal, setShowClaimModal] = useState(false)
 
-  const {state} = useContext(DashboardContext)
+  const {
+    state,
+    loggedIn,
+    selectWallet,
+  } = useContext(DashboardContext)
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -35,21 +39,28 @@ export function StackTab({stackAddress}) {
           <p>APR: {stack.apr}%</p>
           <p>Claimable: {stack.CMPEarned.display}</p>
           <TabActions>
-            <Button
-              fullWidth
-              onClick={() => setShowDepositModal(true)}
-            >
-              Deposit
-            </Button>
-            <Button
-              fullWidth
-              onClick={() => stack.claim()} onDismiss={() => setShowClaimModal(false)}
-            >Claim</Button>
-            <Button
-              outlined
-              fullWidth
-              onClick={() => setShowWithdrawModal(true)}
-            >Withdraw</Button>
+            {loggedIn &&
+              <Button
+                fullWidth
+                onClick={() => setShowDepositModal(true)}
+              >
+                Deposit
+              </Button>
+            }
+            {loggedIn && stack.CMPEarned.numeraire.gt(0) &&
+                <Button
+                  fullWidth
+                  onClick={() => stack.claim()} onDismiss={() => setShowClaimModal(false)}
+                >Claim</Button>
+              }
+            {loggedIn && stack.userLockedValue?.numeraire.gt(0) &&
+                <Button
+                  outlined
+                  fullWidth
+                  onClick={() => setShowWithdrawModal(true)}
+                >Withdraw</Button>
+              }
+            {!loggedIn && <Button onClick={selectWallet} fullWidth>Connect</Button>}
           </TabActions>
         </>
       ) : (

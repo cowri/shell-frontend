@@ -6,6 +6,7 @@ import {AmountInput} from '../../../../../components/AmountInput';
 import Button from '../../../../../components/Button';
 import BigNumber from 'bignumber.js';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
+import {Devider} from '../../ShellTab/styled.js';
 
 export function StackTabWithdrawModal({onDismiss, stack}) {
   const [withdrawValue, setWithdrawValue] = useState('0');
@@ -47,6 +48,7 @@ export function StackTabWithdrawModal({onDismiss, stack}) {
       </ModalRow>
       <ModalActions>
         <Button fullWidth disabled={error} onClick={withdrawAction}>Withdraw</Button>
+        <Devider />
         <Button fullWidth outlined onClick={onDismiss}>Cancel</Button>
       </ModalActions>
     </Modal>

@@ -358,6 +358,7 @@ const StartModal = ({
       </ModalContent>
       <ModalActions>
         <Button fullWidth onClick={onDismiss} outlined >Cancel</Button>
+        <Devider />
         <Button fullWidth onClick={handleSubmit}
           style={ error ? { cursor: 'no-drop'} : null }
           disabled={ error || zero }

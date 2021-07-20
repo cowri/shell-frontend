@@ -6,6 +6,7 @@ import {AmountInput} from '../../../../../components/AmountInput';
 import Button from '../../../../../components/Button';
 import BigNumber from 'bignumber.js';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
+import {Devider} from '../../ShellTab/styled.js';
 
 export function StackTabDepositModal({onDismiss, stack}) {
   const [depositValue, setDepositValue] = useState('0');
@@ -30,13 +31,11 @@ export function StackTabDepositModal({onDismiss, stack}) {
       <ModalTitle>Deposit Funds</ModalTitle>
       <ModalRow>
         <AmountInput
-          balance={stack.underlyingBalance.display.toString()}
-          // icon={asset.icon}
+          balance={stack.underlyingBalance.numeraire.toString()}
           isError={ !!error }
           isAllowanceError={error === allowanceErrorMessage}
           helperText={ error }
           onChange={payload => setDepositValue(payload.value) }
-          // styles={inputStyles}
           symbol={'CMP-LP'}
           value={depositValue}
           onUnlock={() => stack.approve()}
@@ -44,6 +43,7 @@ export function StackTabDepositModal({onDismiss, stack}) {
       </ModalRow>
       <ModalActions>
         <Button fullWidth disabled={error} onClick={() => stack.deposit(depositValue)}>Deposit</Button>
+        <Devider />
         <Button fullWidth outlined onClick={onDismiss}>Cancel</Button>
       </ModalActions>
     </Modal>

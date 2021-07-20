@@ -32,8 +32,9 @@ const StyledStartAdornment = styled.div`
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  padding-left: 22px;
-  padding-right: 12px;
+  padding-left: 24px;
+  padding-right: 14px;
+  flex-shrink: 0;
 `
 
 const StyledSwapTab = styled.div`

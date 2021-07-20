@@ -24,6 +24,7 @@ export function AmountInput({
     inputBase: {
       fontSize: '20px',
       height: '60px',
+      paddingLeft: '20px',
     },
     helperText: {
       color: 'red',

@@ -104,7 +104,7 @@
       "icon": "logo.png",
       "displayDecimals": 4,
       "decimals": 18,
-      "monthRewards": 100000
+      "monthRewards": 8220
     },
     {
       "managerAddress": "0x2BE4d20b9eeB7d625FA68112568F94c615Af376B",
@@ -113,7 +113,7 @@
       "icon": "logo.png",
       "displayDecimals": 4,
       "decimals": 18,
-      "monthRewards": 100000
+      "monthRewards": 8220
     }
   ]
 }

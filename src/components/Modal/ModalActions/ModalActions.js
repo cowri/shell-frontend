@@ -7,19 +7,13 @@ const StyledModalActions = withTheme(styled.div`
   align-items: center;
   display: flex;
   justify-content: space-around;
-  margin: 40px 0 0;
+  margin: 40px 40px 20px;
   min-height: 48px;
-  @media (max-width: 512px) {
-    flex-direction: column;
-  }
   ${StyledButton} {
     margin: 0;
   }
-  ${StyledButton}:not(:last-child) {
-    margin-right: 2rem;
-    @media (max-width: 512px) {
-      margin: 0 0 2rem;
-    }
+  @media (max-width: 512px) {
+    margin: 20px;
   }
 `)
 

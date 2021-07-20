@@ -17,12 +17,7 @@ theme.overrides = {
     root: {
       background: '#e9cff9',
       borderRadius: theme.shape.borderRadius,
-      paddingLeft: '20px',
     },
-    inputBase: {
-      height: '60px',
-      fontSize: '20px'
-    }
   },
   MuiButton: {
     disabled: {
