@@ -16,6 +16,7 @@ export default function StakingTab({showStake}) {
       <StakeItemContainer th>
         <StakeItemTd>Pool</StakeItemTd>
         <StakeItemTd>Assets</StakeItemTd>
+        <StakeItemTd>My deposit</StakeItemTd>
         <StakeItemTd>APR</StakeItemTd>
       </StakeItemContainer>
       {state.get('staking') && state.get('staking').stakes && Object.values(state.get('staking').stakes).map((stake) => (
