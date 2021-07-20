@@ -6,11 +6,11 @@ import ModalActions from '../Modal/ModalActions';
 import Button from '../Button';
 import ModalTitle from '../Modal/ModalTitle';
 import ModalContent from '../Modal/ModalContent';
-import BigNumber from 'bignumber.js';
 import ModalConfirm from '../Modal/ModalConfirm';
 import ModalError from '../Modal/ModalError';
 import WithdrawingModal from '../Modal/ModalAwaitingTx/ModalAwaitingTx.js';
 import ModalSuccess from '../Modal/ModalSuccess';
+import BN from '../../utils/BN.js';
 
 const ClaimModalParam = styled.div`
   display: flex;
@@ -69,7 +69,7 @@ export function ClaimRewardsModal({onDismiss}) {
           <ModalTitle>Claim Rewards</ModalTitle>
           <ModalContent>
             <ClaimModalParam><span>Wallet:</span><span>{engine.rewards.account}</span></ClaimModalParam>
-            <ClaimModalParam><span>Claimable:</span><span>{new BigNumber(engine.rewards.amount).div(10 ** 18).toFixed(4)} CMP</span></ClaimModalParam>
+            <ClaimModalParam><span>Claimable:</span><span>{BN(engine.rewards.amount).div(10 ** 18).toFixed(4)} CMP</span></ClaimModalParam>
           </ModalContent>
           <ModalActions>
             <Button outlined onClick={onDismiss}> Cancel </Button>

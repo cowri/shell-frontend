@@ -1,7 +1,7 @@
 import NumericFormats from './NumberFormats.js';
 import StakingManagerABI from '../abi/StakingManager.abi.json'
 import ERC20ABI from '../abi/ERC20.abi.json';
-import BigNumber from 'bignumber.js';
+import BN from './BN.js';
 
 export class Stake extends NumericFormats {
   /**
@@ -38,19 +38,19 @@ export class Stake extends NumericFormats {
   }
 
   async getUserUnderlyingTokensBalance() {
-    const userLockedValue = new BigNumber(await this.managerContract.methods.balanceOf(this.account).call());
+    const userLockedValue = BN(await this.managerContract.methods.balanceOf(this.account).call());
     this.userLockedValue = this.getAllFormatsFromRaw(userLockedValue);
 
-    const underlyingBalance = new BigNumber(await this.underlyingPoolContract.methods.balanceOf(this.account).call());
+    const underlyingBalance = BN(await this.underlyingPoolContract.methods.balanceOf(this.account).call());
     this.underlyingBalance = this.getAllFormatsFromRaw(underlyingBalance);
 
-    const allowance = new BigNumber(await this.underlyingPoolContract.methods.allowance(this.account, this.managerAddress).call());
+    const allowance = BN(await this.underlyingPoolContract.methods.allowance(this.account, this.managerAddress).call());
     this.allowance = this.getAllFormatsFromRaw(allowance);
 
-    const totalLockedValue = new BigNumber(await this.underlyingPoolContract.methods.balanceOf(this.managerAddress).call());
+    const totalLockedValue = BN(await this.underlyingPoolContract.methods.balanceOf(this.managerAddress).call());
     this.totalLockedValue = this.getAllFormatsFromRaw(totalLockedValue);
 
-    const CMPEarned = new BigNumber(await this.managerContract.methods.earned(this.account).call())
+    const CMPEarned = BN(await this.managerContract.methods.earned(this.account).call())
     this.CMPEarned = this.getAllFormatsFromRaw(CMPEarned)
   }
 
@@ -59,7 +59,7 @@ export class Stake extends NumericFormats {
     const totalCMPLPLiquidity = await this.underlyingPoolContract.methods.totalSupply().call()
     let CMPLPPrice = totalUnderlyingPoolLiquidity.div(totalCMPLPLiquidity)
 
-    this.apr = new BigNumber(this.monthRewards)
+    this.apr = BN(this.monthRewards)
       .times(cmpPrice)
       .times(12)
       .div(
@@ -76,7 +76,7 @@ export class Stake extends NumericFormats {
   }
 
   async deposit(value) {
-    const valueWei = new BigNumber(value).times(new BigNumber(10).pow(18));
+    const valueWei = BN(value).times(BN(10).pow(18));
     const gasPrice = await this.web3.eth.getGasPrice();
     const gas = await this.managerContract.methods.deposit(valueWei.toString()).estimateGas({from: this.account});
     return this.managerContract.methods.deposit(valueWei.toString()).send({
@@ -87,7 +87,7 @@ export class Stake extends NumericFormats {
   }
 
   async withdraw(value) {
-    const valueWei = new BigNumber(value).times(new BigNumber(10).pow(18));
+    const valueWei = BN(value).times(BN(10).pow(18));
     const gasPrice = await this.web3.eth.getGasPrice();
     const gas = await this.managerContract.methods.withdraw(valueWei.toString()).estimateGas({from: this.account});
     return this.managerContract.methods.withdraw(valueWei.toString()).send({

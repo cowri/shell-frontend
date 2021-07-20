@@ -4,12 +4,12 @@ import config from '../mainnet.multiple.config';
 import Asset from './Asset';
 import Shell from './Shell';
 import SwapEngine from './SwapEngine';
-import BigNumber from 'bignumber.js';
 import {CircularProgress} from '@material-ui/core';
 
 import shellIcon from '../assets/logo.png';
 import Rewards from './Rewards.js';
 import StakingEngine from './StakingEngine.js';
+import BN from './BN.js';
 
 export default class Engine extends SwapEngine {
 
@@ -47,11 +47,11 @@ export default class Engine extends SwapEngine {
 
       shell.displayDecimals = _pool_.displayDecimals;
       shell.swapDecimals = _pool_.swapDecimals;
-      shell.alpha = new BigNumber(_pool_.params.alpha);
-      shell.beta = new BigNumber(_pool_.params.beta);
-      shell.delta = new BigNumber(_pool_.params.delta);
-      shell.epsilon = new BigNumber(_pool_.params.epsilon);
-      shell.lambda = new BigNumber(_pool_.params.lambda);
+      shell.alpha = BN(_pool_.params.alpha);
+      shell.beta = BN(_pool_.params.beta);
+      shell.delta = BN(_pool_.params.delta);
+      shell.epsilon = BN(_pool_.params.epsilon);
+      shell.lambda = BN(_pool_.params.lambda);
 
       shell.weights = [];
       shell.assets = [];
@@ -74,7 +74,7 @@ export default class Engine extends SwapEngine {
 
         asset.displayDecimals = _pool_.displayDecimals;
         asset.swapDecimals = _pool_.swapDecimals;
-        asset.weight = new BigNumber(_asset_.weight);
+        asset.weight = BN(_asset_.weight);
         asset.approveToZero = _asset_.approveToZero;
 
         shell.assetIx[_asset_.address] = ix;

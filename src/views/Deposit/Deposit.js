@@ -10,8 +10,7 @@ import StartModal from './components/StartModal'
 import ModalSuccess from '../../components/Modal/ModalSuccess'
 
 import { fromJS } from 'immutable'
-import BigNumber from 'bignumber.js'
-new BigNumber(0);
+
 const Deposit = ({ shellIx, onDismiss }) => {
   const {
     engine,

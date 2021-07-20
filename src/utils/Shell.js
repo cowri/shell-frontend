@@ -1,10 +1,9 @@
-import BigNumber from 'bignumber.js';
-
 import ShellABI from '../abi/Shell.abi.json';
 
 import NumericFormats from "./NumberFormats.js";
+import BN from './BN.js';
 
-const ONE = new BigNumber(1)
+const ONE = BN(1)
 
 export default class Shell extends NumericFormats {
 
@@ -67,7 +66,7 @@ export default class Shell extends NumericFormats {
 
   calculateUtilities (liquidity, liquidities) {
 
-    let utility = new BigNumber(0)
+    let utility = BN(0)
     let utilities = []
     let fees = []
 
@@ -76,7 +75,7 @@ export default class Shell extends NumericFormats {
       const balance = liquidities[i].numeraire
       const ideal = liquidity.numeraire.multipliedBy(this.weights[i])
 
-      let margin = new BigNumber(0)
+      let margin = BN(0)
 
       if (balance.isGreaterThan(ideal)) {
 
@@ -106,7 +105,7 @@ export default class Shell extends NumericFormats {
 
         utilities.push(this.getAllFormatsFromNumeraire(balance))
 
-        fees.push(this.getAllFormatsFromNumeraire(new BigNumber(0)))
+        fees.push(this.getAllFormatsFromNumeraire(BN(0)))
 
       } else {
 
@@ -170,7 +169,7 @@ export default class Shell extends NumericFormats {
 
     try {
 
-      const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(
+      const shells = BN( await this.contract.methods.viewSelectiveDeposit(
         addresses,
         amounts.map(a => a.raw.integerValue().toFixed())
       ).call() )
@@ -201,7 +200,7 @@ export default class Shell extends NumericFormats {
 
     try {
 
-      const shellsToBurn = new BigNumber( await this.contract.methods.viewSelectiveWithdraw(
+      const shellsToBurn = BN( await this.contract.methods.viewSelectiveWithdraw(
         addresses,
         amounts.map( a => a.raw.integerValue().toFixed() )
       ).call() )
@@ -232,7 +231,7 @@ export default class Shell extends NumericFormats {
 
     try {
 
-      return new BigNumber( await this.contract.methods.viewOriginSwap(origin, target, amount).call() )
+      return BN( await this.contract.methods.viewOriginSwap(origin, target, amount).call() )
 
     } catch {
 
@@ -246,7 +245,7 @@ export default class Shell extends NumericFormats {
 
     try {
 
-      return new BigNumber( await this.contract.methods.viewTargetSwap(origin, target, amount).call() )
+      return BN( await this.contract.methods.viewTargetSwap(origin, target, amount).call() )
 
     } catch {
 

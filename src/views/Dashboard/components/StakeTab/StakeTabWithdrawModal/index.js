@@ -7,6 +7,7 @@ import Button from '../../../../../components/Button';
 import BigNumber from 'bignumber.js';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
 import {Devider} from '../../ShellTab/styled.js';
+import BN from '../../../../../utils/BN.js';
 
 export function StakeTabWithdrawModal({onDismiss, stake}) {
   const [withdrawValue, setWithdrawValue] = useState('0');
@@ -16,7 +17,7 @@ export function StakeTabWithdrawModal({onDismiss, stake}) {
   const allowanceErrorMessage = 'You must approve CMP-LP tokens';
 
   useEffect(() => {
-    if (stake.balance && new BigNumber(withdrawValue.replace(/,/g,'')).gt(stake.balance.raw)) {
+    if (stake.balance && BN(withdrawValue.replace(/,/g,'')).gt(stake.balance.raw)) {
       setError(amountErrorMessage);
     } else {
       setError('');

@@ -7,6 +7,7 @@ import Button from '../../../../../components/Button';
 import BigNumber from 'bignumber.js';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
 import {Devider} from '../../ShellTab/styled.js';
+import BN from '../../../../../utils/BN.js'
 
 export function StakeTabDepositModal({onDismiss, stake}) {
   const [depositValue, setDepositValue] = useState('0');
@@ -16,9 +17,9 @@ export function StakeTabDepositModal({onDismiss, stake}) {
   const allowanceErrorMessage = 'You must approve CMP-LP tokens';
 
   useEffect(() => {
-    if (stake.balance && new BigNumber(depositValue.replace(/,/g,'')).gt(stake.balance.raw)) {
+    if (stake.balance && BN(depositValue.replace(/,/g,'')).gt(stake.balance.raw)) {
       setError(amountErrorMessage);
-    } else if (new BigNumber(depositValue).gt(stake.allowance.raw)) {
+    } else if (BN(depositValue).gt(stake.allowance.raw)) {
       setError(allowanceErrorMessage);
     } else {
       setError('');

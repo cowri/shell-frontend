@@ -1,9 +1,9 @@
-import BigNumber from 'bignumber.js';
 
 import ERC20ABI from '../abi/ERC20.abi.json';
 import ShellABI from '../abi/Shell.abi.json';
 
 import NumericFormats from "./NumberFormats.js";
+import BN from './BN.js';
 
 export class ERC20 extends NumericFormats {
 
@@ -28,7 +28,7 @@ export class ERC20 extends NumericFormats {
 
   async allowance (owner, spender) {
 
-    const allowance = new BigNumber( await this.contract.methods.allowance(owner, spender).call() )
+    const allowance = BN( await this.contract.methods.allowance(owner, spender).call() )
 
     return this.getNumeraireFromRaw(allowance)
 
@@ -36,7 +36,7 @@ export class ERC20 extends NumericFormats {
 
   async balanceOf (account) {
 
-    const balance = new BigNumber( await this.contract.methods.balanceOf(account).call() )
+    const balance = BN( await this.contract.methods.balanceOf(account).call() )
 
     return this.getNumeraireFromRaw(balance)
 
@@ -61,7 +61,7 @@ export class Shell extends NumericFormats {
 
   async balanceOf (account) {
 
-    const balance = new BigNumber( await this.contract.methods.balanceOf(account).call() )
+    const balance = BN( await this.contract.methods.balanceOf(account).call() )
 
     return this.getNumeraireFromRaw(balance)
 
@@ -69,7 +69,7 @@ export class Shell extends NumericFormats {
 
   async totalSupply () {
 
-    const totalSupply = new BigNumber( await this.contract.methods.totalSupply().call() )
+    const totalSupply = BN( await this.contract.methods.totalSupply().call() )
 
     return this.getNumeraireFromRaw(totalSupply)
 
@@ -80,11 +80,11 @@ export class Shell extends NumericFormats {
     const liquidity = await this.contract.methods.liquidity().call()
 
     return {
-      total: new BigNumber(liquidity[0]).dividedBy(1e18),
-      dai: new BigNumber(liquidity[1][0]).dividedBy(1e18),
-      usdc: new BigNumber(liquidity[1][1]).dividedBy(1e18),
-      usdt: new BigNumber(liquidity[1][2]).dividedBy(1e18),
-      susd: new BigNumber(liquidity[1][3]).dividedBy(1e18)
+      total: BN(liquidity[0]).dividedBy(1e18),
+      dai: BN(liquidity[1][0]).dividedBy(1e18),
+      usdc: BN(liquidity[1][1]).dividedBy(1e18),
+      usdt: BN(liquidity[1][2]).dividedBy(1e18),
+      susd: BN(liquidity[1][3]).dividedBy(1e18)
     }
 
   }
@@ -93,7 +93,7 @@ export class Shell extends NumericFormats {
 
     try {
 
-      const shells = new BigNumber( await this.contract.methods.viewSelectiveDeposit(addresses, amounts).call() )
+      const shells = BN( await this.contract.methods.viewSelectiveDeposit(addresses, amounts).call() )
 
       return this.getNumeraireFromRaw(shells)
 
@@ -115,7 +115,7 @@ export class Shell extends NumericFormats {
 
     try {
 
-      const shellsToBurn = new BigNumber( await this.contract.methods.viewSelectiveWithdraw(addresses, amounts).call() )
+      const shellsToBurn = BN( await this.contract.methods.viewSelectiveWithdraw(addresses, amounts).call() )
 
       return this.getNumeraireFromRaw(shellsToBurn)
 
@@ -143,7 +143,7 @@ export class Shell extends NumericFormats {
 
     try {
 
-      return new BigNumber( await this.contract.methods.viewOriginSwap(origin, target, amount).call() )
+      return BN( await this.contract.methods.viewOriginSwap(origin, target, amount).call() )
 
     } catch {
 
@@ -157,7 +157,7 @@ export class Shell extends NumericFormats {
 
     try {
 
-      return new BigNumber( await this.contract.methods.viewTargetSwap(origin, target, amount).call() )
+      return BN( await this.contract.methods.viewTargetSwap(origin, target, amount).call() )
 
     } catch {
 

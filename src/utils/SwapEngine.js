@@ -1,15 +1,13 @@
-import BigNumber from "bignumber.js"
-
-BigNumber.config({ FORMAT: { groupSeparator: '' }})
+import BN from './BN.js';
 
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+75'
 
 export default class SwapEngine {
 
     async viewOriginSwap (origin, target, originAmount) {
-        
+
         let shells = this.pairsToShells[origin.address][target.address]
-        
+
         let quotes = await Promise.all(shells.map( async (ix) => {
             return await this.shells[ix].viewOriginSwap(
                 origin.address,
@@ -17,11 +15,11 @@ export default class SwapEngine {
                 origin.getRawFromDisplay(originAmount).integerValue().toFixed()
             )
         }))
-        
+
         let shellIx
         let shellDerivativeIx
-        let max = new BigNumber(0)
-        
+        let max = BN(0)
+
         for (let i = 0; i < shells.length; i++) {
             if (!quotes[i] || quotes[i].toString() === REVERTED) continue
             if (quotes[i].isGreaterThan(max)){
@@ -29,16 +27,16 @@ export default class SwapEngine {
                 shellIx = shells[i]
             }
         }
-        
+
         if (shellIx == undefined) { throw( new Error("reverted")) }
-        
+
         for (let i = 0; i < this.shells[shellIx].derivatives.length; i++) {
             if (this.shells[shellIx].derivatives[i].address === origin.address) {
                 shellDerivativeIx = i
                 break
             }
         }
-        
+
         return {
             originAmount: {
                 numeraire: origin.getNumeraireFromDisplay(originAmount),
@@ -53,13 +51,13 @@ export default class SwapEngine {
             _shellIx: shellIx,
             _shellDerivativeIx: shellDerivativeIx
         }
-        
+
     }
 
     async viewTargetSwap (origin, target, targetAmount) {
-        
+
         let shells = this.pairsToShells[origin.address][target.address]
-        
+
         let quotes = await Promise.all(shells.map( async (ix) => {
             return await this.shells[ix].viewTargetSwap(
                 origin.address,
@@ -70,8 +68,8 @@ export default class SwapEngine {
 
         let shellIx
         let shellDerivativeIx
-        let min = new BigNumber(1e80)
-        
+        let min = BN(1e80)
+
         for (let i = 0; i < shells.length; i++) {
             if (!quotes[i] || quotes[i].toString() === REVERTED) continue
             if (quotes[i].isLessThan(min)){
@@ -81,14 +79,14 @@ export default class SwapEngine {
         }
 
         if (shellIx == undefined) throw( new Error("reverted"))
-            
+
         for (let i = 0; i < this.shells[shellIx].derivatives.length; i++) {
             if (this.shells[shellIx].derivatives[i].address === origin.address) {
                 shellDerivativeIx = i
                 break
             }
         }
-        
+
         return {
             originAmount: {
                 display: origin.getDisplayFromRaw(min, origin.swapDecimals),
@@ -107,12 +105,12 @@ export default class SwapEngine {
     }
 
     executeOriginSwap (shellIx, origin, target, originAmount, minTargetAmount) {
-        
+
         originAmount = origin.getRawFromDisplay(originAmount)
 
         let minTarget = target.getRawFromDisplay(minTargetAmount)
-        
-        minTarget = minTarget.multipliedBy(new BigNumber(.99))
+
+        minTarget = minTarget.multipliedBy(BN(0.99))
 
         let deadline = Math.floor(Date.now() / 1000 + 900)
 
@@ -132,7 +130,7 @@ export default class SwapEngine {
 
         let maxOrigin =  origin.getRawFromDisplay(maxOriginAmount)
 
-        maxOrigin = maxOrigin.multipliedBy(new BigNumber(1.01))
+        maxOrigin = maxOrigin.multipliedBy(BN(1.01))
 
         let deadline = Math.floor(Date.now() / 1000 + 900)
 
@@ -143,7 +141,7 @@ export default class SwapEngine {
             targetAmount.integerValue().toFixed(),
             deadline
         )
-        
+
     }
 
 }
