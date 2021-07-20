@@ -65,7 +65,7 @@ export class Stake extends NumericFormats {
       .div(
         this.totalLockedValue.numeraire.times(CMPLPPrice)
       )
-      .toFixed(0)
+      .toFixed(2)
   }
 
   async approve() {
