@@ -1,12 +1,11 @@
 import NumericFormats from './NumberFormats.js';
-import StackingManagerABI from '../abi/StackingManager.abi.json'
+import StakingManagerABI from '../abi/StakingManager.abi.json'
 import ERC20ABI from '../abi/ERC20.abi.json';
 import BigNumber from 'bignumber.js';
-import axios from 'axios'
 
-export class Stack extends NumericFormats {
+export class Stake extends NumericFormats {
   /**
-   * Stack class
+   * Stake class
    * @param web3
    * @param account {String}
    * @param {Object} pool
@@ -21,7 +20,7 @@ export class Stack extends NumericFormats {
     this.web3 = web3;
     this.shell = shell.shell;
     this.account = this.web3.utils.toChecksumAddress(account);
-    this.managerContract = new web3.eth.Contract(StackingManagerABI, pool.managerAddress)
+    this.managerContract = new web3.eth.Contract(StakingManagerABI, pool.managerAddress)
     this.underlyingPoolContract = new web3.eth.Contract(ERC20ABI, pool.underlyingPoolAddress)
 
     this.underlyingBalance = null;
@@ -29,17 +28,16 @@ export class Stack extends NumericFormats {
     this.allowance = null;
     this.totalLockedValue = null;
     this.apr = null;
-    this.CMPPrice = null;
     this.CMPEarned = null;
 
   }
 
-  async init() {
+  async init(cmpPrice) {
     await this.getUserUnderlyingTokensBalance();
+    await this.calculateAPR(cmpPrice);
   }
 
   async getUserUnderlyingTokensBalance() {
-
     const userLockedValue = new BigNumber(await this.managerContract.methods.balanceOf(this.account).call());
     this.userLockedValue = this.getAllFormatsFromRaw(userLockedValue);
 
@@ -54,21 +52,15 @@ export class Stack extends NumericFormats {
 
     const CMPEarned = new BigNumber(await this.managerContract.methods.earned(this.account).call())
     this.CMPEarned = this.getAllFormatsFromRaw(CMPEarned)
-
-    await this.calculateAPR();
   }
 
-  async calculateAPR() {
-    const resp = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=component&vs_currencies=usd');
-    const CMPPrice = resp.data.component.usd;
-    this.CMPPrice = CMPPrice
-
+  async calculateAPR(cmpPrice) {
     const totalUnderlyingPoolLiquidity = this.shell.liquidityTotal.raw
     const totalCMPLPLiquidity = await this.underlyingPoolContract.methods.totalSupply().call()
     let CMPLPPrice = totalUnderlyingPoolLiquidity.div(totalCMPLPLiquidity)
 
     this.apr = new BigNumber(this.monthRewards)
-      .times(CMPPrice)
+      .times(cmpPrice)
       .times(12)
       .div(
         this.totalLockedValue.numeraire.times(CMPLPPrice)

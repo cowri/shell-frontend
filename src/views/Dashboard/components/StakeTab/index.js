@@ -2,13 +2,13 @@ import React, {useContext, useEffect, useState} from 'react';
 import {TabActions, TabContainer, TabHeading} from '../../../../components/TabContainer/styled.js';
 import DashboardContext from '../../context.js';
 import Button from '../../../../components/Button';
-import {StackTabWithdrawModal} from './StackTabWithdrawModal';
-import {StackTabDepositModal} from './StackTabDepositModal';
+import {StakeTabWithdrawModal} from './StakeTabWithdrawModal';
+import {StakeTabDepositModal} from './StakeTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
 
-export function StackTab({stackAddress}) {
+export function StakeTab({stakeAddress}) {
   const [loading, setLoading] = useState(true)
-  const [stack, setStack] = useState(null)
+  const [stake, setStake] = useState(null)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
   const [showClaimModal, setShowClaimModal] = useState(false)
@@ -21,23 +21,23 @@ export function StackTab({stackAddress}) {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const address = stackAddress || queryParams.get('address')
-    if (address && state.get('stacking') && state.get('stacking').stacks) setStack(state.get('stacking').stacks[address]);
+    const address = stakeAddress || queryParams.get('address')
+    if (address && state.get('staking') && state.get('staking').stakes) setStake(state.get('staking').stakes[address]);
     setLoading(false)
-  }, [state, stackAddress])
+  }, [state, stakeAddress])
 
   return (
     <TabContainer>
-      {loading ? <Spinner /> : stack ? (
+      {loading ? <Spinner /> : stake ? (
         <>
-          {showWithdrawModal && <StackTabWithdrawModal onDismiss={() => setShowWithdrawModal(false)} stack={stack} />}
-          {showDepositModal && <StackTabDepositModal onDismiss={() => setShowDepositModal(false)} stack={stack} />}
-          <TabHeading>{stack.name}</TabHeading>
-          <p>TVL: {stack.totalLockedValue.display}</p>
-          <p>Locked: {stack.userLockedValue.display}</p>
-          <p>CMP price: ${stack.CMPPrice}</p>
-          <p>APR: {stack.apr}%</p>
-          <p>Claimable: {stack.CMPEarned.display}</p>
+          {showWithdrawModal && <StakeTabWithdrawModal onDismiss={() => setShowWithdrawModal(false)} stake={stake} />}
+          {showDepositModal && <StakeTabDepositModal onDismiss={() => setShowDepositModal(false)} stake={stake} />}
+          <TabHeading>{stake.name}</TabHeading>
+          <p>TVL: {stake.totalLockedValue.display}</p>
+          <p>Deposited: {stake.userLockedValue.display}</p>
+          <p>Available to deposit: {stake.underlyingBalance.display}</p>
+          <p>APR: {stake.apr}%</p>
+          <p>Claimable: {stake.CMPEarned.display}</p>
           <TabActions>
             {loggedIn &&
               <Button
@@ -47,13 +47,13 @@ export function StackTab({stackAddress}) {
                 Deposit
               </Button>
             }
-            {loggedIn && stack.CMPEarned.numeraire.gt(0) &&
+            {loggedIn && stake.CMPEarned.numeraire.gt(0) &&
                 <Button
                   fullWidth
-                  onClick={() => stack.claim()} onDismiss={() => setShowClaimModal(false)}
+                  onClick={() => stake.claim()} onDismiss={() => setShowClaimModal(false)}
                 >Claim</Button>
               }
-            {loggedIn && stack.userLockedValue?.numeraire.gt(0) &&
+            {loggedIn && stake.userLockedValue?.numeraire.gt(0) &&
                 <Button
                   outlined
                   fullWidth
@@ -64,7 +64,7 @@ export function StackTab({stackAddress}) {
           </TabActions>
         </>
       ) : (
-        <TabHeading>Unknown stack address</TabHeading>
+        <TabHeading>Unknown stake address</TabHeading>
       )}
     </TabContainer>
   )

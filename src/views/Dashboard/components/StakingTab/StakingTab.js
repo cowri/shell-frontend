@@ -4,7 +4,7 @@ import StakeItem from './StakeItem.js';
 import DashboardContext from '../../context.js';
 import {StakeItemContainer, StakeItemTd} from './styled.js';
 
-export default function StakingTab({showStack}) {
+export default function StakingTab({showStake}) {
 
   const {
     state
@@ -12,14 +12,14 @@ export default function StakingTab({showStack}) {
 
   return (
     <TabContainer>
-      <TabHeading>Liquidity mining</TabHeading>
+      <TabHeading>Liquidity farming</TabHeading>
       <StakeItemContainer th>
         <StakeItemTd>Pool</StakeItemTd>
-        <StakeItemTd>Mining</StakeItemTd>
+        <StakeItemTd>Assets</StakeItemTd>
         <StakeItemTd>APR</StakeItemTd>
       </StakeItemContainer>
-      {state.get('stacking') && state.get('stacking').stacks && Object.values(state.get('stacking').stacks).map((stack) => (
-        <StakeItem stack={stack} key={stack.managerAddress} showStack={showStack} />
+      {state.get('staking') && state.get('staking').stakes && Object.values(state.get('staking').stakes).map((stake) => (
+        <StakeItem stake={stake} key={stake.managerAddress} showStake={showStake} />
       ))}
     </TabContainer>
   )

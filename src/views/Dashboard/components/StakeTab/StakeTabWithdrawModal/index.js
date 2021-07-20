@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from '../../../../../components/Modal';
 import ModalTitle from '../../../../../components/Modal/ModalTitle';
 import ModalActions from '../../../../../components/Modal/ModalActions';
@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
 import {Devider} from '../../ShellTab/styled.js';
 
-export function StackTabWithdrawModal({onDismiss, stack}) {
+export function StakeTabWithdrawModal({onDismiss, stake}) {
   const [withdrawValue, setWithdrawValue] = useState('0');
   const [error, setError] = useState('');
 
@@ -16,16 +16,16 @@ export function StackTabWithdrawModal({onDismiss, stack}) {
   const allowanceErrorMessage = 'You must approve CMP-LP tokens';
 
   useEffect(() => {
-    if (stack.balance && new BigNumber(withdrawValue.replace(/,/g,'')).gt(stack.balance.raw)) {
+    if (stake.balance && new BigNumber(withdrawValue.replace(/,/g,'')).gt(stake.balance.raw)) {
       setError(amountErrorMessage);
     } else {
       setError('');
     }
-  }, [stack, withdrawValue]);
+  }, [stake, withdrawValue]);
 
   function withdrawAction() {
-    if (withdrawValue === stack.userLockedValue.display) stack.exit();
-    else stack.withdraw(withdrawValue)
+    if (withdrawValue === stake.userLockedValue.display) stake.exit();
+    else stake.withdraw(withdrawValue)
   }
 
 
@@ -34,8 +34,8 @@ export function StackTabWithdrawModal({onDismiss, stack}) {
       <ModalTitle>Withdraw Funds</ModalTitle>
       <ModalRow>
         <AmountInput
-          balance={stack.userLockedValue.display}
-          icon={stack.icon}
+          balance={stake.userLockedValue.display}
+          icon={stake.icon}
           isError={ !!error }
           isAllowanceError={error === allowanceErrorMessage}
           helperText={ error }

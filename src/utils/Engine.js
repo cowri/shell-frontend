@@ -9,7 +9,7 @@ import {CircularProgress} from '@material-ui/core';
 
 import shellIcon from '../assets/logo.png';
 import Rewards from './Rewards.js';
-import StackingEngine from './StackingEngine.js';
+import StakingEngine from './StakingEngine.js';
 
 export default class Engine extends SwapEngine {
 
@@ -32,7 +32,7 @@ export default class Engine extends SwapEngine {
     this.pairsToShells = {};
 
     this.rewards = {};
-    this.stacking = {};
+    this.staking = {};
 
     for (const _pool_ of config.pools) {
 
@@ -365,9 +365,9 @@ export default class Engine extends SwapEngine {
     await rewards.getClaimedStatus();
     this.rewards = rewards;
 
-    const stacking = new StackingEngine(this.web3, account, shells);
-    await stacking.init();
-    this.stacking = stacking;
+    const staking = new StakingEngine(this.web3, account, shells);
+    await staking.init();
+    this.staking = staking;
 
     this.state = fromJS({
       account,
@@ -375,7 +375,7 @@ export default class Engine extends SwapEngine {
       assets,
       derivatives,
       rewards,
-      stacking,
+      staking,
     });
 
     this.setState(this.state);

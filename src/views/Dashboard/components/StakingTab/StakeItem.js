@@ -1,19 +1,19 @@
 import React from 'react';
 import { StakeItemContainer, StakeItemTd } from './styled.js';
 
-export default function StakeItem({stack, showStack}) {
+export default function StakeItem({stake, showStake}) {
   return (
-    <StakeItemContainer onClick={() => {showStack(stack.managerAddress)}}>
+    <StakeItemContainer onClick={() => {showStake(stake.managerAddress)}}>
       <StakeItemTd>
         CMP-LP&nbsp;
-        <span>({stack.name})</span>
+        <span>({stake.name})</span>
       </StakeItemTd>
       <StakeItemTd>
-        {stack.totalLockedValue.display}
-        <span>(Balance: {stack.underlyingBalance.display})</span>
+        {stake.totalLockedValue.display}
+        <span>(Balance: {stake.underlyingBalance.display})</span>
       </StakeItemTd>
       <StakeItemTd>
-        {Number(stack.apr).toLocaleString('en-US', { minimumFractionDigits: 0 })}%
+        {Number(stake.apr).toLocaleString('en-US', { minimumFractionDigits: 0 })}%
       </StakeItemTd>
     </StakeItemContainer>
   )

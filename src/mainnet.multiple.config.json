@@ -96,7 +96,7 @@
       }
     }
   ],
-  "stackingPools": [
+  "stakingPools": [
     {
       "managerAddress": "0x7351A6D36FdE5c7D5D2a23eE0a26feB8083F91B5",
       "underlyingPoolAddress": "0x49519631b404e06ca79c9c7b0dc91648d86f08db",

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from '../../../../../components/Modal';
 import ModalTitle from '../../../../../components/Modal/ModalTitle';
 import ModalActions from '../../../../../components/Modal/ModalActions';
@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
 import {Devider} from '../../ShellTab/styled.js';
 
-export function StackTabDepositModal({onDismiss, stack}) {
+export function StakeTabDepositModal({onDismiss, stake}) {
   const [depositValue, setDepositValue] = useState('0');
   const [error, setError] = useState('');
 
@@ -16,14 +16,14 @@ export function StackTabDepositModal({onDismiss, stack}) {
   const allowanceErrorMessage = 'You must approve CMP-LP tokens';
 
   useEffect(() => {
-    if (stack.balance && new BigNumber(depositValue.replace(/,/g,'')).gt(stack.balance.raw)) {
+    if (stake.balance && new BigNumber(depositValue.replace(/,/g,'')).gt(stake.balance.raw)) {
       setError(amountErrorMessage);
-    } else if (new BigNumber(depositValue).gt(stack.allowance.raw)) {
+    } else if (new BigNumber(depositValue).gt(stake.allowance.raw)) {
       setError(allowanceErrorMessage);
     } else {
       setError('');
     }
-  }, [stack, depositValue]);
+  }, [stake, depositValue]);
 
 
   return (
@@ -31,18 +31,18 @@ export function StackTabDepositModal({onDismiss, stack}) {
       <ModalTitle>Deposit Funds</ModalTitle>
       <ModalRow>
         <AmountInput
-          balance={stack.underlyingBalance.numeraire.toString()}
+          balance={stake.underlyingBalance.numeraire.toString()}
           isError={ !!error }
           isAllowanceError={error === allowanceErrorMessage}
           helperText={ error }
           onChange={payload => setDepositValue(payload.value) }
           symbol={'CMP-LP'}
           value={depositValue}
-          onUnlock={() => stack.approve()}
+          onUnlock={() => stake.approve()}
         />
       </ModalRow>
       <ModalActions>
-        <Button fullWidth disabled={error} onClick={() => stack.deposit(depositValue)}>Deposit</Button>
+        <Button fullWidth disabled={error} onClick={() => stake.deposit(depositValue)}>Deposit</Button>
         <Devider />
         <Button fullWidth outlined onClick={onDismiss}>Cancel</Button>
       </ModalActions>

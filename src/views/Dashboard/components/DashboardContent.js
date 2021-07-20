@@ -12,8 +12,8 @@ import SwapTab from './SwapTab/SwapTab.js'
 import DashboardContext from '../context'
 import Footer from '../../../components/Footer';
 import {faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons/faArrowCircleLeft.js';
-import StakingTab from './StakingTab/StakingTab.js';
-import {StackTab} from './StackTab';
+import StakeListTab from './StakingTab/StakingTab.js';
+import {StakeTab} from './StakeTab';
 
 
 const DashboardContent = () => {
@@ -22,8 +22,8 @@ const DashboardContent = () => {
 
   const [activeTab, setActiveTab] = useState('shells')
   const [shellsTab, setShellsTab] = useState('shells')
-  const [stacksTab, setStacksTab] = useState('stacks')
-  const [selectedStackAddress, setSelectedStackAddress] = useState(null)
+  const [stakesTab, setStakesTab] = useState('stakeList')
+  const [selectedStakeAddress, setSelectedStakeAddress] = useState(null)
   const [shellIx, setShellIx] = useState(null)
 
   useEffect(() => {
@@ -50,13 +50,13 @@ const DashboardContent = () => {
     window.history.replaceState(null, null, `?${queryParams}`)
   }
 
-  function showStack(stackAddress) {
-    setActiveTab('stack')
-    setStacksTab('stack')
-    setSelectedStackAddress(stackAddress)
+  function showStake(stakeAddress) {
+    setActiveTab('stake')
+    setStakesTab('stakeList')
+    setSelectedStakeAddress(stakeAddress)
     const queryParams = new URLSearchParams(window.location.search);
-    queryParams.set('tab', 'stack')
-    queryParams.set('address', stackAddress)
+    queryParams.set('tab', 'stake')
+    queryParams.set('address', stakeAddress)
     window.history.replaceState(null, null, `?${queryParams}`)
   }
 
@@ -71,14 +71,14 @@ const DashboardContent = () => {
     }
   }
 
-  const stackTabClick = () => {
-    if (activeTab === 'stack') {
-      setStacksTab('stacks')
-      setActiveTab('stacks')
-      storeTabTypeToUrl('stacks')
+  const stakeTabClick = () => {
+    if (activeTab === 'stake') {
+      setStakesTab('stakeList')
+      setActiveTab('stakeList')
+      storeTabTypeToUrl('stakeList')
     } else {
-      setActiveTab(stacksTab)
-      storeTabTypeToUrl(stacksTab)
+      setActiveTab(stakesTab)
+      storeTabTypeToUrl(stakesTab)
     }
   }
 
@@ -123,15 +123,15 @@ const DashboardContent = () => {
               Swap
             </Tab>
             <Tab
-              active={activeTab === 'stacks' || activeTab === 'stack'}
-              onClick={stackTabClick}
+              active={activeTab === 'stakeList' || activeTab === 'stake'}
+              onClick={stakeTabClick}
             >
-              { activeTab !== 'stack'
-                ? 'Yield'
+              { activeTab !== 'stake'
+                ? 'Farm'
                 : (
                   <a style={{display: 'flex', alignItems: 'center'}}>
                     <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
-                    <span>Yield</span>
+                    <span>Farm</span>
                   </a>
                 )
               }
@@ -140,8 +140,8 @@ const DashboardContent = () => {
           { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
           { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
           { activeTab === 'swap' && <SwapTab /> }
-          { activeTab === 'stacks' && <StakingTab showStack={showStack} />}
-          { activeTab === 'stack' && <StackTab stackAddress={selectedStackAddress}/>}
+          { activeTab === 'stakeList' && <StakeListTab showStake={showStake} />}
+          { activeTab === 'stake' && <StakeTab stakeAddress={selectedStakeAddress}/>}
         </Surface>
       </Container>
       <Footer shellIx={shellIx}/>

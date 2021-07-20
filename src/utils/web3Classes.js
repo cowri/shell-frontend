@@ -180,15 +180,3 @@ export class Shell extends NumericFormats {
   }
 
 }
-
-export class StackingPool extends NumericFormats {
-
-  constructor (web3, pool) {
-
-    super()
-
-    this.contract = new web3.eth.Contract(pool.managerAddress)
-
-  }
-
-}

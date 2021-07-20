@@ -29,6 +29,14 @@ const StyledHeaderLink = styled.a`
   }
 `
 
+const StyledHeaderText = styled.text`
+  color: #00010f;
+  text-decoration: none;
+  font-size: 20px;
+  margin-left: auto;
+  margin-right: 20px;
+`
+
 const ConnectButtonContainer = styled.div`
   @media screen and (max-width: 600px) {
     width: 100%;
@@ -45,6 +53,7 @@ const Header = () => {
     <Container>
       <StyledHeader>
         <Logo />
+          {engine && engine.staking && engine.staking.cmpPrice && <StyledHeaderText>CMP price: ${engine.staking.cmpPrice}</StyledHeaderText>}
         <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
         <ConnectButtonContainer>
           <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
