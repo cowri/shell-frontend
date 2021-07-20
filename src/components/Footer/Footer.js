@@ -31,7 +31,7 @@ const StyledSocialIcon = styled.a`
   }
 `
 
-const IconBox = styled.a`
+const IconBox = styled.span`
   width: 44px;
   height: 44px;
   display: flex;
@@ -68,9 +68,9 @@ const Footer = ({ shellIx }) => {
           <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faTelegram} size="lg"/>
         </StyledSocialIcon>
         {shellIx !== null && (
-          <StyledSocialIcon>
-            <IconBox href={etherscan} target="_blank">
-              <img src={etherscanIcon}/>
+          <StyledSocialIcon href={etherscan} target="_blank">
+            <IconBox >
+              <img src={etherscanIcon} alt="etherscan logo"/>
             </IconBox>
           </StyledSocialIcon>
         )}

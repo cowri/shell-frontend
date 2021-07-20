@@ -72,7 +72,9 @@ const SwapTab = () => {
 
   const {
     state,
-    engine
+    engine,
+    loggedIn,
+    selectWallet,
   } = useContext(DashboardContext)
 
   function getInitOriginIx() {
@@ -233,12 +235,12 @@ const SwapTab = () => {
   const handleSwap = async (e) => {
 
     const noAllowance = state.getIn([
-        'shells',
-        ixs.get('shell'),
-        'derivatives',
-        ixs.get('derivative'),
-        'allowance',
-        'numeraire'
+      'shells',
+      ixs.get('shell'),
+      'derivatives',
+      ixs.get('derivative'),
+      'allowance',
+      'numeraire'
     ]).isLessThan(originValue)
 
     if (noAllowance) return setStep('unlocking')
@@ -411,7 +413,7 @@ const SwapTab = () => {
 
   const selections = engine.derivatives.map( (asset, ix) => {
 
-      return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
+    return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
 
   })
 
@@ -490,81 +492,83 @@ const SwapTab = () => {
   return (
     <>
 
-    <TabContainer>
+      <StyledSwapTab>
 
-      { step === 'unlocking' && <ModalUnlock
+        { step === 'unlocking' && <ModalUnlock
           coin={state.getIn(['shells', ixs.get('shell'), 'derivatives', ixs.get('derivative') ])}
           handleUnlock={handleUnlock}
           handleCancel={ () => setStep('none') }
         /> }
 
-      { step === 'confirming' && <ModalConfirm wallet={engine.wallet} /> }
+        { step === 'confirming' && <ModalConfirm wallet={engine.wallet} /> }
 
-      { step === 'broadcasting' && <ModalTx txHash={txHash} /> }
+        { step === 'broadcasting' && <ModalTx txHash={txHash} /> }
 
-      { step === 'success' && <ModalSuccess
+        { step === 'success' && <ModalSuccess
           buttonBlurb={'Finish'}
           txHash={txHash}
           onDismiss={() => setStep('none')}
           title={'Swap Successful.'}
         /> }
 
-      { step === 'unlockSuccess' && <ModalSuccess
-        buttonBlurb={'Finish'}
-        onDismiss={() => setStep('none')}
-        title={'Unlocking Successful.'}
+        { step === 'unlockSuccess' && <ModalSuccess
+          buttonBlurb={'Finish'}
+          onDismiss={() => setStep('none')}
+          title={'Unlocking Successful.'}
         /> }
 
-      { step === 'error' && <ModalError
-        buttonBlurb={'Finish'}
-        onDismiss={() => setStep('none')}
-        title={'An error occurred.'}
+        { step === 'error' && <ModalError
+          buttonBlurb={'Finish'}
+          onDismiss={() => setStep('none')}
+          title={'An error occurred.'}
         /> }
 
-      <StyledRows>
-        <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
-        <AmountInput
-          allowance={allowance}
-          balance={balance}
-          icon={origin.icon}
-          onChange={ handleOriginInput }
-          selections={getDropdown(_handleOriginSelect, selections, originIx)}
-          styles={inputStyles}
-          symbol={origin.symbol}
-          title='From'
-          value={originValue}
-          error={!!errorMessage}
-          helperText={errorMessage}
-        />
-        <SwapDirectionIcon onClick={handleSwitch} />
-        <AmountInput
-          icon={target.icon}
-          onChange={ handleTargetInput }
-          selections={getDropdown(_handleTargetSelect, targetSelections, targetIx)}
-          styles={inputStyles}
-          symbol={target.symbol}
-          title='To'
-          value={targetValue}
-        />
-      </StyledRows>
-      <TabActions>
-        {asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue ?
-          (<Button
-            fullWidth
-            disabled={!targetValue || !originValue || errorMessage}
-            onClick={handleSwap}
-          >
-            Execute
-          </Button>)
-          : (
-            <Button onClick={() => handleUnlock(MAX)} fullWidth>
-              Approve {origin.symbol}
-            </Button>
-          )
-        )}
-      </TabActions>
-    </TabContainer>
-  </>
+        <StyledRows>
+          <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
+          <AmountInput
+            allowance={allowance}
+            balance={balance}
+            icon={origin.icon}
+            onChange={ handleOriginInput }
+            selections={getDropdown(_handleOriginSelect, selections, originIx)}
+            styles={inputStyles}
+            symbol={origin.symbol}
+            title='From'
+            value={originValue}
+            error={!!errorMessage}
+            helperText={errorMessage}
+          />
+          <SwapDirectionIcon onClick={handleSwitch} />
+          <AmountInput
+            icon={target.icon}
+            onChange={ handleTargetInput }
+            selections={getDropdown(_handleTargetSelect, targetSelections, targetIx)}
+            styles={inputStyles}
+            symbol={target.symbol}
+            title='To'
+            value={targetValue}
+          />
+        </StyledRows>
+      </StyledSwapTab>
+      {!loggedIn ? (
+        <Button onClick={selectWallet} fullWidth>Connect</Button>
+      ) : (
+        asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue)
+      ) ? (
+        <Button
+          fullWidth
+          disabled={!targetValue || !originValue || errorMessage}
+          onClick={handleSwap}
+          style={{ marginTop: '40px' }}
+        >
+          Execute
+        </Button>
+      ) : (
+        <Button onClick={() => handleUnlock(MAX)} fullWidth>
+          Approve {origin.symbol}
+        </Button>
+      )}
+    </>
   )
 }
 
@@ -578,47 +582,44 @@ const AmountInput = ({
   styles,
   value,
   selections
-}) => {
-
-  return (
-    <StyledInput>
-      <StyledTokenInfo>
-        { balance ?
-          <StyledCoinHint onClick={() => onChange({target: {value: balance}})}>
-            Max:
-            <span className="number">&nbsp;{ balance }</span>
-          </StyledCoinHint> : null }
-      </StyledTokenInfo>
-      <NumberFormat
-        fullWidth
-        allowNegative={false}
-        customInput={TextField}
-        error={error}
-        FormHelperTextProps={{className: styles.helperText}}
-        helperText={helperText}
-        inputMode="numeric"
-        min="0"
-        onChange={onChange}
-        placeholder="0"
-        thousandSeparator={true}
-        type="text"
-        value={value}
-        InputProps={{
-          className: styles.inputBase,
-          startAdornment: (
-            <StyledStartAdornment>
-              <TokenIcon > <img src={icon} alt="" /> </TokenIcon>
-            </StyledStartAdornment>
-          ),
-          endAdornment: (
-            <div style={{ marginRight: 6, fontFamily: 'Metric, Arial, sans-serif' }}>
-              { selections }
-            </div>
-          ),
-        }}
-      />
-    </StyledInput>
-  )
-}
+}) => (
+  <StyledInput>
+    <StyledTokenInfo>
+      { balance ?
+        <StyledCoinHint onClick={() => onChange({target: {value: balance}})}>
+          Max:
+          <span className="number">&nbsp;{ balance }</span>
+        </StyledCoinHint> : null }
+    </StyledTokenInfo>
+    <NumberFormat
+      fullWidth
+      allowNegative={false}
+      customInput={TextField}
+      error={error}
+      FormHelperTextProps={{className: styles.helperText}}
+      helperText={helperText}
+      inputMode="numeric"
+      min="0"
+      onChange={onChange}
+      placeholder="0"
+      thousandSeparator={true}
+      type="text"
+      value={value}
+      InputProps={{
+        className: styles.inputBase,
+        startAdornment: (
+          <StyledStartAdornment>
+            <TokenIcon > <img src={icon} alt="" /> </TokenIcon>
+          </StyledStartAdornment>
+        ),
+        endAdornment: (
+          <div style={{ marginRight: 6, fontFamily: 'Metric, Arial, sans-serif' }}>
+            { selections }
+          </div>
+        ),
+      }}
+    />
+  </StyledInput>
+)
 
 export default SwapTab

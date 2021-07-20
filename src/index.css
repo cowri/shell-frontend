@@ -19,7 +19,7 @@
 }
 
 .number {
-  font-family: Metric, Arial, sans-serif;;
+  font-family: Metric, Arial, sans-serif;
 }
 
 body {
@@ -27,7 +27,7 @@ body {
   color: #00010f;
   margin: 0;
   font-size: 16px;
-  font-family: Metric, Arial, sans-serif;;
+  font-family: Metric, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
