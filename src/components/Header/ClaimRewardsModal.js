@@ -2,15 +2,15 @@ import React, {useContext, useState} from 'react';
 import styled from 'styled-components';
 import Modal from '../Modal';
 import DashboardContext from '../../views/Dashboard/context.js';
-import ModalActions from '../ModalActions';
+import ModalActions from '../Modal/ModalActions';
 import Button from '../Button';
-import ModalTitle from '../ModalTitle';
-import ModalContent from '../ModalContent';
+import ModalTitle from '../Modal/ModalTitle';
+import ModalContent from '../Modal/ModalContent';
 import BigNumber from 'bignumber.js';
-import ModalConfirm from '../ModalConfirm';
-import ModalError from '../ModalError';
-import WithdrawingModal from '../ModalAwaitingTx/ModalAwaitingTx.js';
-import ModalSuccess from '../ModalSuccess';
+import ModalConfirm from '../Modal/ModalConfirm';
+import ModalError from '../Modal/ModalError';
+import WithdrawingModal from '../Modal/ModalAwaitingTx/ModalAwaitingTx.js';
+import ModalSuccess from '../Modal/ModalSuccess';
 
 const ClaimModalParam = styled.div`
   display: flex;

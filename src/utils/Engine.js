@@ -9,6 +9,7 @@ import {CircularProgress} from '@material-ui/core';
 
 import shellIcon from '../assets/logo.png';
 import Rewards from './Rewards.js';
+import StakingEngine from './StakingEngine.js';
 
 export default class Engine extends SwapEngine {
 
@@ -29,7 +30,9 @@ export default class Engine extends SwapEngine {
     this.derivatives = [];
     this.overlaps = {};
     this.pairsToShells = {};
+
     this.rewards = {};
+    this.staking = {};
 
     for (const _pool_ of config.pools) {
 
@@ -359,8 +362,12 @@ export default class Engine extends SwapEngine {
     derivatives = derivatives.filter(filter, new Set());
 
     rewards = new Rewards(this.web3, account);
-    await rewards.getClaimedStatus()
-    this.rewards = rewards
+    await rewards.getClaimedStatus();
+    this.rewards = rewards;
+
+    const staking = new StakingEngine(this.web3, account, shells);
+    await staking.init();
+    this.staking = staking;
 
     this.state = fromJS({
       account,
@@ -368,6 +375,7 @@ export default class Engine extends SwapEngine {
       assets,
       derivatives,
       rewards,
+      staking,
     });
 
     this.setState(this.state);

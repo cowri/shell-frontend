@@ -3,9 +3,6 @@ import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
 
 export const StyledButton = withTheme(styled.button`
-  // position: ${props => props.withInput ? 'absolute' : 'initial'};
-  // top: 15px;
-  // right: 15px;
   align-items: center;
   background: ${props => props.outlined ? '#e9cff9' : '#ff42a1'};
   border: none;

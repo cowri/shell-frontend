@@ -10,7 +10,7 @@ import withWallet from '../../containers/withWallet'
 import DashboardContent from './components/DashboardContent'
 
 import DashboardContext from './context'
-import Spinner from './components/DistributionTab/Spinner.js';
+import Spinner from '../../components/Spiner/Spinner.js';
 
 const StyledDashboard = styled.div`
   align-items: center;
@@ -54,7 +54,7 @@ const Dashboard = ({
       }}>
           <StyledDashboard>
             <Header />
-            { web3 && (engine.shells.length && state.size ? <DashboardContent/> : <Spinner />)}
+            { (web3 && engine.shells.length && state.size) ? <DashboardContent/> : <Spinner />}
           </StyledDashboard>
       </DashboardContext.Provider>
     </>

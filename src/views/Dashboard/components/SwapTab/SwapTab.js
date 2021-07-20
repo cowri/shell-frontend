@@ -6,11 +6,11 @@ import BigNumber from 'bignumber.js'
 
 import DashboardContext from '../../context.js'
 
-import ModalConfirm from '../../../../components/ModalConfirm'
-import ModalError from '../../../../components/ModalError'
-import ModalSuccess from '../../../../components/ModalSuccess'
-import ModalTx from '../../../../components/ModalAwaitingTx'
-import ModalUnlock from '../../../../components/ModalUnlock'
+import ModalConfirm from '../../../../components/Modal/ModalConfirm'
+import ModalError from '../../../../components/Modal/ModalError'
+import ModalSuccess from '../../../../components/Modal/ModalSuccess'
+import ModalTx from '../../../../components/Modal/ModalAwaitingTx'
+import ModalUnlock from '../../../../components/Modal/ModalUnlock'
 import NumberFormat from 'react-number-format'
 
 import TextField from '@material-ui/core/TextField'
@@ -21,6 +21,7 @@ import Button from '../../../../components/Button'
 
 import TokenIcon from '../../../../components/TokenIcon'
 import {SwapDirectionIcon} from './SwapDirectionIcon/SwapDirectionIcon.js';
+import {TabActions, TabContainer} from '../../../../components/TabContainer/styled.js';
 
 const DEFAULT_MSG = "Your price for this trade will be..."
 const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
@@ -31,8 +32,9 @@ const StyledStartAdornment = styled.div`
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  padding-left: 22px;
-  padding-right: 12px;
+  padding-left: 24px;
+  padding-right: 14px;
+  flex-shrink: 0;
 `
 
 const StyledSwapTab = styled.div`
@@ -44,8 +46,7 @@ const StyledSwapTab = styled.div`
   width: 90%;
 `
 
-const StyledTokenInfo = withTheme(styled.div`
-`)
+const StyledTokenInfo = withTheme(styled.div``)
 
 const StyledCoinHint = withTheme(styled.div`
   text-align: right;
@@ -56,8 +57,7 @@ const StyledCoinHint = withTheme(styled.div`
   }
 `)
 
-const StyledInput = styled.div`
-`
+const StyledInput = styled.div``
 const StyledMessage = styled.div`
   font-size: 20px;
   padding: 30px;
@@ -122,14 +122,14 @@ const SwapTab = () => {
 
   useEffect(() => {
 
-    if ((swapType === 'origin' && originValue === '.') || (swapType === 'target' && targetValue === '.')) {
+    if ((swapType == 'origin' && originValue == '.') || (swapType == 'target' && targetValue == '.')) {
 
       setIxs(ixs.set('shell', null).set('derivative', null))
       return
 
     }
 
-    if (swapType === 'origin' && ( originValue === '' || originValue.replace('.','') === '0' )) {
+    if (swapType == 'origin' && ( originValue == '' || originValue.replace('.','') == 0 )) {
 
       setTargetValue('')
       setPriceMessage(DEFAULT_MSG)
@@ -138,7 +138,7 @@ const SwapTab = () => {
 
     }
 
-    if (swapType === 'target' && ( targetValue === '' || targetValue.replace('.','') === '0' )) {
+    if (swapType == 'target' && ( targetValue == '' || targetValue.replace('.','') == 0 )) {
 
       setOriginValue('')
       setPriceMessage(DEFAULT_MSG)
@@ -147,7 +147,7 @@ const SwapTab = () => {
 
     }
 
-    if (targetValue === '' && originValue === '') {
+    if (targetValue == '' && originValue == '') {
 
       setPriceMessage(DEFAULT_MSG)
       setHaltMessage('')
@@ -159,7 +159,7 @@ const SwapTab = () => {
     ;(async function () {
       try {
 
-        const method = swapType === 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
+        const method = swapType == 'origin' ? 'viewOriginSwap' : 'viewTargetSwap'
 
         const {
           originAmount,
@@ -169,10 +169,10 @@ const SwapTab = () => {
         } = await engine[method](
           origin,
           target,
-          swapType === 'origin' ? originValue : targetValue
+          swapType == 'origin' ? originValue : targetValue
         )
 
-        swapType === 'origin'
+        swapType == 'origin'
           ? setTargetValue(targetAmount.display)
           : setOriginValue(originAmount.display)
 
@@ -192,7 +192,7 @@ const SwapTab = () => {
 
       } catch (e) {
 
-        swapType === 'origin'
+        swapType == 'origin'
           ? setTargetValue('')
           : setOriginValue('')
 
@@ -336,7 +336,7 @@ const SwapTab = () => {
 
     setSwapType('origin')
     setOriginValue(sanitizeNumber(e.target.value, origin.decimals))
-    if (e.target.value === '') setTargetValue('')
+    if (e.target.value == '') setTargetValue('')
     if (new BigNumber(e.target.value.replace(/,/g,'')).gt(balance)) {
       setErrorMessage('Amount is greater than your wallet\'s balance')
     } else {
@@ -353,7 +353,7 @@ const SwapTab = () => {
     queryParams.set('token0', v)
     window.history.replaceState(null, null, "?"+queryParams.toString());
 
-    if (v === targetIx) {
+    if (v == targetIx) {
 
       setTargetIx(originIx)
 
@@ -365,9 +365,9 @@ const SwapTab = () => {
 
     const overlaps = engine.overlaps[engine.derivatives[v].symbol]
 
-    if (overlaps.indexOf(target.symbol) === -1) {
+    if (overlaps.indexOf(target.symbol) == -1) {
 
-      const find = asset => asset.symbol === overlaps[0]
+      const find = asset => asset.symbol == overlaps[0]
       setTargetIx(engine.derivatives.findIndex(find))
 
       const queryParams = new URLSearchParams(window.location.search);
@@ -382,7 +382,7 @@ const SwapTab = () => {
 
     setSwapType('target')
     setTargetValue(sanitizeNumber(e.target.value, target.decimals))
-    if (e.target.value === '') setOriginValue('')
+    if (e.target.value == '') setOriginValue('')
 
   }
 
@@ -420,7 +420,7 @@ const SwapTab = () => {
 
   const targetSelections = engine.derivatives.reduce( (a, c, i) => {
 
-    if (engine.overlaps[c.symbol].indexOf(origin.symbol) !== -1) {
+    if (engine.overlaps[c.symbol].indexOf(origin.symbol) != -1) {
       a.push(
         <MenuItem className={selectionCss.root} key={i} value={i} >
           { c.symbol }
@@ -434,12 +434,15 @@ const SwapTab = () => {
 
   const getDropdown = (handler, selections, value) => {
 
-    return ( <TextField select
-                        InputProps={{ className: selectionCss.root }}
-                        children={selections}
-                        onChange={e => handler(e.target.value)}
-                        value={value}
-    /> )
+    return (
+      <TextField
+        select
+        InputProps={{ className: selectionCss.root }}
+        children={selections}
+        onChange={e => handler(e.target.value)}
+        value={value}
+      />
+    )
 
   }
 

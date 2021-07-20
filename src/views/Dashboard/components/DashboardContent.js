@@ -12,6 +12,8 @@ import SwapTab from './SwapTab/SwapTab.js'
 import DashboardContext from '../context'
 import Footer from '../../../components/Footer';
 import {faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons/faArrowCircleLeft.js';
+import StakeListTab from './StakingTab/StakingTab.js';
+import {StakeTab} from './StakeTab';
 
 
 const DashboardContent = () => {
@@ -20,6 +22,8 @@ const DashboardContent = () => {
 
   const [activeTab, setActiveTab] = useState('shells')
   const [shellsTab, setShellsTab] = useState('shells')
+  const [stakesTab, setStakesTab] = useState('stakeList')
+  const [selectedStakeAddress, setSelectedStakeAddress] = useState(null)
   const [shellIx, setShellIx] = useState(null)
 
   useEffect(() => {
@@ -46,6 +50,16 @@ const DashboardContent = () => {
     window.history.replaceState(null, null, `?${queryParams}`)
   }
 
+  function showStake(stakeAddress) {
+    setActiveTab('stake')
+    setStakesTab('stakeList')
+    setSelectedStakeAddress(stakeAddress)
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set('tab', 'stake')
+    queryParams.set('address', stakeAddress)
+    window.history.replaceState(null, null, `?${queryParams}`)
+  }
+
   const shellTabClick = () => {
     if (activeTab === 'shell') {
       setShellsTab('shells')
@@ -54,6 +68,17 @@ const DashboardContent = () => {
     } else {
       setActiveTab(shellsTab)
       storeTabTypeToUrl(shellsTab)
+    }
+  }
+
+  const stakeTabClick = () => {
+    if (activeTab === 'stake') {
+      setStakesTab('stakeList')
+      setActiveTab('stakeList')
+      storeTabTypeToUrl('stakeList')
+    } else {
+      setActiveTab(stakesTab)
+      storeTabTypeToUrl(stakesTab)
     }
   }
 
@@ -66,6 +91,7 @@ const DashboardContent = () => {
     const queryParams = new URLSearchParams(window.location.search);
     queryParams.set('tab', tabName)
     queryParams.delete('shellId')
+    queryParams.delete('address')
     window.history.replaceState(null, null, `?${queryParams}`)
   }
 
@@ -96,10 +122,26 @@ const DashboardContent = () => {
             >
               Swap
             </Tab>
+            <Tab
+              active={activeTab === 'stakeList' || activeTab === 'stake'}
+              onClick={stakeTabClick}
+            >
+              { activeTab !== 'stake'
+                ? 'Farm'
+                : (
+                  <a style={{display: 'flex', alignItems: 'center'}}>
+                    <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
+                    <span>Farm</span>
+                  </a>
+                )
+              }
+            </Tab>
           </Tabs>
           { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
           { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
           { activeTab === 'swap' && <SwapTab /> }
+          { activeTab === 'stakeList' && <StakeListTab showStake={showStake} />}
+          { activeTab === 'stake' && <StakeTab stakeAddress={selectedStakeAddress}/>}
         </Surface>
       </Container>
       <Footer shellIx={shellIx}/>

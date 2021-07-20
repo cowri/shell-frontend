@@ -2,17 +2,17 @@ import React, { useContext, useState } from 'react'
 
 import { fromJS } from 'immutable'
 
-import ModalConfirm from '../../components/ModalConfirm'
-import WithdrawingModal from '../../components/ModalAwaitingTx'
+import ModalConfirm from '../../components/Modal/ModalConfirm'
+import WithdrawingModal from '../../components/Modal/ModalAwaitingTx'
 
 import DashboardContext from '../Dashboard/context'
 
-import ModalError from '../../components/ModalError'
+import ModalError from '../../components/Modal/ModalError'
 import StartModal from './components/StartModal'
-import ModalSuccess from '../../components/ModalSuccess'
+import ModalSuccess from '../../components/Modal/ModalSuccess'
 
 const Withdraw = ({ shellIx, onDismiss }) => {
-  const { 
+  const {
     engine,
     state
   } = useContext(DashboardContext)
@@ -29,8 +29,8 @@ const Withdraw = ({ shellIx, onDismiss }) => {
     proportional: false,
     zero: true
   }))
-  
-  let success = false 
+
+  let success = false
 
   const handleTxHash = (hash) => ( setStep('withdrawing'), setTxHash(hash) )
 
@@ -66,7 +66,7 @@ const Withdraw = ({ shellIx, onDismiss }) => {
     )
 
   }
-  
+
   return (
     <>
       {step === 'start' && (
@@ -91,19 +91,19 @@ const Withdraw = ({ shellIx, onDismiss }) => {
       )}
 
       {step === 'success' && (
-        <ModalSuccess 
-          buttonBlurb={'Finish'} 
-          onDismiss={onDismiss} 
-          title={'Withdrawal Successful.'} 
+        <ModalSuccess
+          buttonBlurb={'Finish'}
+          onDismiss={onDismiss}
+          title={'Withdrawal Successful.'}
           txHash={txHash}
         />
       )}
 
       {step === 'error' && (
-        <ModalError 
-          buttonBlurb={'Finish'} 
-          onDismiss={onDismiss} 
-          title={'An error occurred.'} 
+        <ModalError
+          buttonBlurb={'Finish'}
+          onDismiss={onDismiss}
+          title={'An error occurred.'}
           txHash={txHash}
         />
       )}
