@@ -105,6 +105,15 @@
       "displayDecimals": 4,
       "decimals": 18,
       "monthRewards": 100000
+    },
+    {
+      "managerAddress": "0x2BE4d20b9eeB7d625FA68112568F94c615Af376B",
+      "underlyingPoolAddress": "0x6477960dd932d29518D7e8087d5Ea3D11E606068",
+      "name": "USDP/DAI/SUSD",
+      "icon": "logo.png",
+      "displayDecimals": 4,
+      "decimals": 18,
+      "monthRewards": 100000
     }
   ]
 }

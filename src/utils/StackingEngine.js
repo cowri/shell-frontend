@@ -10,7 +10,10 @@ export default class StackingEngine {
   }
 
   async init() {
-    const stacks = {}
+    const stacks = {
+      [config.stackingPools[0].managerAddress]: {},
+      [config.stackingPools[1].managerAddress]: {},
+    }
 
     await Promise.all(config.stackingPools.map(async (pool) => {
       console.log(this.shells)
