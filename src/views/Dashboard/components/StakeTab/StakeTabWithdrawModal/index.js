@@ -4,7 +4,6 @@ import ModalTitle from '../../../../../components/Modal/ModalTitle';
 import ModalActions from '../../../../../components/Modal/ModalActions';
 import {AmountInput} from '../../../../../components/AmountInput';
 import Button from '../../../../../components/Button';
-import BigNumber from 'bignumber.js';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
 import {Devider} from '../../ShellTab/styled.js';
 import BN from '../../../../../utils/BN.js';
@@ -13,8 +12,7 @@ export function StakeTabWithdrawModal({onDismiss, stake}) {
   const [withdrawValue, setWithdrawValue] = useState('0');
   const [error, setError] = useState('');
 
-  const amountErrorMessage = 'Amount is greater than your wallet\'s balance';
-  const allowanceErrorMessage = 'You must approve CMP-LP tokens';
+  const amountErrorMessage = 'Amount is greater than wallet balance';
 
   useEffect(() => {
     if (stake.balance && BN(withdrawValue.replace(/,/g,'')).gt(stake.balance.raw)) {
@@ -38,7 +36,7 @@ export function StakeTabWithdrawModal({onDismiss, stake}) {
           balance={stake.userLockedValue.display}
           icon={stake.icon}
           isError={ !!error }
-          isAllowanceError={error === allowanceErrorMessage}
+          isAllowanceError={false}
           helperText={ error }
           onChange={payload => setWithdrawValue(payload.value) }
           // styles={inputStyles}

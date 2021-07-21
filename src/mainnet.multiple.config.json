@@ -114,6 +114,24 @@
       "displayDecimals": 4,
       "decimals": 18,
       "monthRewards": 8220
+    },
+    {
+      "managerAddress": "0x79876b5062160C107e02826371dD33c047CCF2de",
+      "underlyingPoolAddress": "0x9f20ed5f919dc1c1695042542c13adcfc100dcab",
+      "name": "CMP",
+      "icon": "logo.png",
+      "displayDecimals": 4,
+      "decimals": 18,
+      "monthRewards": 8220
+    },
+    {
+      "managerAddress": "0x5D4066ed92F0FE565747FB75C128995e0b757d7d",
+      "underlyingPoolAddress": "0x6f21eea19c917fd5ce48cabfeb3bd723dfa508a6",
+      "name": "CMP/ETH",
+      "icon": "logo.png",
+      "displayDecimals": 4,
+      "decimals": 18,
+      "monthRewards": 41100
     }
   ]
 }

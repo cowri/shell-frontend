@@ -29,7 +29,7 @@ const StyledHeaderLink = styled.a`
   }
 `
 
-const StyledHeaderText = styled.text`
+const StyledHeaderText = styled.span`
   color: #00010f;
   text-decoration: none;
   font-size: 20px;

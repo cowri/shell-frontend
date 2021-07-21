@@ -18,10 +18,13 @@ export class Stake extends NumericFormats {
     super();
     Object.assign(this, pool);
     this.web3 = web3;
-    this.shell = shell.shell;
+    try {
+      this.shell = shell.shell;
+    } catch (e) {}
     this.account = this.web3.utils.toChecksumAddress(account);
     this.managerContract = new web3.eth.Contract(StakingManagerABI, pool.managerAddress)
     this.underlyingPoolContract = new web3.eth.Contract(ERC20ABI, pool.underlyingPoolAddress)
+    this.cmpToken = new web3.eth.Contract(ERC20ABI, "0x9f20ed5f919dc1c1695042542c13adcfc100dcab")
 
     this.underlyingBalance = null;
     this.userLockedValue = null;
@@ -55,15 +58,24 @@ export class Stake extends NumericFormats {
   }
 
   async calculateAPR(cmpPrice) {
-    const totalUnderlyingPoolLiquidity = this.shell.liquidityTotal.raw
-    const totalCMPLPLiquidity = await this.underlyingPoolContract.methods.totalSupply().call()
-    let CMPLPPrice = totalUnderlyingPoolLiquidity.div(totalCMPLPLiquidity)
+    let underlyingPrice
+    if (this.shell) {
+      const totalUnderlyingPoolLiquidity = this.shell.liquidityTotal.raw
+      const totalCMPLPLiquidity = await this.underlyingPoolContract.methods.totalSupply().call()
+      underlyingPrice = totalUnderlyingPoolLiquidity.div(totalCMPLPLiquidity)
+    } else if (this.name === "CMP") {
+      underlyingPrice = BN(cmpPrice)
+    } else {
+      const totalLPSupply = await this.underlyingPoolContract.methods.totalSupply().call()
+      const cmpPoolBalance = await this.cmpToken.methods.balanceOf(this.underlyingPoolAddress).call()
+      underlyingPrice = BN(cmpPoolBalance).times(cmpPrice).times(2).div(totalLPSupply)
+    }
 
     this.apr = BN(this.monthRewards)
       .times(cmpPrice)
       .times(12)
       .div(
-        this.totalLockedValue.numeraire.times(CMPLPPrice)
+        this.totalLockedValue.numeraire.times(underlyingPrice)
       )
       .toFixed(2)
   }
