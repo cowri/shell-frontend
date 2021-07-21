@@ -19,6 +19,9 @@ const StyledTab = withTheme(styled.div`
     background: rgba(255,66,161,0.6);
     opacity: 1;
   }
+  @media screen and (max-width: 600px) {
+    font-size: 18px;
+  }
 `)
 
 const Tab = ({ active, children, disabled, onClick }) => (

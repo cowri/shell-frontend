@@ -96,7 +96,7 @@
       }
     }
   ],
-  "stakingPools": [
+  "farmingPools": [
     {
       "managerAddress": "0x7351A6D36FdE5c7D5D2a23eE0a26feB8083F91B5",
       "underlyingPoolAddress": "0x49519631b404e06ca79c9c7b0dc91648d86f08db",
@@ -116,15 +116,6 @@
       "monthRewards": 8220
     },
     {
-      "managerAddress": "0x79876b5062160C107e02826371dD33c047CCF2de",
-      "underlyingPoolAddress": "0x9f20ed5f919dc1c1695042542c13adcfc100dcab",
-      "name": "CMP",
-      "icon": "logo.png",
-      "displayDecimals": 4,
-      "decimals": 18,
-      "monthRewards": 8220
-    },
-    {
       "managerAddress": "0x5D4066ed92F0FE565747FB75C128995e0b757d7d",
       "underlyingPoolAddress": "0x6f21eea19c917fd5ce48cabfeb3bd723dfa508a6",
       "name": "CMP/ETH",
@@ -132,6 +123,17 @@
       "displayDecimals": 4,
       "decimals": 18,
       "monthRewards": 41100
+    }
+  ],
+  "stakingPools": [
+    {
+      "managerAddress": "0x79876b5062160C107e02826371dD33c047CCF2de",
+      "underlyingPoolAddress": "0x9f20ed5f919dc1c1695042542c13adcfc100dcab",
+      "name": "CMP",
+      "icon": "logo.png",
+      "displayDecimals": 4,
+      "decimals": 18,
+      "monthRewards": 8220
     }
   ]
 }

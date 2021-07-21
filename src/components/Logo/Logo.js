@@ -8,6 +8,7 @@ const StyledLogo = styled.div`
   display: flex;
   font-size: 24px;
   font-weight: 700;
+  margin-right: auto;
   @media screen and (max-width: 512px) {
     margin-left: 5px;
   }

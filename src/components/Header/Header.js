@@ -30,10 +30,11 @@ const StyledHeaderLink = styled.a`
 `
 
 const StyledHeaderText = styled.span`
+  white-space: nowrap;
   color: #00010f;
   text-decoration: none;
   font-size: 20px;
-  margin-left: auto;
+  margin-left: 20px;
   margin-right: 20px;
 `
 
@@ -53,7 +54,7 @@ const Header = () => {
     <Container>
       <StyledHeader>
         <Logo />
-          {engine && engine.staking && engine.staking.cmpPrice && <StyledHeaderText>CMP price: ${engine.staking.cmpPrice}</StyledHeaderText>}
+        {engine && engine.staking && engine.staking.cmpPrice && <StyledHeaderText>CMP price: ${engine.staking.cmpPrice}</StyledHeaderText>}
         <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
         <ConnectButtonContainer>
           <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>

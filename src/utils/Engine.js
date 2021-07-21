@@ -10,6 +10,7 @@ import shellIcon from '../assets/logo.png';
 import Rewards from './Rewards.js';
 import StakingEngine from './StakingEngine.js';
 import BN from './BN.js';
+import FarmingEngine from './FarmingEngine.js';
 
 export default class Engine extends SwapEngine {
 
@@ -33,6 +34,7 @@ export default class Engine extends SwapEngine {
 
     this.rewards = {};
     this.staking = {};
+    this.farming = {};
 
     for (const _pool_ of config.pools) {
 
@@ -369,6 +371,10 @@ export default class Engine extends SwapEngine {
     await staking.init();
     this.staking = staking;
 
+    const farming = new FarmingEngine(this.web3, account, shells);
+    await farming.init();
+    this.farming = farming;
+
     this.state = fromJS({
       account,
       shells,
@@ -376,6 +382,7 @@ export default class Engine extends SwapEngine {
       derivatives,
       rewards,
       staking,
+      farming,
     });
 
     this.setState(this.state);
