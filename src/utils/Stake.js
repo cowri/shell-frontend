@@ -71,6 +71,9 @@ export class Stake extends NumericFormats {
       underlyingPrice = BN(cmpPoolBalance).times(cmpPrice).times(2).div(totalLPSupply)
     }
 
+    this.totalLockedValueUsd = this.totalLockedValue.numeraire.times(underlyingPrice).toFixed(2)
+    this.depositValueUsd = this.userLockedValue.numeraire.times(underlyingPrice).toFixed(2)
+
     this.apr = BN(this.monthRewards)
       .times(cmpPrice)
       .times(12)
