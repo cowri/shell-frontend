@@ -1,5 +1,6 @@
 import React from 'react';
 import { StakeItemContainer, StakeItemTd } from './styled.js';
+import ReactTooltip from 'react-tooltip';
 
 export default function StakeItem({stake, showStake}) {
 
@@ -22,13 +23,14 @@ export default function StakeItem({stake, showStake}) {
         <StakeItemContainer onClick={() => {
             showStake(stake.managerAddress)
         }}>
+            <ReactTooltip />
             <StakeItemTd>
                 {poolName}
             </StakeItemTd>
-            <StakeItemTd>
+            <StakeItemTd data-tip={stake.totalLockedValueUsd + '$'}>
                 {stake.totalLockedValue.display}
             </StakeItemTd>
-            <StakeItemTd>
+            <StakeItemTd data-tip={stake.depositValueUsd + '$'}>
                 {stake.userLockedValue.display}
                 <span>(Balance: {stake.underlyingBalance.display})</span>
             </StakeItemTd>
