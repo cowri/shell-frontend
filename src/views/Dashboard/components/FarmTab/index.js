@@ -6,7 +6,7 @@ import {FarmTabWithdrawModal} from './FarmTabWithdrawModal';
 import {FarmTabDepositModal} from './FarmTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
 
-export function FarmTab({farmAddress}) {
+export function FarmTab({farmAddress, type}) {
   const [loading, setLoading] = useState(true)
   const [farm, setFarm] = useState(null)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
@@ -22,7 +22,7 @@ export function FarmTab({farmAddress}) {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const address = farmAddress || queryParams.get('address')
-    if (address && state.get('farming') && state.get('farming').farms) setFarm(state.get('farming').farms[address]);
+    if (address && state.get('farming') && state.get('farming')[type]) setFarm(state.get('farming')[type][address]);
     setLoading(false)
   }, [state, farmAddress])
 

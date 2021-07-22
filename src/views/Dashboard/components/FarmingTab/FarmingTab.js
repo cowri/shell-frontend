@@ -4,7 +4,7 @@ import DashboardContext from '../../context.js';
 import {StakeItemContainer, StakeItemTd} from './styled.js';
 import FarmItem from './FarmItem.js';
 
-export default function FarmingTab({showFarm}) {
+export default function FarmingTab({showFarm, type}) {
 
   const {
     state,
@@ -13,16 +13,18 @@ export default function FarmingTab({showFarm}) {
 
   return (
     <TabContainer>
-      <TabHeading>Liquidity farming</TabHeading>
+      <TabHeading>{type === 'stakes' ? 'CMP Staking' : 'Liquidity farming'}</TabHeading>
       <StakeItemContainer th>
         <StakeItemTd>Pool</StakeItemTd>
         <StakeItemTd>Assets</StakeItemTd>
         {loggedIn && <StakeItemTd>My deposit</StakeItemTd>}
         <StakeItemTd>APR</StakeItemTd>
       </StakeItemContainer>
-      {state.get('farming') && state.get('farming').farms && Object.values(state.get('farming').farms).map((farm) => (
-        <FarmItem farm={farm} key={farm.managerAddress} showFarm={showFarm} loggedIn={loggedIn} />
-      ))}
+      {
+        state.get('farming') && state.get('farming')[type] && Object.values(state.get('farming')[type]).map((pool) => (
+          <FarmItem farm={pool} key={pool.managerAddress} showFarm={showFarm} loggedIn={loggedIn} />
+        ))
+      }
     </TabContainer>
   )
 }

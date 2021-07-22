@@ -12,9 +12,7 @@ import SwapTab from './SwapTab/SwapTab.js'
 import DashboardContext from '../context'
 import Footer from '../../../components/Footer';
 import {faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons/faArrowCircleLeft.js';
-import StakeListTab from './StakingTab/StakingTab.js';
-import {StakeTab} from './StakeTab';
-import FarmListTab from './FarmingTab/FarmingTab.js';
+import FarmingTab from './FarmingTab/FarmingTab.js';
 import {FarmTab} from './FarmTab';
 
 
@@ -179,10 +177,10 @@ const DashboardContent = () => {
           { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
           { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
           { activeTab === 'swap' && <SwapTab /> }
-          { activeTab === 'stakeList' && <StakeListTab showStake={showStake} />}
-          { activeTab === 'stake' && <StakeTab stakeAddress={selectedStakeAddress}/>}
-          { activeTab === 'farmList' && <FarmListTab showFarm={showFarm} />}
-          { activeTab === 'farm' && <FarmTab farmAddress={selectedFarmAddress}/>}
+          { activeTab === 'stakeList' && <FarmingTab type="stakes" showFarm={showStake} />}
+          { activeTab === 'stake' && <FarmTab type="stakes" stakeAddress={selectedStakeAddress}/>}
+          { activeTab === 'farmList' && <FarmingTab type="farms" showFarm={showFarm} />}
+          { activeTab === 'farm' && <FarmTab type="farms" farmAddress={selectedFarmAddress}/>}
         </Surface>
       </Container>
       <Footer shellIx={shellIx}/>
