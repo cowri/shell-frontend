@@ -54,7 +54,7 @@ const Header = () => {
     <Container>
       <StyledHeader>
         <Logo />
-        {engine && engine.staking && engine.staking.cmpPrice && <StyledHeaderText>CMP price: ${engine.staking.cmpPrice}</StyledHeaderText>}
+        {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
         <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
         <ConnectButtonContainer>
           <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
