@@ -21,7 +21,12 @@ export const StakeItemTd = styled.div`
     font-size: 0.7em;
   }
   &:last-child {
-    flex-grow: 0.3;
+    flex-grow: 0.5;
     align-items: flex-end;
+  }
+  @media screen and (max-width: 600px) {
+    :nth-child(3) {
+      display: none;
+    }
   }
 `

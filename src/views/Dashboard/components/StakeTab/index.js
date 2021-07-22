@@ -22,7 +22,7 @@ export function StakeTab({stakeAddress}) {
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const address = stakeAddress || queryParams.get('address')
-    if (address && state.get('staking') && state.get('staking').stakes) setStake(state.get('staking').stakes[address]);
+    if (address && state.get('farming') && state.get('farming').stakes) setStake(state.get('farming').stakes[address]);
     setLoading(false)
   }, [state, stakeAddress])
 

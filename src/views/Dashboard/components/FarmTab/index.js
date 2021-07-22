@@ -50,7 +50,7 @@ export function FarmTab({farmAddress}) {
             {loggedIn && farm.CMPEarned.numeraire.gt(0) &&
                 <Button
                   fullWidth
-                  onClick={() => farm.claim()} onDismiss={() => setShowClaimModal(false)}
+                  onClick={() => farm.claim()}
                 >Claim</Button>
               }
             {loggedIn && farm.userLockedValue?.numeraire.gt(0) &&

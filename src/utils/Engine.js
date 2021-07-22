@@ -8,7 +8,6 @@ import {CircularProgress} from '@material-ui/core';
 
 import shellIcon from '../assets/logo.png';
 import Rewards from './Rewards.js';
-import StakingEngine from './StakingEngine.js';
 import BN from './BN.js';
 import FarmingEngine from './FarmingEngine.js';
 
@@ -367,10 +366,6 @@ export default class Engine extends SwapEngine {
     await rewards.getClaimedStatus();
     this.rewards = rewards;
 
-    const staking = new StakingEngine(this.web3, account, shells);
-    await staking.init();
-    this.staking = staking;
-
     const farming = new FarmingEngine(this.web3, account, shells);
     await farming.init();
     this.farming = farming;
@@ -381,7 +376,6 @@ export default class Engine extends SwapEngine {
       assets,
       derivatives,
       rewards,
-      staking,
       farming,
     });
 

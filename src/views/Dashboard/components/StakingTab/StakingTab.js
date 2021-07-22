@@ -1,26 +1,27 @@
 import React, {useContext} from 'react';
 import {TabHeading, TabContainer} from '../../../../components/TabContainer/styled.js';
-import StakeItem from './StakeItem.js';
 import DashboardContext from '../../context.js';
-import {StakeItemContainer, StakeItemTd} from './styled.js';
+import {StakeItemContainer, StakeItemTd} from '../FarmingTab/styled.js';
+import FarmItem from '../FarmingTab/FarmItem.js';
 
 export default function StakingTab({showStake}) {
 
   const {
-    state
+    state,
+    loggedIn,
   } = useContext(DashboardContext)
 
   return (
     <TabContainer>
-      <TabHeading>Liquidity farming</TabHeading>
+      <TabHeading>CMP Staking</TabHeading>
       <StakeItemContainer th>
         <StakeItemTd>Pool</StakeItemTd>
         <StakeItemTd>Assets</StakeItemTd>
-        <StakeItemTd>My deposit</StakeItemTd>
+        {loggedIn && <StakeItemTd>My deposit</StakeItemTd>}
         <StakeItemTd>APR</StakeItemTd>
       </StakeItemContainer>
-      {state.get('staking') && state.get('staking').stakes && Object.values(state.get('staking').stakes).map((stake) => (
-        <StakeItem stake={stake} key={stake.managerAddress} showStake={showStake} />
+      {state.get('farming') && state.get('farming').stakes && Object.values(state.get('farming').stakes).map((stake) => (
+        <FarmItem farm={stake} key={stake.managerAddress} showFarm={showStake} loggedIn={loggedIn} />
       ))}
     </TabContainer>
   )
