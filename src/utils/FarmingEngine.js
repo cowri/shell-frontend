@@ -14,7 +14,9 @@ export default class FarmingEngine {
 
   async init() {
     await this.getCmpPrice()
-    await Promise.all([this.initFarming(), this.initStaking()])
+    const pools = await Promise.all([this.formPools(config.farmingPools), this.formPools(config.stakingPools)])
+    this.farms = pools[0]
+    this.stakes = pools[1]
   }
 
   async getCmpPrice() {
@@ -22,41 +24,16 @@ export default class FarmingEngine {
     this.cmpPrice = resp.data.component.usd;
   }
 
-  async initFarming() {
-    const farms = {}
-    config.farmingPools.forEach(pool => {
-      farms[pool.managerAddress] = {}
-    })
-
-    await Promise.all(config.farmingPools.map(async (pool) => {
+  async formPools(pools) {
+    const items = {}
+    await Promise.all(pools.map(async (pool) => {
       const shell = this.shells.find((item) => {
         return item.shell.address.toLowerCase() === pool.underlyingPoolAddress.toLowerCase()
       })
-      const farm = new Farm(this.web3, this.account, pool, shell);
-      await farm.init(this.cmpPrice)
-      farms[farm.managerAddress] = farm;
+      const item = new Farm(this.web3, this.account, pool, shell);
+      await item.init(this.cmpPrice)
+      items[item.managerAddress] = item;
     }))
-
-    this.farms = farms
-  }
-
-  async initStaking() {
-    const stakes = {}
-    //[config.stakingPools[0].managerAddress]: {},
-    //[config.stakingPools[1].managerAddress]: {},
-    config.stakingPools.forEach(pool => {
-      stakes[pool.managerAddress] = {}
-    })
-
-    await Promise.all(config.stakingPools.map(async (pool) => {
-      const shell = this.shells.find((item) => {
-        return item.shell.address.toLowerCase() === pool.underlyingPoolAddress.toLowerCase()
-      })
-      const stake = new Farm(this.web3, this.account, pool, shell);
-      await stake.init(this.cmpPrice)
-      stakes[stake.managerAddress] = stake;
-    }))
-
-    this.stakes = stakes
+    return items;
   }
 }
