@@ -35,7 +35,7 @@ export const ShellsTableRow = ({showShell, liqTotal, liqOwned, assets}) => {
       {loggedIn && (
         <StyledBalance
           className="number"
-          style={{justifyContent: 'flex-end', flex: '1'}}
+          style={{justifyContent: 'flex-start', flex: '1'}}
         >
           { liqOwned }
         </StyledBalance>

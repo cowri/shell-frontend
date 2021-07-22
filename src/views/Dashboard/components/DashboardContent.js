@@ -20,7 +20,7 @@ const DashboardContent = () => {
 
   const { state } = useContext(DashboardContext)
 
-  const [activeTab, setActiveTab] = useState('shells')
+  const [activeTab, setActiveTab] = useState('swap')
   const [shellsTab, setShellsTab] = useState('shells')
   const [stakesTab, setStakesTab] = useState('stakeList')
   const [farmsTab, setFarmsTab] = useState('farmList')
@@ -124,6 +124,13 @@ const DashboardContent = () => {
         <Surface>
           <Tabs>
             <Tab
+              active={activeTab === 'swap'}
+              disabled={!state.has('shells')}
+              onClick={() => tabClickAction('swap')}
+            >
+              Swap
+            </Tab>
+            <Tab
               active={activeTab === 'shell' || activeTab === 'shells'}
               disabled={!state.has('shells')}
               onClick={shellTabClick}
@@ -131,19 +138,12 @@ const DashboardContent = () => {
               { activeTab !== 'shell'
                 ? 'Pools'
                 : (
-                    <a style={{display: 'flex', alignItems: 'center'}}>
-                      <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
-                      <span>Back to pools</span>
-                    </a>
+                  <a style={{display: 'flex', alignItems: 'center'}}>
+                    <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
+                    <span>Back to pools</span>
+                  </a>
                 )
               }
-            </Tab>
-            <Tab
-              active={activeTab === 'swap'}
-              disabled={!state.has('shells')}
-              onClick={() => tabClickAction('swap')}
-            >
-              Swap
             </Tab>
             <Tab
               active={activeTab === 'farmList' || activeTab === 'farm'}

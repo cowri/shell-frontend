@@ -9,6 +9,7 @@ const StyledLogo = styled.div`
   font-size: 24px;
   font-weight: 700;
   margin-right: auto;
+  cursor: pointer;
   @media screen and (max-width: 512px) {
     margin-left: 5px;
   }

@@ -5,6 +5,7 @@ import Button from '../../../../components/Button';
 import {FarmTabWithdrawModal} from './FarmTabWithdrawModal';
 import {FarmTabDepositModal} from './FarmTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
+import styled from 'styled-components';
 
 export function FarmTab({farmAddress, type}) {
   const [loading, setLoading] = useState(true)
@@ -26,18 +27,28 @@ export function FarmTab({farmAddress, type}) {
     setLoading(false)
   }, [state, farmAddress])
 
+  const test = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    p {
+      display: block;
+      width: 50%;
+    }
+  `
+
   return (
     <TabContainer>
       {loading ? <Spinner /> : farm ? (
         <>
           {showWithdrawModal && <FarmTabWithdrawModal onDismiss={() => setShowWithdrawModal(false)} farm={farm} />}
           {showDepositModal && <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />}
-          <TabHeading>{farm.name}</TabHeading>
-          <p>TVL: {farm.totalLockedValue.display}</p>
-          <p>Deposited: {farm.userLockedValue.display}</p>
-          <p>Available to deposit: {farm.underlyingBalance.display}</p>
-          <p>APR: {farm.apr}%</p>
-          <p>Claimable: {farm.CMPEarned.display}</p>
+          <TabHeading>{farm.name} <span>(APR: {farm.apr}%)</span></TabHeading>
+          <div>
+            <p>TVL: {farm.totalLockedValue.display}</p>
+            <p>Deposited: {farm.userLockedValue.display}</p>
+            <p>Available to deposit: {farm.underlyingBalance.display}</p>
+            <p>Claimable: {farm.CMPEarned.display}</p>
+          </div>
           <TabActions>
             {loggedIn &&
               <Button

@@ -15,6 +15,9 @@ export const TabHeading = styled.p`
   text-transform: uppercase;
   text-align: center;
   margin-top: 0;
+  span {
+    font-size: .7em;
+  }
 `;
 
 export const TabActions = withTheme(styled.div`
