@@ -41,7 +41,7 @@ export const ShellsTab = ({showShell}) => {
         <Row head>
           <span style={{ flex: 1.3 }}>Pools</span>
           <span style={{ flex: 1.2, textAlign: loggedIn ? 'left' : 'right' }}>Liquidity</span>
-          {loggedIn && <span style={{ flex: 1, textAlign: 'right' }}>Your Balance</span>}
+          {loggedIn && <span style={{ flex: 1 }}>Your Balance</span>}
         </Row>
         { rows }
       </PoolsTable>

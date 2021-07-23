@@ -4,9 +4,9 @@ import ErrorIcon from '@material-ui/icons/Warning'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
-import ModalActions from '../../../components/ModalActions'
-import ModalIcon from '../../../components/ModalIcon'
-import ModalTitle from '../../../components/ModalTitle'
+import ModalActions from '../../../components/Modal/ModalActions'
+import ModalIcon from '../../../components/Modal/ModalIcon'
+import ModalTitle from '../../../components/Modal/ModalTitle'
 
 const Network = () => {
   return (

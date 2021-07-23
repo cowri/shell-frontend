@@ -28,6 +28,15 @@ const StyledHeaderLink = styled.a`
   }
 `
 
+const StyledHeaderText = styled.span`
+  white-space: nowrap;
+  color: #00010f;
+  text-decoration: none;
+  font-size: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+`
+
 const ConnectButtonContainer = styled.div`
   @media screen and (max-width: 600px) {
     width: 100%;
@@ -39,11 +48,12 @@ const ConnectButtonContainer = styled.div`
 `
 
 const Header = () => {
-  const {loggedIn, selectWallet, disconnect} = useContext(DashboardContext)
+  const {engine, loggedIn, selectWallet, disconnect} = useContext(DashboardContext)
   return (
     <Container>
       <StyledHeader>
         <Logo />
+        {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
         <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
         <ConnectButtonContainer>
           <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>

@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
-import ModalActions from '../../../components/ModalActions'
+import ModalActions from '../../../components/Modal/ModalActions'
 
 const ModalContent = withTheme(styled.div`
   flex: 1;
@@ -27,15 +27,15 @@ const ModalWarning = ({
   onCancel,
   onContinue
 }) => {
-  
-  let message 
-  
+
+  let message
+
 
   if (tag === 'STABLEx') {
 
-    message = ( <ModalContent> 
-        <p> 
-          STABLEx is an experimental project. Exercise extreme caution. 
+    message = ( <ModalContent>
+        <p>
+          STABLEx is an experimental project. Exercise extreme caution.
         </p>
         <p>
           <a target="_blank" href="https://www.notion.so/shellprotocol/STABLEx-Shell-Pool-26129611af064c239da396f4120e8e9c">
@@ -47,7 +47,7 @@ const ModalWarning = ({
       </ModalContent> )
 
   } else {
-    
+
     message = ( <ModalContent>
         <p> Component is in beta. </p>
         <p> Please do not deposit any funds you can not afford to lose. </p>

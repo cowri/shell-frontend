@@ -4,10 +4,11 @@ import config from '../mainnet.multiple.config';
 import Asset from './Asset';
 import Shell from './Shell';
 import SwapEngine from './SwapEngine';
-import BigNumber from 'bignumber.js';
 import {CircularProgress} from '@material-ui/core';
 
 import shellIcon from '../assets/logo.png';
+import BN from './BN.js';
+import FarmingEngine from './FarmingEngine.js';
 
 export default class Engine extends SwapEngine {
 
@@ -29,6 +30,9 @@ export default class Engine extends SwapEngine {
     this.overlaps = {};
     this.pairsToShells = {};
 
+    this.staking = {};
+    this.farming = {};
+
     for (const _pool_ of config.pools) {
 
       const shell = new Shell(
@@ -42,11 +46,11 @@ export default class Engine extends SwapEngine {
 
       shell.displayDecimals = _pool_.displayDecimals;
       shell.swapDecimals = _pool_.swapDecimals;
-      shell.alpha = new BigNumber(_pool_.params.alpha);
-      shell.beta = new BigNumber(_pool_.params.beta);
-      shell.delta = new BigNumber(_pool_.params.delta);
-      shell.epsilon = new BigNumber(_pool_.params.epsilon);
-      shell.lambda = new BigNumber(_pool_.params.lambda);
+      shell.alpha = BN(_pool_.params.alpha);
+      shell.beta = BN(_pool_.params.beta);
+      shell.delta = BN(_pool_.params.delta);
+      shell.epsilon = BN(_pool_.params.epsilon);
+      shell.lambda = BN(_pool_.params.lambda);
 
       shell.weights = [];
       shell.assets = [];
@@ -69,7 +73,7 @@ export default class Engine extends SwapEngine {
 
         asset.displayDecimals = _pool_.displayDecimals;
         asset.swapDecimals = _pool_.swapDecimals;
-        asset.weight = new BigNumber(_asset_.weight);
+        asset.weight = BN(_asset_.weight);
         asset.approveToZero = _asset_.approveToZero;
 
         shell.assetIx[_asset_.address] = ix;
@@ -355,11 +359,16 @@ export default class Engine extends SwapEngine {
     assets = assets.filter(filter, new Set());
     derivatives = derivatives.filter(filter, new Set());
 
+    const farming = new FarmingEngine(this.web3, account, shells);
+    await farming.init();
+    this.farming = farming;
+
     this.state = fromJS({
       account,
       shells,
       assets,
       derivatives,
+      farming,
     });
 
     this.setState(this.state);

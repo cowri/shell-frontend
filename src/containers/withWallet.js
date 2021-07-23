@@ -23,8 +23,8 @@ const withWallet = (WrappedComponent) => {
     const [loggedIn, setLoggedIn] = useState(false)
     const [walletSelected, setWalletSelected] = useState(true)
 
-    const selectWallet = async () => {
-        const walletSelected = await onboard.walletSelect();
+    const selectWallet = async (wallet) => {
+        const walletSelected = await onboard.walletSelect(wallet);
 
         if (walletSelected) {
           const walletChecked = await onboard.walletCheck();
@@ -36,6 +36,7 @@ const withWallet = (WrappedComponent) => {
     const disconnect = async () => {
       onboard.walletReset()
       setLoggedIn(false)
+      window.localStorage.removeItem('selectedWallet')
     }
 
     // init application
@@ -90,6 +91,7 @@ const withWallet = (WrappedComponent) => {
             wallet: async wallet => {
               if (!wallet.name) return
 
+              window.localStorage.setItem('selectedWallet', wallet.name)
               web3 = new Web3(wallet.provider)
               engine = new Engine(web3, setState)
               engine.wallet = wallet.name
@@ -108,6 +110,12 @@ const withWallet = (WrappedComponent) => {
             ]
           }
         });
+
+        const previouslySelectedWallet = window.localStorage.getItem('selectedWallet')
+
+        if (previouslySelectedWallet != null) {
+          await selectWallet(previouslySelectedWallet)
+        }
       }
 
     }, [])
