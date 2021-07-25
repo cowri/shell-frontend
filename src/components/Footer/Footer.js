@@ -38,7 +38,7 @@ const IconBox = styled.span`
   align-items: center;
   justify-content: center;
   img {
-    width: 21px;
+    width: 32px;
   }
 `
 

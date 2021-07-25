@@ -33,7 +33,7 @@ export const TabActions = withTheme(styled.div`
     margin: 0;
   }
   ${StyledButton}:not(:last-child) {
-    margin-right: 2rem;
+    margin-right: 1.5rem;
     @media (max-width: 512px) {
       margin: 0 0 2rem;
     }

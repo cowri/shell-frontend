@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {forwardRef, useContext, useEffect, useImperativeHandle, useState} from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Container from '../../../components/Container'
 import Surface from '../../../components/Surface'
@@ -16,7 +16,7 @@ import FarmingTab from './FarmingTab/FarmingTab.js';
 import {FarmTab} from './FarmTab';
 
 
-const DashboardContent = () => {
+const DashboardContent = forwardRef((props, ref) => {
 
   const { state } = useContext(DashboardContext)
 
@@ -27,6 +27,14 @@ const DashboardContent = () => {
   const [selectedStakeAddress, setSelectedStakeAddress] = useState(null)
   const [selectedFarmAddress, setSelectedFarmAddress] = useState(null)
   const [shellIx, setShellIx] = useState(null)
+
+  useImperativeHandle(ref, () => ({
+
+    goToIndexTab() {
+      tabClickAction('swap')
+    }
+
+  }));
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -186,6 +194,6 @@ const DashboardContent = () => {
       <Footer shellIx={shellIx}/>
     </>
   )
-}
+})
 
 export default DashboardContent

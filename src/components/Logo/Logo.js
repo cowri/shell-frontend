@@ -26,9 +26,9 @@ const StyledName = styled.span`
   font-size: 1.2em;
 `
 
-export default function (){
+export default function ({onClick}){
   return (
-    <StyledLogo>
+    <StyledLogo onClick={onClick}>
       <StyledImg src={logo} />
       <StyledName>component</StyledName>
     </StyledLogo>

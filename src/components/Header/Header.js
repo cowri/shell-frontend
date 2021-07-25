@@ -12,18 +12,18 @@ const StyledHeader = styled.div`
   align-items: center;
   display: flex;
   padding: 40px 0;
-  justify-content: space-between;
+  justify-content: flex-end;
   @media screen and (max-width: 600px) {
     flex-wrap: wrap;
   }
 `
 
 const StyledHeaderLink = styled.a`
-  color: #ac0cee;
+  color: #ff42a1;
   text-decoration: none;
   font-size: 20px;
   margin-right: 20px;
-  margin-left: auto;
+  font-weight: bold;
   &:hover {
     text-decoration: underline;
   }
@@ -31,11 +31,15 @@ const StyledHeaderLink = styled.a`
 
 const StyledHeaderText = styled.span`
   white-space: nowrap;
-  color: #00010f;
+  color: #ff42a1;
+  font-weight: bold;
   text-decoration: none;
   font-size: 20px;
   margin-left: 20px;
   margin-right: 20px;
+  @media screen and (max-width: 380px) {
+    margin-left: auto;
+  }
 `
 
 const ConnectButtonContainer = styled.div`
@@ -48,12 +52,12 @@ const ConnectButtonContainer = styled.div`
   }
 `
 
-const Header = () => {
+const Header = ({goToIndexTab}) => {
   const {engine, loggedIn, selectWallet, disconnect} = useContext(DashboardContext)
   return (
     <Container>
       <StyledHeader>
-        <Logo />
+        <Logo onClick={() => goToIndexTab()}/>
         {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
         <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
         <ConnectButtonContainer>

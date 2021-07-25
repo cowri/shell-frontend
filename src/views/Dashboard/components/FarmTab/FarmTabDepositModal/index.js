@@ -31,7 +31,7 @@ export function FarmTabDepositModal({onDismiss, farm}) {
       <ModalTitle>Deposit Funds</ModalTitle>
       <ModalRow>
         <AmountInput
-          balance={farm.underlyingBalance.numeraire.toString()}
+          balance={farm.underlyingBalance.numeraire.toFixed(4)}
           isError={ !!error }
           isAllowanceError={error === allowanceErrorMessage}
           helperText={ error }

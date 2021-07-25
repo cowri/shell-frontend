@@ -54,7 +54,7 @@ const StyledModalContent = styled.div`
   border-radius: 12px;
   vertical-align: middle;
   @media (max-width: 512px) {
-    padding: 20px 10px;
+    padding: 20px;
   }
 `
 

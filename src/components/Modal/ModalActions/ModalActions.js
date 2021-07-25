@@ -7,13 +7,13 @@ const StyledModalActions = withTheme(styled.div`
   align-items: center;
   display: flex;
   justify-content: space-around;
-  margin: 40px 40px 20px;
+  margin: 40px 55px 20px;
   min-height: 48px;
   ${StyledButton} {
     margin: 0;
   }
   @media (max-width: 512px) {
-    margin: 20px;
+    margin: 20px 0;
   }
 `)
 

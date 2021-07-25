@@ -25,8 +25,8 @@ export const StakeItemTd = styled.div`
     align-items: flex-end;
   }
   @media screen and (max-width: 600px) {
-    :nth-child(3) {
-      display: none;
-    }
+    //:nth-child(3):not(:last-child) {
+    //  display: none;
+    //}
   }
 `

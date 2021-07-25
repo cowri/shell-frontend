@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useRef} from 'react';
 import styled from 'styled-components'
 import cookie from 'js-cookie'
 import randomWords from 'random-words'
@@ -32,6 +32,8 @@ const Dashboard = ({
   disconnect,
 }) => {
 
+  const dashboardRef = useRef(null);
+
   let userId = cookie.get('userId')
 
   if (!userId) {
@@ -53,8 +55,14 @@ const Dashboard = ({
         disconnect,
       }}>
           <StyledDashboard>
-            <Header />
-            { (web3 && engine.shells.length && state.size) ? <DashboardContent/> : <Spinner />}
+            <Header goToIndexTab={() => dashboardRef.current.goToIndexTab()}/>
+            { (web3 && engine.shells.length && state.size) ? (
+                <DashboardContent
+                  ref={dashboardRef}
+                />
+            ) : (
+              <Spinner />
+            )}
           </StyledDashboard>
       </DashboardContext.Provider>
     </>

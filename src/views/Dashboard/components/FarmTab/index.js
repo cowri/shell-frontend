@@ -7,6 +7,42 @@ import {FarmTabDepositModal} from './FarmTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
 import styled from 'styled-components';
 
+const FarmParams = styled.table`
+  margin: 0 auto;
+  font-size: 20px;
+  td {
+    &:first-child {
+      padding-right: 30px;
+      @media screen and (min-width: 512px) {
+        padding-right: 80px;
+      }
+    }
+    span {
+      font-weight: bold;
+    }
+  }
+  tr:not(:last-child) {
+    td {
+      padding-bottom: 20px;
+    }
+  }
+`
+
+const FarmParam = styled.div`
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 40px;
+  &:nth-child(1),
+  &:nth-child(2) {
+    margin-bottom: 20px;
+  }
+  span {
+    font-weight: bold;
+  }
+`
+
 export function FarmTab({farmAddress, type}) {
   const [loading, setLoading] = useState(true)
   const [farm, setFarm] = useState(null)
@@ -27,15 +63,6 @@ export function FarmTab({farmAddress, type}) {
     setLoading(false)
   }, [state, farmAddress])
 
-  const test = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    p {
-      display: block;
-      width: 50%;
-    }
-  `
-
   return (
     <TabContainer>
       {loading ? <Spinner /> : farm ? (
@@ -43,12 +70,16 @@ export function FarmTab({farmAddress, type}) {
           {showWithdrawModal && <FarmTabWithdrawModal onDismiss={() => setShowWithdrawModal(false)} farm={farm} />}
           {showDepositModal && <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />}
           <TabHeading>{farm.name} <span>(APR: {farm.apr}%)</span></TabHeading>
-          <div>
-            <p>TVL: {farm.totalLockedValue.display}</p>
-            <p>Deposited: {farm.userLockedValue.display}</p>
-            <p>Available to deposit: {farm.underlyingBalance.display}</p>
-            <p>Claimable: {farm.CMPEarned.display}</p>
-          </div>
+          <FarmParams>
+            <tr>
+              <td><span>TVL</span><br />{farm.totalLockedValue.display}</td>
+              <td><span>Deposited</span><br />{farm.userLockedValue.display}</td>
+            </tr>
+            <tr>
+              <td><span>Available to deposit</span><br />{farm.underlyingBalance.display}</td>
+              <td><span>Claimable</span><br />{farm.CMPEarned.display}</td>
+            </tr>
+          </FarmParams>
           <TabActions>
             {loggedIn &&
               <Button
