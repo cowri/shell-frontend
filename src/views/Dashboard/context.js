@@ -1,5 +1,5 @@
 import React from 'react'
-import BigNumber from 'bignumber.js'
+import BN from '../../utils/BN.js';
 
 export default React.createContext({
   account: undefined,
@@ -8,7 +8,7 @@ export default React.createContext({
   contracts: {},
   shell: {},
   liquidity: {},
-  totalShells: new BigNumber(0),
+  totalShells: BN(0),
   updateAllState: () => {},
   presentDeposit: () => {},
   presentWithdraw: () => {},
@@ -16,5 +16,6 @@ export default React.createContext({
   web3: undefined,
   engine: {},
   state: {},
-  login: {}
+  login: {},
+  rewards: {},
 })

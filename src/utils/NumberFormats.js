@@ -1,12 +1,12 @@
-import BigNumber from 'bignumber.js';
+import BN from './BN.js';
 
 export default class NumericFormats {
-    
-    getNumeraireFromDisplay (display) { 
+
+    getNumeraireFromDisplay (display) {
 
       display = display.replace(',','')
 
-      return new BigNumber(display === '' ? 0 : display);
+      return BN(display === '' ? 0 : display);
 
     }
 
@@ -19,17 +19,15 @@ export default class NumericFormats {
         numeraire: this.getNumeraireFromDisplay(display),
         raw: this.getRawFromDisplay(display)
       }
-      
+
     }
 
     getNumeraireFromRaw (raw) {
 
-      const numeraire = new BigNumber(raw).dividedBy(10 ** this.decimals)
-
-      return numeraire
+      return BN(raw).dividedBy(10 ** this.decimals)
 
     }
-    
+
     getAllFormatsFromNumeraire (numeraire) {
 
       return {
@@ -42,7 +40,7 @@ export default class NumericFormats {
 
     getAllFormatsFromRaw (raw) {
 
-      raw = new BigNumber(raw)
+      raw = BN(raw)
 
       return {
         raw: raw,
@@ -62,7 +60,7 @@ export default class NumericFormats {
 
       display = display.replace(',','')
 
-      return new BigNumber(display).multipliedBy(10 ** this.decimals)
+      return BN(display).multipliedBy(10 ** this.decimals)
 
     }
 
@@ -71,9 +69,9 @@ export default class NumericFormats {
       decimals = decimals ? decimals : this.displayDecimals
 
       return Number(
-        new BigNumber(raw).dividedBy(10 ** this.decimals).toFixed(decimals)
+        BN(raw).dividedBy(10 ** this.decimals).toFixed(decimals)
       ).toLocaleString('en-US', { minimumFractionDigits: decimals })
-      
+
     }
 
     getDisplayFromNumeraire (numeraire, decimals) {

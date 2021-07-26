@@ -6,11 +6,11 @@ import BigNumber from 'bignumber.js'
 
 import DashboardContext from '../../context.js'
 
-import ModalConfirm from '../../../../components/ModalConfirm'
-import ModalError from '../../../../components/ModalError'
-import ModalSuccess from '../../../../components/ModalSuccess'
-import ModalTx from '../../../../components/ModalAwaitingTx'
-import ModalUnlock from '../../../../components/ModalUnlock'
+import ModalConfirm from '../../../../components/Modal/ModalConfirm'
+import ModalError from '../../../../components/Modal/ModalError'
+import ModalSuccess from '../../../../components/Modal/ModalSuccess'
+import ModalTx from '../../../../components/Modal/ModalAwaitingTx'
+import ModalUnlock from '../../../../components/Modal/ModalUnlock'
 import NumberFormat from 'react-number-format'
 
 import TextField from '@material-ui/core/TextField'
@@ -31,8 +31,9 @@ const StyledStartAdornment = styled.div`
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
-  padding-left: 22px;
-  padding-right: 12px;
+  padding-left: 24px;
+  padding-right: 14px;
+  flex-shrink: 0;
 `
 
 const StyledSwapTab = styled.div`
@@ -44,8 +45,7 @@ const StyledSwapTab = styled.div`
   width: 90%;
 `
 
-const StyledTokenInfo = withTheme(styled.div`
-`)
+const StyledTokenInfo = withTheme(styled.div``)
 
 const StyledCoinHint = withTheme(styled.div`
   text-align: right;
@@ -56,8 +56,7 @@ const StyledCoinHint = withTheme(styled.div`
   }
 `)
 
-const StyledInput = styled.div`
-`
+const StyledInput = styled.div``
 const StyledMessage = styled.div`
   font-size: 20px;
   padding: 30px;
@@ -73,7 +72,9 @@ const SwapTab = () => {
 
   const {
     state,
-    engine
+    engine,
+    loggedIn,
+    selectWallet,
   } = useContext(DashboardContext)
 
   function getInitOriginIx() {
@@ -234,12 +235,12 @@ const SwapTab = () => {
   const handleSwap = async (e) => {
 
     const noAllowance = state.getIn([
-        'shells',
-        ixs.get('shell'),
-        'derivatives',
-        ixs.get('derivative'),
-        'allowance',
-        'numeraire'
+      'shells',
+      ixs.get('shell'),
+      'derivatives',
+      ixs.get('derivative'),
+      'allowance',
+      'numeraire'
     ]).isLessThan(originValue)
 
     if (noAllowance) return setStep('unlocking')
@@ -407,12 +408,12 @@ const SwapTab = () => {
   }
 
   const selectionCss = makeStyles({
-    root: { 'fontFamily': 'Metric, Arial, sans-serif;', 'fontSize': '17.5px' }
+    root: { 'fontFamily': 'Metric, Arial, sans-serif', 'fontSize': '17.5px' }
   })()
 
   const selections = engine.derivatives.map( (asset, ix) => {
 
-      return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
+    return <MenuItem className={selectionCss.root} key={ix} value={ix} > { asset.symbol } </MenuItem>
 
   })
 
@@ -432,12 +433,15 @@ const SwapTab = () => {
 
   const getDropdown = (handler, selections, value) => {
 
-    return ( <TextField select
-      InputProps={{ className: selectionCss.root }}
-      children={selections}
-      onChange={e => handler(e.target.value)}
-      value={value}
-    /> )
+    return (
+      <TextField
+        select
+        InputProps={{ className: selectionCss.root }}
+        children={selections}
+        onChange={e => handler(e.target.value)}
+        value={value}
+      />
+    )
 
   }
 
@@ -473,7 +477,7 @@ const SwapTab = () => {
     ])
 
     allowance = asset.getIn(['allowance'])
-    balance = asset.getIn(['balance', 'numeraire']).toString()
+    balance = asset.getIn(['balance', 'numeraire']).toFixed(2)
 
     if ( allowance.get('numeraire').isGreaterThan(new BigNumber('100000000'))) {
       allowance = '100,000,000+'
@@ -488,80 +492,83 @@ const SwapTab = () => {
   return (
     <>
 
-    <StyledSwapTab>
+      <StyledSwapTab>
 
-      { step === 'unlocking' && <ModalUnlock
+        { step === 'unlocking' && <ModalUnlock
           coin={state.getIn(['shells', ixs.get('shell'), 'derivatives', ixs.get('derivative') ])}
           handleUnlock={handleUnlock}
           handleCancel={ () => setStep('none') }
         /> }
 
-      { step === 'confirming' && <ModalConfirm wallet={engine.wallet} /> }
+        { step === 'confirming' && <ModalConfirm wallet={engine.wallet} /> }
 
-      { step === 'broadcasting' && <ModalTx txHash={txHash} /> }
+        { step === 'broadcasting' && <ModalTx txHash={txHash} /> }
 
-      { step === 'success' && <ModalSuccess
+        { step === 'success' && <ModalSuccess
           buttonBlurb={'Finish'}
           txHash={txHash}
           onDismiss={() => setStep('none')}
           title={'Swap Successful.'}
         /> }
 
-      { step === 'unlockSuccess' && <ModalSuccess
-        buttonBlurb={'Finish'}
-        onDismiss={() => setStep('none')}
-        title={'Unlocking Successful.'}
+        { step === 'unlockSuccess' && <ModalSuccess
+          buttonBlurb={'Finish'}
+          onDismiss={() => setStep('none')}
+          title={'Unlocking Successful.'}
         /> }
 
-      { step === 'error' && <ModalError
-        buttonBlurb={'Finish'}
-        onDismiss={() => setStep('none')}
-        title={'An error occurred.'}
+        { step === 'error' && <ModalError
+          buttonBlurb={'Finish'}
+          onDismiss={() => setStep('none')}
+          title={'An error occurred.'}
         /> }
 
-      <StyledRows>
-        <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
-        <AmountInput
-          allowance={allowance}
-          balance={balance}
-          icon={origin.icon}
-          onChange={ handleOriginInput }
-          selections={getDropdown(_handleOriginSelect, selections, originIx)}
-          styles={inputStyles}
-          symbol={origin.symbol}
-          title='From'
-          value={originValue}
-          error={!!errorMessage}
-          helperText={errorMessage}
-        />
-        <SwapDirectionIcon onClick={handleSwitch} />
-        <AmountInput
-          icon={target.icon}
-          onChange={ handleTargetInput }
-          selections={getDropdown(_handleTargetSelect, targetSelections, targetIx)}
-          styles={inputStyles}
-          symbol={target.symbol}
-          title='To'
-          value={targetValue}
-        />
-      </StyledRows>
-    </StyledSwapTab>
-      {asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue ?
-          (<Button
-            fullWidth
-            disabled={!targetValue || !originValue || errorMessage}
-            onClick={handleSwap}
-            style={{ marginTop: '40px' }}
-          >
-            Execute
-          </Button>)
-          : (
-            <Button onClick={() => handleUnlock(MAX)} fullWidth>
-              Approve {origin.symbol}
-            </Button>
-          ))}
-    <div style={{ width: 12 }} />
-  </>
+        <StyledRows>
+          <StyledMessage> { priceMessage || haltMessage } </StyledMessage>
+          <AmountInput
+            allowance={allowance}
+            balance={balance}
+            icon={origin.icon}
+            onChange={ handleOriginInput }
+            selections={getDropdown(_handleOriginSelect, selections, originIx)}
+            styles={inputStyles}
+            symbol={origin.symbol}
+            title='From'
+            value={originValue}
+            error={!!errorMessage}
+            helperText={errorMessage}
+          />
+          <SwapDirectionIcon onClick={handleSwitch} />
+          <AmountInput
+            icon={target.icon}
+            onChange={ handleTargetInput }
+            selections={getDropdown(_handleTargetSelect, targetSelections, targetIx)}
+            styles={inputStyles}
+            symbol={target.symbol}
+            title='To'
+            value={targetValue}
+          />
+        </StyledRows>
+      </StyledSwapTab>
+      {!loggedIn ? (
+        <Button onClick={selectWallet} fullWidth>Connect</Button>
+      ) : (
+        asset && (+asset.getIn(['allowance']).get('numeraire').toString() > +originValue)
+      ) ? (
+        <Button
+          fullWidth
+          disabled={!targetValue || !originValue || errorMessage}
+          onClick={handleSwap}
+          style={{ marginTop: '40px' }}
+        >
+          Execute
+        </Button>
+      ) : (
+        <Button onClick={() => handleUnlock(MAX)} fullWidth>
+          Approve {origin.symbol}
+        </Button>
+      )}
+    </>
   )
 }
 
@@ -575,47 +582,44 @@ const AmountInput = ({
   styles,
   value,
   selections
-}) => {
-
-  return (
-    <StyledInput>
-      <StyledTokenInfo>
-        { balance ?
-          <StyledCoinHint onClick={() => onChange({target: {value: balance}})}>
-            Max:
-            <span className="number">&nbsp;{ balance }</span>
-          </StyledCoinHint> : null }
-      </StyledTokenInfo>
-      <NumberFormat
-        fullWidth
-        allowNegative={false}
-        customInput={TextField}
-        error={error}
-        FormHelperTextProps={{className: styles.helperText}}
-        helperText={helperText}
-        inputMode="numeric"
-        min="0"
-        onChange={onChange}
-        placeholder="0"
-        thousandSeparator={true}
-        type="text"
-        value={value}
-        InputProps={{
-          className: styles.inputBase,
-          startAdornment: (
-            <StyledStartAdornment>
-              <TokenIcon > <img src={icon} alt="" /> </TokenIcon>
-            </StyledStartAdornment>
-          ),
-          endAdornment: (
-            <div style={{ marginRight: 6, fontFamily: 'Metric, Arial, sans-serif;' }}>
-              { selections }
-            </div>
-          ),
-        }}
-      />
-    </StyledInput>
-  )
-}
+}) => (
+  <StyledInput>
+    <StyledTokenInfo>
+      { balance ?
+        <StyledCoinHint onClick={() => onChange({target: {value: balance}})}>
+          Max:
+          <span className="number">&nbsp;{ balance }</span>
+        </StyledCoinHint> : null }
+    </StyledTokenInfo>
+    <NumberFormat
+      fullWidth
+      allowNegative={false}
+      customInput={TextField}
+      error={error}
+      FormHelperTextProps={{className: styles.helperText}}
+      helperText={helperText}
+      inputMode="numeric"
+      min="0"
+      onChange={onChange}
+      placeholder="0"
+      thousandSeparator={true}
+      type="text"
+      value={value}
+      InputProps={{
+        className: styles.inputBase,
+        startAdornment: (
+          <StyledStartAdornment>
+            <TokenIcon > <img src={icon} alt="" /> </TokenIcon>
+          </StyledStartAdornment>
+        ),
+        endAdornment: (
+          <div style={{ marginRight: 6, fontFamily: 'Metric, Arial, sans-serif' }}>
+            { selections }
+          </div>
+        ),
+      }}
+    />
+  </StyledInput>
+)
 
 export default SwapTab

@@ -1,19 +1,18 @@
 import React, { useContext, useState } from 'react'
 
-import ModalConfirm from '../../components/ModalConfirm'
-import BroadcastingModal from '../../components/ModalAwaitingTx'
+import ModalConfirm from '../../components/Modal/ModalConfirm'
+import BroadcastingModal from '../../components/Modal/ModalAwaitingTx'
 
 import DashboardContext from '../Dashboard/context'
 
-import ModalError from '../../components/ModalError'
+import ModalError from '../../components/Modal/ModalError'
 import StartModal from './components/StartModal'
-import ModalSuccess from '../../components/ModalSuccess'
+import ModalSuccess from '../../components/Modal/ModalSuccess'
 
 import { fromJS } from 'immutable'
-import BigNumber from 'bignumber.js'
-new BigNumber(0);
+
 const Deposit = ({ shellIx, onDismiss }) => {
-  const { 
+  const {
     engine,
     state
   } = useContext(DashboardContext)
@@ -28,13 +27,13 @@ const Deposit = ({ shellIx, onDismiss }) => {
     error: '',
     feeTip: 'Your rate on this deposit will be...',
   }))
-  
+
   const handleDeposit = async (addresses, amounts) => {
 
     setStep('confirming')
 
     setLocalState(localState.delete('error'))
-    
+
     let success = false
 
     engine.selectiveDeposit(
@@ -67,7 +66,7 @@ const Deposit = ({ shellIx, onDismiss }) => {
   }
 
   const handleUnlock = async (index, amount) => {
-    
+
     setStep('confirming')
 
     engine.unlock(
@@ -114,19 +113,19 @@ const Deposit = ({ shellIx, onDismiss }) => {
 
       { step === 'broadcasting' && <BroadcastingModal txHash={txHash} />}
 
-      { step === 'unlocking-success' && <ModalSuccess 
-          buttonBlurb={'Finish'} 
-          onDismiss={dismissSubmodal} 
-          title={'Approval Successful.'} 
+      { step === 'unlocking-success' && <ModalSuccess
+          buttonBlurb={'Finish'}
+          onDismiss={dismissSubmodal}
+          title={'Approval Successful.'}
           txHash={txHash} /> }
 
-      { step === 'deposit-success' && <ModalSuccess 
-          buttonBlurb={'Finish'} 
-          onDismiss={dismissSubmodal} 
-          title={'Deposit Successful.'} 
+      { step === 'deposit-success' && <ModalSuccess
+          buttonBlurb={'Finish'}
+          onDismiss={dismissSubmodal}
+          title={'Deposit Successful.'}
           txHash={txHash} /> }
 
-      { step === 'error' && <ModalError 
+      { step === 'error' && <ModalError
           buttonBlurb={'Finish'}
           onDismiss={dismissSubmodal}
           title={'An error occurred.'}

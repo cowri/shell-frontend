@@ -8,9 +8,9 @@ import tinyShellIcon from '../../../assets/logo.png'
 
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
-import ModalActions from '../../../components/ModalActions'
-import ModalContent from '../../../components/ModalContent'
-import ModalTitle from '../../../components/ModalTitle'
+import ModalActions from '../../../components/Modal/ModalActions'
+import ModalContent from '../../../components/Modal/ModalContent'
+import ModalTitle from '../../../components/Modal/ModalTitle'
 import TokenIcon from '../../../components/TokenIcon'
 
 import NumberFormat from 'react-number-format'
@@ -293,7 +293,7 @@ const StartModal = ({
 
     const assetState = state.getIn([ 'shells', shellIx, 'assets', ix ])
 
-    let balance = assetState.getIn([ 'balance', 'numeraire']).toString()
+    let balance = assetState.getIn([ 'balance', 'numeraire']).toFixed(2)
 
     let available = assetState.getIn([ 'allowance', 'numeraire' ])
 
@@ -330,7 +330,7 @@ const StartModal = ({
           tag={engine.shells[shellIx].tag}
           onCancel={ () => setPrompting(false) }
           onContinue={handleSubmit} /> }
-      <ModalTitle> Deposit Funds </ModalTitle>
+      <ModalTitle>Deposit Funds</ModalTitle>
       <ModalContent>
         <StyledForm>
           <StyledRows>

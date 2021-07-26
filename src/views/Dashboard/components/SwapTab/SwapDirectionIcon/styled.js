@@ -7,13 +7,12 @@ export const SwapIconContainer = styled.div`
   position: relative;
   margin: 5px 0;
   color: rgba(172,12,238,1);
-  text-align: right;
+  text-align: center;
   font-size: 30px;
 `
 
 export const StyledIconButton = styled(IconButton)`
   font-size: 30px !important;
-  margin-right: 20px !important;
 `
 
 export const StyledSwapVert = withTheme(styled(SwapVert)`

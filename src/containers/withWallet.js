@@ -19,37 +19,24 @@ let syncer
 const withWallet = (WrappedComponent) => {
 
   return (props) => {
-
     const [state, setState] = useState(Map({}))
-
     const [loggedIn, setLoggedIn] = useState(false)
-
     const [walletSelected, setWalletSelected] = useState(true)
 
-    const selectWallet = async () => {
-
-        const walletSelected = await onboard.walletSelect();
+    const selectWallet = async (wallet) => {
+        const walletSelected = await onboard.walletSelect(wallet);
 
         if (walletSelected) {
-
           const walletChecked = await onboard.walletCheck();
-
-          if (!walletChecked) {
-
-            selectWallet()
-
-          } else {
-
-            setLoggedIn(true)
-
-          }
-
-        } else {
-
-          selectWallet()
-
+          if (walletChecked) setLoggedIn(true)
         }
 
+    }
+
+    const disconnect = async () => {
+      onboard.walletReset()
+      setLoggedIn(false)
+      window.localStorage.removeItem('selectedWallet')
     }
 
     // init application
@@ -58,6 +45,10 @@ const withWallet = (WrappedComponent) => {
       init()
 
       async function init () {
+
+        web3 = new Web3('https://mainnet.infura.io/v3/db72eb2275564c62bfa71896870d8975')
+        engine = engine ? engine : new Engine(web3, setState)
+        engine.sync(address || `0x${'0'.repeat(40)}`)
 
         onboard = Onboard({
           dappId: config.blocknative, // [String] The API key created by step one above
@@ -69,9 +60,9 @@ const withWallet = (WrappedComponent) => {
 
               if (!_address) {
 
-                return await selectWallet()
+                init()
 
-              } else if (network == config.network) {
+              } else if (network === config.network) {
 
                 engine = engine ? engine : new Engine(web3, setState)
 
@@ -86,7 +77,7 @@ const withWallet = (WrappedComponent) => {
 
               network = _network
 
-              if (address && _network == config.network) {
+              if (address && _network === config.network) {
 
                 engine = engine ? engine : new Engine(web3, setState)
 
@@ -94,21 +85,15 @@ const withWallet = (WrappedComponent) => {
 
                 if (!syncer) syncer = setInterval(() => engine.sync(address), 7500)
 
-              } else if (_network != config.network) {
-
-                selectWallet()
-
               }
 
             },
             wallet: async wallet => {
+              if (!wallet.name) return
 
-              if (wallet.name == undefined) return
-
+              window.localStorage.setItem('selectedWallet', wallet.name)
               web3 = new Web3(wallet.provider)
-
               engine = new Engine(web3, setState)
-
               engine.wallet = wallet.name
 
             },
@@ -125,9 +110,13 @@ const withWallet = (WrappedComponent) => {
             ]
           }
         });
-      }
 
-      selectWallet()
+        const previouslySelectedWallet = window.localStorage.getItem('selectedWallet')
+
+        if (previouslySelectedWallet != null) {
+          await selectWallet(previouslySelectedWallet)
+        }
+      }
 
     }, [])
 
@@ -137,6 +126,7 @@ const withWallet = (WrappedComponent) => {
           {...props}
           hasMetamask={!!window.ethereum}
           selectWallet={selectWallet}
+          disconnect={disconnect}
           network={network}
           walletSelected={walletSelected}
           web3={web3}

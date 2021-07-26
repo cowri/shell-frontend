@@ -5,9 +5,9 @@ import LockIcon from '@material-ui/icons/Lock'
 import Button from '../../../components/Button'
 import Loader from '../../../components/Loader'
 import Modal from '../../../components/Modal'
-import ModalActions from '../../../components/ModalActions'
-import ModalIcon from '../../../components/ModalIcon'
-import ModalTitle from '../../../components/ModalTitle'
+import ModalActions from '../../../components/Modal/ModalActions'
+import ModalIcon from '../../../components/Modal/ModalIcon'
+import ModalTitle from '../../../components/Modal/ModalTitle'
 
 import metamaskLogo from '../../../assets/metamask.svg'
 
@@ -22,9 +22,9 @@ const Unlock = () => {
     setIsRequesting(true)
 
     onEnable().catch(e => setIsRequesting(false))
-    
+
   }
-  
+
   if (isRequesting) {
     return (
       <Modal onDismiss={() => setIsRequesting(false)}>

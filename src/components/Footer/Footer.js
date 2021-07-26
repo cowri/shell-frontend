@@ -12,7 +12,7 @@ const StyledFooter = styled.footer`
   align-items: center;
   color: #FFF;
   display: flex;
-  height: 96px;
+  height: 136px;
   justify-content: center;
 `
 
@@ -31,14 +31,14 @@ const StyledSocialIcon = styled.a`
   }
 `
 
-const IconBox = styled.a`
+const IconBox = styled.span`
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   img {
-    width: 21px;
+    width: 32px;
   }
 `
 
@@ -54,24 +54,24 @@ const Footer = ({ shellIx }) => {
     <Container>
       <StyledFooter>
         <StyledSocialIcon target="_blank" href="https://twitter.com/componentx">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faTwitter} size="lg"/>
+          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faTwitter} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://discord.gg/AMrXmH3yff">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faDiscord} size="lg"/>
+          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faDiscord} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://github.com/Componentfinance">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faGithub} size="lg"/>
+          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faGithub} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://componentfinance.medium.com/">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faMedium} size="lg"/>
+          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faMedium} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://t.me/componentfinance">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faTelegram} size="lg"/>
+          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faTelegram} size="2x"/>
         </StyledSocialIcon>
         {shellIx !== null && (
-          <StyledSocialIcon>
-            <IconBox href={etherscan} target="_blank">
-              <img alt="" src={etherscanIcon}/>
+          <StyledSocialIcon href={etherscan} target="_blank">
+            <IconBox >
+              <img alt="" src={etherscanIcon} alt="etherscan logo"/>
             </IconBox>
           </StyledSocialIcon>
         )}
