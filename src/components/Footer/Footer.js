@@ -38,7 +38,7 @@ const IconBox = styled.span`
   align-items: center;
   justify-content: center;
   img {
-    width: 32px;
+    width: 21px;
   }
 `
 
@@ -71,7 +71,7 @@ const Footer = ({ shellIx }) => {
         {shellIx !== null && (
           <StyledSocialIcon href={etherscan} target="_blank">
             <IconBox >
-              <img alt="" src={etherscanIcon} alt="etherscan logo"/>
+              <img src={etherscanIcon} alt="etherscan logo"/>
             </IconBox>
           </StyledSocialIcon>
         )}

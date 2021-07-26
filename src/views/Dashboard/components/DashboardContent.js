@@ -167,20 +167,20 @@ const DashboardContent = forwardRef((props, ref) => {
                 )
               }
             </Tab>
-            <Tab
-              active={activeTab === 'stakeList' || activeTab === 'stake'}
-              onClick={stakeTabClick}
-            >
-              { activeTab !== 'stake'
-                ? 'Stake'
-                : (
-                  <a style={{display: 'flex', alignItems: 'center'}}>
-                    <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
-                    <span>Stake</span>
-                  </a>
-                )
-              }
-            </Tab>
+            {/*<Tab*/}
+            {/*  active={activeTab === 'stakeList' || activeTab === 'stake'}*/}
+            {/*  onClick={stakeTabClick}*/}
+            {/*>*/}
+            {/*  { activeTab !== 'stake'*/}
+            {/*    ? 'Stake'*/}
+            {/*    : (*/}
+            {/*      <a style={{display: 'flex', alignItems: 'center'}}>*/}
+            {/*        <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>*/}
+            {/*        <span>Stake</span>*/}
+            {/*      </a>*/}
+            {/*    )*/}
+            {/*  }*/}
+            {/*</Tab>*/}
           </Tabs>
           { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
           { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }

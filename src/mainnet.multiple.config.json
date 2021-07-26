@@ -93,5 +93,35 @@
         "lambda": "1"
       }
     }
-  ]
+  ],
+  "farmingPools": [
+    {
+      "managerAddress": "0xEAc13bda20A0A81f5Cb0ADdC4a091d00344C2E1b",
+      "underlyingPoolAddress": "0xcf76a0ceDf50DA184FDef08A9d04E6829D7FefDF",
+      "name": "USDP/BUSD/USDT",
+      "icon": "logo.png",
+      "displayDecimals": 4,
+      "decimals": 18,
+      "monthRewards": 8220
+    },
+    {
+      "managerAddress": "0xB56689C8746A14e8ba1d8050e55eF241268178eB",
+      "underlyingPoolAddress": "0x3Bb6Bf6EcBC71f8f78D1Eec9c91de4f8Fd5C891c",
+      "name": "BUSD/USDT/USDC",
+      "icon": "logo.png",
+      "displayDecimals": 4,
+      "decimals": 18,
+      "monthRewards": 8220
+    },
+    {
+      "managerAddress": "0x53De001bbfAe8cEcBbD6245817512F8DBd8EEF18",
+      "underlyingPoolAddress": "0x696741234737f93FA45017E4891DEa87070896d8",
+      "name": "CMP/BNB",
+      "icon": "logo.png",
+      "displayDecimals": 4,
+      "decimals": 18,
+      "monthRewards": 41100
+    }
+  ],
+  "stakingPools": []
 }

@@ -24,7 +24,7 @@ export class Farm extends NumericFormats {
     this.account = this.web3.utils.toChecksumAddress(account);
     this.managerContract = new web3.eth.Contract(StakingManagerABI, pool.managerAddress)
     this.underlyingPoolContract = new web3.eth.Contract(ERC20ABI, pool.underlyingPoolAddress)
-    this.cmpToken = new web3.eth.Contract(ERC20ABI, "0x9f20ed5f919dc1c1695042542c13adcfc100dcab")
+    this.cmpToken = new web3.eth.Contract(ERC20ABI, "0x96124f7382a0ed672bba8f9b92208434eabcfb40")
 
     this.underlyingBalance = null;
     this.userLockedValue = null;

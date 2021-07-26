@@ -46,7 +46,7 @@ const withWallet = (WrappedComponent) => {
 
       async function init () {
 
-        web3 = new Web3('https://mainnet.infura.io/v3/db72eb2275564c62bfa71896870d8975')
+        web3 = new Web3('https://icy-small-sound.bsc.quiknode.pro/4baedf5d827d8d9c3c17aa08b0bc5dd8b1ce2378/')
         engine = engine ? engine : new Engine(web3, setState)
         engine.sync(address || `0x${'0'.repeat(40)}`)
 

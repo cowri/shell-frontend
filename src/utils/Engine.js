@@ -7,7 +7,6 @@ import SwapEngine from './SwapEngine';
 import {CircularProgress} from '@material-ui/core';
 
 import shellIcon from '../assets/logo.png';
-import Rewards from './Rewards.js';
 import BN from './BN.js';
 import FarmingEngine from './FarmingEngine.js';
 
@@ -31,7 +30,6 @@ export default class Engine extends SwapEngine {
     this.overlaps = {};
     this.pairsToShells = {};
 
-    this.rewards = {};
     this.staking = {};
     this.farming = {};
 
@@ -340,7 +338,6 @@ export default class Engine extends SwapEngine {
     const shells = [];
     let assets = [];
     let derivatives = [];
-    let rewards;
 
     for (const _shell_ of this.shells) {
 
@@ -363,10 +360,6 @@ export default class Engine extends SwapEngine {
     assets = assets.filter(filter, new Set());
     derivatives = derivatives.filter(filter, new Set());
 
-    rewards = new Rewards(this.web3, account);
-    await rewards.getClaimedStatus();
-    this.rewards = rewards;
-
     const farming = new FarmingEngine(this.web3, account, shells);
     await farming.init();
     this.farming = farming;
@@ -376,7 +369,6 @@ export default class Engine extends SwapEngine {
       shells,
       assets,
       derivatives,
-      rewards,
       farming,
     });
 

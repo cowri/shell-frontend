@@ -3,7 +3,6 @@ import styled from 'styled-components'
 
 import Container from '../Container'
 import Logo from '../Logo'
-import {ClaimRewards} from './ClaimRewards.js';
 import DashboardContext from '../../views/Dashboard/context.js';
 import Button from '../Button';
 import {StyledButton} from '../Button/Button.js';
@@ -63,7 +62,6 @@ const Header = ({goToIndexTab}) => {
         <ConnectButtonContainer>
           <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
         </ConnectButtonContainer>
-        {engine && engine.rewards.amount && !engine.rewards.isClaimed && <ClaimRewards />}
       </StyledHeader>
     </Container>
   )
