@@ -52,19 +52,22 @@ const ConnectButtonContainer = styled.div`
 `
 
 const Header = ({goToIndexTab}) => {
-  const {engine, loggedIn, selectWallet, disconnect} = useContext(DashboardContext)
-  return (
-    <Container>
-      <StyledHeader>
-        <Logo onClick={() => goToIndexTab()}/>
-        {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
-        <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
-        <ConnectButtonContainer>
-          <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
-        </ConnectButtonContainer>
-      </StyledHeader>
-    </Container>
-  )
+    const {engine, loggedIn, selectWallet, disconnect} = useContext(DashboardContext)
+    return (
+        <Container>
+            <StyledHeader>
+                <Logo onClick={() => goToIndexTab()}/>
+                {engine && engine.farming && engine.farming.cmpPrice &&
+                <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
+                <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
+                <ConnectButtonContainer>
+                    <Button onClick={() => {
+                        loggedIn ? disconnect() : selectWallet()
+                    }}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
+                </ConnectButtonContainer>
+            </StyledHeader>
+        </Container>
+    )
 }
 
 export default Header

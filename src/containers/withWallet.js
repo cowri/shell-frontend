@@ -25,17 +25,41 @@ const withWallet = (WrappedComponent) => {
 
     const selectWallet = async (wallet) => {
       const walletSelected = await onboard.walletSelect(wallet);
-
       const state = onboard.getState()
+      const params = [{
+        "chainId": "0x38", // 56 in decimal
+        "chainName": "Binance Smart Chain",
+        "rpcUrls": [
+          "https://bsc-dataseed.binance.org"
+        ],
+        "nativeCurrency": {
+          "name": "Binance Coin",
+          "symbol": "BNB",
+          "decimals": 18
+        },
+        "blockExplorerUrls": [
+          "https://bscscan.com"
+        ]
+      }]
 
       if (state.network !== state.appNetworkId && window.ethereum) {
         try {
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{chainId: '0x1'}],
+            params: [{chainId: '0x38'}],
           });
         } catch (switchError) {
           console.error(String(switchError))
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params,
+              });
+            } catch (addError) {
+              console.error(String(addError))
+            }
+          }
         }
       }
 
@@ -61,7 +85,7 @@ const withWallet = (WrappedComponent) => {
 
       async function init () {
 
-        web3 = new Web3('https://icy-small-sound.bsc.quiknode.pro/4baedf5d827d8d9c3c17aa08b0bc5dd8b1ce2378/')
+        web3 = new Web3(process.env.REACT_APP_NODE_RPC_URL)
         engine = engine ? engine : new Engine(web3, setState)
         engine.sync(address || `0x${'0'.repeat(40)}`)
 
@@ -79,7 +103,7 @@ const withWallet = (WrappedComponent) => {
 
               } else if (network === config.network) {
 
-                engine = engine ? engine : new Engine(web3, setState)
+                engine = engine ?? new Engine(web3, setState)
 
                 engine.sync(address)
 
@@ -119,7 +143,7 @@ const withWallet = (WrappedComponent) => {
               {
                 walletName: "walletConnect",
                 preferred: true,
-                rpc: { 56: config.defaultWeb3Provider },
+                rpc: { 56: process.env.REACT_APP_NODE_RPC_URL },
                 bridge: 'https://bridge.walletconnect.org',
               },
             ]
