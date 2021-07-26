@@ -47,7 +47,9 @@ const withWallet = (WrappedComponent) => {
     }
 
     const disconnect = async () => {
-      onboard.walletReset()
+      try {
+        onboard.walletReset()
+      } catch (e) { }
       setLoggedIn(false)
       window.localStorage.removeItem('selectedWallet')
     }
