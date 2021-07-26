@@ -80,7 +80,7 @@ export class Farm extends NumericFormats {
     this.depositValueUsd = this.userLockedValue.numeraire.times(underlyingPrice).toFixed(2)
 
     if (+this.periodFinish === 0) {
-      this.apr = 'Not started yet'
+      this.apr = 'TBA'
     } else if (blockTime > this.periodFinish) {
       this.apr = 'Ended'
     } else {
