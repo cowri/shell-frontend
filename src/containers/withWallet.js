@@ -24,17 +24,32 @@ const withWallet = (WrappedComponent) => {
     const [walletSelected, setWalletSelected] = useState(true)
 
     const selectWallet = async (wallet) => {
-        const walletSelected = await onboard.walletSelect(wallet);
+      const walletSelected = await onboard.walletSelect(wallet);
 
-        if (walletSelected) {
-          const walletChecked = await onboard.walletCheck();
-          if (walletChecked) setLoggedIn(true)
+      const state = onboard.getState()
+
+      if (state.network !== state.appNetworkId && window.ethereum) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{chainId: '0x1'}],
+          });
+        } catch (switchError) {
+          console.error(String(switchError))
         }
+      }
+
+      if (walletSelected) {
+        const walletChecked = await onboard.walletCheck();
+        if (walletChecked) setLoggedIn(true)
+      }
 
     }
 
     const disconnect = async () => {
-      onboard.walletReset()
+      try {
+        onboard.walletReset()
+      } catch (e) { }
       setLoggedIn(false)
       window.localStorage.removeItem('selectedWallet')
     }
