@@ -104,7 +104,7 @@
       "icon": "logo.png",
       "displayDecimals": 4,
       "decimals": 18,
-      "monthRewards": 8220
+      "periodDuration": 2592000
     },
     {
       "managerAddress": "0x2BE4d20b9eeB7d625FA68112568F94c615Af376B",
@@ -113,7 +113,7 @@
       "icon": "logo.png",
       "displayDecimals": 4,
       "decimals": 18,
-      "monthRewards": 8220
+      "periodDuration": 2592000
     },
     {
       "managerAddress": "0x5D4066ed92F0FE565747FB75C128995e0b757d7d",
@@ -122,7 +122,7 @@
       "icon": "logo.png",
       "displayDecimals": 4,
       "decimals": 18,
-      "monthRewards": 41100
+      "periodDuration": 2592000
     }
   ],
   "stakingPools": [
@@ -133,7 +133,7 @@
       "icon": "logo.png",
       "displayDecimals": 4,
       "decimals": 18,
-      "monthRewards": 8220
+      "periodDuration": 2592000
     }
   ]
 }

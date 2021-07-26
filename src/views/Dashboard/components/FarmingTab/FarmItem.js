@@ -20,6 +20,8 @@ export default function FarmItem({farm, showFarm, loggedIn}) {
     </>
   }
 
+  const apr = isNaN(farm.apr) ? farm.apr : `${Number(farm.apr).toLocaleString('en-US', {minimumFractionDigits: 0})}%`
+
   return (
     <>
       <ReactTooltip />
@@ -39,7 +41,7 @@ export default function FarmItem({farm, showFarm, loggedIn}) {
           </StakeItemTd>
         )}
         <StakeItemTd>
-          {Number(farm.apr).toLocaleString('en-US', {minimumFractionDigits: 0})}%
+          {apr}
         </StakeItemTd>
       </StakeItemContainer>
     </>

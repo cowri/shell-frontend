@@ -28,27 +28,11 @@ const FarmParams = styled.table`
   }
 `
 
-const FarmParam = styled.div`
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding-left: 40px;
-  &:nth-child(1),
-  &:nth-child(2) {
-    margin-bottom: 20px;
-  }
-  span {
-    font-weight: bold;
-  }
-`
-
 export function FarmTab({farmAddress, type}) {
   const [loading, setLoading] = useState(true)
   const [farm, setFarm] = useState(null)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
-  const [showClaimModal, setShowClaimModal] = useState(false)
 
   const {
     state,
@@ -63,13 +47,15 @@ export function FarmTab({farmAddress, type}) {
     setLoading(false)
   }, [state, farmAddress])
 
+  const apr = farm ? (isNaN(farm.apr) ? `${farm.apr}` : `APR: ${farm.apr}%`) : ''
+
   return (
     <TabContainer>
       {loading ? <Spinner /> : farm ? (
         <>
           {showWithdrawModal && <FarmTabWithdrawModal onDismiss={() => setShowWithdrawModal(false)} farm={farm} />}
           {showDepositModal && <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />}
-          <TabHeading>{farm.name} <span>(APR: {farm.apr}%)</span></TabHeading>
+          <TabHeading>{farm.name} <span>({apr})</span></TabHeading>
           <FarmParams>
             <tr>
               <td><span>TVL</span><br />{farm.totalLockedValue.display}</td>
