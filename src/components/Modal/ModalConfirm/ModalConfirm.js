@@ -15,8 +15,8 @@ const ModalConfirm = ({wallet}) => (
     <ModalIcon>
       <img
         alt="Wallet Logo"
-        src={ wallet == 'MetaMask' ? metamaskLogo :
-              wallet == 'WalletConnect' ? walletConnectLogo :
+        src={ wallet === 'MetaMask' ? metamaskLogo :
+              wallet === 'WalletConnect' ? walletConnectLogo :
               ''
             }
         style={{ height: 96 }}

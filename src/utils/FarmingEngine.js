@@ -14,6 +14,7 @@ export default class FarmingEngine {
 
   async init() {
     await this.getCmpPrice()
+    await this.getCurrentTime()
     const pools = await Promise.all([this.formPools(config.farmingPools), this.formPools(config.stakingPools)])
     this.farms = pools[0]
     this.stakes = pools[1]
@@ -24,6 +25,10 @@ export default class FarmingEngine {
     this.cmpPrice = resp.data.component.usd;
   }
 
+  async getCurrentTime() {
+    this.blockTime = (await this.web3.eth.getBlock('latest')).timestamp;
+  }
+
   async formPools(pools) {
     const items = {}
     await Promise.all(pools.map(async (pool) => {
@@ -31,7 +36,7 @@ export default class FarmingEngine {
         return item.shell.address.toLowerCase() === pool.underlyingPoolAddress.toLowerCase()
       })
       const item = new Farm(this.web3, this.account, pool, shell);
-      await item.init(this.cmpPrice)
+      await item.init(this.cmpPrice, this.blockTime)
       items[item.managerAddress] = item;
     }))
     return items;

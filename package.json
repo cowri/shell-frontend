@@ -15,7 +15,7 @@
     "@testing-library/user-event": "^12.7.3",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
-    "bnc-onboard": "^1.19.2",
+    "bnc-onboard": "^1.30.0",
     "immutable": "^3.8.2",
     "immutable-js": "^0.3.1-6",
     "js-cookie": "^2.2.1",

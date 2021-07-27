@@ -39,9 +39,9 @@ export class Farm extends NumericFormats {
     this.deposit = this.deposit.bind(this)
   }
 
-  async init(cmpPrice) {
+  async init(cmpPrice, blockTime) {
     await this.getUserUnderlyingTokensBalance();
-    await this.calculateAPR(cmpPrice);
+    await this.calculateAPR(cmpPrice, blockTime);
   }
 
   async getUserUnderlyingTokensBalance() {
@@ -59,9 +59,14 @@ export class Farm extends NumericFormats {
 
     const CMPEarned = BN(await this.managerContract.methods.earned(this.account).call())
     this.CMPEarned = this.getAllFormatsFromRaw(CMPEarned)
+
+    this.periodFinish = await this.managerContract.methods.periodFinish().call()
+
+    const rewardRate = BN(await this.managerContract.methods.rewardRate().call())
+    this.rewardRate = this.getAllFormatsFromRaw(rewardRate)
   }
 
-  async calculateAPR(cmpPrice) {
+  async calculateAPR(cmpPrice, blockTime) {
     let underlyingPrice
     if (this.shell) {
       const totalUnderlyingPoolLiquidity = this.shell.liquidityTotal.raw
@@ -78,13 +83,20 @@ export class Farm extends NumericFormats {
     this.totalLockedValueUsd = this.totalLockedValue.numeraire.times(underlyingPrice).toFixed(2)
     this.depositValueUsd = this.userLockedValue.numeraire.times(underlyingPrice).toFixed(2)
 
-    this.apr = BN(this.monthRewards)
-      .times(cmpPrice)
-      .times(12)
-      .div(
-        this.totalLockedValue.numeraire.times(underlyingPrice)
-      )
-      .toFixed(2)
+    if (+this.periodFinish === 0) {
+      this.apr = 'TBA'
+    } else if (blockTime > this.periodFinish) {
+      this.apr = 'Ended'
+    } else {
+      this.apr = BN(this.periodDuration)
+          .times(this.rewardRate.numeraire)
+          .times(cmpPrice)
+          .times(12)
+          .div(
+              this.totalLockedValue.numeraire.times(underlyingPrice)
+          )
+          .toFixed(2)
+    }
   }
 
   async approve() {

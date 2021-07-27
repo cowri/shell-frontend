@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {TabActions, TabContainer, TabHeading} from '../../../../components/TabContainer/styled.js';
 import DashboardContext from '../../context.js';
 import Button from '../../../../components/Button';
@@ -6,8 +6,6 @@ import {FarmTabWithdrawModal} from './FarmTabWithdrawModal';
 import {FarmTabDepositModal} from './FarmTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
 import styled from 'styled-components';
-import ModalConfirm from '../../../../components/Modal/ModalConfirm';
-import {StatusModals} from '../../../../components/StatusModals';
 import {currentTxStore} from '../../../../store/currentTxStore.js';
 
 const FarmParams = styled.table`
@@ -50,9 +48,7 @@ export function FarmTab({farmAddress, type}) {
     setLoading(false)
   }, [state, farmAddress])
 
-  function onDismiss() {
-    currentTxStore.setCurrentTx(null)
-  }
+  const apr = farm ? (isNaN(farm.apr) ? `${farm.apr}` : `APR: ${farm.apr}%`) : ''
 
   return (
     <TabContainer>
