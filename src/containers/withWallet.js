@@ -29,11 +29,14 @@ const withWallet = (WrappedComponent) => {
 
       const state = onboard.getState()
 
+      console.log(state.network)
+      console.log(state.appNetworkId)
+
       if (state.network !== state.appNetworkId && window.ethereum) {
         try {
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{chainId: '0x1'}],
+            params: [{ chainId: Web3.utils.toHex(chainId) }],
           });
         } catch (switchError) {
           console.error(String(switchError))
@@ -60,7 +63,7 @@ const withWallet = (WrappedComponent) => {
 
       async function init () {
 
-        web3 = new Web3('https://mainnet.infura.io/v3/db72eb2275564c62bfa71896870d8975')
+        web3 = new Web3(config.defaultWeb3Provider[chainId])
         engine = engine ? engine : engine = new Engine(web3, setState)
 
         const previouslySelectedWallet = window.localStorage.getItem('selectedWallet')

@@ -4,16 +4,18 @@ import Container from '../../../components/Container'
 import Surface from '../../../components/Surface'
 import Tab from '../../../components/Tab'
 import Tabs from '../../../components/Tabs'
+import config from '../../../config.js'
 
 import {ShellTab} from './ShellTab'
 import {ShellsTab} from './ShellsTab';
 import SwapTab from './SwapTab/SwapTab.js'
 
 import DashboardContext from '../context'
-import Footer from '../../../components/Footer';
 import {faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons/faArrowCircleLeft.js';
 import FarmingTab from './FarmingTab/FarmingTab.js';
 import {FarmTab} from './FarmTab';
+import {chainId} from '../../../constants/chainId.js';
+import Footer from '../../../components/Footer';
 
 
 const DashboardContent = forwardRef((props, ref) => {
@@ -126,6 +128,9 @@ const DashboardContent = forwardRef((props, ref) => {
     window.history.replaceState(null, null, `?${queryParams}`)
   }
 
+  const chainHaveFarming = !!config.farmingPools[chainId].length
+  const chainHaveStaking = !!config.stakingPools[chainId].length
+
   return (
     <>
       <Container>
@@ -153,21 +158,21 @@ const DashboardContent = forwardRef((props, ref) => {
                 )
               }
             </Tab>
-            <Tab
+            {chainHaveFarming && <Tab
               active={activeTab === 'farmList' || activeTab === 'farm'}
               onClick={farmTabClick}
             >
-              { activeTab !== 'farm'
+              {activeTab !== 'farm'
                 ? 'Farm'
                 : (
                   <a style={{display: 'flex', alignItems: 'center'}}>
-                    <FontAwesomeIcon icon={faArrowCircleLeft} style={{ marginRight: '10px' }}/>
+                    <FontAwesomeIcon icon={faArrowCircleLeft} style={{marginRight: '10px'}}/>
                     <span>Farm</span>
                   </a>
                 )
               }
-            </Tab>
-            <Tab
+            </Tab>}
+            {chainHaveStaking && <Tab
               active={activeTab === 'stakeList' || activeTab === 'stake'}
               onClick={stakeTabClick}
             >
@@ -180,15 +185,15 @@ const DashboardContent = forwardRef((props, ref) => {
                   </a>
                 )
               }
-            </Tab>
+            </Tab>}
           </Tabs>
           { activeTab === 'shells' && <ShellsTab showShell={showShell} /> }
           { activeTab === 'shell' && <ShellTab shellIx={shellIx} /> }
           { activeTab === 'swap' && <SwapTab /> }
-          { activeTab === 'stakeList' && <FarmingTab type="stakes" showFarm={showStake} />}
-          { activeTab === 'stake' && <FarmTab type="stakes" stakeAddress={selectedStakeAddress}/>}
-          { activeTab === 'farmList' && <FarmingTab type="farms" showFarm={showFarm} />}
-          { activeTab === 'farm' && <FarmTab type="farms" farmAddress={selectedFarmAddress}/>}
+          { activeTab === 'stakeList' && chainHaveStaking && <FarmingTab type="stakes" showFarm={showStake} />}
+          { activeTab === 'stake' && chainHaveStaking && <FarmTab type="stakes" stakeAddress={selectedStakeAddress}/>}
+          { activeTab === 'farmList' && chainHaveFarming && <FarmingTab type="farms" showFarm={showFarm} />}
+          { activeTab === 'farm' && chainHaveFarming && <FarmTab type="farms" farmAddress={selectedFarmAddress}/>}
         </Surface>
       </Container>
       <Footer shellIx={shellIx}/>

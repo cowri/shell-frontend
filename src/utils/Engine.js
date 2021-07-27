@@ -343,12 +343,18 @@ export default class Engine extends SwapEngine {
 
     for (const _shell_ of this.shells) {
 
+      try {
+
         const shell = await this.readShell(_shell_);
 
         assets = assets.concat(shell.assets);
         derivatives = derivatives.concat(shell.assets.flatMap(asset => [asset].concat(asset.derivatives)));
 
         shells.push(shell);
+
+      } catch (e) {
+        console.log(e)
+      }
 
     }
 

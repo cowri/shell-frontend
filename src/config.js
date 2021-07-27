@@ -2,7 +2,7 @@ export default {
   defaultWeb3Provider: {
     1: 'https://mainnet.infura.io/v3/3c3dfdec6ce94abc935977aa995d1a8c',
     56: 'https://icy-small-sound.bsc.quiknode.pro/4baedf5d827d8d9c3c17aa08b0bc5dd8b1ce2378/',
-    100: 'https://little-wispy-sun.xdai.quiknode.pro/b3fea81156c1abb58de12e3819e9de382216c99c',
+    100: 'https://little-wispy-sun.xdai.quiknode.pro/b3fea81156c1abb58de12e3819e9de382216c99c/',
   },
   infuraKey: {
     1: '3c3dfdec6ce94abc935977aa995d1a8c',
@@ -18,6 +18,11 @@ export default {
     1: '0xc8c59160542B97Bd160B3b6a6B353dAC0adc8283',
     56: null,
     100: null,
+  },
+  cmpAddress: {
+    1: '0x9f20ed5f919dc1c1695042542c13adcfc100dcab',
+    56: '0x96124f7382a0ed672bba8f9b92208434eabcfb40',
+    100: '0x911F196Ed489e41C8B45B5C56FEce021C27a6159',
   },
   pools: {
     1: [
@@ -403,41 +408,41 @@ export default {
     ],
     100: [
       {
-        "managerAddress": "0x79876b5062160C107e02826371dD33c047CCF2de",
-        "underlyingPoolAddress": "0x53De001bbfAe8cEcBbD6245817512F8DBd8EEF18",
-        "name": "USDP/WXDAI/USDC",
-        "icon": "logo.png",
-        "displayDecimals": 4,
-        "decimals": 18,
-        "periodDuration": 2592000
+        managerAddress: '0x79876b5062160C107e02826371dD33c047CCF2de',
+        underlyingPoolAddress: '0x53De001bbfAe8cEcBbD6245817512F8DBd8EEF18',
+        name: 'USDP/WXDAI/USDC',
+        icon: 'logo.png',
+        displayDecimals: 4,
+        decimals: 18,
+        periodDuration: 2592000,
       },
       {
-        "managerAddress": "0xdbd9aC0802544F6D293B293ee15E82d3Ec410CCb",
-        "underlyingPoolAddress": "0xF82fc0ecBf3ff8e253a262447335d3d8A72CD028",
-        "name": "WXDAI/DAI(BSC)",
-        "icon": "logo.png",
-        "displayDecimals": 4,
-        "decimals": 18,
-        "periodDuration": 2592000
+        managerAddress: '0xdbd9aC0802544F6D293B293ee15E82d3Ec410CCb',
+        underlyingPoolAddress: '0xF82fc0ecBf3ff8e253a262447335d3d8A72CD028',
+        name: 'WXDAI/DAI(BSC)',
+        icon: 'logo.png',
+        displayDecimals: 4,
+        decimals: 18,
+        periodDuration: 2592000,
       },
       {
-        "managerAddress": "0xF3aC78AF33B79E3106e1d31c769cd1D54C487E69",
-        "underlyingPoolAddress": "0xfbbd0F67cEbCA3252717E66c1Ed1E97ad8B06377",
-        "name": "DAI(BSC)/USDC(BSC)/USDC/WXDAI",
-        "icon": "logo.png",
-        "displayDecimals": 4,
-        "decimals": 18,
-        "periodDuration": 2592000
+        managerAddress: '0xF3aC78AF33B79E3106e1d31c769cd1D54C487E69',
+        underlyingPoolAddress: '0xfbbd0F67cEbCA3252717E66c1Ed1E97ad8B06377',
+        name: 'DAI(BSC)/USDC(BSC)/USDC/WXDAI',
+        icon: 'logo.png',
+        displayDecimals: 4,
+        decimals: 18,
+        periodDuration: 2592000,
       },
       {
-        "managerAddress": "0xc2004547637240d4d8DC376B0fe8C08C563224F9",
-        "underlyingPoolAddress": "0xd51Ecf96357aB928227Ef25179d12731C986Ca0b",
-        "name": "CMP/XDAI",
-        "icon": "logo.png",
-        "displayDecimals": 4,
-        "decimals": 18,
-        "periodDuration": 2592000
-      }
+        managerAddress: '0xc2004547637240d4d8DC376B0fe8C08C563224F9',
+        underlyingPoolAddress: '0xd51Ecf96357aB928227Ef25179d12731C986Ca0b',
+        name: 'CMP/XDAI',
+        icon: 'logo.png',
+        displayDecimals: 4,
+        decimals: 18,
+        periodDuration: 2592000,
+      },
     ],
   },
   stakingPools: {

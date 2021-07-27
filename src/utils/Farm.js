@@ -2,6 +2,8 @@ import NumericFormats from './NumberFormats.js';
 import StakingManagerABI from '../abi/StakingManager.abi.json'
 import ERC20ABI from '../abi/ERC20.abi.json';
 import BN from './BN.js';
+import config from '../config.js';
+import {chainId} from '../constants/chainId.js';
 
 export class Farm extends NumericFormats {
   /**
@@ -24,7 +26,7 @@ export class Farm extends NumericFormats {
     this.account = this.web3.utils.toChecksumAddress(account);
     this.managerContract = new web3.eth.Contract(StakingManagerABI, pool.managerAddress)
     this.underlyingPoolContract = new web3.eth.Contract(ERC20ABI, pool.underlyingPoolAddress)
-    this.cmpToken = new web3.eth.Contract(ERC20ABI, "0x9f20ed5f919dc1c1695042542c13adcfc100dcab")
+    this.cmpToken = new web3.eth.Contract(ERC20ABI, config.cmpAddress[chainId])
 
     this.underlyingBalance = null;
     this.userLockedValue = null;
