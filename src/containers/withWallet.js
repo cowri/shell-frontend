@@ -58,7 +58,7 @@ const withWallet = (WrappedComponent) => {
             "https://blockscout.com/xdai/mainnet"
           ]
         }],
-      }
+      }[chainId]
 
       if (state.network !== state.appNetworkId && window.ethereum) {
         try {
