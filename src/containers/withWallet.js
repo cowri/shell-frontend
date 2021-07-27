@@ -65,7 +65,7 @@ const withWallet = (WrappedComponent) => {
 
       async function init () {
 
-        web3 = new Web3(config.defaultWeb3Provider[chainId])
+        web3 = new Web3(config.defaultWeb3Provider)
         engine = engine ? engine : engine = new Engine(web3, setState)
 
         const previouslySelectedWallet = window.localStorage.getItem('selectedWallet')
@@ -73,7 +73,7 @@ const withWallet = (WrappedComponent) => {
         if (!previouslySelectedWallet) engine.sync(address || `0x${'0'.repeat(40)}`)
 
         const onboardInitSettings = {
-          dappId: config.blocknative[chainId], // [String] The API key created by step one above
+          dappId: config.blocknative, // [String] The API key created by step one above
           networkId: chainId, // [Integer] The Ethereum network ID your Dapp uses.
           subscriptions: {
             address: async _address => {
@@ -123,7 +123,7 @@ const withWallet = (WrappedComponent) => {
           walletSelect: {
             wallets: [
               { walletName: "metamask", preferred: true },
-              { walletName: "walletConnect", preferred: true, infuraKey: config.infuraKey[chainId] },
+              { walletName: "walletConnect", preferred: true, infuraKey: config.infuraKey },
             ]
           }
         }
@@ -134,7 +134,7 @@ const withWallet = (WrappedComponent) => {
             {
               walletName: "walletConnect",
                 preferred: true,
-                rpc: { 56: config.defaultWeb3Provider[chainId] },
+                rpc: { 56: config.defaultWeb3Provider },
               bridge: 'https://bridge.walletconnect.org',
             },
           ]

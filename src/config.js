@@ -1,19 +1,7 @@
 export default {
-  defaultWeb3Provider: {
-    1: 'https://mainnet.infura.io/v3/3c3dfdec6ce94abc935977aa995d1a8c',
-    56: 'https://icy-small-sound.bsc.quiknode.pro/4baedf5d827d8d9c3c17aa08b0bc5dd8b1ce2378/',
-    100: 'https://little-wispy-sun.xdai.quiknode.pro/b3fea81156c1abb58de12e3819e9de382216c99c/',
-  },
-  infuraKey: {
-    1: '3c3dfdec6ce94abc935977aa995d1a8c',
-    56: '',
-    100: '3c3dfdec6ce94abc935977aa995d1a8c'
-  },
-  blocknative: {
-    1: '73db068a-608c-4d6a-8849-b184f50eda34',
-    56: '70a8519d-1a7c-4bc5-bf62-5b38617208ff',
-    100: '70a8519d-1a7c-4bc5-bf62-5b38617208ff',
-  },
+  defaultWeb3Provider: process.env.REACT_APP_RPC_URL,
+  infuraKey: process.env.REACT_APP_INFURA_KEY,
+  blocknative: process.env.REACT_APP_BLOCKNATIVE_KEY,
   claimRewards: {
     1: '0xc8c59160542B97Bd160B3b6a6B353dAC0adc8283',
     56: null,
