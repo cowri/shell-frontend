@@ -6,7 +6,8 @@ import {faDiscord, faTelegram, faTwitter, faGithub, faMedium, faEthereum} from '
 import Container from '../Container'
 import theme from '../../theme';
 import etherscanIcon from '../../assets/etherscan-logo-circle.svg'
-import config from '../../mainnet.multiple.config.json';
+import config from '../../config.js';
+import {chainId, IS_BSC, IS_ETH} from '../../constants/chainId.js';
 
 const StyledFooter = styled.footer`
   align-items: center;
@@ -45,9 +46,12 @@ const IconBox = styled.span`
 const Footer = ({ shellIx }) => {
   let etherscan = null;
   if (shellIx !== null) {
-    etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
-      : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
-        : ''
+    const shellAddress = config.pools[chainId][shellIx].shell
+    etherscan = IS_ETH
+      ? `https://etherscan.io/address/${shellAddress}`
+      : IS_BSC
+      ? `https://bscscan.com/address/${shellAddress}`
+      : `https://blockscout.com/xdai/mainnet/address/${shellAddress}`
   }
   return (
     <Container>

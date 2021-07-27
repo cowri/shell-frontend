@@ -5,9 +5,10 @@ import { Map } from 'immutable'
 import Web3 from 'web3'
 import Onboard from 'bnc-onboard'
 
-import config from "../mainnet.multiple.config.json"
+import config from "../config.js"
 
 import Engine from '../utils/Engine'
+import {chainId, IS_BSC} from '../constants/chainId.js';
 
 let web3
 let onboard
@@ -66,9 +67,9 @@ const withWallet = (WrappedComponent) => {
 
         if (!previouslySelectedWallet) engine.sync(address || `0x${'0'.repeat(40)}`)
 
-        onboard = Onboard({
-          dappId: config.blocknative, // [String] The API key created by step one above
-          networkId: config.network, // [Integer] The Ethereum network ID your Dapp uses.
+        const onboardInitSettings = {
+          dappId: config.blocknative[chainId], // [String] The API key created by step one above
+          networkId: chainId, // [Integer] The Ethereum network ID your Dapp uses.
           subscriptions: {
             address: async _address => {
 
@@ -78,7 +79,7 @@ const withWallet = (WrappedComponent) => {
 
                 init()
 
-              } else if (network === config.network) {
+              } else if (network === chainId) {
 
                 engine = engine ? engine : engine = new Engine(web3, setState)
 
@@ -93,7 +94,7 @@ const withWallet = (WrappedComponent) => {
 
               network = _network
 
-              if (address && _network === config.network) {
+              if (address && _network === chainId) {
 
                 engine = engine ? engine : engine = new Engine(web3, setState)
 
@@ -117,10 +118,24 @@ const withWallet = (WrappedComponent) => {
           walletSelect: {
             wallets: [
               { walletName: "metamask", preferred: true },
-              { walletName: "walletConnect", preferred: true, infuraKey: config.infuraKey },
+              { walletName: "walletConnect", preferred: true, infuraKey: config.infuraKey[chainId] },
             ]
           }
-        });
+        }
+
+        if (IS_BSC) {
+          onboardInitSettings.walletSelect.wallets = [
+            { walletName: "metamask", preferred: true },
+            {
+              walletName: "walletConnect",
+                preferred: true,
+                rpc: { 56: config.defaultWeb3Provider[chainId] },
+              bridge: 'https://bridge.walletconnect.org',
+            },
+          ]
+        }
+
+        onboard = Onboard(onboardInitSettings);
 
         if (previouslySelectedWallet != null) {
           await selectWallet(previouslySelectedWallet)

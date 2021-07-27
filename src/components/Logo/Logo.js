@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import logo from '../../assets/logo.png'
+import {IS_BSC, IS_XDAI} from '../../constants/chainId.js';
 
 const StyledLogo = styled.div`
   align-items: center;
@@ -33,7 +34,7 @@ export default function ({onClick}){
   return (
     <StyledLogo onClick={onClick}>
       <StyledImg src={logo} />
-      <StyledName>component</StyledName>
+      <StyledName>component{IS_BSC ? ' on BSC' : IS_XDAI ? ' on xDAI' : ''}</StyledName>
     </StyledLogo>
   )
 }

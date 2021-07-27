@@ -1,13 +1,14 @@
 import RewardABI from '../abi/Rewards.abi.json';
-import config from '../mainnet.multiple.config';
+import config from '../config.js';
 import rewardsData from '../distr_mainnet.json';
+import {chainId} from '../constants/chainId.js';
 
 
 export default class Rewards {
   constructor (web3, account) {
     this.account = web3.utils.toChecksumAddress(account);
     this.web3 = web3;
-    this.contract = new web3.eth.Contract(RewardABI, config.claimRewards);
+    this.contract = new web3.eth.Contract(RewardABI, config.claimRewards[chainId]);
 
     if (rewardsData.claims[this.account]) {
       this.amount = rewardsData.claims[this.account].amount;
