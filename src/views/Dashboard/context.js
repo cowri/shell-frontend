@@ -1,5 +1,4 @@
 import React from 'react'
-import BigNumber from 'bignumber.js'
 import BN from '../../utils/BN.js';
 
 export default React.createContext({

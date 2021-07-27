@@ -373,7 +373,6 @@ export default {
         icon: 'logo.png',
         displayDecimals: 4,
         decimals: 18,
-        monthRewards: 8220,
         periodDuration: 2592000,
       },
       {
@@ -383,7 +382,6 @@ export default {
         icon: 'logo.png',
         displayDecimals: 4,
         decimals: 18,
-        monthRewards: 8220,
         periodDuration: 2592000,
       },
       {
@@ -393,7 +391,6 @@ export default {
         icon: 'logo.png',
         displayDecimals: 4,
         decimals: 18,
-        monthRewards: 41100,
         periodDuration: 2592000,
       },
     ],

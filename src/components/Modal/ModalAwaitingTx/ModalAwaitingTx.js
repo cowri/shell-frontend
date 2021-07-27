@@ -33,8 +33,8 @@ const AwaitingTxModal = ({ txHash }) => {
       </ModalIcon>
       {
         txHash ?  <StyledViewOnEtherscan>
-          <a href={IS_XDAI ? xdai : etherscan} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
-            <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
+          <a href={etherscanlink} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
+            <img src={IS_XDAI ? xdai : etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
             <span>
               View On Explorer
             </span>

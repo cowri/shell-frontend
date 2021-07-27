@@ -42,7 +42,7 @@ export function FarmTabWithdrawModal({onDismiss, farm}) {
           helperText={ error }
           onChange={payload => setWithdrawValue(payload.value) }
           // styles={inputStyles}
-          symbol={'CMP-LP'}
+          symbol={farm.name.includes('CMP') ? farm.name :'CMP-LP'}
           value={withdrawValue}
           onUnlock={() => () => console.log('unlock')}
         />

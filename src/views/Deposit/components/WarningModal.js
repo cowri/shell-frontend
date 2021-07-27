@@ -9,7 +9,7 @@ import ModalActions from '../../../components/Modal/ModalActions'
 const ModalContent = withTheme(styled.div`
   flex: 1;
   color: red;
-  padding: 0px 40px 20px;
+  padding: 0 40px 20px;
   margin-top: -10px;
   font-size: 20px;
 `)

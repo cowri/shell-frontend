@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faDiscord, faTelegram, faTwitter, faGithub, faMedium, faEthereum} from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faTelegram, faTwitter, faGithub, faMedium } from '@fortawesome/free-brands-svg-icons';
 
 import Container from '../Container'
 import theme from '../../theme';
@@ -40,7 +40,7 @@ const IconBox = styled.span`
   align-items: center;
   justify-content: center;
   img {
-    width: 32px;
+    width: 21px;
   }
 `
 

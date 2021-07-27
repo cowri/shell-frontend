@@ -1,8 +1,6 @@
 import React from 'react'
 import styled, { keyframes } from 'styled-components'
 
-import Surface from '../Surface'
-
 const contentKeyframes = keyframes`
   from {
     opacity: 0;

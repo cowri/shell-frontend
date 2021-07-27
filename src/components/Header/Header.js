@@ -3,7 +3,6 @@ import styled from 'styled-components'
 
 import Container from '../Container'
 import Logo from '../Logo'
-import {ClaimRewards} from './ClaimRewards.js';
 import DashboardContext from '../../views/Dashboard/context.js';
 import Button from '../Button';
 import {IS_BSC, IS_ETH, IS_XDAI} from '../../constants/chainId.js';
@@ -35,30 +34,6 @@ const StyledHeaderText = styled.span`
   font-size: 20px;
   margin-right: 20px;
 `
-
-const ConnectButtonContainer = styled.div`
-  @media screen and (max-width: 600px) {
-    button {
-      padding: 0 16px;
-    }
-  }
-  @media screen and (max-width: 600px) {
-    margin-right: 5px;
-    display: none;
-  }
-`
-
-const HeaderLinksContainer = styled.div`
-  width: 100%;
-  padding: 30px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  @media screen and (max-width: 600px) {
-    display: none;
-  }
-`
-
 const MobileMenuBtn = styled.div`
   align-items: center;
   justify-content: space-around;

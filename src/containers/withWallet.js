@@ -8,7 +8,7 @@ import Onboard from 'bnc-onboard'
 import config from "../config.js"
 
 import Engine from '../utils/Engine'
-import {chainId, IS_BSC} from '../constants/chainId.js';
+import {chainId, IS_BSC, IS_XDAI} from '../constants/chainId.js';
 
 let web3
 let onboard
@@ -26,11 +26,39 @@ const withWallet = (WrappedComponent) => {
 
     const selectWallet = async (wallet) => {
       const walletSelected = await onboard.walletSelect(wallet);
-
       const state = onboard.getState()
-
-      console.log(state.network)
-      console.log(state.appNetworkId)
+      const params = {
+        56: [{
+          "chainId": "0x38", // 56 in decimal
+          "chainName": "Binance Smart Chain",
+          "rpcUrls": [
+            "https://bsc-dataseed.binance.org"
+          ],
+          "nativeCurrency": {
+            "name": "Binance Coin",
+            "symbol": "BNB",
+            "decimals": 18
+          },
+          "blockExplorerUrls": [
+            "https://bscscan.com"
+          ]
+        }],
+        100: [{
+          "chainId": "0x64", // 100 in decimal
+          "chainName": "xDai",
+          "rpcUrls": [
+            "https://rpc.xdaichain.com/"
+          ],
+          "nativeCurrency": {
+            "name": "xDai",
+            "symbol": "xDai",
+            "decimals": 18
+          },
+          "blockExplorerUrls": [
+            "https://blockscout.com/xdai/mainnet"
+          ]
+        }],
+      }
 
       if (state.network !== state.appNetworkId && window.ethereum) {
         try {
@@ -40,6 +68,16 @@ const withWallet = (WrappedComponent) => {
           });
         } catch (switchError) {
           console.error(String(switchError))
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params,
+              });
+            } catch (addError) {
+              console.error(String(addError))
+            }
+          }
         }
       }
 
@@ -86,7 +124,7 @@ const withWallet = (WrappedComponent) => {
 
               } else if (network === chainId) {
 
-                engine = engine ? engine : engine = new Engine(web3, setState)
+                engine = engine ?? new Engine(web3, setState)
 
                 engine.sync(address)
 
@@ -123,18 +161,25 @@ const withWallet = (WrappedComponent) => {
           walletSelect: {
             wallets: [
               { walletName: "metamask", preferred: true },
-              { walletName: "walletConnect", preferred: true, infuraKey: config.infuraKey },
+              {
+                walletName: "walletConnect",
+                preferred: true,
+                rpc: { 56: process.env.REACT_APP_NODE_RPC_URL },
+                bridge: 'https://bridge.walletconnect.org',
+              },
             ]
           }
         }
 
-        if (IS_BSC) {
+        if (IS_BSC || IS_XDAI) {
+          const rpc = {}
+          rpc[chainId] = config.defaultWeb3Provider
           onboardInitSettings.walletSelect.wallets = [
             { walletName: "metamask", preferred: true },
             {
               walletName: "walletConnect",
                 preferred: true,
-                rpc: { 56: config.defaultWeb3Provider },
+                rpc: rpc,
               bridge: 'https://bridge.walletconnect.org',
             },
           ]

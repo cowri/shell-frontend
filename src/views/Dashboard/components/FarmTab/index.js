@@ -63,7 +63,7 @@ export function FarmTab({farmAddress, type}) {
           {showDepositModal && (
             <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />
           )}
-          <TabHeading>{farm.name} <span>(APR: {farm.apr}%)</span></TabHeading>
+          <TabHeading>{farm.name} <span>({apr})</span></TabHeading>
           <FarmParams>
             <tbody>
               <tr>

@@ -21,7 +21,6 @@ import Button from '../../../../components/Button'
 
 import TokenIcon from '../../../../components/TokenIcon'
 import {SwapDirectionIcon} from './SwapDirectionIcon/SwapDirectionIcon.js';
-import {TabActions, TabContainer} from '../../../../components/TabContainer/styled.js';
 
 const DEFAULT_MSG = "Your price for this trade will be..."
 const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'

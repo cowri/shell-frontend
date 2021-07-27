@@ -24,9 +24,7 @@ export default class NumericFormats {
 
     getNumeraireFromRaw (raw) {
 
-      const numeraire = BN(raw).dividedBy(10 ** this.decimals)
-
-      return numeraire
+      return BN(raw).dividedBy(10 ** this.decimals)
 
     }
 
