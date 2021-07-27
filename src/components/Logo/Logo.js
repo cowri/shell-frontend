@@ -24,6 +24,9 @@ const StyledName = styled.span`
   margin-top: -.15em;
   margin-left: .6em;
   font-size: 1.2em;
+  @media screen and (max-width: 340px) {
+    display: none;
+  }
 `
 
 export default function ({onClick}){

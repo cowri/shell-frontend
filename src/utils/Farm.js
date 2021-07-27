@@ -33,6 +33,10 @@ export class Farm extends NumericFormats {
     this.apr = null;
     this.CMPEarned = null;
 
+    this.claim = this.claim.bind(this)
+    this.exit = this.exit.bind(this)
+    this.withdraw = this.withdraw.bind(this)
+    this.deposit = this.deposit.bind(this)
   }
 
   async init(cmpPrice, blockTime) {
@@ -102,7 +106,7 @@ export class Farm extends NumericFormats {
     ).send({from: this.account})
   }
 
-  async deposit(value) {
+  async deposit(onTxHash, onConfirmation, onError, value) {
     const valueWei = BN(value).times(BN(10).pow(18));
     const gasPrice = await this.web3.eth.getGasPrice();
     const gas = await this.managerContract.methods.deposit(valueWei.toString()).estimateGas({from: this.account});
@@ -111,9 +115,12 @@ export class Farm extends NumericFormats {
       gasPrice,
       gas,
     })
+      .once('transactionHash', onTxHash)
+      .on('confirmation', onConfirmation)
+      .on('error', onError)
   }
 
-  async withdraw(value) {
+  async withdraw(onTxHash, onConfirmation, onError, value) {
     const valueWei = BN(value).times(BN(10).pow(18));
     const gasPrice = await this.web3.eth.getGasPrice();
     const gas = await this.managerContract.methods.withdraw(valueWei.toString()).estimateGas({from: this.account});
@@ -122,9 +129,12 @@ export class Farm extends NumericFormats {
       gasPrice,
       gas,
     })
+      .once('transactionHash', onTxHash)
+      .once('confirmation', onConfirmation)
+      .on('error', onError)
   }
 
-  async exit() {
+  async exit(onTxHash, onConfirmation, onError) {
     const gasPrice = await this.web3.eth.getGasPrice();
     const gas = await this.managerContract.methods.exit().estimateGas({from: this.account});
     return this.managerContract.methods.exit().send({
@@ -132,9 +142,12 @@ export class Farm extends NumericFormats {
       gasPrice,
       gas,
     })
+      .once('transactionHash', onTxHash)
+      .on('confirmation', onConfirmation)
+      .on('error', onError)
   }
 
-  async claim() {
+  async claim(onTxHash, onConfirmation, onError) {
     const gasPrice = await this.web3.eth.getGasPrice();
     const gas = await this.managerContract.methods.exit().estimateGas({from: this.account});
     return this.managerContract.methods.claim().send({
@@ -142,6 +155,9 @@ export class Farm extends NumericFormats {
       gasPrice,
       gas,
     })
+      .once('transactionHash', onTxHash)
+      .on('confirmation', onConfirmation)
+      .on('error', onError)
   }
 
 }

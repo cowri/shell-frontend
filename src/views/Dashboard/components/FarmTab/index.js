@@ -6,6 +6,7 @@ import {FarmTabWithdrawModal} from './FarmTabWithdrawModal';
 import {FarmTabDepositModal} from './FarmTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
 import styled from 'styled-components';
+import {currentTxStore} from '../../../../store/currentTxStore.js';
 
 const FarmParams = styled.table`
   margin: 0 auto;
@@ -53,18 +54,27 @@ export function FarmTab({farmAddress, type}) {
     <TabContainer>
       {loading ? <Spinner /> : farm ? (
         <>
-          {showWithdrawModal && <FarmTabWithdrawModal onDismiss={() => setShowWithdrawModal(false)} farm={farm} />}
-          {showDepositModal && <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />}
-          <TabHeading>{farm.name} <span>({apr})</span></TabHeading>
+          {showWithdrawModal && (
+            <FarmTabWithdrawModal
+              onDismiss={() => setShowWithdrawModal(false)}
+              farm={farm}
+            />
+          )}
+          {showDepositModal && (
+            <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />
+          )}
+          <TabHeading>{farm.name} <span>(APR: {farm.apr}%)</span></TabHeading>
           <FarmParams>
-            <tr>
-              <td><span>TVL</span><br />{farm.totalLockedValue.display}</td>
-              <td><span>Deposited</span><br />{farm.userLockedValue.display}</td>
-            </tr>
-            <tr>
-              <td><span>Available to deposit</span><br />{farm.underlyingBalance.display}</td>
-              <td><span>Claimable</span><br />{farm.CMPEarned.display}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td><span>TVL</span><br />{farm.totalLockedValue.display}</td>
+                <td><span>Deposited</span><br />{farm.userLockedValue.display}</td>
+              </tr>
+              <tr>
+                <td><span>Available to deposit</span><br />{farm.underlyingBalance.display}</td>
+                <td><span>Claimable</span><br />{farm.CMPEarned.display}</td>
+              </tr>
+            </tbody>
           </FarmParams>
           <TabActions>
             {loggedIn &&
@@ -78,7 +88,7 @@ export function FarmTab({farmAddress, type}) {
             {loggedIn && farm.CMPEarned.numeraire.gt(0) &&
                 <Button
                   fullWidth
-                  onClick={() => farm.claim()}
+                  onClick={() => currentTxStore.setCurrentTx(() => farm.claim)}
                 >Claim</Button>
               }
             {loggedIn && farm.userLockedValue?.numeraire.gt(0) &&

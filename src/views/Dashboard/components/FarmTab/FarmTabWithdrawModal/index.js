@@ -7,6 +7,7 @@ import Button from '../../../../../components/Button';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
 import {Devider} from '../../ShellTab/styled.js';
 import BN from '../../../../../utils/BN.js';
+import {currentTxStore} from '../../../../../store/currentTxStore.js';
 
 export function FarmTabWithdrawModal({onDismiss, farm}) {
   const [withdrawValue, setWithdrawValue] = useState('0');
@@ -23,8 +24,9 @@ export function FarmTabWithdrawModal({onDismiss, farm}) {
   }, [farm, withdrawValue]);
 
   function withdrawAction() {
-    if (withdrawValue === farm.userLockedValue.display) farm.exit();
-    else farm.withdraw(withdrawValue)
+    if (withdrawValue === farm.userLockedValue.display) currentTxStore.setCurrentTx(() => farm.exit);
+    else currentTxStore.setCurrentTx(() => farm.withdraw, withdrawValue)
+    onDismiss();
   }
 
 
