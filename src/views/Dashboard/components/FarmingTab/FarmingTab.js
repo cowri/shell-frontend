@@ -21,7 +21,14 @@ export default function FarmingTab({showFarm, type}) {
         <StakeItemTd>APR</StakeItemTd>
       </StakeItemContainer>
       {
-        state.get('farming') && state.get('farming')[type] && Object.values(state.get('farming')[type]).map((pool) => (
+        state.get('farming') && state.get('farming')[type] && Object.values(state.get('farming')[type]).sort((a, b) => {
+            if (a.name.length > b.name.length) return -1;
+            if (a.name.length < b.name.length) return 1;
+            if (a.name > b.name) return -1;
+            if (a.name < b.name) return 1;
+            return 0
+          }
+        ).map((pool) => (
           <FarmItem farm={pool} key={pool.managerAddress} showFarm={showFarm} loggedIn={loggedIn} />
         ))
       }

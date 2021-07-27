@@ -34,7 +34,7 @@ export default function ({onClick}){
   return (
     <StyledLogo onClick={onClick}>
       <StyledImg src={logo} />
-      <StyledName>component{IS_BSC ? ' on BSC' : IS_XDAI ? ' on xDAI' : ''}</StyledName>
+      <StyledName>component</StyledName>
     </StyledLogo>
   )
 }

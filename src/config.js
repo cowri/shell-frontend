@@ -386,6 +386,7 @@ export default {
         displayDecimals: 4,
         decimals: 18,
         monthRewards: 8220,
+        periodDuration: 2592000,
       },
       {
         managerAddress: '0xB56689C8746A14e8ba1d8050e55eF241268178eB',
@@ -395,6 +396,7 @@ export default {
         displayDecimals: 4,
         decimals: 18,
         monthRewards: 8220,
+        periodDuration: 2592000,
       },
       {
         managerAddress: '0x53De001bbfAe8cEcBbD6245817512F8DBd8EEF18',
@@ -404,6 +406,7 @@ export default {
         displayDecimals: 4,
         decimals: 18,
         monthRewards: 41100,
+        periodDuration: 2592000,
       },
     ],
     100: [

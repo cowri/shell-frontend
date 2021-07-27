@@ -13,6 +13,16 @@ export default function FarmItem({farm, showFarm, loggedIn}) {
       UNI-V2&nbsp;
       <span>{farm.name}</span>
     </>
+  } else if (farm.name === 'CMP/BNB') {
+    poolName = <>
+      Cake-LP&nbsp;
+      <span>{farm.name}</span>
+    </>
+  } else if (farm.name === 'CMP/XDAI') {
+    poolName = <>
+      Sushi-LP&nbsp;
+      <span>{farm.name}</span>
+    </>
   } else {
     poolName = <>
       CMP-LP&nbsp;

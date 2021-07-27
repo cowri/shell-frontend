@@ -3,12 +3,13 @@ import styled from 'styled-components'
 import WarningIcon from '@material-ui/icons/Warning'
 
 import etherscan from '../../../assets/etherscan-logo-circle.svg'
+import xdai from '../../../assets/etherscan-logo-circle-xdai.svg'
 import Button from '../../Button'
 import Modal from '../index.js'
 import ModalActions from '../ModalActions'
 import ModalIcon from '../ModalIcon'
 import ModalTitle from '../ModalTitle'
-import {IS_BSC, IS_ETH} from '../../../constants/chainId.js';
+import {IS_BSC, IS_ETH, IS_XDAI} from '../../../constants/chainId.js';
 
 const StyledViewOnEtherscan = styled.div`
   font-size: 1.3em;
@@ -39,9 +40,9 @@ const ModalError = ({
       {
         txHash ? <StyledViewOnEtherscan>
               <a href={etherscanlink} style={{textDecoration:'none', color:'inherit'}} target="_blank" rel="noopener noreferrer">
-                <img src={etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
+                <img src={IS_XDAI ? xdai : etherscan} style={{margin: '-3.5px 10px', width: '1.15em'}} alt="" />
                 <span>
-                  View On Etherscan
+                  View On Explorer
                 </span>
               </a>
             </StyledViewOnEtherscan> : null

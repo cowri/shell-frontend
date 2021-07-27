@@ -5,9 +5,10 @@ import {faDiscord, faTelegram, faTwitter, faGithub, faMedium, faEthereum} from '
 
 import Container from '../Container'
 import theme from '../../theme';
-import etherscanIcon from '../../assets/etherscan-logo-circle.svg'
 import config from '../../config.js';
-import {chainId, IS_BSC, IS_ETH} from '../../constants/chainId.js';
+import {chainId, IS_BSC, IS_ETH, IS_XDAI} from '../../constants/chainId.js';
+import etherscanIcon from '../../assets/etherscan-logo-circle.svg'
+import xdaiIcon from '../../assets/etherscan-logo-circle-xdai.svg'
 
 const StyledFooter = styled.footer`
   align-items: center;
@@ -74,7 +75,7 @@ const Footer = ({ shellIx }) => {
         {shellIx !== null && (
           <StyledSocialIcon href={etherscan} target="_blank">
             <IconBox >
-              <img src={etherscanIcon} alt="etherscan logo"/>
+              <img src={IS_XDAI ? xdaiIcon : etherscanIcon} alt="etherscan logo"/>
             </IconBox>
           </StyledSocialIcon>
         )}
