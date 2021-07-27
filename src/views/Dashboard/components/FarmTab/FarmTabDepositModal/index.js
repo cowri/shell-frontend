@@ -7,8 +7,9 @@ import Button from '../../../../../components/Button';
 import {ModalRow} from '../../../../../components/Modal/styled.js';
 import {Devider} from '../../ShellTab/styled.js';
 import BN from '../../../../../utils/BN.js'
+import {currentTxStore} from '../../../../../store/currentTxStore.js';
 
-export function FarmTabDepositModal({onDismiss, farm}) {
+export function FarmTabDepositModal({onDismiss, farm, setTx}) {
   const [depositValue, setDepositValue] = useState('0');
   const [error, setError] = useState('');
 
@@ -24,6 +25,11 @@ export function FarmTabDepositModal({onDismiss, farm}) {
       setError('');
     }
   }, [farm, depositValue]);
+
+  function depositAction() {
+    currentTxStore.setCurrentTx(() => farm.deposit, depositValue)
+    onDismiss();
+  }
 
 
   return (
@@ -42,7 +48,7 @@ export function FarmTabDepositModal({onDismiss, farm}) {
         />
       </ModalRow>
       <ModalActions>
-        <Button fullWidth disabled={error} onClick={() => farm.deposit(depositValue)}>Deposit</Button>
+        <Button fullWidth disabled={error} onClick={depositAction}>Deposit</Button>
         <Devider />
         <Button fullWidth outlined onClick={onDismiss}>Cancel</Button>
       </ModalActions>

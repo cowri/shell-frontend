@@ -11,19 +11,22 @@ import {StyledButton} from '../Button/Button.js';
 const StyledHeader = styled.div`
   align-items: center;
   display: flex;
-  padding: 40px 0;
+  padding: 40px 0 30px;
   justify-content: flex-end;
-  @media screen and (max-width: 600px) {
-    flex-wrap: wrap;
-  }
+  flex-wrap: wrap;
 `
 
 const StyledHeaderLink = styled.a`
   color: #ff42a1;
   text-decoration: none;
   font-size: 20px;
-  margin-right: 20px;
   font-weight: bold;
+  :not(:last-child) {
+    margin-right: 20px;
+  }
+  @media screen and (max-width: 325px) {
+    font-size: 16px;
+  }
   &:hover {
     text-decoration: underline;
   }
@@ -35,20 +38,31 @@ const StyledHeaderText = styled.span`
   font-weight: bold;
   text-decoration: none;
   font-size: 20px;
-  margin-left: 20px;
   margin-right: 20px;
-  @media screen and (max-width: 380px) {
-    margin-left: auto;
+  @media screen and (max-width: 325px) {
+    font-size: 16px;
   }
 `
 
 const ConnectButtonContainer = styled.div`
   @media screen and (max-width: 600px) {
-    width: 100%;
-    ${StyledButton} {
-      margin: 40px auto 0 !important;
-      justify-self: center !important;
+    button {
+      padding: 0 16px;
     }
+  }
+  @media screen and (max-width: 512px) {
+    margin-right: 5px;
+  }
+`
+
+const HeaderLinksContainer = styled.div`
+  width: 100%;
+  padding: 30px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  @media screen and (max-width: 512px) {
+    justify-content: center;
   }
 `
 
@@ -58,12 +72,15 @@ const Header = ({goToIndexTab}) => {
     <Container>
       <StyledHeader>
         <Logo onClick={() => goToIndexTab()}/>
-        {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
-        <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
         <ConnectButtonContainer>
           <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
         </ConnectButtonContainer>
         {engine && engine.rewards.amount && !engine.rewards.isClaimed && <ClaimRewards />}
+        <HeaderLinksContainer>
+          {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
+          <StyledHeaderLink href="https://omni.xdaichain.com/bridge" target="_blank">Bridge to BSC</StyledHeaderLink>
+          <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
+        </HeaderLinksContainer>
       </StyledHeader>
     </Container>
   )

@@ -47,8 +47,11 @@ const withWallet = (WrappedComponent) => {
       async function init () {
 
         web3 = new Web3('https://mainnet.infura.io/v3/db72eb2275564c62bfa71896870d8975')
-        engine = engine ? engine : new Engine(web3, setState)
-        engine.sync(address || `0x${'0'.repeat(40)}`)
+        engine = engine ? engine : engine = new Engine(web3, setState)
+
+        const previouslySelectedWallet = window.localStorage.getItem('selectedWallet')
+
+        if (!previouslySelectedWallet) engine.sync(address || `0x${'0'.repeat(40)}`)
 
         onboard = Onboard({
           dappId: config.blocknative, // [String] The API key created by step one above
@@ -64,7 +67,7 @@ const withWallet = (WrappedComponent) => {
 
               } else if (network === config.network) {
 
-                engine = engine ? engine : new Engine(web3, setState)
+                engine = engine ? engine : engine = new Engine(web3, setState)
 
                 engine.sync(address)
 
@@ -79,7 +82,7 @@ const withWallet = (WrappedComponent) => {
 
               if (address && _network === config.network) {
 
-                engine = engine ? engine : new Engine(web3, setState)
+                engine = engine ? engine : engine = new Engine(web3, setState)
 
                 engine.sync(address)
 
@@ -105,8 +108,6 @@ const withWallet = (WrappedComponent) => {
             ]
           }
         });
-
-        const previouslySelectedWallet = window.localStorage.getItem('selectedWallet')
 
         if (previouslySelectedWallet != null) {
           await selectWallet(previouslySelectedWallet)

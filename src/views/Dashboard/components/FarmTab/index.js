@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {TabActions, TabContainer, TabHeading} from '../../../../components/TabContainer/styled.js';
 import DashboardContext from '../../context.js';
 import Button from '../../../../components/Button';
@@ -6,6 +6,9 @@ import {FarmTabWithdrawModal} from './FarmTabWithdrawModal';
 import {FarmTabDepositModal} from './FarmTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
 import styled from 'styled-components';
+import ModalConfirm from '../../../../components/Modal/ModalConfirm';
+import {StatusModals} from '../../../../components/StatusModals';
+import {currentTxStore} from '../../../../store/currentTxStore.js';
 
 const FarmParams = styled.table`
   margin: 0 auto;
@@ -28,27 +31,11 @@ const FarmParams = styled.table`
   }
 `
 
-const FarmParam = styled.div`
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding-left: 40px;
-  &:nth-child(1),
-  &:nth-child(2) {
-    margin-bottom: 20px;
-  }
-  span {
-    font-weight: bold;
-  }
-`
-
 export function FarmTab({farmAddress, type}) {
   const [loading, setLoading] = useState(true)
   const [farm, setFarm] = useState(null)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
-  const [showClaimModal, setShowClaimModal] = useState(false)
 
   const {
     state,
@@ -63,22 +50,35 @@ export function FarmTab({farmAddress, type}) {
     setLoading(false)
   }, [state, farmAddress])
 
+  function onDismiss() {
+    currentTxStore.setCurrentTx(null)
+  }
+
   return (
     <TabContainer>
       {loading ? <Spinner /> : farm ? (
         <>
-          {showWithdrawModal && <FarmTabWithdrawModal onDismiss={() => setShowWithdrawModal(false)} farm={farm} />}
-          {showDepositModal && <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />}
+          {showWithdrawModal && (
+            <FarmTabWithdrawModal
+              onDismiss={() => setShowWithdrawModal(false)}
+              farm={farm}
+            />
+          )}
+          {showDepositModal && (
+            <FarmTabDepositModal onDismiss={() => setShowDepositModal(false)} farm={farm} />
+          )}
           <TabHeading>{farm.name} <span>(APR: {farm.apr}%)</span></TabHeading>
           <FarmParams>
-            <tr>
-              <td><span>TVL</span><br />{farm.totalLockedValue.display}</td>
-              <td><span>Deposited</span><br />{farm.userLockedValue.display}</td>
-            </tr>
-            <tr>
-              <td><span>Available to deposit</span><br />{farm.underlyingBalance.display}</td>
-              <td><span>Claimable</span><br />{farm.CMPEarned.display}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td><span>TVL</span><br />{farm.totalLockedValue.display}</td>
+                <td><span>Deposited</span><br />{farm.userLockedValue.display}</td>
+              </tr>
+              <tr>
+                <td><span>Available to deposit</span><br />{farm.underlyingBalance.display}</td>
+                <td><span>Claimable</span><br />{farm.CMPEarned.display}</td>
+              </tr>
+            </tbody>
           </FarmParams>
           <TabActions>
             {loggedIn &&
@@ -92,7 +92,7 @@ export function FarmTab({farmAddress, type}) {
             {loggedIn && farm.CMPEarned.numeraire.gt(0) &&
                 <Button
                   fullWidth
-                  onClick={() => farm.claim()}
+                  onClick={() => currentTxStore.setCurrentTx(() => farm.claim)}
                 >Claim</Button>
               }
             {loggedIn && farm.userLockedValue?.numeraire.gt(0) &&

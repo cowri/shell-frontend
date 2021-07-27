@@ -1,16 +1,19 @@
-import React, {useRef} from 'react';
+import React, {useContext, useRef} from 'react';
 import styled from 'styled-components'
 import cookie from 'js-cookie'
 import randomWords from 'random-words'
 
 import Header from '../../components/Header'
 
-import withWallet from '../../containers/withWallet'
+import WithWallet from '../../containers/withWallet'
 
 import DashboardContent from './components/DashboardContent'
 
 import DashboardContext from './context'
 import Spinner from '../../components/Spiner/Spinner.js';
+import useSubject from '../../hooks/useSubject.js';
+import {currentTxStore} from '../../store/currentTxStore.js';
+import {StatusModals} from '../../components/StatusModals';
 
 const StyledDashboard = styled.div`
   align-items: center;
@@ -31,6 +34,8 @@ const Dashboard = ({
   selectWallet,
   disconnect,
 }) => {
+
+  const currentTx = useSubject(currentTxStore.currentTx)
 
   const dashboardRef = useRef(null);
 
@@ -54,19 +59,20 @@ const Dashboard = ({
         selectWallet,
         disconnect,
       }}>
-          <StyledDashboard>
-            <Header goToIndexTab={() => dashboardRef.current.goToIndexTab()}/>
-            { (web3 && engine.shells.length && state.size) ? (
-                <DashboardContent
-                  ref={dashboardRef}
-                />
-            ) : (
-              <Spinner />
-            )}
-          </StyledDashboard>
+        {currentTx && <StatusModals tx={currentTx} />}
+        <StyledDashboard>
+          <Header goToIndexTab={() => dashboardRef.current.goToIndexTab()}/>
+          { (web3 && engine.shells.length && state.size) ? (
+              <DashboardContent
+                ref={dashboardRef}
+              />
+          ) : (
+            <Spinner />
+          )}
+        </StyledDashboard>
       </DashboardContext.Provider>
     </>
   )
 }
 
-export default withWallet(Dashboard)
+export default WithWallet(Dashboard)
