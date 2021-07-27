@@ -23,37 +23,17 @@ const ModalTitle = withTheme(styled.div`
 `)
 
 const ModalWarning = ({
-  tag,
   onCancel,
   onContinue
 }) => {
 
-  let message
-
-
-  if (tag === 'STABLEx') {
-
-    message = ( <ModalContent>
-        <p>
-          STABLEx is an experimental project. Exercise extreme caution.
-        </p>
-        <p>
-          <a target="_blank" href="https://www.notion.so/shellprotocol/STABLEx-Shell-Pool-26129611af064c239da396f4120e8e9c">
-          See here for details.
-          </a>
-        </p>
-        <p> Furthermore, Component is in beta. </p>
-        <p> Please do not deposit any funds you can not afford to lose. </p>
-      </ModalContent> )
-
-  } else {
-
-    message = ( <ModalContent>
-        <p> Component is in beta. </p>
-        <p> Please do not deposit any funds you can not afford to lose. </p>
-      </ModalContent> )
-
-  }
+  const message = ( <ModalContent>
+    <p> Component is in beta. </p>
+    <p> Please note that this is an early version of the Сomponent. The protocol, dapp (https://component.finance/), and all content are provided on an "as is" basis.
+        While we have made reasonable efforts to ensure the Сomponent's security and functionality, we strongly advise anyone who chooses to use the early experimental version: Don't risk any funds you do not afford to lose.
+        The Сomponent team does not give any warranties, whether express or implied, regarding the protocol's suitability or usability. The Сomponent will not be liable for any loss, whether such loss is direct, indirect, special, or consequential, suffered by any party due to their use of the Сomponent.
+        Thank you for being an early adopter. </p>
+  </ModalContent> )
 
   return (
     <Modal>
