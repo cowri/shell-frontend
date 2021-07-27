@@ -1,6 +1,6 @@
 import React from 'react';
 import {fromJS} from 'immutable';
-import config from '../mainnet.multiple.config';
+import config from '../config.js';
 import Asset from './Asset';
 import Shell from './Shell';
 import SwapEngine from './SwapEngine';
@@ -10,6 +10,7 @@ import shellIcon from '../assets/logo.png';
 import Rewards from './Rewards.js';
 import BN from './BN.js';
 import FarmingEngine from './FarmingEngine.js';
+import {chainId, IS_ETH} from '../constants/chainId.js';
 
 export default class Engine extends SwapEngine {
 
@@ -35,8 +36,7 @@ export default class Engine extends SwapEngine {
     this.staking = {};
     this.farming = {};
 
-    for (const _pool_ of config.pools) {
-
+    for (const _pool_ of config.pools[chainId]) {
       const shell = new Shell(
         this.web3,
         _pool_.shell,
@@ -343,12 +343,18 @@ export default class Engine extends SwapEngine {
 
     for (const _shell_ of this.shells) {
 
-      const shell = await this.readShell(_shell_);
+      try {
 
-      assets = assets.concat(shell.assets);
-      derivatives = derivatives.concat(shell.assets.flatMap(asset => [asset].concat(asset.derivatives)));
+        const shell = await this.readShell(_shell_);
 
-      shells.push(shell);
+        assets = assets.concat(shell.assets);
+        derivatives = derivatives.concat(shell.assets.flatMap(asset => [asset].concat(asset.derivatives)));
+
+        shells.push(shell);
+
+      } catch (e) {
+        console.log(e)
+      }
 
     }
 
@@ -362,9 +368,11 @@ export default class Engine extends SwapEngine {
     assets = assets.filter(filter, new Set());
     derivatives = derivatives.filter(filter, new Set());
 
-    rewards = new Rewards(this.web3, account);
-    await rewards.getClaimedStatus();
-    this.rewards = rewards;
+    if (IS_ETH) {
+      rewards = new Rewards(this.web3, account);
+      await rewards.getClaimedStatus();
+      this.rewards = rewards;
+    }
 
     const farming = new FarmingEngine(this.web3, account, shells);
     await farming.init();

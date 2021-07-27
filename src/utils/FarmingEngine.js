@@ -1,6 +1,7 @@
-import config from '../mainnet.multiple.config.json';
+import config from '../config.js';
 import {Farm} from './Farm.js';
 import axios from "axios";
+import {chainId} from '../constants/chainId.js';
 
 export default class FarmingEngine {
   constructor(web3, account, shells) {
@@ -15,7 +16,7 @@ export default class FarmingEngine {
   async init() {
     await this.getCmpPrice()
     await this.getCurrentTime()
-    const pools = await Promise.all([this.formPools(config.farmingPools), this.formPools(config.stakingPools)])
+    const pools = await Promise.all([this.formPools(config.farmingPools[chainId]), this.formPools(config.stakingPools[chainId])])
     this.farms = pools[0]
     this.stakes = pools[1]
   }

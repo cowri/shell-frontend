@@ -5,8 +5,10 @@ import {faDiscord, faTelegram, faTwitter, faGithub, faMedium, faEthereum} from '
 
 import Container from '../Container'
 import theme from '../../theme';
+import config from '../../config.js';
+import {chainId, IS_BSC, IS_ETH, IS_XDAI} from '../../constants/chainId.js';
 import etherscanIcon from '../../assets/etherscan-logo-circle.svg'
-import config from '../../mainnet.multiple.config.json';
+import xdaiIcon from '../../assets/etherscan-logo-circle-xdai.svg'
 
 const StyledFooter = styled.footer`
   align-items: center;
@@ -45,9 +47,12 @@ const IconBox = styled.span`
 const Footer = ({ shellIx }) => {
   let etherscan = null;
   if (shellIx !== null) {
-    etherscan = config.network === 1 ? 'https://etherscan.io/address/' + config.pools[shellIx].shell
-      : config.network === 41 ? 'https://kovan.etherscan.io/address/' + config.pools[shellIx].shell
-        : ''
+    const shellAddress = config.pools[chainId][shellIx].shell
+    etherscan = IS_ETH
+      ? `https://etherscan.io/address/${shellAddress}`
+      : IS_BSC
+      ? `https://bscscan.com/address/${shellAddress}`
+      : `https://blockscout.com/xdai/mainnet/address/${shellAddress}`
   }
   return (
     <Container>
@@ -70,7 +75,7 @@ const Footer = ({ shellIx }) => {
         {shellIx !== null && (
           <StyledSocialIcon href={etherscan} target="_blank">
             <IconBox >
-              <img src={etherscanIcon} alt="etherscan logo"/>
+              <img src={IS_XDAI ? xdaiIcon : etherscanIcon} alt="etherscan logo"/>
             </IconBox>
           </StyledSocialIcon>
         )}

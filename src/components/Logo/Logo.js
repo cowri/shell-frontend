@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import logo from '../../assets/logo.png'
+import {IS_BSC, IS_XDAI} from '../../constants/chainId.js';
 
 const StyledLogo = styled.div`
   align-items: center;
