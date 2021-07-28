@@ -1,12 +1,6 @@
 export default {
   defaultWeb3Provider: process.env.REACT_APP_RPC_URL,
-  infuraKey: process.env.REACT_APP_INFURA_KEY,
   blocknative: process.env.REACT_APP_BLOCKNATIVE_KEY,
-  claimRewards: {
-    1: '0xc8c59160542B97Bd160B3b6a6B353dAC0adc8283',
-    56: null,
-    100: null,
-  },
   cmpAddress: {
     1: '0x9f20ed5f919dc1c1695042542c13adcfc100dcab',
     56: '0x96124f7382a0ed672bba8f9b92208434eabcfb40',
