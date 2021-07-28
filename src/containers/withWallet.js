@@ -171,19 +171,17 @@ const withWallet = (WrappedComponent) => {
           }
         }
 
-        if (IS_BSC || IS_XDAI) {
-          const rpc = {}
-          rpc[chainId] = config.defaultWeb3Provider
-          onboardInitSettings.walletSelect.wallets = [
-            { walletName: "metamask", preferred: true },
-            {
-              walletName: "walletConnect",
-                preferred: true,
-                rpc: rpc,
-              bridge: 'https://bridge.walletconnect.org',
-            },
-          ]
-        }
+        const rpc = {}
+        rpc[chainId] = config.defaultWeb3Provider
+        onboardInitSettings.walletSelect.wallets = [
+          { walletName: "metamask", preferred: true },
+          {
+            walletName: "walletConnect",
+              preferred: true,
+              rpc: rpc,
+            bridge: 'https://bridge.walletconnect.org',
+          },
+        ]
 
         onboard = Onboard(onboardInitSettings);
 
