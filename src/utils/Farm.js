@@ -94,6 +94,7 @@ export class Farm extends NumericFormats {
           .times(this.rewardRate.numeraire)
           .times(cmpPrice)
           .times(12)
+          .times(100)
           .div(
               this.totalLockedValue.numeraire.times(underlyingPrice)
           )
