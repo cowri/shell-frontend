@@ -1,9 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import logo from '../../assets/logo.png'
-import {IS_BSC, IS_XDAI} from '../../constants/chainId.js';
-
 const StyledLogo = styled.div`
   align-items: center;
   display: flex;
@@ -14,10 +11,6 @@ const StyledLogo = styled.div`
   @media screen and (max-width: 512px) {
     margin-left: 5px;
   }
-`
-
-const StyledImg = styled.img`
-  width: 48px;
 `
 
 const StyledName = styled.span`
@@ -33,7 +26,7 @@ const StyledName = styled.span`
 export default function ({onClick}){
   return (
     <StyledLogo onClick={onClick}>
-      <StyledName>Component</StyledName>
+      <StyledName>component</StyledName>
     </StyledLogo>
   )
 }
