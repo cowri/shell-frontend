@@ -110,10 +110,10 @@ const Header = ({goToIndexTab}) => {
             >
               <StyledHeaderLink href="https://omni.xdaichain.com/bridge" target="_blank">{
                 IS_ETH
-                  ? 'Bridge to ETH'
+                  ? 'BSC/xDAI bridge'
                   : IS_BSC
-                  ? 'Bridge to BSC'
-                  : 'Bridge to xDAI'
+                  ? 'ETH/xDAI bridge'
+                  : 'ETH/BSC bridge'
               }</StyledHeaderLink>
               {!IS_ETH && <StyledHeaderLink href="https://component.finance/" target="_blank">Component on ETH</StyledHeaderLink>}
               {!IS_BSC && <StyledHeaderLink href="https://bsc.component.finance/" target="_blank">Component on BSC</StyledHeaderLink>}
