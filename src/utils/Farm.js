@@ -151,8 +151,9 @@ export class Farm extends NumericFormats {
   }
 
   async claim(onTxHash, onConfirmation, onError) {
+    alert('claim')
     const gasPrice = await this.web3.eth.getGasPrice();
-    const gas = await this.managerContract.methods.exit().estimateGas({from: this.account});
+    const gas = await this.managerContract.methods.claim().estimateGas({from: this.account});
     return this.managerContract.methods.claim().send({
       from: this.account,
       gasPrice,
