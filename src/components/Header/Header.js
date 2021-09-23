@@ -90,7 +90,7 @@ const Header = ({goToIndexTab}) => {
     <Container>
       <StyledHeader>
         <Logo onClick={() => goToIndexTab()}/>
-        {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice}</StyledHeaderText>}
+        {engine && engine.farming && engine.farming.cmpPrice && <StyledHeaderText>CMP price: ${engine.farming.cmpPrice.toFixed(2)}</StyledHeaderText>}
         <MobileMenuBtn
           onClick={e => {
             e.stopPropagation()
@@ -119,6 +119,14 @@ const Header = ({goToIndexTab}) => {
               {!IS_BSC && <StyledHeaderLink href="https://bsc.component.finance/" target="_blank">Component on BSC</StyledHeaderLink>}
               {!IS_XDAI && <StyledHeaderLink href="https://xdai.component.finance/" target="_blank">Component on xDAI</StyledHeaderLink>}
               <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
+              {
+                IS_ETH
+                  ? <StyledHeaderLink href="https://app.uniswap.org/#/swap?inputCurrency=0x9f20ed5f919dc1c1695042542c13adcfc100dcab&outputCurrency=ETH" target="_blank">CMP on Uniswap</StyledHeaderLink>
+                  : IS_BSC
+                  ? <StyledHeaderLink href="https://pancakeswap.finance/swap?inputCurrency=0x96124f7382a0ed672bba8f9b92208434eabcfb40&outputCurrency=BNB" target="_blank">CMP on PancakeSwap</StyledHeaderLink>
+                  : <StyledHeaderLink href="https://app.honeyswap.org/#/swap?inputCurrency=0x911F196Ed489e41C8B45B5C56FEce021C27a6159&outputCurrency=XDAI" target="_blank">CMP on HoneySwap</StyledHeaderLink>
+              }
+              {IS_ETH && <StyledHeaderLink href="https://app.balancer.fi/#/trade/ether/0x9f20ed5f919dc1c1695042542c13adcfc100dcab" target="_blank">CMP on Balancer</StyledHeaderLink>}
               <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
             </MobileMenuContainer>
           )}
