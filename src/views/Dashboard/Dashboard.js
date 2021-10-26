@@ -62,7 +62,7 @@ const Dashboard = ({
         {currentTx && <StatusModals tx={currentTx} />}
         <StyledDashboard>
           <Header goToIndexTab={() => dashboardRef.current.goToIndexTab()}/>
-          { (web3 && engine.shells.length && state.size) ? (
+          { (web3 && engine && engine.shells.length && state.size) ? (
               <DashboardContent
                 ref={dashboardRef}
               />

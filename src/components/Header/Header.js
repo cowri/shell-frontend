@@ -124,7 +124,12 @@ const Header = ({goToIndexTab}) => {
               {IS_BSC && <StyledHeaderLink href="https://pancakeswap.finance/swap?inputCurrency=0x96124f7382a0ed672bba8f9b92208434eabcfb40&outputCurrency=BNB" target="_blank">CMP on PancakeSwap</StyledHeaderLink>}
               {IS_XDAI && <StyledHeaderLink href="https://app.sushi.com/swap?inputCurrency=0x911F196Ed489e41C8B45B5C56FEce021C27a6159&outputCurrency=0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d" target="_blank">CMP on SushiSwap</StyledHeaderLink>}
               <StyledHeaderLink href="https://docs.component.finance/" target="_blank">Docs</StyledHeaderLink>
-              <Button onClick={() => {loggedIn ? disconnect() : selectWallet()}}>{loggedIn ? 'Disconnect' : 'Connect'}</Button>
+              <Button onClick={() => {
+                loggedIn ? disconnect() : selectWallet()
+                setShowMenu(false)
+              }}>
+                {loggedIn ? 'Disconnect' : 'Connect'}
+              </Button>
             </MobileMenuContainer>
           )}
         </MobileMenuBtn>

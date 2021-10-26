@@ -1,5 +1,6 @@
 export default {
   defaultWeb3Provider: process.env.REACT_APP_RPC_URL,
+  infuraId: process.env.REACT_APP_INFURA_ID,
   blocknative: process.env.REACT_APP_BLOCKNATIVE_KEY,
   cmpAddress: {
     1: '0x9f20ed5f919dc1c1695042542c13adcfc100dcab',
