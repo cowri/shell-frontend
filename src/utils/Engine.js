@@ -331,6 +331,7 @@ export default class Engine extends SwapEngine {
 
   async sync(account) {
 
+
     account = account ? account : this.account;
 
     this.account = account;

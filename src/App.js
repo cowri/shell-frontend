@@ -9,15 +9,19 @@ import { IS_BSC, IS_XDAI } from "./constants/chainId";
 
 function App() {
 
-    useEffect(() => {
-        document.title = `Component on ${IS_BSC ? 'BSC' : IS_XDAI ? 'xDAI' : 'ETH'}`
-    }, []);
+  useEffect(() => {
+    document.title = `Component on ${IS_BSC ? 'BSC' : IS_XDAI ? 'xDAI' : 'ETH'}`
 
-    return (
-        <ThemeProvider theme={theme}>
-            <Dashboard/>
-        </ThemeProvider>
-    )
+    if (+process.env.REACT_APP_CHAIN_ID === 1) {
+      document.documentElement.classList.add('fantom')
+    }
+  }, []);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Dashboard/>
+    </ThemeProvider>
+  )
 }
 
 export default App

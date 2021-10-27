@@ -72,7 +72,6 @@ const withWallet = (WrappedComponent) => {
     const [loggedIn, setLoggedIn] = useState(false)
 
     const onConnect = async () => {
-      console.log('onConnect')
       try {
         if (isMobile() && (window.ethereum || window.web3)) {
           if (window.ethereum) {
@@ -83,6 +82,7 @@ const withWallet = (WrappedComponent) => {
             }
             provider = window.ethereum
           } else if (window.web3) provider = window.web3.currentProvider
+          web3 = new Web3(provider);
         } else {
           provider = await web3Modal.connect();
           web3 = new Web3(provider);
@@ -137,12 +137,7 @@ const withWallet = (WrappedComponent) => {
     async function fetchAccountData() {
       const accounts = await web3.eth.getAccounts();
       address = accounts[0]
-      engine = engine ? engine : engine = new Engine(web3, setState)
-      await engine.sync(address || `0x${'0'.repeat(40)}`)
-      if (provider) {
-        if (provider.isMetaMask) engine.wallet = 'MetaMask'
-        else engine.wallet = 'WalletConnect'
-      }
+      await initEngine();
     }
 
     const disconnect = async () => {
@@ -155,6 +150,16 @@ const withWallet = (WrappedComponent) => {
       setLoggedIn(false)
       address = undefined
       init()
+    }
+
+    async function initEngine() {
+      engine = new Engine(web3, setState)
+      await engine.sync(address || `0x${'0'.repeat(40)}`)
+
+      if (provider) {
+        if (provider.isMetaMask) engine.wallet = 'MetaMask'
+        else engine.wallet = 'WalletConnect'
+      }
     }
 
     async function initWeb3Modal() {
@@ -195,10 +200,10 @@ const withWallet = (WrappedComponent) => {
       })
 
       web3 = new Web3(config.defaultWeb3Provider)
-      engine = engine ? engine : engine = new Engine(web3, setState)
-      await engine.sync(address || `0x${'0'.repeat(40)}`)
 
       if (web3Modal.cachedProvider) await onConnect()
+
+      await initEngine();
     }
 
     async function init () {
