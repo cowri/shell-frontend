@@ -1,3 +1,5 @@
+import {IS_FTM} from '../constants/chainId.js';
+
 export const grey = {
   50: '#f0f4f8',
   100: '#D9E2EC',
@@ -12,5 +14,5 @@ export const grey = {
 export const primary = {
   dark: 'rgba(255,66, 161, .8)',
   light: '#00fff3 ',
-  main: '#ff42a1',
+  main: IS_FTM ? '#0A14EE' : '#ff42a1',
 }

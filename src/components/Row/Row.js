@@ -1,10 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 import { withTheme } from'@material-ui/core/styles'
+import {IS_FTM} from '../../constants/chainId.js';
 
 const StyledRow = withTheme(styled.div`
   align-items: center;
-  color: ${props => props.head ? '#000' : 'inherit'};
+  color: ${props => {
+    if (props.head) return IS_FTM ? 'inherit' : '#000'
+    return 'inherit';
+  }};
   display: flex;
   font-weight: ${props => props.head ? 600 : 400};
   height: ${props => props.head ? 40 : 80}px;

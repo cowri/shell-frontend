@@ -1,6 +1,7 @@
 import { createTheme } from '@material-ui/core/styles'
 
 import { grey, primary } from './colors'
+import {IS_FTM} from '../constants/chainId.js';
 
 const theme = createTheme({
   palette: {
@@ -15,7 +16,7 @@ const theme = createTheme({
 theme.overrides = {
   MuiTextField: {
     root: {
-      background: '#e9cff9',
+      background: IS_FTM ? '#C6D7FF' : '#e9cff9',
       borderRadius: theme.shape.borderRadius,
     },
   },

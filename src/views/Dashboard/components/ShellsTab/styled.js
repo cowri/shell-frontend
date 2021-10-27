@@ -2,6 +2,7 @@ import {withTheme} from '@material-ui/core/styles';
 import styled from 'styled-components';
 import {primary} from '../../../../theme/colors.js';
 import {StyledTokenIcon} from '../../../../components/TokenIcon/TokenIcon.js';
+import {IS_FTM} from '../../../../constants/chainId.js';
 
 
 export const StyledShellsTab = styled.div`
@@ -21,7 +22,6 @@ export const Symbol = styled.span`
   width: 100%;
   font-size: 18px;
   text-decoration: none;
-  color: black;
 `
 export const Weight = styled.span`
   text-align: center;
@@ -29,7 +29,7 @@ export const Weight = styled.span`
   width: 100%;
   font-size: 12px;
   text-decoration: none;
-  color: grey;
+  color: ${IS_FTM ? 'inherit' : 'grey'};
 `
 
 export const StyledBalance = styled.div`
@@ -45,7 +45,6 @@ export const StyledBalance = styled.div`
     }
   }
   text-decoration: none;
-  color: black;
 `
 
 export const PoolsTable = styled.div`
@@ -68,7 +67,7 @@ export const ShellNamePart = styled.span`
     margin-left: 0;
   }
   :not(:last-child) {
-    border-right: 1px solid rgba(0, 0, 0, .4);
+    border-right: 1px solid ${IS_FTM ? '#fff' : 'rgba(0, 0, 0, .4)'};
   }
   ${StyledTokenIcon} {
     display: none;

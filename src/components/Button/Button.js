@@ -1,14 +1,21 @@
 import React from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
+import {IS_FTM} from '../../constants/chainId.js';
 
 export const StyledButton = withTheme(styled.button`
   align-items: center;
-  background: ${props => props.outlined ? '#e9cff9' : '#ff42a1'};
+  background: ${props => {
+    if (props.outlined) return IS_FTM ? 'rgb(70, 78, 244)' : '#e9cff9'
+    return IS_FTM ? 'rgb(10, 21, 237)' : '#ff42a1'
+  }};
   border: none;
   border-radius: ${props => props.withInput ? 8 : props.theme.shape.borderRadius}px;
   box-sizing: border-box;
-  color: ${props => props.outlined ? props.theme.palette.primary.main : '#FFF'};
+  color: ${props => {
+    if (props.outlined) return IS_FTM ? 'inherit' : props.theme.palette.primary.main
+    return '#FFF';
+  }};
   display: flex;
   font-size: ${props => props.withInput ? '0.8rem' : props.small ? '1rem' : '1.2rem'};
   font-weight: 700;
@@ -24,9 +31,15 @@ export const StyledButton = withTheme(styled.button`
   outline: none;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   &:hover {
-    background-color: ${props => props.outlined && '#FFF'};
+    background-color: ${props => {
+      if (IS_FTM) return '#C6D7FF'
+      if (props.outlined) return '#FFF'
+    }};
     border-color: ${props => props.outlined ? props.theme.palette.primary.main : 'transparent'};
-    color: ${props => props.outlined ? props.theme.palette.primary.main : '#000' };
+    color: ${props => {
+      if (props.outlined) return IS_FTM ? 'rgb(10, 21, 237)' : props.theme.palette.primary.main;
+      return IS_FTM ? 'rgb(10, 21, 237)' : '#000'
+    }};
   }
   @media screen and (min-width: 512px) {
     height: ${props => props.withInput ? 30 : props.small ? 32 : 60}px;

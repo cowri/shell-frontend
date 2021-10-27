@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import {IS_FTM} from '../../constants/chainId.js';
 
 const StyledLogo = styled.div`
   align-items: center;
@@ -14,7 +15,7 @@ const StyledLogo = styled.div`
 `
 
 const StyledName = styled.span`
-  color: rgb(0,0,0);
+  color: ${IS_FTM ? '#fff' : 'rgb(0,0,0)'};
   margin-top: -.15em;
   margin-left: .6em;
   font-size: 1.2em;

@@ -6,7 +6,7 @@ import { faDiscord, faTelegram, faTwitter, faGithub, faMedium } from '@fortaweso
 import Container from '../Container'
 import theme from '../../theme';
 import config from '../../config.js';
-import {chainId, IS_BSC, IS_ETH, IS_XDAI} from '../../constants/chainId.js';
+import {chainId, IS_BSC, IS_ETH, IS_FTM, IS_XDAI} from '../../constants/chainId.js';
 import etherscanIcon from '../../assets/etherscan-logo-circle.svg'
 import xdaiIcon from '../../assets/etherscan-logo-circle-xdai.svg'
 
@@ -54,23 +54,25 @@ const Footer = ({ shellIx }) => {
       ? `https://bscscan.com/address/${shellAddress}`
       : `https://blockscout.com/xdai/mainnet/address/${shellAddress}`
   }
+  const iconColor = IS_FTM ? '#C6D7FF' : theme.palette.primary.main;
+
   return (
     <Container>
       <StyledFooter>
         <StyledSocialIcon target="_blank" href="https://twitter.com/componentx">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faTwitter} size="2x"/>
+          <FontAwesomeIcon style={{iconColor}} icon={faTwitter} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://discord.gg/AMrXmH3yff">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faDiscord} size="2x"/>
+          <FontAwesomeIcon style={{iconColor}} icon={faDiscord} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://github.com/Componentfinance">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faGithub} size="2x"/>
+          <FontAwesomeIcon style={{iconColor}} icon={faGithub} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://componentfinance.medium.com/">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faMedium} size="2x"/>
+          <FontAwesomeIcon style={{iconColor}} icon={faMedium} size="2x"/>
         </StyledSocialIcon>
         <StyledSocialIcon target="_blank" href="https://t.me/componentfinance">
-          <FontAwesomeIcon style={{color: theme.palette.primary.main}} icon={faTelegram} size="2x"/>
+          <FontAwesomeIcon style={{iconColor}} icon={faTelegram} size="2x"/>
         </StyledSocialIcon>
         {shellIx !== null && (
           <StyledSocialIcon href={etherscan} target="_blank">

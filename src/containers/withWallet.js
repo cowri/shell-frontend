@@ -45,7 +45,7 @@ const params = {
   }],
   250: [
     {
-      chainId: '0xfa', // 56 in decimal
+      chainId: '0xfa', // 250 in decimal
       chainName: 'Fantom Opera',
       rpcUrls: ['https://rpc.ftm.tools/'],
       nativeCurrency: {

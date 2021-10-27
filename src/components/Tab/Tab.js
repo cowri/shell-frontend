@@ -1,10 +1,16 @@
 import React from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
+import {IS_FTM} from '../../constants/chainId.js';
 
 const StyledTab = withTheme(styled.div`
   align-items: center;
-  background: ${props => props.active ? 'rgba(255,66,161,1) !important' : 'rgb(246 211 246)'};
+  background: ${props => {
+    if (props.active) {
+      return IS_FTM ? 'rgba(10, 21, 237, 1) !important' :  'rgba(255,66,161,1) !important'
+    }
+    return 'rgb(246, 211, 246)'
+  }};
   color: #fff;
   cursor: pointer;
   display: flex;
@@ -15,21 +21,17 @@ const StyledTab = withTheme(styled.div`
   justify-content: center;
   opacity: 1;
   pointer-events: ${props => props.disabled ? 'none' : 'all'};
-  :hover {
-    background: rgba(255,66,161,0.6);
-    opacity: 1;
-  }
   :nth-child(1) {
-    background: rgba(255,66,161,.9)
+    background: ${IS_FTM ? 'rgba(10, 21, 237, .9)' : 'rgba(255,66,161,.9)'}
   }
   :nth-child(2) {
-    background: rgba(255,66,161,.8)
+    background: ${IS_FTM ? 'rgba(10, 21, 237, .8)' : 'rgba(255,66,161,.8)'}
   }
   :nth-child(3) {
-    background: rgba(255,66,161,.7)
+    background: ${IS_FTM ? 'rgba(10, 21, 237, .7)' : 'rgba(255,66,161,.7)'}
   }
   :nth-child(4) {
-    background: rgba(255,66,161,.6)
+    background: ${IS_FTM ? 'rgba(10, 21, 237, .6)' : 'rgba(255,66,161,.6)'}
   }
   @media screen and (max-width: 600px) {
     font-size: 18px;

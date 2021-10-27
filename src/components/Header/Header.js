@@ -5,7 +5,7 @@ import Container from '../Container'
 import Logo from '../Logo'
 import DashboardContext from '../../views/Dashboard/context.js';
 import Button from '../Button';
-import {IS_BSC, IS_ETH, IS_XDAI} from '../../constants/chainId.js';
+import {IS_BSC, IS_ETH, IS_FTM, IS_XDAI} from '../../constants/chainId.js';
 
 const StyledHeader = styled.div`
   align-items: center;
@@ -16,7 +16,7 @@ const StyledHeader = styled.div`
 `
 
 const StyledHeaderLink = styled.a`
-  color: #ff42a1;
+  color: ${IS_FTM ? '#0A14EE' : '#ff42a1'};
   text-decoration: none;
   font-size: 20px;
   font-weight: bold;
@@ -29,7 +29,7 @@ const StyledHeaderLink = styled.a`
 
 const StyledHeaderText = styled.span`
   white-space: nowrap;
-  color: #ff42a1;
+  color: ${IS_FTM ? 'inherit' : '#ff42a1'};
   font-weight: bold;
   text-decoration: none;
   font-size: 20px;
@@ -39,7 +39,7 @@ const MobileMenuBtn = styled.div`
   align-items: center;
   justify-content: space-around;
   padding: 20px 10px;
-  background: rgba(255,255,255,0.6);
+  background: ${IS_FTM ? 'rgba(71,136,255,1)' : 'rgba(255,255,255,0.6)'};
   border-radius: 10px;
   position: relative;
   margin-right: 10px;
@@ -49,7 +49,7 @@ const MobileMenuBtn = styled.div`
     display: block;
     width: 8px;
     height: 8px;
-    background: #ff42a1;
+    background: ${IS_FTM ? '#fff' : '#ff42a1'};
     border-radius: 50%;
     &:nth-child(1),
     &:nth-child(2) {
@@ -63,7 +63,7 @@ const MobileMenuContainer = styled.div`
   right: 0;
   top: calc(100% + 12px);
   width: auto;
-  background: #fcefff;
+  background: ${IS_FTM ? '#C6D7FF' : '#fcefff'};
   z-index: 10;
   padding: 20px;
   border-radius: 10px;

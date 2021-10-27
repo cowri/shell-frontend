@@ -24,6 +24,7 @@ const StyledDashboard = styled.div`
   display: flex;
   flex-direction: column;
   position: relative;
+  color: ${IS_FTM ? '#fff' : '#000'}
 `
 
 const Dashboard = ({

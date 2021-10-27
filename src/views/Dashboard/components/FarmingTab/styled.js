@@ -24,9 +24,4 @@ export const StakeItemTd = styled.div`
     flex-grow: 0.5;
     align-items: flex-end;
   }
-  @media screen and (max-width: 600px) {
-    //:nth-child(3):not(:last-child) {
-    //  display: none;
-    //}
-  }
 `
