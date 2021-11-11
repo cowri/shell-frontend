@@ -19,7 +19,7 @@ import {IS_ETH, IS_FTM} from '../../constants/chainId.js';
 const StyledDashboard = styled.div`
   align-items: center;
   background-size: cover;
-  background: ${IS_FTM ? 'center / cover no-repeat url("/images/fantom/app-bg.jpg");': 'radial-gradient(circle at center top, rgb(255 230 247) 0, rgb(255 218 254), rgba(203, 0, 255, .18)) no-repeat fixed center;'}
+  background: ${IS_FTM ? 'right 10% top 20% / 75% auto no-repeat url("/images/fantom/app-bg.png"), radial-gradient(51.93% 86.9% at 32.4% 53.94%, #F4D3FF 0%, #A7C6FF 100%)' : 'radial-gradient(circle at center top, rgb(255 230 247) 0, rgb(255 218 254), rgba(203, 0, 255, .18)) no-repeat fixed center'};
   min-height: 100vh;
   display: flex;
   flex-direction: column;

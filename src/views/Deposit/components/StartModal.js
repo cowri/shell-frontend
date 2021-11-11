@@ -20,6 +20,7 @@ import WarningModal from './WarningModal'
 import { List } from 'immutable'
 
 import BigNumber from 'bignumber.js'
+import {IS_FTM} from '../../../constants/chainId.js';
 
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
 const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
@@ -67,6 +68,7 @@ const StyledForm = styled.form`
 const MaxAmount = styled.div`
   margin: 0 5px 0 auto;
   cursor: pointer;
+  color: ${IS_FTM ? '#000' : 'inherit'};
   &:hover {
     text-decoration: underline;
   }
@@ -88,6 +90,7 @@ const StyledLabelBar = withTheme(styled.div`
 const StyledDepositMessage = styled.div`
   padding: 20px 10px 10px 10px;
   font-size: 22px;
+  color: ${IS_FTM ? '#000' : 'inherit'};
 `
 
 const InputContainer = styled.div`

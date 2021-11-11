@@ -329,6 +329,98 @@ export default {
         },
       },
     ],
+    250: [
+      {
+        shell: '0xddca02ddd94f97eefe07fccde780fd2fbdc85b23',
+        name: '50% USDP 25% USDC 25% DAI',
+        displayDecimals: 2,
+        swapDecimals: 2,
+        tag: 'STABLECOIN1',
+        hideapy: true,
+        farming: false,
+        assets: [
+          {
+            address: '0x3129ac70c738d398d1d74c87eab9483fd56d16f8',
+            decimals: 18,
+            icon: 'usdp.png',
+            name: 'Unit Protocol Stablecoin',
+            symbol: 'USDP',
+            weight: '.5',
+            derivatives: [],
+          },
+          {
+            address: '0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e',
+            decimals: 18,
+            icon: 'dai.svg',
+            name: 'DAI',
+            symbol: 'DAI',
+            weight: '.25',
+            derivatives: [],
+          },
+          {
+            address: '0x04068da6c83afcfa0e13ba15a6696662335d5b75',
+            decimals: 6,
+            icon: 'usdc.svg',
+            name: 'USD Coin',
+            symbol: 'USDC',
+            weight: '.25',
+            derivatives: [],
+          },
+        ],
+        params: {
+          alpha: '.95',
+          beta: '.45',
+          delta: '.05',
+          epsilon: '.0004',
+          lambda: '1',
+        },
+      },
+      {
+        shell: '0x238139bf999f389063444e397cdfadf780ec57db',
+        name: '50% USDP 25% MIM 25% FRAX',
+        displayDecimals: 2,
+        swapDecimals: 2,
+        tag: 'STABLECOIN2',
+        hideapy: true,
+        farming: false,
+        assets: [
+          {
+            address: '0x3129ac70c738d398d1d74c87eab9483fd56d16f8',
+            decimals: 18,
+            icon: 'usdp.png',
+            name: 'Unit Protocol Stablecoin',
+            symbol: 'USDP',
+            weight: '.5',
+            derivatives: [],
+          },
+          {
+            address: '0x82f0b8b456c1a451378467398982d4834b6829c1',
+            decimals: 18,
+            icon: 'dai.svg',
+            name: 'MIM',
+            symbol: 'MIM',
+            weight: '.25',
+            derivatives: [],
+          },
+          {
+            address: '0xdc301622e621166bd8e82f2ca0a26c13ad0be355',
+            decimals: 18,
+            icon: 'frax.png',
+            name: 'FRAX',
+            symbol: 'FRAX',
+            weight: '.25',
+            derivatives: [],
+          },
+        ],
+        params: {
+          alpha: '.95',
+          beta: '.45',
+          delta: '.05',
+          epsilon: '.0004',
+          lambda: '1',
+        },
+      },
+    ],
   },
   farmingPools: {
     1: [
@@ -427,6 +519,7 @@ export default {
         periodDuration: 2592000,
       },
     ],
+    250: [],
   },
   stakingPools: {
     1: [
@@ -442,5 +535,6 @@ export default {
     ],
     56: [],
     100: [],
+    250: [],
   }
 };

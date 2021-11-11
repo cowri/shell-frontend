@@ -9,6 +9,7 @@ import config from '../../config.js';
 import {chainId, IS_BSC, IS_ETH, IS_FTM, IS_XDAI} from '../../constants/chainId.js';
 import etherscanIcon from '../../assets/etherscan-logo-circle.svg'
 import xdaiIcon from '../../assets/etherscan-logo-circle-xdai.svg'
+import fantomIcon from '../../assets/etherscan-logo-circle-fantom.svg'
 
 const StyledFooter = styled.footer`
   align-items: center;
@@ -40,7 +41,7 @@ const IconBox = styled.span`
   align-items: center;
   justify-content: center;
   img {
-    width: 21px;
+    width: 30px;
   }
 `
 
@@ -77,7 +78,7 @@ const Footer = ({ shellIx }) => {
         {shellIx !== null && (
           <StyledSocialIcon href={etherscan} target="_blank">
             <IconBox >
-              <img src={IS_XDAI ? xdaiIcon : etherscanIcon} alt="etherscan logo"/>
+              <img src={IS_XDAI ? xdaiIcon : IS_FTM ? fantomIcon : etherscanIcon} alt="etherscan logo"/>
             </IconBox>
           </StyledSocialIcon>
         )}

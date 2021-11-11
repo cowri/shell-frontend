@@ -21,6 +21,7 @@ import Button from '../../../../components/Button'
 
 import TokenIcon from '../../../../components/TokenIcon'
 import {SwapDirectionIcon} from './SwapDirectionIcon/SwapDirectionIcon.js';
+import {IS_FTM} from '../../../../constants/chainId.js';
 
 const DEFAULT_MSG = "Your price for this trade will be..."
 const MAX = '115792089237316195423570985008687907853269984665640564039457584007913129639935'
@@ -204,7 +205,7 @@ const SwapTab = () => {
 
   function setHaltIndication () {
 
-    const errorStyles = { color: 'red', fontSize: '26px', fontWeight: 'bold' }
+    const errorStyles = { color: IS_FTM ? '#f69595' : 'red', fontSize: '26px', fontWeight: 'bold' }
 
     setHaltMessage(<span style={errorStyles}> This amount triggers pool's Safety Check </span>)
 

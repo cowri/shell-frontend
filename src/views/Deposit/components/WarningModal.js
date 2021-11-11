@@ -5,10 +5,11 @@ import styled from 'styled-components'
 import Button from '../../../components/Button'
 import Modal from '../../../components/Modal'
 import ModalActions from '../../../components/Modal/ModalActions'
+import {IS_FTM} from '../../../constants/chainId.js';
 
 const ModalContent = withTheme(styled.div`
   flex: 1;
-  color: red;
+  color: ${IS_FTM ? '#f69595' : 'red'};
   padding: 0 40px 20px;
   margin-top: -10px;
   font-size: 20px;
@@ -18,7 +19,7 @@ const ModalTitle = withTheme(styled.div`
   font-size: 1.75rem;
   margin-bottom: 6px;
   margin-top: 24px;
-  color: red;
+  color: ${IS_FTM ? '#f69595' : 'red'};
   padding: 0 24px;
 `)
 

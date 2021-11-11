@@ -12,7 +12,7 @@ export const grey = {
 }
 
 export const primary = {
-  dark: 'rgba(255,66, 161, .8)',
+  dark: IS_FTM ? '#0A14EE' : 'rgba(255,66, 161, .8)',
   light: '#00fff3 ',
   main: IS_FTM ? '#0A14EE' : '#ff42a1',
 }

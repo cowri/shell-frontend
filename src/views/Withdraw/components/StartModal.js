@@ -21,6 +21,7 @@ import NumberFormat from 'react-number-format'
 import { List } from 'immutable'
 
 import BigNumber from 'bignumber.js'
+import {IS_FTM} from '../../../constants/chainId.js';
 
 const REVERTED = '3.963877391197344453575983046348115674221700746820753546331534351508065746944e+57'
 
@@ -43,6 +44,7 @@ const StyledWithdrawEverything = styled.div`
   justify-content: flex-end;
   width: 100%;
   margin-top: -20px;
+  color: ${IS_FTM ? '#000' : 'inherit'};
 `
 
 const StyledEndAdornment = styled.div`
@@ -74,11 +76,13 @@ const StyledShellIcon = styled.img`
 const StyledShellBalance = styled.div`
   font-size: 24px;
   font-weight: 300;
+  color: ${IS_FTM ? '#000' : 'inherit'};
 `
 
 const StyledWithdrawMessage = styled.div`
   padding: 20px 10px 10px 10px;
   font-size: 22px;
+  color: ${IS_FTM ? '#000' : 'inherit'};
 `
 
 const errorStyles = {

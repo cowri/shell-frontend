@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import {withTheme} from '@material-ui/core/styles';
+import {IS_FTM} from '../../constants/chainId.js';
 
 export const StyledLabelBar = withTheme(styled.div`
   align-items: center;
@@ -13,6 +14,7 @@ export const StyledLabelBar = withTheme(styled.div`
 export const MaxAmount = styled.div`
   margin: 0 5px 0 auto;
   cursor: pointer;
+  color: ${IS_FTM ? '#000' : 'inherit'};
   &:hover {
     text-decoration: underline;
   }
