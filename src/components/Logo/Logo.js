@@ -15,7 +15,7 @@ const StyledLogo = styled.div`
 `
 
 const StyledName = styled.span`
-  color: ${IS_FTM ? '#171717' : 'rgb(0,0,0)'};
+  color: ${IS_FTM ? '#fff' : 'rgb(0,0,0)'};
   margin-top: -.15em;
   margin-left: .6em;
   font-size: 1.2em;

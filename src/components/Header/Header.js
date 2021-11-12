@@ -29,7 +29,7 @@ const StyledHeaderLink = styled.a`
 
 const StyledHeaderText = styled.span`
   white-space: nowrap;
-  color: ${IS_FTM ? '#171717' : '#ff42a1'};
+  color: ${IS_FTM ? '#fff' : '#ff42a1'};
   font-weight: bold;
   text-decoration: none;
   font-size: 20px;
