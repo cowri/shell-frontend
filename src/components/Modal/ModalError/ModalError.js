@@ -31,6 +31,8 @@ const ModalError = ({
     ? `https://etherscan.io/tx/${txHash}`
     : IS_BSC
     ? `https://bscscan.com/tx/${txHash}`
+    : IS_FTM
+    ? `https://ftmscan.com/tx/${txHash}`
     : `https://blockscout.com/xdai/mainnet/tx/${txHash}`;
 
   return (

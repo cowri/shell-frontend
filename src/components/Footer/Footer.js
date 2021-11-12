@@ -53,6 +53,8 @@ const Footer = ({ shellIx }) => {
       ? `https://etherscan.io/address/${shellAddress}`
       : IS_BSC
       ? `https://bscscan.com/address/${shellAddress}`
+      : IS_FTM
+      ? `https://ftmscan.com/address/${shellAddress}`
       : `https://blockscout.com/xdai/mainnet/address/${shellAddress}`
   }
   const iconColor = IS_FTM ? '#C6D7FF' : theme.palette.primary.main;

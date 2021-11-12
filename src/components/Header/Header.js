@@ -114,6 +114,8 @@ const Header = ({goToIndexTab}) => {
                   ? 'BSC/xDAI bridge'
                   : IS_BSC
                   ? 'ETH/xDAI bridge'
+                  : IS_FTM
+                  ? ''
                   : 'ETH/BSC bridge'
               }</StyledHeaderLink>
               {!IS_ETH && <StyledHeaderLink href="https://component.finance/" target="_blank">Component on ETH</StyledHeaderLink>}
