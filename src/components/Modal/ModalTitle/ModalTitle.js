@@ -7,7 +7,7 @@ const StyledModalTitle = withTheme(styled.div`
   font-size: 1.75rem;
   padding: 0 24px;
   font-weight: bold;
-  color: ${IS_FTM ? 'rgb(10,21,237)' : '#fff'};
+  color: ${IS_FTM ? 'rgb(10,21,237)' : 'inherit'};
 `)
 
 const ModalTitle = ({ children }) => (
