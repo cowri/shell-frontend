@@ -342,7 +342,7 @@ export default {
           {
             address: '0x3129ac70c738d398d1d74c87eab9483fd56d16f8',
             decimals: 18,
-            icon: 'usdp.png',
+            icon: '/images/fantom/usdp.png',
             name: 'Unit Protocol Stablecoin',
             symbol: 'USDP',
             weight: '.5',
@@ -387,7 +387,7 @@ export default {
           {
             address: '0x3129ac70c738d398d1d74c87eab9483fd56d16f8',
             decimals: 18,
-            icon: 'usdp.png',
+            icon: '/images/fantom/usdp.png',
             name: 'Unit Protocol Stablecoin',
             symbol: 'USDP',
             weight: '.5',

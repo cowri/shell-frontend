@@ -1,13 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 import { withTheme } from '@material-ui/core/styles'
+import {IS_FTM} from '../../constants/chainId.js';
 
 const StyledLabelledValue = styled.div`
   display: flex;
   flex-direction: column;
 `
 const StyledLabel = withTheme(styled.span`
-  color: ${props => props.theme.palette.grey[500]};
+  color: ${props => IS_FTM ? '#fff' : props.theme.palette.grey[500]};
   font-size: 16px;
   font-weight: 400;
   line-height: 1rem;

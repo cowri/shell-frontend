@@ -4,7 +4,7 @@ import WarningIcon from '@material-ui/icons/Warning'
 
 import etherscan from '../../../assets/etherscan-logo-circle.svg'
 import xdai from '../../../assets/etherscan-logo-circle-xdai.svg'
-import fantom from '../../../assets/etherscan-logo-circle-fantom.svg'
+import fantom from '../../../assets/etherscan-logo-circle-fantom-blue.svg'
 import Button from '../../Button'
 import Modal from '../index.js'
 import ModalActions from '../ModalActions'

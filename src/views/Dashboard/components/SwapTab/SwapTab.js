@@ -205,7 +205,7 @@ const SwapTab = () => {
 
   function setHaltIndication () {
 
-    const errorStyles = { color: IS_FTM ? '#f69595' : 'red', fontSize: '26px', fontWeight: 'bold' }
+    const errorStyles = { color: IS_FTM ? '#fff' : 'red', fontSize: '26px', fontWeight: 'bold' }
 
     setHaltMessage(<span style={errorStyles}> This amount triggers pool's Safety Check </span>)
 
