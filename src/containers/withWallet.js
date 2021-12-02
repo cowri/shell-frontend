@@ -64,6 +64,7 @@ let network
 let address
 let web3Modal
 let provider
+let wrongNetwork
 
 const withWallet = (WrappedComponent) => {
 
@@ -95,6 +96,7 @@ const withWallet = (WrappedComponent) => {
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: Web3.utils.toHex(chainId) }],
               });
+              wrongNetwork = false
             } catch (switchError) {
               console.error(String(switchError))
               if (switchError.code === 4902) {
@@ -103,12 +105,18 @@ const withWallet = (WrappedComponent) => {
                     method: 'wallet_addEthereumChain',
                     params,
                   });
+                  wrongNetwork = false
                 } catch (addError) {
+                  wrongNetwork = true
+                  web3 = new Web3(config.defaultWeb3Provider)
                   console.error(String(addError))
                 }
+              } else if (switchError.code === 4001) {
+                web3 = new Web3(config.defaultWeb3Provider)
+                wrongNetwork = true
               }
             }
-          }
+          } else wrongNetwork = false
         }
       } catch(e) {
         console.log("Could not get a wallet connection", e);
@@ -131,7 +139,8 @@ const withWallet = (WrappedComponent) => {
       });
 
       await fetchAccountData();
-      setLoggedIn(true)
+      if (!wrongNetwork) setLoggedIn(true)
+      else setLoggedIn(false)
     }
 
     async function fetchAccountData() {
@@ -154,7 +163,7 @@ const withWallet = (WrappedComponent) => {
 
     async function initEngine() {
       engine = new Engine(web3, setState)
-      await engine.sync(address || `0x${'0'.repeat(40)}`)
+      await engine.sync((!wrongNetwork && address) || `0x${'0'.repeat(40)}`)
 
       if (provider) {
         if (provider.isMetaMask) engine.wallet = 'MetaMask'
