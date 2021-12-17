@@ -8,7 +8,7 @@ export const StyledLabelBar = withTheme(styled.div`
   height: 32px;
   justify-content: space-between;
   margin: 0 auto;
-  max-width: 460px;
+  max-width: ${p => p.fullWidth ? '100%' : '460px'};
 `)
 
 export const MaxAmount = styled.div`
@@ -25,7 +25,7 @@ export const InputContainer = styled.div`
   align-items: center;
   position: relative;
   margin: 0 auto;
-  max-width: 460px;
+  max-width: ${p => p.fullWidth ? '100%' : '460px'};
 `;
 
 export const StyledEndAdornment = styled.div`

@@ -7,7 +7,6 @@ const StyledSurface = styled.div`
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
   padding: ${p => p.modal ? '60px 40px 70px;' : '0'};
 `
 

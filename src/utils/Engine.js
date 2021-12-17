@@ -10,6 +10,7 @@ import shellIcon from '../assets/logo.png';
 import BN from './BN.js';
 import FarmingEngine from './FarmingEngine.js';
 import {chainId} from '../constants/chainId.js';
+import {Locking} from './Locking.js';
 
 export default class Engine extends SwapEngine {
 
@@ -33,6 +34,7 @@ export default class Engine extends SwapEngine {
 
     this.staking = {};
     this.farming = {};
+    this.locking = null;
 
     for (const _pool_ of config.pools[chainId]) {
       const shell = new Shell(
@@ -370,6 +372,10 @@ export default class Engine extends SwapEngine {
     const farming = new FarmingEngine(this.web3, account, shells);
     await farming.init();
     this.farming = farming;
+    if (config.veCMPAddress[chainId]) {
+      this.locking = new Locking(this.web3, account);
+      await this.locking.init();
+    }
 
     this.state = fromJS({
       account,
@@ -377,6 +383,7 @@ export default class Engine extends SwapEngine {
       assets,
       derivatives,
       farming,
+      locking: this.locking
     });
 
     this.setState(this.state);

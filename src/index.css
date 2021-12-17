@@ -39,3 +39,66 @@ code {
 * {
   box-sizing: border-box;
 }
+
+.react-date-picker__calendar * {
+  font-size: 1rem !important;
+}
+
+.react-calendar__tile {
+  padding: 1rem 0 !important;
+}
+
+.react-calendar__tile:disabled {
+  background: inherit !important;
+  opacity: 0.6 !important;
+}
+
+.react-date-picker__wrapper {
+  padding: 7px 20px !important;
+  border: none !important;
+  border-radius: 16px !important;
+  background: rgba(233, 207, 249, 1);
+}
+
+.react-date-picker__wrapper input {
+  outline: none;
+}
+
+.react-date-picker__inputGroup {
+  padding: 0 !important;
+}
+
+.react-date-picker__inputGroup input {
+  padding: 11px 0 !important;
+  height: auto !important;
+  font-weight: 600 !important;
+}
+
+.react-date-picker__calendar .react-calendar {
+  box-shadow: 1px 1px 10px 2px rgb(0 0 255 / 20%);
+  background: #fcefff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #444 !important;
+}
+
+.react-calendar__tile--active, .react-calendar__tile--hasActive {
+  background: rgba(233, 207, 249, 1) !important;
+}
+
+.react-calendar__month-view__days__day--weekend {
+  color: inherit !important;
+}
+
+.react-calendar__navigation button:enabled:hover, .react-calendar__navigation button:enabled:focus,
+.react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus {
+  background: rgba(233, 207, 249, 0.2) !important;
+}
+
+.react-calendar__tile--now {
+  background: rgba(233, 207, 249, 0.4) !important;
+}
+
+.react-date-picker__inputGroup__leadingZero {
+  opacity: 0;
+}

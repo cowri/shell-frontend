@@ -7,33 +7,17 @@ import {FarmTabDepositModal} from './FarmTabDepositModal';
 import Spinner from '../../../../components/Spiner/Spinner.js';
 import styled from 'styled-components';
 import {currentTxStore} from '../../../../store/currentTxStore.js';
-
-const FarmParams = styled.table`
-  margin: 0 auto;
-  font-size: 20px;
-  td {
-    &:first-child {
-      padding-right: 30px;
-      @media screen and (min-width: 512px) {
-        padding-right: 80px;
-      }
-    }
-    span {
-      font-weight: bold;
-    }
-  }
-  tr:not(:last-child) {
-    td {
-      padding-bottom: 20px;
-    }
-  }
-`
+import config from '../../../../config.js';
+import {chainId} from '../../../../constants/chainId.js';
+import {LockingTab} from './LockingTab';
+import {FarmParams} from './styled.js';
 
 export function FarmTab({farmAddress, type}) {
   const [loading, setLoading] = useState(true)
   const [farm, setFarm] = useState(null)
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
+  const [address, setAddress] = useState('')
 
   const {
     state,
@@ -43,10 +27,13 @@ export function FarmTab({farmAddress, type}) {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const address = farmAddress || queryParams.get('address')
+    setAddress(farmAddress || queryParams.get('address'))
+  }, [farmAddress])
+
+  useEffect(() => {
     if (address && state.get('farming') && state.get('farming')[type]) setFarm(state.get('farming')[type][address]);
     setLoading(false)
-  }, [state, farmAddress])
+  }, [state, address])
 
   const apr = farm ? (isNaN(farm.apr) ? `${farm.apr}` : `APR: ${farm.apr}%`) : ''
 
@@ -101,8 +88,10 @@ export function FarmTab({farmAddress, type}) {
             {!loggedIn && <Button onClick={selectWallet} fullWidth>Connect</Button>}
           </TabActions>
         </>
+      ) : address === config.veCMPDistributionAddress[chainId] ? (
+        <LockingTab />
       ) : (
-        <TabHeading>Unknown farm address</TabHeading>
+        <TabHeading>Unknown farm address: {address}</TabHeading>
       )}
     </TabContainer>
   )

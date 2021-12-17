@@ -17,6 +17,7 @@ export function AmountInput({
   symbol,
   value,
   onUnlock,
+  fullWidth = false,
 }) {
 
 
@@ -37,13 +38,13 @@ export function AmountInput({
 
   return (
     <>
-      <StyledLabelBar style={{ marginTop: '18px', marginBottom: '0px' }} >
+      <StyledLabelBar fullWidth={fullWidth} style={{ marginTop: '18px', marginBottom: '0px' }} >
         <MaxAmount onClick={() => onChange({value: balance})}>
           Max:
           <span className="number"> {balance} </span>
         </MaxAmount>
       </StyledLabelBar>
-      <InputContainer>
+      <InputContainer fullWidth={fullWidth}>
         <NumberFormat
           fullWidth
           allowNegative={false}

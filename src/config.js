@@ -7,6 +7,16 @@ export default {
     56: '0x96124f7382a0ed672bba8f9b92208434eabcfb40',
     100: '0x911F196Ed489e41C8B45B5C56FEce021C27a6159',
   },
+  veCMPAddress: {
+    1: '0x90A460B2DB6FB68A327a5bA928D520495F533fDe',
+    56: '',
+    100: '',
+  },
+  veCMPDistributionAddress: {
+    1: '0x5774Dbecf0e1eBFD9b4F5D3dc178A00aB506C588',
+    56: '',
+    100: '',
+  },
   pools: {
     1: [
       {
@@ -531,8 +541,15 @@ export default {
         displayDecimals: 4,
         decimals: 18,
         periodDuration: 2592000,
+        deprecated: true,
       },
     ],
+    56: [],
+    100: [],
+    250: [],
+  },
+  lockingPools: {
+    1: [],
     56: [],
     100: [],
     250: [],

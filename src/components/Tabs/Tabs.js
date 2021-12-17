@@ -6,6 +6,9 @@ const StyledTabs = withTheme(styled.div`
   align-items: center;
   background-color: #fff;
   display: flex;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  overflow: hidden;
 `)
 
 const Tabs = ({ children }) => (
