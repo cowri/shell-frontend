@@ -211,8 +211,7 @@ const withWallet = (WrappedComponent) => {
       web3 = new Web3(config.defaultWeb3Provider)
 
       if (web3Modal.cachedProvider) await onConnect()
-
-      await initEngine();
+      else await initEngine();
     }
 
     async function init () {
@@ -223,7 +222,7 @@ const withWallet = (WrappedComponent) => {
     useEffect(() => {
       init()
     }, [])
-
+    
     return (
       <>
         <WrappedComponent

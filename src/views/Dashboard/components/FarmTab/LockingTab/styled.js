@@ -6,7 +6,7 @@ export const LockingTabs = styled.div`
   text-align: center;
   font-size: 20px;
   margin-top: 40px;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
   background: #fcefff;
   border-radius: 16px;
   align-items: center;

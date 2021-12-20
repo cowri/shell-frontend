@@ -7,7 +7,7 @@ export const LockingPeriodSelector = styled.div`
   font-size: 12px;
   flex-wrap: wrap;
   ${StyledButton} {
-    padding: 4px 8px;
+    padding: 20px 15px;
     border-radius: 6px;
     margin-bottom: 10px;
     :not(:last-child) {

@@ -339,6 +339,7 @@ export default class Engine extends SwapEngine {
     this.account = account;
 
     const shells = [];
+    let initPromises = [];
     let assets = [];
     let derivatives = [];
 
@@ -370,12 +371,16 @@ export default class Engine extends SwapEngine {
     derivatives = derivatives.filter(filter, new Set());
 
     const farming = new FarmingEngine(this.web3, account, shells);
-    await farming.init();
+    initPromises.push(farming.init());
     this.farming = farming;
     if (config.veCMPAddress[chainId]) {
       this.locking = new Locking(this.web3, account);
-      await this.locking.init();
+      initPromises.push(this.locking.init());
     }
+
+    await Promise.all(initPromises);
+
+
 
     this.state = fromJS({
       account,

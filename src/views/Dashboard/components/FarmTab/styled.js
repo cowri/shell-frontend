@@ -5,10 +5,13 @@ export const FarmParams = styled.table`
   font-size: 20px;
   td {
     &:first-child {
-      padding-right: 30px;
       @media screen and (min-width: 512px) {
-        padding-right: 80px;
+        padding-right: 10px;
+        padding-left: 30px;
       }
+    }
+    &:last-child {
+      padding-left: 90px;
     }
     span {
       font-weight: bold;

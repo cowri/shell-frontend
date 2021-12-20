@@ -4,7 +4,6 @@ import {FarmParams} from '../styled.js';
 import DashboardContext from '../../../context.js';
 import BN from '../../../../../utils/BN.js';
 import {LockingBlock} from './LockingBlock';
-import {formatDateToHuman} from '../../../../../utils/time.js';
 
 export const LockingTab = () => {
   const {

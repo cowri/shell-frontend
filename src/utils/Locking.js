@@ -60,9 +60,7 @@ export class Locking extends NumericFormats {
 
   async fetchTokensParams() {
     this.claimableCMP = (await this.distributionContract.methods.claimable(this.account).call())
-    await this.getLockingParams()
-    await this.getTokensBalances()
-    await this.getLockerAllowance()
+    await Promise.all([this.getLockingParams(), this.getTokensBalances(), this.getLockerAllowance()])
     await this.calculateApr()
   }
 
@@ -75,7 +73,6 @@ export class Locking extends NumericFormats {
     )
     params.push(this.veCMPContract.methods.locked(this.account).call())
     params = await Promise.all(params)
-    console.log(params)
 
     const [totalLocked, totalSupply, totalMinted, locked] = params
 
@@ -127,7 +124,6 @@ export class Locking extends NumericFormats {
     let distroTime = '0';
     for (let i = 1; i < 5; i++) {
       const thisWeekFees = await this.distributionContract.methods.tokens_per_week(t).call()
-      console.log(thisWeekFees)
 
       if (BN(thisWeekFees.toString()).gt(0)) {
         total = BN(thisWeekFees).plus(total).toString()

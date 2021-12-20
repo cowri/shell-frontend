@@ -11,6 +11,7 @@ import Button from '../../../../../../components/Button';
 import {currentTxStore} from '../../../../../../store/currentTxStore.js';
 import {TabActions} from '../../../../../../components/TabContainer/styled.js';
 import {formatDateToHuman} from '../../../../../../utils/time.js';
+import {ReactComponent as Calendar} from '../../../../../../assets/icons/ic-calendar.svg';
 
 const TABS = [
   {
@@ -210,7 +211,7 @@ export const LockingBlock = ({lockingStore}) => {
           )}
           {(!lockingStore.stats.lockEnd || currentLockTab.id === 'amount') && (
             <div>
-              <h2 style={{marginTop: '40px', marginBottom: '-15px'}}>Set lock amount:</h2>
+              <h2 style={{marginTop: '40px'}}>Set lock amount:</h2>
               <AmountInput
                 isError={ !!error }
                 isAllowanceError={error === allowanceErrorMessage}
@@ -227,9 +228,10 @@ export const LockingBlock = ({lockingStore}) => {
           <div>
             {(!lockingStore.stats.lockEnd || currentLockTab.id === 'time') && (
               <div>
-                <h2 style={{marginTop: '40px'}}>Set unlock time:</h2>
+                <h2 style={{marginTop: '40px', marginBottom: '35px'}}>Set unlock time:</h2>
                 <div style={{fontSize: '20px'}}>
                   <DatePicker
+                    calendarIcon={<Calendar />}
                     value={increaseLock}
                     onChange={(e) => {
                       setIncreaseLock(e)
@@ -270,19 +272,21 @@ export const LockingBlock = ({lockingStore}) => {
                 </LockingPeriodSelector>
               </div>
             )}
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px'}}>
               <h2>Your veCMP balance will be:</h2>
               <h2 style={{flexShrink: '0', marginLeft: '20px'}}>{newVeCMPMinted} veCMP</h2>
             </div>
-            <TabActions>
-              {!!lockingStore.stats.lockEnd && (currentLockTab.id === 'amount'
-                ? (
-                  <Button fullWidth onClick={addToLock}>Increase lock amount</Button>
-                ) : (
-                  <Button fullWidth onClick={increaseLockTime}>Increase lock time</Button>
-                )
-              )}
-            </TabActions>
+            {!!lockingStore.stats.lockEnd && (
+              <TabActions>
+                {(currentLockTab.id === 'amount'
+                  ? (
+                    <Button fullWidth onClick={addToLock}>Increase lock amount</Button>
+                  ) : (
+                    <Button fullWidth onClick={increaseLockTime}>Increase lock time</Button>
+                  )
+                )}
+              </TabActions>
+            )}
           </div>
         </>
       ) : hasEndedLock ? (
@@ -293,9 +297,9 @@ export const LockingBlock = ({lockingStore}) => {
           </TabActions>
         </div>
       ) : lockingStore.stats.lockEnd ? (
-        <div style={{fontSize: '20px', marginTop: '40px'}}>You can withdraw your CMP after the locking period ends.</div>
+        <div style={{fontSize: '20px', marginTop: '40px', textAlign: 'center'}}>You can withdraw your CMP after the locking period ends.</div>
       ) : (
-        <div style={{fontSize: '20px', marginTop: '40px'}}>You have no locked CMP yet</div>
+        <div style={{fontSize: '20px', marginTop: '40px', textAlign: 'center'}}>You have no locked CMP yet</div>
       )}
       {currentTab.id === 'lock' && !lockingStore.stats.lockEnd && (
         <TabActions>
